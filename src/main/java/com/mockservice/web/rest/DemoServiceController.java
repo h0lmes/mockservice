@@ -30,10 +30,9 @@ public class DemoServiceController {
         return mockService.mock(this, request, pathVariables);
     }
 
-    @RequestMapping("entity/{id}/data")
-    public String demoApiEntityWithQueryParams(HttpServletRequest request,
-                                               @PathVariable Map<String, String> pathVariables,
+    @RequestMapping("entity/filter")
+    public String demoApiEntityListWithQueryParams(HttpServletRequest request,
                                                @RequestParam Map<String,String> requestParams) {
-        return mockService.mock(this, request, pathVariables, requestParams);
+        return mockService.mock(this, request, requestParams);
     }
 }

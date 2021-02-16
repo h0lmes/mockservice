@@ -1,5 +1,0 @@
-{
-  "id": ${id},
-  "name": "entity name",
-  "data": "${data_param}"
-}

@@ -10,13 +10,13 @@ import java.util.Map;
 @Service
 public class MockService {
 
-    public static final String PATH_DELIMITER_SUBSTITUTE = "_";
-    private final TemplateService templateService;
-    private final ResourceService resourceService;
-
     private static final String CONTROLLER_SUFFIX = "Controller";
     private static final String PATH_DELIMITER = "/";
+    private static final String PATH_DELIMITER_SUBSTITUTE = "_";
     private static final String DEFAULT_EXTENSION = ".json";
+
+    private final TemplateService templateService;
+    private final ResourceService resourceService;
 
     public MockService(TemplateService templateService, ResourceService resourceService) {
         this.templateService = templateService;
@@ -28,7 +28,8 @@ public class MockService {
     }
 
     public String mock(Object controller, HttpServletRequest request, Map<String, String> variables, Map<String, String> params) {
-        variables.putAll(params);
+        if (variables != null && params != null)
+            variables.putAll(params);
         return mock(controller, request, variables);
     }
 
