@@ -3,6 +3,7 @@ package com.mockservice.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -31,38 +32,53 @@ public class MockService {
     /**
      * General mock method to call
      */
-    public String mock(Object controller, HttpServletRequest request, Map<String, String> variables) {
-        String path = getPath(controller, request);
-        String resourceString = resourceService.getAsString(path);
-        return templateService.resolve(resourceString, variables);
+    public ResponseEntity<String> mock(Object controller, HttpServletRequest request, Map<String, String> variables) {
+        ResourceWrapper resource = resourceService.getAsWrapper(getPath(controller, request));
+
+        return ResponseEntity
+                .status(resource.getCode())
+                .headers(resource.getHeaders())
+                .body(templateService.resolve(resource.getBody(), variables));
     }
 
-    public <T> T mockTyped(Object controller, HttpServletRequest request, Map<String, String> variables, Class<T> clazz) throws JsonProcessingException {
-        String result = mock(controller, request, variables);
+    public <T> ResponseEntity<T> mockTyped(Object controller, HttpServletRequest request, Map<String, String> variables, Class<T> clazz) throws JsonProcessingException {
+        ResourceWrapper resource = resourceService.getAsWrapper(getPath(controller, request));
+
         ObjectMapper mapper = new ObjectMapper();
         JavaType type = mapper.getTypeFactory().constructType(clazz);
-        return mapper.readValue(result, type);
+        T body = mapper.readValue(templateService.resolve(resource.getBody(), variables), type);
+
+        return ResponseEntity
+                .status(resource.getCode())
+                .headers(resource.getHeaders())
+                .body(body);
     }
 
-    public <T> List<T> mockTypedList(Object controller, HttpServletRequest request, Map<String, String> variables, Class<T> clazz) throws JsonProcessingException {
-        String result = mock(controller, request, variables);
+    public <T> ResponseEntity<List<T>> mockTypedList(Object controller, HttpServletRequest request, Map<String, String> variables, Class<T> clazz) throws JsonProcessingException {
+        ResourceWrapper resource = resourceService.getAsWrapper(getPath(controller, request));
+
         ObjectMapper mapper = new ObjectMapper();
         JavaType type = mapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz);
-        return mapper.readValue(result, type);
+        List<T> body = mapper.readValue(templateService.resolve(resource.getBody(), variables), type);
+
+        return ResponseEntity
+                .status(resource.getCode())
+                .headers(resource.getHeaders())
+                .body(body);
     }
 
     /**
      * Method to call with no variables map
      */
-    public String mock(Object controller, HttpServletRequest request) {
+    public ResponseEntity<String> mock(Object controller, HttpServletRequest request) {
         return mock(controller, request, new HashMap<>());
     }
 
-    public <T> T mockTyped(Object controller, HttpServletRequest request, Class<T> clazz) throws JsonProcessingException {
+    public <T> ResponseEntity<T> mockTyped(Object controller, HttpServletRequest request, Class<T> clazz) throws JsonProcessingException {
         return mockTyped(controller, request, new HashMap<>(), clazz);
     }
 
-    public <T> List<T> mockTypedList(Object controller, HttpServletRequest request, Class<T> clazz) throws JsonProcessingException {
+    public <T> ResponseEntity<List<T>> mockTypedList(Object controller, HttpServletRequest request, Class<T> clazz) throws JsonProcessingException {
         return mockTypedList(controller, request, new HashMap<>(), clazz);
     }
 
@@ -80,16 +96,17 @@ public class MockService {
     //
     //--------------------------------------------------------------------------
 
-    private String getPath(Object controller, HttpServletRequest request) {
-        StringBuilder path = new StringBuilder();
-        path
+    // TODO add support for 'Mock' header to select case
+    private static String getPath(Object controller, HttpServletRequest request) {
+        StringBuilder path = new StringBuilder("classpath:");
+        return path
                 .append(getServiceFolder(controller))
                 .append(PATH_DELIMITER)
                 .append(request.getMethod().toUpperCase())
                 .append(PATH_DELIMITER_SUBSTITUTE)
                 .append(encodePath(getPathPattern(request)))
-                .append(DEFAULT_FILE_EXTENSION);
-        return path.toString();
+                .append(DEFAULT_FILE_EXTENSION)
+                .toString();
     }
 
     private static String getServiceFolder(Object controller) {
@@ -100,13 +117,13 @@ public class MockService {
         return folder.substring(0, suffixStart);
     }
 
-    private static String getPathPattern(HttpServletRequest request) {
-        return (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-    }
-
     private static String encodePath(String path) {
         if (path.startsWith(PATH_DELIMITER))
             path = path.substring(1);
         return String.join(PATH_DELIMITER_SUBSTITUTE, path.split(PATH_DELIMITER));
+    }
+
+    private static String getPathPattern(HttpServletRequest request) {
+        return (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
     }
 }
