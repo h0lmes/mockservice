@@ -1,4 +1,1 @@
-{
-  "id": ${id},
-  "name": "entity name"
-}
+{"id": ${id}, "name": "entity name"}

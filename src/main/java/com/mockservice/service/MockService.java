@@ -1,10 +1,15 @@
 package com.mockservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -13,27 +18,69 @@ public class MockService {
     private static final String CONTROLLER_SUFFIX = "Controller";
     private static final String PATH_DELIMITER = "/";
     private static final String PATH_DELIMITER_SUBSTITUTE = "_";
-    private static final String DEFAULT_EXTENSION = ".json";
+    private static final String DEFAULT_FILE_EXTENSION = ".json";
 
-    private final TemplateService templateService;
     private final ResourceService resourceService;
+    private final TemplateService templateService;
 
-    public MockService(TemplateService templateService, ResourceService resourceService) {
-        this.templateService = templateService;
+    public MockService(ResourceService resourceService, TemplateService templateService) {
         this.resourceService = resourceService;
+        this.templateService = templateService;
     }
 
+    /**
+     * General mock method to call
+     */
+    public String mock(Object controller, HttpServletRequest request, Map<String, String> variables) {
+        String path = getPath(controller, request);
+        String resourceString = resourceService.getAsString(path);
+        return templateService.resolve(resourceString, variables);
+    }
+
+    public <T> T mockTyped(Object controller, HttpServletRequest request, Map<String, String> variables, Class<T> clazz) throws JsonProcessingException {
+        String result = mock(controller, request, variables);
+        ObjectMapper mapper = new ObjectMapper();
+        JavaType type = mapper.getTypeFactory().constructType(clazz);
+        return mapper.readValue(result, type);
+    }
+
+    public <T> List<T> mockTypedList(Object controller, HttpServletRequest request, Map<String, String> variables, Class<T> clazz) throws JsonProcessingException {
+        String result = mock(controller, request, variables);
+        ObjectMapper mapper = new ObjectMapper();
+        JavaType type = mapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz);
+        return mapper.readValue(result, type);
+    }
+
+    /**
+     * Method to call with no variables map
+     */
     public String mock(Object controller, HttpServletRequest request) {
         return mock(controller, request, new HashMap<>());
     }
 
-    public String mock(Object controller, HttpServletRequest request, Map<String, String> variables, Map<String, String> params) {
-        if (variables != null && params != null)
-            variables.putAll(params);
-        return mock(controller, request, variables);
+    public <T> T mockTyped(Object controller, HttpServletRequest request, Class<T> clazz) throws JsonProcessingException {
+        return mockTyped(controller, request, new HashMap<>(), clazz);
     }
 
-    public String mock(Object controller, HttpServletRequest request, Map<String, String> variables) {
+    public <T> List<T> mockTypedList(Object controller, HttpServletRequest request, Class<T> clazz) throws JsonProcessingException {
+        return mockTypedList(controller, request, new HashMap<>(), clazz);
+    }
+
+    //--------------------------------------------------------------------------
+    //
+    //
+    //
+    //
+    //
+    // static and private methods here
+    //
+    //
+    //
+    //
+    //
+    //--------------------------------------------------------------------------
+
+    private String getPath(Object controller, HttpServletRequest request) {
         StringBuilder path = new StringBuilder();
         path
                 .append(getServiceFolder(controller))
@@ -41,9 +88,8 @@ public class MockService {
                 .append(request.getMethod().toUpperCase())
                 .append(PATH_DELIMITER_SUBSTITUTE)
                 .append(encodePath(getPathPattern(request)))
-                .append(DEFAULT_EXTENSION);
-
-        return templateService.resolve(resourceService.getAsString(path.toString()), variables);
+                .append(DEFAULT_FILE_EXTENSION);
+        return path.toString();
     }
 
     private static String getServiceFolder(Object controller) {
