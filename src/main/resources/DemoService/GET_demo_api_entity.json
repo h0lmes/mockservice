@@ -1,7 +1,7 @@
 [
-  {"id": ${random:int}, "name": "${random:string}"},
-  {"id": ${random:int}, "name": "${random:uuid}"},
-  {"id": ${random:int}, "name": "${random:string}"},
-  {"id": ${random:int}, "name": "${random:uuid}"},
-  {"id": ${random:int}, "name": "${random:string}"}
+  {"id": ${id:first}, "name": "${random:string}"},
+  {"id": ${id:next}, "name": "${random:uuid}"},
+  {"id": ${id:next}, "name": "${random:string}"},
+  {"id": ${id:next}, "name": "${random:uuid}"},
+  {"id": ${id:next}, "name": "${random:string}"}
 ]

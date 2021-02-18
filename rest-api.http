@@ -4,6 +4,13 @@ Cache-Control: no-cache
 
 ###
 
+GET http://localhost:8080/demo/api/entity
+Accept: */*
+Cache-Control: no-cache
+Mock: demoservice/error
+
+###
+
 GET http://localhost:8080/demo/api/entity/2
 Accept: */*
 Cache-Control: no-cache

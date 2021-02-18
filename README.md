@@ -41,3 +41,14 @@ Example:
     Custom-Header: header value
     
     ... body content here ...
+
+#
+### Customizing response of an API method
+
+One can include special header `Mock` along with HTTP request. Looks like this:
+
+    Mock: accountService/option3 storeService/option2
+
+In this case text before `/` symbol is matched with a service name and, if found, marker after the `/` is used as an option name.
+
+In the example above if you call a method of the `accountService` then a file with `#option3` before its extension would be loaded. Example: `./AccountService/account#option3.json`

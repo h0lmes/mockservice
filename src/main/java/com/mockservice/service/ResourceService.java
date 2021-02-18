@@ -3,34 +3,30 @@ package com.mockservice.service;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ConcurrentLruCache;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
 public class ResourceService {
 
+    private static final int CACHE_SIZE = 256;
     private final ResourceLoader resourceLoader;
-    private final Map<String, ResourceWrapper> cache = new LinkedHashMap<>(100);
+    private final ConcurrentLruCache<String, ResourceWrapper> cache;
 
     public ResourceService(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
+        cache = new ConcurrentLruCache<>(CACHE_SIZE, path -> new ResourceWrapper(getAsString(path)));
     }
 
     public ResourceWrapper getAsWrapper(String path) {
-        if (cache.containsKey(path))
-            return cache.get(path);
-
-        ResourceWrapper resourceWrapper = new ResourceWrapper(getAsString(path));
-        cache.put(path, resourceWrapper);
-        return resourceWrapper;
+        return cache.get(path);
     }
 
     private String getAsString(String path) {

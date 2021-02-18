@@ -20,6 +20,8 @@ public class MockService {
     private static final String PATH_DELIMITER = "/";
     private static final String PATH_DELIMITER_SUBSTITUTE = "_";
     private static final String DEFAULT_FILE_EXTENSION = ".json";
+    private static final String MOCK_HEADER = "Mock";
+    private static final String MOCK_HEADER_SPLIT_REGEX = "\\s+";
 
     private final ResourceService resourceService;
     private final TemplateService templateService;
@@ -96,15 +98,25 @@ public class MockService {
     //
     //--------------------------------------------------------------------------
 
-    // TODO add support for 'Mock' header to select case
     private static String getPath(Object controller, HttpServletRequest request) {
+        String serviceFolder = getServiceFolder(controller);
+        String mockOption = getMockOption(serviceFolder, request);
+
         StringBuilder path = new StringBuilder("classpath:");
-        return path
-                .append(getServiceFolder(controller))
+        path
+                .append(serviceFolder)
                 .append(PATH_DELIMITER)
                 .append(request.getMethod().toUpperCase())
                 .append(PATH_DELIMITER_SUBSTITUTE)
-                .append(encodePath(getPathPattern(request)))
+                .append(encodePath(getPathPattern(request)));
+
+        if (!mockOption.isEmpty()) {
+            path
+                    .append("#")
+                    .append(mockOption);
+        }
+
+        return path
                 .append(DEFAULT_FILE_EXTENSION)
                 .toString();
     }
@@ -115,6 +127,20 @@ public class MockService {
         if (suffixStart < 1)
             throw new IllegalArgumentException("RestController ClassName must end with suffix: " + CONTROLLER_SUFFIX);
         return folder.substring(0, suffixStart);
+    }
+
+    private static String getMockOption(String serviceName, HttpServletRequest request) {
+        serviceName = serviceName.toLowerCase();
+        String header = request.getHeader(MOCK_HEADER);
+        if (header != null) {
+            header = header.trim().toLowerCase();
+            for (String option : header.split(MOCK_HEADER_SPLIT_REGEX)) {
+                if (option.startsWith(serviceName)) {
+                    return option.substring(serviceName.length() + 1);
+                }
+            }
+        }
+        return "";
     }
 
     private static String encodePath(String path) {
