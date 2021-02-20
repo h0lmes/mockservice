@@ -22,6 +22,7 @@ public class MockService {
     private static final String DEFAULT_FILE_EXTENSION = ".json";
     private static final String MOCK_HEADER = "Mock";
     private static final String MOCK_HEADER_SPLIT_REGEX = "\\s+";
+    private static final String MOCK_OPTION_DELIMITER = "#";
 
     private final ResourceService resourceService;
     private final TemplateService templateService;
@@ -103,20 +104,13 @@ public class MockService {
         String mockOption = getMockOption(serviceFolder, request);
 
         StringBuilder path = new StringBuilder("classpath:");
-        path
+        return path
                 .append(serviceFolder)
                 .append(PATH_DELIMITER)
                 .append(request.getMethod().toUpperCase())
                 .append(PATH_DELIMITER_SUBSTITUTE)
-                .append(encodePath(getPathPattern(request)));
-
-        if (!mockOption.isEmpty()) {
-            path
-                    .append("#")
-                    .append(mockOption);
-        }
-
-        return path
+                .append(encodePath(getPathPattern(request)))
+                .append(mockOption.isEmpty() ? "" : MOCK_OPTION_DELIMITER + mockOption)
                 .append(DEFAULT_FILE_EXTENSION)
                 .toString();
     }
