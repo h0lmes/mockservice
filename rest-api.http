@@ -8,6 +8,7 @@ GET http://localhost:8080/demo/api/entity
 Accept: */*
 Cache-Control: no-cache
 Mock: demoservice/error
+Mock-Timeout: demoservice/1000
 
 ###
 

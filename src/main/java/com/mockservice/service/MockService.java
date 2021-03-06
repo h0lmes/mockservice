@@ -21,6 +21,7 @@ public class MockService {
     private static final String PATH_DELIMITER_SUBSTITUTE = "_";
     private static final String DEFAULT_FILE_EXTENSION = ".json";
     private static final String MOCK_HEADER = "Mock";
+    private static final String MOCK_TIMEOUT_HEADER = "Mock-Timeout";
     private static final String MOCK_HEADER_SPLIT_REGEX = "\\s+";
     private static final String MOCK_OPTION_DELIMITER = "#";
 
@@ -38,6 +39,8 @@ public class MockService {
     public ResponseEntity<String> mock(Object controller, HttpServletRequest request, Map<String, String> variables) {
         ResourceWrapper resource = resourceService.getAsWrapper(getPath(controller, request));
 
+        mockTimeout(controller, request);
+
         return ResponseEntity
                 .status(resource.getCode())
                 .headers(resource.getHeaders())
@@ -51,6 +54,8 @@ public class MockService {
         JavaType type = mapper.getTypeFactory().constructType(clazz);
         T body = mapper.readValue(templateService.resolve(resource.getBody(), variables), type);
 
+        mockTimeout(controller, request);
+
         return ResponseEntity
                 .status(resource.getCode())
                 .headers(resource.getHeaders())
@@ -63,6 +68,8 @@ public class MockService {
         ObjectMapper mapper = new ObjectMapper();
         JavaType type = mapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz);
         List<T> body = mapper.readValue(templateService.resolve(resource.getBody(), variables), type);
+
+        mockTimeout(controller, request);
 
         return ResponseEntity
                 .status(resource.getCode())
@@ -98,6 +105,23 @@ public class MockService {
     //
     //
     //--------------------------------------------------------------------------
+
+    private static void mockTimeout(Object controller, HttpServletRequest request) {
+        String serviceName = getFolder(controller).toLowerCase();
+        String header = request.getHeader(MOCK_TIMEOUT_HEADER);
+        if (header != null) {
+            for (String option : header.trim().toLowerCase().split(MOCK_HEADER_SPLIT_REGEX)) {
+                if (option.startsWith(serviceName)) {
+                    long ms = Long.valueOf(option.substring(serviceName.length() + 1));
+                    try {
+                        Thread.sleep(ms);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
 
     private static String getPath(Object controller, HttpServletRequest request) {
         String folder = getFolder(controller);
