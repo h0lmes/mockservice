@@ -100,22 +100,21 @@ public class MockService {
     //--------------------------------------------------------------------------
 
     private static String getPath(Object controller, HttpServletRequest request) {
-        String serviceFolder = getServiceFolder(controller);
-        String mockOption = getMockOption(serviceFolder, request);
+        String folder = getFolder(controller);
 
         StringBuilder path = new StringBuilder("classpath:");
         return path
-                .append(serviceFolder)
+                .append(folder)
                 .append(PATH_DELIMITER)
                 .append(request.getMethod().toUpperCase())
                 .append(PATH_DELIMITER_SUBSTITUTE)
                 .append(encodePath(getPathPattern(request)))
-                .append(mockOption.isEmpty() ? "" : MOCK_OPTION_DELIMITER + mockOption)
+                .append(getMockOption(folder, request))
                 .append(DEFAULT_FILE_EXTENSION)
                 .toString();
     }
 
-    private static String getServiceFolder(Object controller) {
+    private static String getFolder(Object controller) {
         String folder = controller.getClass().getSimpleName();
         int suffixStart = folder.indexOf(CONTROLLER_SUFFIX);
         if (suffixStart < 1)
@@ -130,7 +129,7 @@ public class MockService {
             header = header.trim().toLowerCase();
             for (String option : header.split(MOCK_HEADER_SPLIT_REGEX)) {
                 if (option.startsWith(serviceName)) {
-                    return option.substring(serviceName.length() + 1);
+                    return MOCK_OPTION_DELIMITER + option.substring(serviceName.length() + 1);
                 }
             }
         }

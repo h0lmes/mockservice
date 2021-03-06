@@ -31,9 +31,9 @@ Path variables supported. Example: `api/entity/{id}` transforms into `api_entity
 
 Status code and headers could be specified at the beginning of the data file to override defaults (default status code is 200).
 
-You can not override headers without overriding status code as well. Data file parser looks for 'HTTP/1.1' at the beginning of the first line of a data file as an indication this file not only contains payload but status code and headers as well.
+You can not override headers without overriding status code as well. Data file parser looks for 'HTTP/1.1' at the beginning of a line of a data file as an indication this file not only contains payload but status code and headers as well.
 
-Headers and body should be separated with an empty line.
+The HTTP code plus headers and the body should be separated with an empty line.
 
 Example:
 
@@ -41,14 +41,21 @@ Example:
     Custom-Header: header value
     
     ... body content here ...
+    
+or
+
+    ... body content here ...
+
+    HTTP/1.1 400
+    Custom-Header: header value
 
 #
 ### Customizing response of an API method
 
-One can include special header `Mock` along with HTTP request. Looks like this:
+One can include special header `Mock` along with HTTP request. Example:
 
     Mock: accountService/option3 storeService/option2
 
-In this case text before `/` symbol is matched with a service name and, if found, marker after the `/` is used as an option name.
+Text before `/` symbol is matched against a service name and, if found, marker after the `/` is used as an option name.
 
 In the example above if you call a method of the `accountService` then a file with `#option3` before its extension would be loaded. Example: `./AccountService/account#option3.json`
