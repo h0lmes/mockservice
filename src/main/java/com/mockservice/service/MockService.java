@@ -47,7 +47,7 @@ public class MockService {
                 .body(templateService.resolve(resource.getBody(), variables));
     }
 
-    public <T> ResponseEntity<T> mockTyped(Object controller, HttpServletRequest request, Map<String, String> variables, Class<T> clazz) throws JsonProcessingException {
+    public <T> ResponseEntity<T> mock(Object controller, HttpServletRequest request, Map<String, String> variables, Class<T> clazz) throws JsonProcessingException {
         ResourceWrapper resource = resourceService.getAsWrapper(getPath(controller, request));
 
         ObjectMapper mapper = new ObjectMapper();
@@ -62,7 +62,7 @@ public class MockService {
                 .body(body);
     }
 
-    public <T> ResponseEntity<List<T>> mockTypedList(Object controller, HttpServletRequest request, Map<String, String> variables, Class<T> clazz) throws JsonProcessingException {
+    public <T> ResponseEntity<List<T>> mockList(Object controller, HttpServletRequest request, Map<String, String> variables, Class<T> clazz) throws JsonProcessingException {
         ResourceWrapper resource = resourceService.getAsWrapper(getPath(controller, request));
 
         ObjectMapper mapper = new ObjectMapper();
@@ -84,12 +84,12 @@ public class MockService {
         return mock(controller, request, new HashMap<>());
     }
 
-    public <T> ResponseEntity<T> mockTyped(Object controller, HttpServletRequest request, Class<T> clazz) throws JsonProcessingException {
-        return mockTyped(controller, request, new HashMap<>(), clazz);
+    public <T> ResponseEntity<T> mock(Object controller, HttpServletRequest request, Class<T> clazz) throws JsonProcessingException {
+        return mock(controller, request, new HashMap<>(), clazz);
     }
 
-    public <T> ResponseEntity<List<T>> mockTypedList(Object controller, HttpServletRequest request, Class<T> clazz) throws JsonProcessingException {
-        return mockTypedList(controller, request, new HashMap<>(), clazz);
+    public <T> ResponseEntity<List<T>> mockList(Object controller, HttpServletRequest request, Class<T> clazz) throws JsonProcessingException {
+        return mockList(controller, request, new HashMap<>(), clazz);
     }
 
     //--------------------------------------------------------------------------
