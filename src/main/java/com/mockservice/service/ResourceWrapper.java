@@ -5,6 +5,7 @@ import org.springframework.http.HttpHeaders;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UncheckedIOException;
 
 public class ResourceWrapper {
 
@@ -45,7 +46,9 @@ public class ResourceWrapper {
                 }
                 line = reader.readLine();
             }
-        } catch (IOException e) { }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     private void processHttpCode(String line) {
@@ -62,7 +65,10 @@ public class ResourceWrapper {
     }
 
     private void processLine(String line) {
-        body.append(line).append('\n');
+        if (body.length() > 0) {
+            body.append('\n');
+        }
+        body.append(line);
     }
 
     public String getBody() {
