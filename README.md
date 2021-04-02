@@ -25,6 +25,7 @@ All standard path delimiters (`/`) should be substituted with an underscores (`_
 
 Path variables supported. Example: `api/entity/{id}` transforms into `api_entity_{id}`.
 
+> Important note. File names should be in lower case, except for HTTP method name.
 
 #
 ### Customizing HTTP status code and headers
