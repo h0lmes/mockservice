@@ -132,7 +132,7 @@ public class MockService {
                 .append(PATH_DELIMITER)
                 .append(request.getMethod().toUpperCase())
                 .append(PATH_DELIMITER_SUBSTITUTE)
-                .append(encodePath(getPathPattern(request)))
+                .append(getEncodedEndpoint(request))
                 .append(getMockOption(folder, request))
                 .append(DEFAULT_FILE_EXTENSION)
                 .toString();
@@ -148,25 +148,39 @@ public class MockService {
 
     private static String getMockOption(String serviceName, HttpServletRequest request) {
         serviceName = serviceName.toLowerCase();
+        String endpoint = getEncodedEndpoint(request);
         String header = request.getHeader(MOCK_HEADER);
         if (header != null) {
             header = header.trim().toLowerCase();
             for (String option : header.split(MOCK_HEADER_SPLIT_REGEX)) {
-                if (option.startsWith(serviceName)) {
-                    return MOCK_OPTION_DELIMITER + option.substring(serviceName.length() + 1);
+                String[] optionParts = option.split(PATH_DELIMITER);
+
+                if (optionParts.length == 2) {
+                    String serviceNamePart = optionParts[0];
+                    String optionNamePart = optionParts[1];
+                    if (serviceNamePart.equals(serviceName)) {
+                        return MOCK_OPTION_DELIMITER + optionNamePart;
+                    }
+                }
+
+                if (optionParts.length == 3) {
+                    String serviceNamePart = optionParts[0];
+                    String endpointPart = optionParts[1];
+                    String optionNamePart = optionParts[2];
+                    if (serviceNamePart.equals(serviceName) && endpointPart.equals(endpoint)) {
+                        return MOCK_OPTION_DELIMITER + optionNamePart;
+                    }
                 }
             }
         }
         return "";
     }
 
-    private static String encodePath(String path) {
-        if (path.startsWith(PATH_DELIMITER))
+    private static String getEncodedEndpoint(HttpServletRequest request) {
+        String path = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        if (path.startsWith(PATH_DELIMITER)) {
             path = path.substring(1);
+        }
         return String.join(PATH_DELIMITER_SUBSTITUTE, path.split(PATH_DELIMITER));
-    }
-
-    private static String getPathPattern(HttpServletRequest request) {
-        return (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
     }
 }
