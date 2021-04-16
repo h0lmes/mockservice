@@ -62,3 +62,18 @@ In the example above if you call an endpoint of the `AccountService` then a file
 
 In a three-parted version the middle part is an endpoint path (with slashes substituted by underscores like in file names).
 In the example above if you call an endpoint `/api/v1/item/{id}` of the `StoreService` then a file with `#option2` before the extension would be loaded (e.g. `resources/StoreService/GET_api_v1_item_{id}#option2.json`).
+
+#
+### Using constants
+
+In JSON files you can use constants that would be replaced with their respective values each time the file contents are returned.
+
+Those constants are:
+
+- ${random:int} - random integer between 1 and 1 000 000
+- ${random:uuid} - random UUID
+- ${random:string} - a string of 20 random characters [a-z]
+- ${random:date} - random date in yyyy-MM-dd format
+- ${current_date} - current date in yyyy-MM-dd format
+- ${current_timestamp} - current date and time in yyyy-MM-dd HH-mm-ss format
+- ${id} - same as ${random:int}
