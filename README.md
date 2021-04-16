@@ -53,10 +53,12 @@ or
 #
 ### Customizing response of an API method
 
-One can include special header `Mock` along with HTTP request. Example:
+One can include a header `Mock` along with HTTP request. Example:
 
-    Mock: accountService/option3 storeService/option2
+    Mock: AccountService/option3 StoreService/api_v1_item_{id}/option2
 
-Text before `/` symbol is matched against a service name and, if found, marker after the `/` is used as an option name.
+In a two-parted version the text before the `/` symbol is a service name and the rest is an option name.
+In the example above if you call an endpoint of the `AccountService` then a file with `#option3` before the extension would be loaded (e.g. `resources/AccountService/GET_accounts#option3.json`) regardless of the endpoint path.
 
-In the example above if you call a method of the `accountService` then a file with `#option3` before its extension would be loaded. Example: `./AccountService/account#option3.json`
+In a three-parted version the middle part is an endpoint path (with slashes substituted by underscores like in file names).
+In the example above if you call an endpoint `/api/v1/item/{id}` of the `StoreService` then a file with `#option2` before the extension would be loaded (e.g. `resources/StoreService/GET_api_v1_item_{id}#option2.json`).
