@@ -9,8 +9,8 @@ import java.util.function.Supplier;
 public class TemplateService {
 
     public String resolve(String template, Map<String, String> vars) {
-        template = resolveConstants(template);
         template = resolveVariables(template, vars);
+        template = resolveConstants(template);
         return template;
     }
 

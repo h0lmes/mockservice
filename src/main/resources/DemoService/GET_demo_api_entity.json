@@ -1,7 +1,0 @@
-[
-  {"id": ${random:int}, "name": "${random:string}"},
-  {"id": ${random:int}, "name": "${random:uuid}"},
-  {"id": ${random:int}, "name": "${random:string}"},
-  {"id": ${random:int}, "name": "${random:uuid}"},
-  {"id": ${random:int}, "name": "${random:string}"}
-]

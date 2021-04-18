@@ -6,11 +6,11 @@ Suitable for integration testing and similar use cases.
 #
 ### Creating new controller
 
-Given new service name is `AccountService` do the following:
-1. Create a new controller named `AccountServiceController` and inject `MockService`.
+Given that new service name is `AccountService` do the following:
+1. Create a new controller named `AccountServiceController` extending `MockController` (there is no enforced convention for controller names, you may name it as you like).
 2. Create required methods in the controller (see `DemoServiceController`).
-3. Create a new folder named `AccountService` under `src/main/resources` folder. Note that folder name must be the controller ClassName without `Controller` suffix.
-4. Create data files under `src/main/resources/AccountService` folder to supply data for each method.
+3. Create a new folder under `src/main/resources` folder. Name the folder as your controller (`AccountServiceController` in this case).
+4. Create data files under `src/main/resources/AccountServiceController` folder to supply data for each method.
 
 #
 ### File naming format
@@ -25,16 +25,16 @@ All standard path delimiters (`/`) should be substituted with an underscores (`_
 
 Path variables supported. Example: `api/entity/{id}` transforms into `api_entity_{id}`.
 
-> Important note. File names should be in lower case, except for HTTP method name.
+> Important note. File names should be in lower case, except for HTTP method name which should be in upper case.
 
 #
 ### Customizing HTTP status code and headers
 
-Status code and headers could be specified at the beginning of the data file to override defaults (default status code is 200).
+Status code and headers could be specified at the beginning or at the end of the data file to override defaults (default status code is 200).
 
 You can not override headers without overriding status code as well. Data file parser looks for 'HTTP/1.1' at the beginning of a line of a data file as an indication this file not only contains payload but status code and headers as well.
 
-The HTTP code plus headers and the body should be separated with an empty line.
+HTTP code and headers should be separated from the body with an empty line.
 
 Example:
 
@@ -64,7 +64,7 @@ In a three-parted version the middle part is an endpoint path (with slashes subs
 In the example above if you call an endpoint `/api/v1/item/{id}` of the `StoreService` then a file with `#option2` before the extension would be loaded (e.g. `resources/StoreService/GET_api_v1_item_{id}#option2.json`).
 
 #
-### Using constants
+### Using constants in JSON
 
 In JSON files you can use constants that would be replaced with their respective values each time the file contents are returned.
 
@@ -76,4 +76,4 @@ Those constants are:
 - ${random:date} - random date in yyyy-MM-dd format
 - ${current_date} - current date in yyyy-MM-dd format
 - ${current_timestamp} - current date and time in yyyy-MM-dd HH-mm-ss format
-- ${id} - same as ${random:int}
+- ${sequence:int} - same as ${random:int} in current version.

@@ -1,0 +1,7 @@
+[
+  {"id": ${sequence:int}, "name": "${random:string}"},
+  {"id": ${sequence:int}, "name": "${random:uuid}"},
+  {"id": ${sequence:int}, "name": "${random:string}"},
+  {"id": ${sequence:int}, "name": "${random:uuid}"},
+  {"id": ${sequence:int}, "name": "${random:string}"}
+]

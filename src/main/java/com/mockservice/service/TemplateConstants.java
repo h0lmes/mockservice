@@ -17,7 +17,7 @@ public enum TemplateConstants {
     RANDOM_DATE("random:date", TemplateConstants::randomDate),
     CURRENT_DATE("current_date", TemplateConstants::currentDate),
     CURRENT_TIMESTAMP("current_timestamp", TemplateConstants::currentTimestamp),
-    ID("id", () -> "" + ThreadLocalRandom.current().nextInt(1, 1000000));
+    SEQUENCE_INT("sequence:int", () -> "" + ThreadLocalRandom.current().nextInt(1, 1000000));
 
     private String name;
     private Supplier<String> supplier;

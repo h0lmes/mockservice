@@ -3,28 +3,20 @@ package com.mockservice.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mockservice.request.HttpServletRequestFacade;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.HandlerMapping;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class MockService {
 
-    private static final String CONTROLLER_SUFFIX = "Controller";
-    private static final String PATH_DELIMITER = "/";
-    private static final String PATH_DELIMITER_SUBSTITUTE = "_";
-    private static final String DEFAULT_FILE_EXTENSION = ".json";
-    private static final String MOCK_HEADER = "Mock";
-    private static final String MOCK_TIMEOUT_HEADER = "Mock-Timeout";
-    private static final String MOCK_HEADER_SPLIT_REGEX = "\\s+";
-    private static final String MOCK_OPTION_DELIMITER = "#";
-
+    @Autowired
+    private HttpServletRequest request;
     private final ResourceService resourceService;
     private final TemplateService templateService;
 
@@ -33,28 +25,27 @@ public class MockService {
         this.templateService = templateService;
     }
 
-    /**
-     * General mock method to call
-     */
-    public ResponseEntity<String> mock(Object controller, HttpServletRequest request, Map<String, String> variables) {
-        ResourceWrapper resource = resourceService.getAsWrapper(getPath(controller, request));
+    public ResponseEntity<String> mock(String folder, Map<String, String> variables) {
+        HttpServletRequestFacade requestFacade = new HttpServletRequestFacade(request, folder);
+        ResourceWrapper resource = resourceService.getAsWrapper(requestFacade.getPath());
 
-        mockTimeout(controller, request);
+        requestFacade.mockTimeout();
 
         return ResponseEntity
                 .status(resource.getCode())
                 .headers(resource.getHeaders())
-                .body(templateService.resolve(resource.getBody(), variables));
+                .body(templateService.resolve(resource.getBody(), requestFacade.getVariables(variables)));
     }
 
-    public <T> ResponseEntity<T> mock(Object controller, HttpServletRequest request, Map<String, String> variables, Class<T> clazz) throws JsonProcessingException {
-        ResourceWrapper resource = resourceService.getAsWrapper(getPath(controller, request));
+    public <T> ResponseEntity<T> mock(String folder, Map<String, String> variables, Class<T> clazz) throws JsonProcessingException {
+        HttpServletRequestFacade requestFacade = new HttpServletRequestFacade(request, folder);
+        ResourceWrapper resource = resourceService.getAsWrapper(requestFacade.getPath());
 
         ObjectMapper mapper = new ObjectMapper();
         JavaType type = mapper.getTypeFactory().constructType(clazz);
-        T body = mapper.readValue(templateService.resolve(resource.getBody(), variables), type);
+        T body = mapper.readValue(templateService.resolve(resource.getBody(), requestFacade.getVariables(variables)), type);
 
-        mockTimeout(controller, request);
+        requestFacade.mockTimeout();
 
         return ResponseEntity
                 .status(resource.getCode())
@@ -62,125 +53,19 @@ public class MockService {
                 .body(body);
     }
 
-    public <T> ResponseEntity<List<T>> mockList(Object controller, HttpServletRequest request, Map<String, String> variables, Class<T> clazz) throws JsonProcessingException {
-        ResourceWrapper resource = resourceService.getAsWrapper(getPath(controller, request));
+    public <T> ResponseEntity<List<T>> mockList(String folder, Map<String, String> variables, Class<T> clazz) throws JsonProcessingException {
+        HttpServletRequestFacade requestFacade = new HttpServletRequestFacade(request, folder);
+        ResourceWrapper resource = resourceService.getAsWrapper(requestFacade.getPath());
 
         ObjectMapper mapper = new ObjectMapper();
         JavaType type = mapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz);
-        List<T> body = mapper.readValue(templateService.resolve(resource.getBody(), variables), type);
+        List<T> body = mapper.readValue(templateService.resolve(resource.getBody(), requestFacade.getVariables(variables)), type);
 
-        mockTimeout(controller, request);
+        requestFacade.mockTimeout();
 
         return ResponseEntity
                 .status(resource.getCode())
                 .headers(resource.getHeaders())
                 .body(body);
-    }
-
-    /**
-     * Method to call with no variables map
-     */
-    public ResponseEntity<String> mock(Object controller, HttpServletRequest request) {
-        return mock(controller, request, new HashMap<>());
-    }
-
-    public <T> ResponseEntity<T> mock(Object controller, HttpServletRequest request, Class<T> clazz) throws JsonProcessingException {
-        return mock(controller, request, new HashMap<>(), clazz);
-    }
-
-    public <T> ResponseEntity<List<T>> mockList(Object controller, HttpServletRequest request, Class<T> clazz) throws JsonProcessingException {
-        return mockList(controller, request, new HashMap<>(), clazz);
-    }
-
-    //--------------------------------------------------------------------------
-    //
-    //
-    //
-    //
-    //
-    // static and private methods here
-    //
-    //
-    //
-    //
-    //
-    //--------------------------------------------------------------------------
-
-    private static void mockTimeout(Object controller, HttpServletRequest request) {
-        String serviceName = getFolder(controller).toLowerCase();
-        String header = request.getHeader(MOCK_TIMEOUT_HEADER);
-        if (header != null) {
-            for (String option : header.trim().toLowerCase().split(MOCK_HEADER_SPLIT_REGEX)) {
-                if (option.startsWith(serviceName)) {
-                    long ms = Long.valueOf(option.substring(serviceName.length() + 1));
-                    try {
-                        Thread.sleep(ms);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
-
-    private static String getPath(Object controller, HttpServletRequest request) {
-        String folder = getFolder(controller);
-
-        StringBuilder path = new StringBuilder("classpath:");
-        return path
-                .append(folder)
-                .append(PATH_DELIMITER)
-                .append(request.getMethod().toUpperCase())
-                .append(PATH_DELIMITER_SUBSTITUTE)
-                .append(getEncodedEndpoint(request))
-                .append(getMockOption(folder, request))
-                .append(DEFAULT_FILE_EXTENSION)
-                .toString();
-    }
-
-    private static String getFolder(Object controller) {
-        String folder = controller.getClass().getSimpleName();
-        int suffixStart = folder.indexOf(CONTROLLER_SUFFIX);
-        if (suffixStart < 1)
-            throw new IllegalArgumentException("RestController ClassName must end with suffix: " + CONTROLLER_SUFFIX);
-        return folder.substring(0, suffixStart);
-    }
-
-    private static String getMockOption(String serviceName, HttpServletRequest request) {
-        serviceName = serviceName.toLowerCase();
-        String endpoint = getEncodedEndpoint(request);
-        String header = request.getHeader(MOCK_HEADER);
-        if (header != null) {
-            header = header.trim().toLowerCase();
-            for (String option : header.split(MOCK_HEADER_SPLIT_REGEX)) {
-                String[] optionParts = option.split(PATH_DELIMITER);
-
-                if (optionParts.length == 2) {
-                    String serviceNamePart = optionParts[0];
-                    String optionNamePart = optionParts[1];
-                    if (serviceNamePart.equals(serviceName)) {
-                        return MOCK_OPTION_DELIMITER + optionNamePart;
-                    }
-                }
-
-                if (optionParts.length == 3) {
-                    String serviceNamePart = optionParts[0];
-                    String endpointPart = optionParts[1];
-                    String optionNamePart = optionParts[2];
-                    if (serviceNamePart.equals(serviceName) && endpointPart.equals(endpoint)) {
-                        return MOCK_OPTION_DELIMITER + optionNamePart;
-                    }
-                }
-            }
-        }
-        return "";
-    }
-
-    private static String getEncodedEndpoint(HttpServletRequest request) {
-        String path = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-        if (path.startsWith(PATH_DELIMITER)) {
-            path = path.substring(1);
-        }
-        return String.join(PATH_DELIMITER_SUBSTITUTE, path.split(PATH_DELIMITER));
     }
 }
