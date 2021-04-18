@@ -8,7 +8,10 @@ import java.util.function.Supplier;
 @Service
 public class TemplateService {
 
-    public String resolve(String template, Map<String, String> vars) {
+    private static final String VAR_START = "${";
+    private static final String VAR_END = "}";
+
+    String resolve(String template, Map<String, String> vars) {
         template = resolveVariables(template, vars);
         template = resolveConstants(template);
         return template;
@@ -24,7 +27,7 @@ public class TemplateService {
     private static String resolveVariables(String template, Map<String, String> vars) {
         if (vars != null) {
             for (Map.Entry<String, String> e : vars.entrySet()) {
-                template = replaceAll(template,"${" + e.getKey() + "}", e.getValue());
+                template = replaceAll(template, VAR_START + e.getKey() + VAR_END, e.getValue());
             }
         }
         return template;
