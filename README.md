@@ -7,10 +7,14 @@ Suitable for integration testing and similar use cases.
 ### Creating new controller
 
 Given that new service name is `AccountService` do the following:
-1. Create a new controller named `AccountServiceController` extending `MockController` (there is no enforced convention for controller names, you may name it as you like).
+1. Create a new controller named `AccountServiceController`
+extending `MockController` (there is no enforced convention for controller names,
+you may name it as you like).
 2. Create required methods in the controller (see `DemoServiceController`).
-3. Create a new folder under `src/main/resources` folder. Name the folder as your controller (`AccountServiceController` in this case).
-4. Create data files under `src/main/resources/AccountServiceController` folder to supply data for each method.
+3. Create a new folder under `src/main/resources` folder.
+Name the folder as your controller (`AccountServiceController` in this case).
+4. Create data files under `src/main/resources/AccountServiceController` folder
+to supply data for each method (see `DemoServiceController` folder).
 
 #
 ### File naming format
@@ -23,16 +27,22 @@ Only `.json` extension supported.
 
 All standard path delimiters (`/`) should be substituted with an underscores (`_`).
 
-Path variables supported. Example: `api/entity/{id}` transforms into `api_entity_{id}`.
+Path variables supported.
+Example: `api/entity/{id}` transforms into `api_entity_{id}`.
 
-> Important note. File names should be in lower case, except for HTTP method name which should be in upper case.
+> Important note. File names should be in lower case,
+except for HTTP method name which should be in upper case.
 
 #
 ### Customizing HTTP status code and headers
 
-Status code and headers could be specified at the beginning or at the end of the data file to override defaults (default status code is 200).
+You can specify status code and headers at the beginning
+or at the end of a data file to override defaults (default status code is 200).
 
-You can not override headers without overriding status code as well. Data file parser looks for 'HTTP/1.1' at the beginning of a line of a data file as an indication this file not only contains payload but status code and headers as well.
+If you want to specify headers only you'd have to provide a status code as well.
+Data file parser looks for 'HTTP/1.1' at the beginning of a line
+of a data file as an indication this file not only contains payload
+but also status code and headers.
 
 HTTP code and headers should be separated from the body with an empty line.
 
@@ -53,20 +63,32 @@ or
 #
 ### Customizing response of an API method
 
-One can include a header `Mock` along with HTTP request. Example:
+You can include a header `Mock` in HTTP request.
+There could be multiple options for different services in one header
+separated by spaces.
+
+There are two versions:
+- service name / option
+- service name / endpoint path / option.
+
+Example:
 
     Mock: AccountService/option3 StoreService/api_v1_item_{id}/option2
 
-In a two-parted version the text before the `/` symbol is a service name and the rest is an option name.
-In the example above if you call an endpoint of the `AccountService` then a file with `#option3` before the extension would be loaded (e.g. `resources/AccountService/GET_accounts#option3.json`) regardless of the endpoint path.
+In the example above if you call an endpoint of the `AccountService`
+a file with `#option3` before the extension would be loaded
+(e.g. `resources/AccountService/GET_accounts#option3.json`) regardless
+of the endpoint path.
 
-In a three-parted version the middle part is an endpoint path (with slashes substituted by underscores like in file names).
-In the example above if you call an endpoint `/api/v1/item/{id}` of the `StoreService` then a file with `#option2` before the extension would be loaded (e.g. `resources/StoreService/GET_api_v1_item_{id}#option2.json`).
+If you call an endpoint `/api/v1/item/{id}` of the `StoreService`
+a file with `#option2` before the extension would be loaded
+(e.g. `resources/StoreService/GET_api_v1_item_{id}#option2.json`).
 
 #
-### Using constants in JSON
+### Using placeholders in JSON
 
-In JSON files you can use constants that would be replaced with their respective values each time the file contents are returned.
+In JSON files you can use placeholders, those would be substituted
+with their values each time a file contents are fetched.
 
 Those constants are:
 
