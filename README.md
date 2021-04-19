@@ -97,5 +97,6 @@ Those constants are:
 - ${random:uuid} - random UUID
 - ${random:string} - a string of 20 random characters [a-z]
 - ${random:date} - random date in yyyy-MM-dd format
+- ${random:timestamp} - random timestamp in yyyy-MM-dd HH:mm:ss.SSS format
 - ${current:date} - current date in yyyy-MM-dd format
-- ${current:timestamp} - current date and time in yyyy-MM-dd HH-mm-ss format.
+- ${current:timestamp} - current timestamp in yyyy-MM-dd HH:mm:ss.SSS format.

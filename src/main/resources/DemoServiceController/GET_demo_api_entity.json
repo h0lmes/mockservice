@@ -1,7 +1,8 @@
 [
   {"id": ${sequence:int}, "name": "${random:string}"},
   {"id": ${sequence:int}, "name": "${random:uuid}"},
-  {"id": ${sequence:int}, "name": "${random:string}"},
-  {"id": ${sequence:int}, "name": "${random:uuid}"},
-  {"id": ${sequence:int}, "name": "${random:string}"}
+  {"id": ${sequence:int}, "name": "${random:date}"},
+  {"id": ${sequence:int}, "name": "${random:timestamp}"},
+  {"id": ${sequence:int}, "name": "${current:date}"},
+  {"id": ${sequence:int}, "name": "${current:timestamp}"}
 ]
