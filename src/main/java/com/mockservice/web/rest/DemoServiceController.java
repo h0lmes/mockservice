@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("demo/api")
 public class DemoServiceController extends MockController {
@@ -24,8 +22,8 @@ public class DemoServiceController extends MockController {
     }
 
     @GetMapping("entity")
-    public ResponseEntity<List<Entity>> getTypedListOfEntities() throws Exception {
-        return mockList(Entity.class);
+    public ResponseEntity<String> getUntypedListOfEntities() {
+        return mock();
     }
 
     @PostMapping("entity")

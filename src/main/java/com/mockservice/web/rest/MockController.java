@@ -5,7 +5,8 @@ import com.mockservice.service.MockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MockController {
 
@@ -18,14 +19,18 @@ public class MockController {
     }
 
     public ResponseEntity<String> mock() {
-        return mockService.mock(folder);
+        return mockService.mock(folder, new HashMap<>(), true);
     }
 
     public <T> ResponseEntity<T> mock(Class<T> clazz) throws JsonProcessingException {
-        return mockService.mock(folder, clazz);
+        return mockService.mock(folder, new HashMap<>(), true, clazz);
     }
 
-    public <T> ResponseEntity<List<T>> mockList(Class<T> clazz) throws JsonProcessingException {
-        return mockService.mockList(folder, clazz);
+    public ResponseEntity<String> mock(Map<String, String> variables, boolean useBodyAsVariables) {
+        return mockService.mock(folder, variables, useBodyAsVariables);
+    }
+
+    public <T> ResponseEntity<T> mock(Map<String, String> variables, boolean useBodyAsVariables, Class<T> clazz) throws JsonProcessingException {
+        return mockService.mock(folder, variables, useBodyAsVariables, clazz);
     }
 }

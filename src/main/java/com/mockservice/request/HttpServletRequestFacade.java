@@ -34,22 +34,15 @@ public class HttpServletRequestFacade {
         this.folder = folder;
     }
 
-    public Map<String, String> getVariables(boolean useBodyAsVariables) {
-        return getVariables(request, useBodyAsVariables);
-    }
-
-    public String getPath() {
-        return getPath(folder, request);
-    }
-
-    public void mockTimeout() {
-        mockTimeout(folder, request);
+    public Map<String, String> getVariables(Map<String, String> variables, boolean useBodyAsVariables) {
+        return getVariables(request, variables, useBodyAsVariables);
     }
 
     @SuppressWarnings("unchecked")
     private static Map<String, String> getVariables(@NonNull HttpServletRequest request,
+                                                    @NonNull Map<String, String> variables,
                                                     boolean useBodyAsVariables) {
-        Map<String, String> variables = new HashMap<>();
+        Assert.notNull(variables, "Variables must not be null");
 
         if (useBodyAsVariables && !"GET".equalsIgnoreCase(request.getMethod())) {
             try {
@@ -71,6 +64,10 @@ public class HttpServletRequestFacade {
         requestParams.forEach((k, v) -> variables.putIfAbsent(k, v[0]));
 
         return variables;
+    }
+
+    public String getPath() {
+        return getPath(folder, request);
     }
 
     private static String getPath(@NonNull String folder, @NonNull HttpServletRequest request) {
@@ -115,6 +112,10 @@ public class HttpServletRequestFacade {
         }
 
         return "";
+    }
+
+    public void mockTimeout() {
+        mockTimeout(folder, request);
     }
 
     private static void mockTimeout(@NonNull String serviceName, @NonNull HttpServletRequest request) {
