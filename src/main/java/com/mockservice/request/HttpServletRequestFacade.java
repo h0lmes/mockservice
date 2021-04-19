@@ -11,6 +11,7 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,8 +34,8 @@ public class HttpServletRequestFacade {
         this.folder = folder;
     }
 
-    public Map<String, String> getVariables(Map<String, String> appendToVariables) {
-        return getVariables(request, appendToVariables);
+    public Map<String, String> getVariables(boolean useBodyAsVariables) {
+        return getVariables(request, useBodyAsVariables);
     }
 
     public String getPath() {
@@ -47,33 +48,29 @@ public class HttpServletRequestFacade {
 
     @SuppressWarnings("unchecked")
     private static Map<String, String> getVariables(@NonNull HttpServletRequest request,
-                                                    @NonNull Map<String, String> appendToVariables) {
-        Assert.notNull(appendToVariables, "Variables must not be null");
+                                                    boolean useBodyAsVariables) {
+        Map<String, String> variables = new HashMap<>();
 
-        // use request body as a map of variables
-        if ("POST".equalsIgnoreCase(request.getMethod()))
-        {
+        if (useBodyAsVariables && !"GET".equalsIgnoreCase(request.getMethod())) {
             try {
                 String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
                 if (body != null && !body.trim().isEmpty()) {
-                    Map<String, String> bodyMap = jsonStringToMap(body);
-                    bodyMap.forEach(appendToVariables::putIfAbsent);
+                    Map<String, String> bodyVariables = jsonStringToMap(body);
+                    bodyVariables.forEach(variables::putIfAbsent);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        // use PathVariables
-        Object uriVars = request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-        if (uriVars instanceof Map) {
-            ((Map<String, String>) uriVars).forEach(appendToVariables::putIfAbsent);
+        Object pathVariables = request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        if (pathVariables instanceof Map) {
+            ((Map<String, String>) pathVariables).forEach(variables::putIfAbsent);
         }
-        // use RequestParams
-        Map<String, String[]> parameterMap = request.getParameterMap();
-        parameterMap.forEach((k, v) -> appendToVariables.putIfAbsent(k, v[0]));
+        Map<String, String[]> requestParams = request.getParameterMap();
+        requestParams.forEach((k, v) -> variables.putIfAbsent(k, v[0]));
 
-        return appendToVariables;
+        return variables;
     }
 
     private static String getPath(@NonNull String folder, @NonNull HttpServletRequest request) {
