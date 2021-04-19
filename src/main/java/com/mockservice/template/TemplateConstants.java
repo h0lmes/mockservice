@@ -1,4 +1,4 @@
-package com.mockservice.service;
+package com.mockservice.template;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -11,32 +11,37 @@ import java.util.function.Supplier;
 
 public enum TemplateConstants {
 
-    RANDOM_INT("random:int", () -> "" + ThreadLocalRandom.current().nextInt(1, 1000000)),
-    RANDOM_UUID("random:uuid", () -> UUID.randomUUID().toString()),
-    RANDOM_STRING("random:string", TemplateConstants::randomString),
-    RANDOM_DATE("random:date", TemplateConstants::randomDate),
-    CURRENT_DATE("current_date", TemplateConstants::currentDate),
-    CURRENT_TIMESTAMP("current_timestamp", TemplateConstants::currentTimestamp),
-    SEQUENCE_INT("sequence:int", () -> "" + ThreadLocalRandom.current().nextInt(1, 1000000));
+    SEQUENCE_INT("sequence:int", IntSequenceSupplier::new),
+    RANDOM_INT("random:int", () -> TemplateConstants::randomInt),
+    RANDOM_UUID("random:uuid", () -> TemplateConstants::randomUuid),
+    RANDOM_STRING("random:string", () -> TemplateConstants::randomString),
+    RANDOM_DATE("random:date", () -> TemplateConstants::randomDate),
+    CURRENT_DATE("current:date", () -> TemplateConstants::currentDate),
+    CURRENT_TIMESTAMP("current:timestamp", () -> TemplateConstants::currentTimestamp);
 
     private String name;
-    private Supplier<String> supplier;
+    private Supplier<Supplier<String>> supplier;
 
-    TemplateConstants(String name, Supplier<String> supplier) {
+    TemplateConstants(String name, Supplier<Supplier<String>> supplier) {
         this.name = name;
         this.supplier = supplier;
     }
 
-    public String getPlaceholder() { return "${" + name + "}"; }
+    public String getName() {
+        return name;
+    }
 
-    public Supplier<String> getSupplier() { return supplier; }
+    public Supplier<String> getSupplier() {
+        return supplier.get();
+    }
 
-    //------------------------------------------------------------------
-    //
-    //
-    //
-    //
-    //------------------------------------------------------------------
+    private static String randomInt() {
+        return "" + ThreadLocalRandom.current().nextInt(1, 1000000);
+    }
+
+    private static String randomUuid() {
+        return UUID.randomUUID().toString();
+    }
 
     private static String randomString() {
         return new Random().ints(97, 123)

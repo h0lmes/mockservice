@@ -1,5 +1,6 @@
 package com.mockservice.service;
 
+import com.mockservice.template.TemplateConstants;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -19,7 +20,7 @@ public class TemplateService {
 
     private static String resolveConstants(String template) {
         for (TemplateConstants constant : TemplateConstants.values()) {
-            template = replaceAll(template, constant.getPlaceholder(), constant.getSupplier());
+            template = replaceAll(template, VAR_START + constant.getName() + VAR_END, constant.getSupplier());
         }
         return template;
     }

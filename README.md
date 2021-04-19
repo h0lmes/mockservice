@@ -92,10 +92,10 @@ with their values each time a file contents are fetched.
 
 Those constants are:
 
+- ${sequence:int} - sequence of integers starting from 1
 - ${random:int} - random integer between 1 and 1 000 000
 - ${random:uuid} - random UUID
 - ${random:string} - a string of 20 random characters [a-z]
 - ${random:date} - random date in yyyy-MM-dd format
-- ${current_date} - current date in yyyy-MM-dd format
-- ${current_timestamp} - current date and time in yyyy-MM-dd HH-mm-ss format
-- ${sequence:int} - same as ${random:int} in current version.
+- ${current:date} - current date in yyyy-MM-dd format
+- ${current:timestamp} - current date and time in yyyy-MM-dd HH-mm-ss format.
