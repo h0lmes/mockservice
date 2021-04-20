@@ -87,7 +87,7 @@ public class HttpServletRequestFacade {
         if (path.startsWith(PATH_DELIMITER)) {
             path = path.substring(1);
         }
-        return String.join(PATH_DELIMITER_SUBSTITUTE, path.split(PATH_DELIMITER));
+        return String.join(PATH_DELIMITER_SUBSTITUTE, path.split(PATH_DELIMITER)).toLowerCase();
     }
 
     private static String getMockOption(@NonNull String serviceName, @NonNull HttpServletRequest request) {
