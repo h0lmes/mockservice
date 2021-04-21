@@ -5,18 +5,21 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class HttpServletRequestFacade {
+
+    Logger log = LoggerFactory.getLogger(HttpServletRequestFacade.class);
 
     private static final String PATH_DELIMITER = "/";
     private static final String PATH_DELIMITER_SUBSTITUTE = "_";
@@ -39,7 +42,7 @@ public class HttpServletRequestFacade {
     }
 
     @SuppressWarnings("unchecked")
-    private static Map<String, String> getVariables(@NonNull HttpServletRequest request,
+    private Map<String, String> getVariables(@NonNull HttpServletRequest request,
                                                     @NonNull Map<String, String> variables,
                                                     boolean useBodyAsVariables) {
         Assert.notNull(variables, "Variables must not be null");
@@ -48,11 +51,11 @@ public class HttpServletRequestFacade {
             try {
                 String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
                 if (body != null && !body.trim().isEmpty()) {
-                    Map<String, String> bodyVariables = jsonStringToMap(body);
+                    Map<String, String> bodyVariables = jsonToMap(body);
                     bodyVariables.forEach(variables::putIfAbsent);
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                log.error("Exception while reading request body.", e);
             }
         }
 
@@ -146,12 +149,12 @@ public class HttpServletRequestFacade {
         } catch (NumberFormatException e) {
             // do nothing
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            Thread.currentThread().interrupt();
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static Map<String, String> jsonStringToMap(String json) {
+    private static Map<String, String> jsonToMap(String json) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         JavaTimeModule module = new JavaTimeModule();
         mapper.registerModule(module);
@@ -159,15 +162,15 @@ public class HttpServletRequestFacade {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
         Map<String, Object> map = null;
-        try {
-            map = mapper.readValue(json, Map.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        map = mapper.readValue(json, Map.class);
         return flattenMap(map);
     }
 
     private static Map<String, String> flattenMap(Map<String, Object> map) {
+        return flattenMapRec(map);
+    }
+
+    private static Map<String, String> flattenMapRec(Map<String, Object> map) {
         return map.entrySet().stream()
                 .flatMap(e -> flatten(e, e.getKey() + "."))
                 .collect(Collectors.toMap( Map.Entry::getKey, e -> String.valueOf(e.getValue()) ));
@@ -180,20 +183,20 @@ public class HttpServletRequestFacade {
         return Stream.of(entry);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws JsonProcessingException {
         String json =
                 "{" +
-                        "\"key1\": \"value 1\", " +
-                        "\"key2\": {" +
-                            "\"key2.1\": \"2021-04-19\"," +
-                            "\"key2.2\": {" +
-                                "\"key2.2.1\": 10101, " +
-                                "\"key2.2.2\": [" +
-                                    "\"value 1\", \"value 2\"" +
-                                "]" +
-                            "}" +
+                    "\"key1\": \"value 1\", " +
+                    "\"key2\": {" +
+                        "\"key2.1\": \"2021-04-19\"," +
+                        "\"key2.2\": {" +
+                            "\"key2.2.1\": 10101, " +
+                            "\"key2.2.2\": [" +
+                                "\"value 1\", \"value 2\"" +
+                            "]" +
                         "}" +
+                    "}" +
                 "}";
-        jsonStringToMap(json).forEach((k, v) -> System.out.println(k + " : " + v));
+        jsonToMap(json).forEach((k, v) -> System.out.println(k + " : " + v));
     }
 }

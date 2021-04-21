@@ -63,7 +63,7 @@ public enum TemplateConstants {
         long startEpochDay = LocalDate.of(1970, 1, 1).toEpochDay();
         long endEpochDay = LocalDate.of(2100, 1, 1).toEpochDay();
         long randomEpochDay = ThreadLocalRandom.current().nextLong(startEpochDay, endEpochDay);
-        long randomSecondOfDay = ThreadLocalRandom.current().nextLong(0, 24 * 60 * 60);
+        long randomSecondOfDay = ThreadLocalRandom.current().nextLong(0, 24L * 60L * 60L);
         return ZonedDateTime
                 .of(LocalDate.ofEpochDay(randomEpochDay), LocalTime.ofSecondOfDay(randomSecondOfDay), ZoneId.systemDefault())
                 .format(DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss.SSS"));

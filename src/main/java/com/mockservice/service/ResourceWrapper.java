@@ -29,17 +29,9 @@ public class ResourceWrapper {
                 if (line.startsWith(HTTP_PREFIX)) {
                     readingHeaders = true;
                     processHttpCode(line);
-                    line = reader.readLine();
-                    continue;
-                }
-
-                if (line.trim().isEmpty()) {
+                } else if (readingHeaders && line.trim().isEmpty()) {
                     readingHeaders = false;
-                    line = reader.readLine();
-                    continue;
-                }
-
-                if (readingHeaders) {
+                } else if (readingHeaders) {
                     processHeader(line);
                 } else {
                     processLine(line);
@@ -52,8 +44,11 @@ public class ResourceWrapper {
     }
 
     private void processHttpCode(String line) {
-        String code = line.substring(HTTP_PREFIX.length() + 1).trim();
-        this.code = Integer.valueOf(code);
+        try {
+            this.code = Integer.parseInt(line.substring(HTTP_PREFIX.length() + 1).trim());
+        } catch (NumberFormatException e) {
+            // do nothing
+        }
     }
 
     private void processHeader(String line) {

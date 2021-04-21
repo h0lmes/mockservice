@@ -5,7 +5,9 @@ public class Entity {
     private int id;
     private String name;
 
-    public Entity() { }
+    public Entity() {
+        // for Jackson
+    }
 
     public int getId() {
         return id;
