@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import javafx.util.Pair;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.HandlerMapping;
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class HttpServletRequestFacade {
 
@@ -45,7 +43,7 @@ public class HttpServletRequestFacade {
             try {
                 String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
                 if (body != null && !body.trim().isEmpty()) {
-                    Map<String, String> bodyVariables = jsonToMap(body);
+                    Map<String, String> bodyVariables = jsonToFlatMap(body);
                     bodyVariables.forEach(variables::putIfAbsent);
                 }
             } catch (IOException e) {
@@ -166,7 +164,7 @@ public class HttpServletRequestFacade {
     }
 
     @SuppressWarnings("unchecked")
-    private static Map<String, String> jsonToMap(String json) throws JsonProcessingException {
+    public static Map<String, String> jsonToFlatMap(String json) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         JavaTimeModule module = new JavaTimeModule();
         mapper.registerModule(module);
@@ -177,6 +175,7 @@ public class HttpServletRequestFacade {
         return flattenMap(map);
     }
 
+    @SuppressWarnings("unchecked")
     private static Map<String, String> flattenMap(Map<String, Object> map) {
         Queue<Pair<String, Pair<String, Object>>> q = new ArrayDeque<>();
         Map<String, String> result = new HashMap<>();
@@ -196,22 +195,5 @@ public class HttpServletRequestFacade {
             }
         }
         return result;
-    }
-
-    public static void main(String[] args) throws JsonProcessingException {
-        String json =
-                "{" +
-                    "\"key1\": \"value 1\", " +
-                    "\"key2\": {" +
-                        "\"key1\": \"2021-04-19\"," +
-                        "\"key2\": {" +
-                            "\"key1\": 10101, " +
-                            "\"key2\": [" +
-                                "\"value 1\", \"value 2\"" +
-                            "]" +
-                        "}" +
-                    "}" +
-                "}";
-        jsonToMap(json).forEach((k, v) -> System.out.println(k + " -> " + v));
     }
 }
