@@ -124,7 +124,7 @@ would be flattened.
 4. `Mock-Variable` header (see below).
 
 #
-###Mock-Variable header
+### Mock-Variable header
 
 You can include multiple headers `Mock-Variable` in HTTP request.
 Each header defines exactly one variable.
