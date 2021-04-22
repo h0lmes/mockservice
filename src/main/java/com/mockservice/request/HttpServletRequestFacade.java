@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import javafx.util.Pair;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.HandlerMapping;
@@ -12,9 +13,7 @@ import org.springframework.web.servlet.HandlerMapping;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -179,22 +178,24 @@ public class HttpServletRequestFacade {
     }
 
     private static Map<String, String> flattenMap(Map<String, Object> map) {
-        // TODO
-        return flattenMapRec(map);
-    }
+        Queue<Pair<String, Pair<String, Object>>> q = new ArrayDeque<>();
+        Map<String, String> result = new HashMap<>();
 
-    private static Map<String, String> flattenMapRec(Map<String, Object> map) {
-        return map.entrySet().stream()
-                .flatMap(e -> flatten(e, e.getKey() + "."))
-                .collect(Collectors.toMap( Map.Entry::getKey, e -> String.valueOf(e.getValue()) ));
-    }
+        map.forEach((k, v) -> q.offer(new Pair<>("", new Pair<>(k, v))));
 
-    @SuppressWarnings("unchecked")
-    private static Stream<Map.Entry<String, ?>> flatten(Map.Entry<String, ?> entry, String keyPrefix) {
-        if (entry.getValue() instanceof Map) {
-            return ((Map<String,?>) entry.getValue()).entrySet().stream().flatMap(e -> flatten(e, keyPrefix + e.getKey() + "."));
+        while (!q.isEmpty()) {
+            Pair<String, Pair<String, Object>> el = q.poll();
+            String parentKey = el.getKey();
+            String key = el.getValue().getKey();
+            Object obj = el.getValue().getValue();
+            if (obj instanceof Map) {
+                map = (Map<String, Object>) obj;
+                map.forEach((k, v) -> q.offer(new Pair<>(parentKey.isEmpty() ? key : parentKey + "." + key, new Pair<>(k, v))));
+            } else {
+                result.put(parentKey.isEmpty() ? key : parentKey + "." + key, obj.toString());
+            }
         }
-        return Stream.of(entry);
+        return result;
     }
 
     public static void main(String[] args) throws JsonProcessingException {
@@ -202,15 +203,15 @@ public class HttpServletRequestFacade {
                 "{" +
                     "\"key1\": \"value 1\", " +
                     "\"key2\": {" +
-                        "\"key2.1\": \"2021-04-19\"," +
-                        "\"key2.2\": {" +
-                            "\"key2.2.1\": 10101, " +
-                            "\"key2.2.2\": [" +
+                        "\"key1\": \"2021-04-19\"," +
+                        "\"key2\": {" +
+                            "\"key1\": 10101, " +
+                            "\"key2\": [" +
                                 "\"value 1\", \"value 2\"" +
                             "]" +
                         "}" +
                     "}" +
                 "}";
-        jsonToMap(json).forEach((k, v) -> System.out.println(k + " : " + v));
+        jsonToMap(json).forEach((k, v) -> System.out.println(k + " -> " + v));
     }
 }
