@@ -11,14 +11,14 @@ import java.util.function.Supplier;
 
 public enum TemplateConstants {
 
-    SEQUENCE_INT("sequence:int", IntSequenceSupplier::new),
-    RANDOM_INT("random:int", () -> TemplateConstants::randomInt),
-    RANDOM_UUID("random:uuid", () -> TemplateConstants::randomUuid),
-    RANDOM_STRING("random:string", () -> TemplateConstants::randomString),
-    RANDOM_DATE("random:date", () -> TemplateConstants::randomDate),
-    RANDOM_TIMESTAMP("random:timestamp", () -> TemplateConstants::randomTimestamp),
-    CURRENT_DATE("current:date", () -> TemplateConstants::currentDate),
-    CURRENT_TIMESTAMP("current:timestamp", () -> TemplateConstants::currentTimestamp);
+    SEQUENCE_INT("sequence", IntSequenceSupplier::new),
+    RANDOM_INT("random_int", () -> TemplateConstants::randomInt),
+    RANDOM_UUID("random_uuid", () -> TemplateConstants::randomUuid),
+    RANDOM_STRING("random_string", () -> TemplateConstants::randomString),
+    RANDOM_DATE("random_date", () -> TemplateConstants::randomDate),
+    RANDOM_TIMESTAMP("random_timestamp", () -> TemplateConstants::randomTimestamp),
+    CURRENT_DATE("current_date", () -> TemplateConstants::currentDate),
+    CURRENT_TIMESTAMP("current_timestamp", () -> TemplateConstants::currentTimestamp);
 
     private String name;
     private Supplier<Supplier<String>> supplier;
@@ -63,7 +63,7 @@ public enum TemplateConstants {
         long startEpochDay = LocalDate.of(1970, 1, 1).toEpochDay();
         long endEpochDay = LocalDate.of(2100, 1, 1).toEpochDay();
         long randomEpochDay = ThreadLocalRandom.current().nextLong(startEpochDay, endEpochDay);
-        long randomSecondOfDay = ThreadLocalRandom.current().nextLong(0, 24L * 60L * 60L);
+        long randomSecondOfDay = ThreadLocalRandom.current().nextLong(0L, 86400L);
         return ZonedDateTime
                 .of(LocalDate.ofEpochDay(randomEpochDay), LocalTime.ofSecondOfDay(randomSecondOfDay), ZoneId.systemDefault())
                 .format(DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss.SSS"));

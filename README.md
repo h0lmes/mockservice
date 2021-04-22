@@ -85,18 +85,18 @@ a file with `#option2` before the extension would be loaded
 (e.g. `resources/StoreService/GET_api_v1_item_{id}#option2.json`).
 
 #
-### Using placeholders in JSON
+### Using variables in JSON
 
-In JSON files you can use placeholders, those would be substituted
-with their values each time a file contents are fetched.
+In JSON files you can use variables, those would be substituted
+with their values each time an endpoint is fetched.
 
-Those constants are:
+List of predefined variables:
 
-- ${sequence:int} - sequence of integers starting from 1
-- ${random:int} - random integer between 1 and 1 000 000
-- ${random:uuid} - random UUID
-- ${random:string} - a string of 20 random characters [a-z]
-- ${random:date} - random date in yyyy-MM-dd format
-- ${random:timestamp} - random timestamp in yyyy-MM-dd HH:mm:ss.SSS format
-- ${current:date} - current date in yyyy-MM-dd format
-- ${current:timestamp} - current timestamp in yyyy-MM-dd HH:mm:ss.SSS format.
+- ${sequence} - sequence of integers starting from 1
+- ${random_int} - random integer between 1 and 1 000 000
+- ${random_uuid} - random UUID
+- ${random_string} - a string of 20 random characters [a-z]
+- ${random_date} - random date in yyyy-MM-dd format
+- ${random_timestamp} - random timestamp in yyyy-MM-dd HH:mm:ss.SSS format
+- ${current_date} - current date in yyyy-MM-dd format
+- ${current_timestamp} - current timestamp in yyyy-MM-dd HH:mm:ss.SSS format.

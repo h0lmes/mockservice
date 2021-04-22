@@ -5,27 +5,28 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class HttpServletRequestFacade {
 
-    Logger log = LoggerFactory.getLogger(HttpServletRequestFacade.class);
-
+    private static final String MESSAGE_SERVICE_NAME_MUST_NOT_BE_NULL = "Service name must not be null";
     private static final String PATH_DELIMITER = "/";
     private static final String PATH_DELIMITER_SUBSTITUTE = "_";
     private static final String DEFAULT_FILE_EXTENSION = ".json";
     private static final String MOCK_HEADER = "Mock";
     private static final String MOCK_TIMEOUT_HEADER = "Mock-Timeout";
+    private static final String MOCK_VARIABLES_HEADER = "Mock-Variables";
     private static final String MOCK_HEADER_SPLIT_REGEX = "\\s+";
     private static final String MOCK_OPTION_DELIMITER = "#";
 
@@ -37,14 +38,8 @@ public class HttpServletRequestFacade {
         this.folder = folder;
     }
 
-    public Map<String, String> getVariables(Map<String, String> variables, boolean useBodyAsVariables) {
-        return getVariables(request, variables, useBodyAsVariables);
-    }
-
     @SuppressWarnings("unchecked")
-    private Map<String, String> getVariables(@NonNull HttpServletRequest request,
-                                                    @NonNull Map<String, String> variables,
-                                                    boolean useBodyAsVariables) {
+    public Map<String, String> getVariables(@NonNull Map<String, String> variables, boolean useBodyAsVariables) {
         Assert.notNull(variables, "Variables must not be null");
 
         if (useBodyAsVariables && !"GET".equalsIgnoreCase(request.getMethod())) {
@@ -55,7 +50,7 @@ public class HttpServletRequestFacade {
                     bodyVariables.forEach(variables::putIfAbsent);
                 }
             } catch (IOException e) {
-                log.error("Exception while reading request body.", e);
+                throw new UncheckedIOException(e);
             }
         }
 
@@ -63,10 +58,36 @@ public class HttpServletRequestFacade {
         if (pathVariables instanceof Map) {
             ((Map<String, String>) pathVariables).forEach(variables::putIfAbsent);
         }
+
         Map<String, String[]> requestParams = request.getParameterMap();
         requestParams.forEach((k, v) -> variables.putIfAbsent(k, v[0]));
 
+        getMockVariables(folder, request).forEach(variables::put);
+
         return variables;
+    }
+
+    private static Map<String, String> getMockVariables(@NonNull String serviceName, @NonNull HttpServletRequest request) {
+        Assert.notNull(serviceName, MESSAGE_SERVICE_NAME_MUST_NOT_BE_NULL);
+        Map<String, String> result = new HashMap<>();
+        serviceName = serviceName.toLowerCase();
+        String endpoint = getEncodedEndpoint(request);
+        Enumeration<String> headers = request.getHeaders(MOCK_VARIABLES_HEADER);
+        while (headers.hasMoreElements()) {
+            String header = headers.nextElement();
+            for (String option : header.trim().toLowerCase().split(MOCK_HEADER_SPLIT_REGEX)) {
+                String[] optionParts = option.split(PATH_DELIMITER);
+
+                if (optionParts.length == 3 && serviceName.equals(optionParts[0])) {
+                    result.put(optionParts[1], optionParts[2]);
+                }
+
+                if (optionParts.length == 4 && serviceName.equals(optionParts[0]) && endpoint.equals(optionParts[1])) {
+                    result.put(optionParts[2], optionParts[3]);
+                }
+            }
+        }
+        return result;
     }
 
     public String getPath() {
@@ -94,7 +115,7 @@ public class HttpServletRequestFacade {
     }
 
     private static String getMockOption(@NonNull String serviceName, @NonNull HttpServletRequest request) {
-        Assert.notNull(serviceName, "Service name must not be null");
+        Assert.notNull(serviceName, MESSAGE_SERVICE_NAME_MUST_NOT_BE_NULL);
         String header = request.getHeader(MOCK_HEADER);
         if (header == null) {
             return "";
@@ -122,7 +143,7 @@ public class HttpServletRequestFacade {
     }
 
     private static void mockTimeout(@NonNull String serviceName, @NonNull HttpServletRequest request) {
-        Assert.notNull(serviceName, "Service name must not be null");
+        Assert.notNull(serviceName, MESSAGE_SERVICE_NAME_MUST_NOT_BE_NULL);
         String header = request.getHeader(MOCK_TIMEOUT_HEADER);
         if (header == null) {
             return;
@@ -161,12 +182,12 @@ public class HttpServletRequestFacade {
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-        Map<String, Object> map = null;
-        map = mapper.readValue(json, Map.class);
+        Map<String, Object> map = mapper.readValue(json, Map.class);
         return flattenMap(map);
     }
 
     private static Map<String, String> flattenMap(Map<String, Object> map) {
+        // TODO
         return flattenMapRec(map);
     }
 
@@ -176,6 +197,7 @@ public class HttpServletRequestFacade {
                 .collect(Collectors.toMap( Map.Entry::getKey, e -> String.valueOf(e.getValue()) ));
     }
 
+    @SuppressWarnings("unchecked")
     private static Stream<Map.Entry<String, ?>> flatten(Map.Entry<String, ?> entry, String keyPrefix) {
         if (entry.getValue() instanceof Map) {
             return ((Map<String,?>) entry.getValue()).entrySet().stream().flatMap(e -> flatten(e, keyPrefix + e.getKey() + "."));

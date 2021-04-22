@@ -1,22 +1,27 @@
 package com.mockservice.service;
 
+import com.mockservice.template.StringTemplate;
 import org.springframework.http.HttpHeaders;
+import org.springframework.lang.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
+import java.util.Map;
+import java.util.function.Supplier;
 
-public class ResourceWrapper {
+public class MockResource {
 
-    private static final String HTTP_PREFIX = "HTTP/1.1";
+    private static final String HTTP_PREFIX = "HTTP/1.1 ";
+    private static final int HTTP_PREFIX_LEN = HTTP_PREFIX.length();
     private static final String HTTP_HEADER_DELIMITER = ": ";
 
     private int code = 200;
     private HttpHeaders headers = new HttpHeaders();
-    private StringBuilder body = new StringBuilder();
+    private StringTemplate body = new StringTemplate();
 
-    public ResourceWrapper(String resource) {
+    public MockResource(String resource) {
         fromString(resource);
     }
 
@@ -45,7 +50,7 @@ public class ResourceWrapper {
 
     private void processHttpCode(String line) {
         try {
-            this.code = Integer.parseInt(line.substring(HTTP_PREFIX.length() + 1).trim());
+            this.code = Integer.parseInt(line.substring(HTTP_PREFIX_LEN).trim());
         } catch (NumberFormatException e) {
             // do nothing
         }
@@ -60,14 +65,11 @@ public class ResourceWrapper {
     }
 
     private void processLine(String line) {
-        if (body.length() > 0) {
-            body.append('\n');
-        }
-        body.append(line);
+        body.add(line);
     }
 
-    public String getBody() {
-        return body.toString();
+    public String getBody(@Nullable Map<String, String> variables, @Nullable Map<String, Supplier<String>> suppliers) {
+        return body.toString(variables, suppliers);
     }
 
     public int getCode() {
