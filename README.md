@@ -30,8 +30,9 @@ All standard path delimiters (`/`) should be substituted with an underscores (`_
 Path variables supported.
 Example: `api/entity/{id}` transforms into `api_entity_{id}`.
 
-> Important note. File names should be in lower case,
-except for HTTP method name which should be in upper case.
+> Important note. Except for HTTP method name (which should be in upper case)
+all file names should be in lower case to avoid any errors
+on case-sensitive (Unix-based) file systems.
 
 #
 ### Customizing HTTP status code and headers
@@ -67,27 +68,26 @@ You can include a header `Mock` in HTTP request.
 There could be multiple options for different services in one header
 separated by spaces.
 
-There are two versions:
+There are two versions of this header:
 - service name / option
 - service name / endpoint path / option.
 
-Example:
 
-    Mock: AccountService/option3 StoreService/api_v1_item_{id}/option2
+    Mock: AccountServiceController/option3 StoreServiceController/api_v1_item_{id}/option2
 
 In the example above if you call an endpoint of the `AccountService`
 a file with `#option3` before the extension would be loaded
-(e.g. `resources/AccountService/GET_accounts#option3.json`) regardless
+(e.g. `resources/AccountServiceController/GET_accounts#option3.json`) regardless
 of the endpoint path.
 
 If you call an endpoint `/api/v1/item/{id}` of the `StoreService`
 a file with `#option2` before the extension would be loaded
-(e.g. `resources/StoreService/GET_api_v1_item_{id}#option2.json`).
+(e.g. `resources/StoreServiceController/GET_api_v1_item_{id}#option2.json`).
 
 #
-### Using variables in JSON
+### Using predefined variables in JSON
 
-In JSON files you can use variables, those would be substituted
+In JSON files you can use predefined variables, those would be substituted
 with their values each time an endpoint is fetched.
 
 List of predefined variables:
@@ -100,3 +100,46 @@ List of predefined variables:
 - ${random_timestamp} - random timestamp in yyyy-MM-dd HH:mm:ss.SSS format
 - ${current_date} - current date in yyyy-MM-dd format
 - ${current_timestamp} - current timestamp in yyyy-MM-dd HH:mm:ss.SSS format.
+
+#
+### Using provided variables in JSON
+
+In JSON files you can use variables which are provided on a per-request basis.
+
+Variables have the following format:
+
+    ${var_name}
+    
+    or
+    
+    ${var_name:default_value}
+
+Mock engine makes available variables from the following sources:
+
+1. Path variables. Example of mapping: `/api/v1/account/{id}`.
+2. Request parameters. Example of request: `/api/v1/account?id=1`.
+3. Request body. Body should contain JSON for this to work.
+All fields of the JSON would be collected into the map which in turn
+would be flattened.
+4. `Mock-Variable` header (see below).
+
+#
+###Mock-Variable header
+
+You can include multiple headers `Mock-Variable` in HTTP request.
+Each header defines exactly one variable.
+
+There are two versions of this header:
+- service name / variable name / value
+- service name / endpoint path / variable name / value.
+
+
+    Mock-Variable: AccountServiceController/total/1000
+    Mock-Variable: StoreServiceController/api_v1_item_{id}/item_name/iPhone 12 Pro
+
+In the example above if you call an endpoint of the `AccountServiceController`
+a variable `total` with value `1000` would be available
+regardless of the endpoint path.
+
+If you call an endpoint `/api/v1/item/{id}` of the `StoreServiceController`
+a variable `item_name` with value `iPhone 12 Pro` would be available.

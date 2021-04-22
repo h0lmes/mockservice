@@ -9,7 +9,9 @@ import java.util.function.Supplier;
 
 public class StringTemplate {
 
-    private enum State {EMPTY, TEXT, VARIABLE}
+    private enum State {
+        EMPTY, TEXT, VARIABLE
+    }
 
     private static final String VAR_START = "${";
     private static final String VAR_END = "}";

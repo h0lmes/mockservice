@@ -18,7 +18,20 @@ Cache-Control: no-cache
 
 ###
 
+GET http://localhost:8080/demo/api/entity/2
+Mock-Variable: demoservicecontroller/id/1000
+Accept: */*
+Cache-Control: no-cache
+
+###
+
 GET http://localhost:8080/demo/api/entity/filter?a=aaa&b=bbb
+Accept: */*
+Cache-Control: no-cache
+
+###
+
+GET http://localhost:8080/demo/api/entity/filter?a=non-default a
 Accept: */*
 Cache-Control: no-cache
 

@@ -26,7 +26,7 @@ public class HttpServletRequestFacade {
     private static final String DEFAULT_FILE_EXTENSION = ".json";
     private static final String MOCK_HEADER = "Mock";
     private static final String MOCK_TIMEOUT_HEADER = "Mock-Timeout";
-    private static final String MOCK_VARIABLES_HEADER = "Mock-Variables";
+    private static final String MOCK_VARIABLE_HEADER = "Mock-Variable";
     private static final String MOCK_HEADER_SPLIT_REGEX = "\\s+";
     private static final String MOCK_OPTION_DELIMITER = "#";
 
@@ -72,18 +72,16 @@ public class HttpServletRequestFacade {
         Map<String, String> result = new HashMap<>();
         serviceName = serviceName.toLowerCase();
         String endpoint = getEncodedEndpoint(request);
-        Enumeration<String> headers = request.getHeaders(MOCK_VARIABLES_HEADER);
+
+        Enumeration<String> headers = request.getHeaders(MOCK_VARIABLE_HEADER);
         while (headers.hasMoreElements()) {
             String header = headers.nextElement();
-            for (String option : header.trim().toLowerCase().split(MOCK_HEADER_SPLIT_REGEX)) {
-                String[] optionParts = option.split(PATH_DELIMITER);
-
-                if (optionParts.length == 3 && serviceName.equals(optionParts[0])) {
-                    result.put(optionParts[1], optionParts[2]);
-                }
-
-                if (optionParts.length == 4 && serviceName.equals(optionParts[0]) && endpoint.equals(optionParts[1])) {
-                    result.put(optionParts[2], optionParts[3]);
+            if (header != null && !header.isEmpty()) {
+                String[] parts = header.split(PATH_DELIMITER);
+                if (parts.length == 3 && serviceName.equals(parts[0])) {
+                    result.put(parts[1], parts[2]);
+                } else if (parts.length > 3 && serviceName.equals(parts[0]) && endpoint.equals(parts[1])) {
+                    result.put(parts[2], parts[3]);
                 }
             }
         }
@@ -96,14 +94,14 @@ public class HttpServletRequestFacade {
 
     private static String getPath(@NonNull String folder, @NonNull HttpServletRequest request) {
         Assert.notNull(folder, "Folder must not be null");
-        return "classpath:" +
-                folder +
-                PATH_DELIMITER +
-                request.getMethod().toUpperCase() +
-                PATH_DELIMITER_SUBSTITUTE +
-                getEncodedEndpoint(request) +
-                getMockOption(folder, request) +
-                DEFAULT_FILE_EXTENSION;
+        return "classpath:"
+                + folder
+                + PATH_DELIMITER
+                + request.getMethod().toUpperCase()
+                + PATH_DELIMITER_SUBSTITUTE
+                + getEncodedEndpoint(request)
+                + getMockOption(folder, request)
+                + DEFAULT_FILE_EXTENSION;
     }
 
     private static String getEncodedEndpoint(@NonNull HttpServletRequest request) {
@@ -124,14 +122,11 @@ public class HttpServletRequestFacade {
         serviceName = serviceName.toLowerCase();
         String endpoint = getEncodedEndpoint(request);
         for (String option : header.trim().toLowerCase().split(MOCK_HEADER_SPLIT_REGEX)) {
-            String[] optionParts = option.split(PATH_DELIMITER);
-
-            if (optionParts.length == 2 && serviceName.equals(optionParts[0])) {
-                return MOCK_OPTION_DELIMITER + optionParts[1];
-            }
-
-            if (optionParts.length == 3 && serviceName.equals(optionParts[0]) && endpoint.equals(optionParts[1])) {
-                return MOCK_OPTION_DELIMITER + optionParts[2];
+            String[] parts = option.split(PATH_DELIMITER);
+            if (parts.length == 2 && serviceName.equals(parts[0])) {
+                return MOCK_OPTION_DELIMITER + parts[1];
+            } else if (parts.length > 2 && serviceName.equals(parts[0]) && endpoint.equals(parts[1])) {
+                return MOCK_OPTION_DELIMITER + parts[2];
             }
         }
 
@@ -152,14 +147,11 @@ public class HttpServletRequestFacade {
         serviceName = serviceName.toLowerCase();
         String endpoint = getEncodedEndpoint(request);
         for (String option : header.trim().toLowerCase().split(MOCK_HEADER_SPLIT_REGEX)) {
-            String[] optionParts = option.split(PATH_DELIMITER);
-
-            if (optionParts.length == 2 && serviceName.equals(optionParts[0])) {
-                sleep(optionParts[1]);
-            }
-
-            if (optionParts.length == 3 && serviceName.equals(optionParts[0]) && endpoint.equals(optionParts[1])) {
-                sleep(optionParts[2]);
+            String[] parts = option.split(PATH_DELIMITER);
+            if (parts.length == 2 && serviceName.equals(parts[0])) {
+                sleep(parts[1]);
+            } else if (parts.length > 2 && serviceName.equals(parts[0]) && endpoint.equals(parts[1])) {
+                sleep(parts[2]);
             }
         }
     }
