@@ -74,7 +74,7 @@ public class HttpServletRequestFacade {
         while (headers.hasMoreElements()) {
             String header = headers.nextElement();
             if (header != null && !header.isEmpty()) {
-                String[] parts = header.split(PATH_DELIMITER);
+                String[] parts = header.trim().toLowerCase().split(PATH_DELIMITER);
                 if (parts.length == 3 && serviceName.equals(parts[0])) {
                     result.put(parts[1], parts[2]);
                 } else if (parts.length > 3 && serviceName.equals(parts[0]) && endpoint.equals(parts[1])) {
