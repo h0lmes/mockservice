@@ -191,7 +191,8 @@ public class HttpServletRequestFacade {
                 map = (Map<String, Object>) obj;
                 map.forEach((k, v) -> q.offer(new Pair<>(parentKey.isEmpty() ? key : parentKey + "." + key, new Pair<>(k, v))));
             } else {
-                result.put(parentKey.isEmpty() ? key : parentKey + "." + key, obj.toString());
+                String str = obj == null ? "null" : obj.toString();
+                result.put(parentKey.isEmpty() ? key : parentKey + "." + key, str);
             }
         }
         return result;
