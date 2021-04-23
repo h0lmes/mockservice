@@ -67,17 +67,16 @@ public class HttpServletRequestFacade {
     private static Map<String, String> getMockVariables(@NonNull String serviceName, @NonNull HttpServletRequest request) {
         Assert.notNull(serviceName, MESSAGE_SERVICE_NAME_MUST_NOT_BE_NULL);
         Map<String, String> result = new HashMap<>();
-        serviceName = serviceName.toLowerCase();
         String endpoint = getEncodedEndpoint(request);
 
         Enumeration<String> headers = request.getHeaders(MOCK_VARIABLE_HEADER);
         while (headers.hasMoreElements()) {
             String header = headers.nextElement();
             if (header != null && !header.isEmpty()) {
-                String[] parts = header.trim().toLowerCase().split(PATH_DELIMITER);
-                if (parts.length == 3 && serviceName.equals(parts[0])) {
+                String[] parts = header.trim().split(PATH_DELIMITER);
+                if (parts.length == 3 && serviceName.equalsIgnoreCase(parts[0])) {
                     result.put(parts[1], parts[2]);
-                } else if (parts.length > 3 && serviceName.equals(parts[0]) && endpoint.equals(parts[1])) {
+                } else if (parts.length > 3 && serviceName.equalsIgnoreCase(parts[0]) && endpoint.equals(parts[1])) {
                     result.put(parts[2], parts[3]);
                 }
             }
@@ -111,22 +110,23 @@ public class HttpServletRequestFacade {
 
     private static String getMockOption(@NonNull String serviceName, @NonNull HttpServletRequest request) {
         Assert.notNull(serviceName, MESSAGE_SERVICE_NAME_MUST_NOT_BE_NULL);
-        String header = request.getHeader(MOCK_HEADER);
-        if (header == null) {
-            return "";
-        }
-
-        serviceName = serviceName.toLowerCase();
         String endpoint = getEncodedEndpoint(request);
-        for (String option : header.trim().toLowerCase().split(MOCK_HEADER_SPLIT_REGEX)) {
-            String[] parts = option.split(PATH_DELIMITER);
-            if (parts.length == 2 && serviceName.equals(parts[0])) {
-                return MOCK_OPTION_DELIMITER + parts[1];
-            } else if (parts.length > 2 && serviceName.equals(parts[0]) && endpoint.equals(parts[1])) {
-                return MOCK_OPTION_DELIMITER + parts[2];
+
+        Enumeration<String> headers = request.getHeaders(MOCK_HEADER);
+        while (headers.hasMoreElements()) {
+            String header = headers.nextElement();
+            if (header != null && !header.isEmpty()) {
+
+                for (String option : header.split(MOCK_HEADER_SPLIT_REGEX)) {
+                    String[] parts = option.split(PATH_DELIMITER);
+                    if (parts.length == 2 && serviceName.equalsIgnoreCase(parts[0])) {
+                        return MOCK_OPTION_DELIMITER + parts[1];
+                    } else if (parts.length > 2 && serviceName.equalsIgnoreCase(parts[0]) && endpoint.equals(parts[1])) {
+                        return MOCK_OPTION_DELIMITER + parts[2];
+                    }
+                }
             }
         }
-
         return "";
     }
 
@@ -136,19 +136,21 @@ public class HttpServletRequestFacade {
 
     private static void mockTimeout(@NonNull String serviceName, @NonNull HttpServletRequest request) {
         Assert.notNull(serviceName, MESSAGE_SERVICE_NAME_MUST_NOT_BE_NULL);
-        String header = request.getHeader(MOCK_TIMEOUT_HEADER);
-        if (header == null) {
-            return;
-        }
-
-        serviceName = serviceName.toLowerCase();
         String endpoint = getEncodedEndpoint(request);
-        for (String option : header.trim().toLowerCase().split(MOCK_HEADER_SPLIT_REGEX)) {
-            String[] parts = option.split(PATH_DELIMITER);
-            if (parts.length == 2 && serviceName.equals(parts[0])) {
-                sleep(parts[1]);
-            } else if (parts.length > 2 && serviceName.equals(parts[0]) && endpoint.equals(parts[1])) {
-                sleep(parts[2]);
+
+        Enumeration<String> headers = request.getHeaders(MOCK_TIMEOUT_HEADER);
+        while (headers.hasMoreElements()) {
+            String header = headers.nextElement();
+            if (header != null && !header.isEmpty()) {
+
+                for (String option : header.split(MOCK_HEADER_SPLIT_REGEX)) {
+                    String[] parts = option.split(PATH_DELIMITER);
+                    if (parts.length == 2 && serviceName.equalsIgnoreCase(parts[0])) {
+                        sleep(parts[1]);
+                    } else if (parts.length > 2 && serviceName.equalsIgnoreCase(parts[0]) && endpoint.equals(parts[1])) {
+                        sleep(parts[2]);
+                    }
+                }
             }
         }
     }
@@ -180,19 +182,16 @@ public class HttpServletRequestFacade {
         Queue<Pair<String, Pair<String, Object>>> q = new ArrayDeque<>();
         Map<String, String> result = new HashMap<>();
 
-        map.forEach((k, v) -> q.offer(new Pair<>("", new Pair<>(k, v))));
+        map.forEach((k, v) -> q.offer(new Pair<>(null, new Pair<>(k, v))));
 
         while (!q.isEmpty()) {
             Pair<String, Pair<String, Object>> el = q.poll();
-            String parentKey = el.getKey();
-            String key = el.getValue().getKey();
+            String key = el.getKey() == null ? el.getValue().getKey() : el.getKey() + "." + el.getValue().getKey();
             Object obj = el.getValue().getValue();
             if (obj instanceof Map) {
-                map = (Map<String, Object>) obj;
-                map.forEach((k, v) -> q.offer(new Pair<>(parentKey.isEmpty() ? key : parentKey + "." + key, new Pair<>(k, v))));
+                ((Map<String, Object>) obj).forEach((k, v) -> q.offer(new Pair<>(key, new Pair<>(k, v))));
             } else {
-                String str = obj == null ? "null" : obj.toString();
-                result.put(parentKey.isEmpty() ? key : parentKey + "." + key, str);
+                result.put(key, obj == null ? "null" : obj.toString());
             }
         }
         return result;
