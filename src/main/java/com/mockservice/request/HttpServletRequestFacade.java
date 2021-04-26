@@ -11,7 +11,6 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,14 +39,19 @@ public class HttpServletRequestFacade {
         Assert.notNull(variables, "Variables must not be null");
 
         if (useBodyAsVariables && !"GET".equalsIgnoreCase(request.getMethod())) {
+            String body = null;
             try {
-                String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-                if (body != null && !body.trim().isEmpty()) {
-                    Map<String, String> bodyVariables = jsonToFlatMap(body);
-                    bodyVariables.forEach(variables::putIfAbsent);
-                }
+                body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
             } catch (IOException e) {
-                throw new UncheckedIOException(e);
+                // Body processed elsewhere. Do nothing.
+            }
+            if (body != null && !body.trim().isEmpty()) {
+                try {
+                    Map<String, String> bodyAsVariables = jsonToFlatMap(body);
+                    bodyAsVariables.forEach(variables::putIfAbsent);
+                } catch (JsonProcessingException e) {
+                    // Not a valid JSON. Ignore.
+                }
             }
         }
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.request.HttpServletRequestFacade;
-import com.mockservice.template.TemplateConstants;
+import com.mockservice.template.TemplateFunction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -20,7 +20,7 @@ import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -30,6 +30,7 @@ public class MockService {
     @Autowired
     private HttpServletRequest request;
 
+    private static final TemplateFunction[] templateFunctions = TemplateFunction.values();
     private static final int CACHE_SIZE = 256;
     private final ResourceLoader resourceLoader;
     private final ConcurrentLruCache<String, MockResource> resourceCache;
@@ -57,7 +58,7 @@ public class MockService {
         MockResource resource = resourceCache.get(requestFacade.getPath());
         requestFacade.mockTimeout();
         Map<String, String> requestVariables = requestFacade.getVariables(variables, useBodyAsVariables);
-        String body = resource.getBody(requestVariables, makeSuppliers());
+        String body = resource.getBody(requestVariables, makeFunctions());
 
         return ResponseEntity.status(resource.getCode()).headers(resource.getHeaders()).body(body);
     }
@@ -67,7 +68,7 @@ public class MockService {
         MockResource resource = resourceCache.get(requestFacade.getPath());
         requestFacade.mockTimeout();
         Map<String, String> requestVariables = requestFacade.getVariables(variables, useBodyAsVariables);
-        String jsonBody = resource.getBody(requestVariables, makeSuppliers());
+        String jsonBody = resource.getBody(requestVariables, makeFunctions());
 
         ObjectMapper mapper = new ObjectMapper();
         JavaType type = mapper.getTypeFactory().constructType(clazz);
@@ -76,11 +77,11 @@ public class MockService {
         return ResponseEntity.status(resource.getCode()).headers(resource.getHeaders()).body(body);
     }
 
-    private Map<String, Supplier<String>> makeSuppliers() {
-        Map<String, Supplier<String>> map = new HashMap<>();
-        for (TemplateConstants constant : TemplateConstants.values()) {
-            map.put(constant.getName(), constant.getSupplier());
+    private Map<String, Function<String[], String>> makeFunctions() {
+        Map<String, Function<String[], String>> functions = new HashMap<>();
+        for (TemplateFunction function : templateFunctions) {
+            functions.put(function.getName(), function.getFunction());
         }
-        return map;
+        return functions;
     }
 }

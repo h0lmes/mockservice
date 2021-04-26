@@ -1,5 +1,6 @@
 [
   {"id": ${sequence}, "name": "${random_string}"},
+  {"id": ${sequence}, "name": "${random_strings:Java:C++:Python:JavaScript}"},
   {"id": ${sequence}, "name": "${random_uuid}"},
   {"id": ${sequence}, "name": "${random_date}"},
   {"id": ${sequence}, "name": "${random_timestamp}"},

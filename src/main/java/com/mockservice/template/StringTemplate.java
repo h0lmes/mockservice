@@ -5,18 +5,43 @@ import org.springframework.lang.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
+/**
+ * The {@code StringTemplate} class represents parsed template.
+ * <p>
+ * Supports only addition of strings.
+ * The format of variables:
+ * - ${var_name}
+ * - ${var_name:def_val}
+ * - ${function_name}
+ * - ${function_name:param1:param2:....}
+ *
+ * @author  Roman Dubinin
+ */
 public class StringTemplate {
 
     private enum State {
-        EMPTY, TEXT, VARIABLE
+        EMPTY, // internal list is empty
+        TEXT, // last line is a text
+        VARIABLE // last line is a variable
     }
 
     private static final String VAR_START = "${";
+    private static final int VAR_START_LEN = VAR_START.length();
     private static final String VAR_END = "}";
+    private static final int VAR_END_LEN = VAR_END.length();
+    private static final String VAR_SPLIT = ":";
     private static final String NEW_LINE = System.lineSeparator();
 
+    /**
+     * Internal list holds data in the following way:
+     * - each line holds a text only (with possible line breaks) or a variable only
+     * - one variable per line
+     * - there could be no consecutive text lines, though could be consecutive lines holding variables.
+     *
+     * The third rule is for performance.
+     */
     private final List<String> strings = new ArrayList<>();
     private State state = State.EMPTY;
 
@@ -64,7 +89,7 @@ public class StringTemplate {
     }
 
     private boolean isTokenVariable(String s) {
-        return !s.isEmpty() && s.startsWith(VAR_START);
+        return s.startsWith(VAR_START);
     }
 
     private List<String> tokenize(String line) {
@@ -75,8 +100,8 @@ public class StringTemplate {
             int start = line.indexOf(VAR_START, at);
             if (start == at) {
                 int end = line.indexOf(VAR_END, start);
-                if (end > at + VAR_START.length()) {
-                    end += VAR_END.length();
+                if (end > at + VAR_START_LEN) {
+                    end += VAR_END_LEN;
                     tokens.add(line.substring(start, end));
                     at = end;
                 } else {
@@ -98,38 +123,32 @@ public class StringTemplate {
 
     // builder
 
-    @Override
-    public String toString() {
+    public String toString(@Nullable Map<String, String> variables, @Nullable Map<String, Function<String[], String>> functions) {
         StringBuilder builder = new StringBuilder();
-        strings.forEach(builder::append);
+        strings.forEach(s -> builder.append(map(s, variables, functions)));
         return builder.toString();
     }
 
-    public String toString(@Nullable Map<String, String> variables, @Nullable Map<String, Supplier<String>> suppliers) {
-        StringBuilder builder = new StringBuilder();
-        strings.forEach(s -> builder.append(map(s, variables, suppliers)));
-        return builder.toString();
-    }
-
-    private String map(String token, @Nullable Map<String, String> variables, @Nullable Map<String, Supplier<String>> suppliers) {
+    private String map(String token, @Nullable Map<String, String> variables, @Nullable Map<String, Function<String[], String>> functions) {
         if (isTokenVariable(token)) {
-            String defVal = token;
-            String name = token.substring(VAR_START.length(), token.length() - VAR_END.length());
-            int colon = name.indexOf(':');
-            if (colon >= 0) {
-                defVal = name.substring(colon + 1);
-                name = name.substring(0, colon);
-            }
+            String[] args = token.substring(VAR_START_LEN, token.length() - VAR_END_LEN).split(VAR_SPLIT);
+            String name = args[0];
+
             if (name.isEmpty()) {
                 throw new IllegalArgumentException("Token name must not be empty (" + token + ")");
             }
+
             if (variables != null && variables.containsKey(name)) {
                 return variables.get(name);
             }
-            if (suppliers != null && suppliers.containsKey(name)) {
-                return suppliers.get(name).get();
+            if (functions != null && functions.containsKey(name)) {
+                return functions.get(name).apply(args);
             }
-            return defVal;
+
+            if (args.length > 1) {
+                return args[1];
+            }
+            return token;
         }
         return token;
     }

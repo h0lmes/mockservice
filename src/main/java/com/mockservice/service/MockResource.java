@@ -9,17 +9,19 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 public class MockResource {
 
     private static final String HTTP_PREFIX = "HTTP/1.1 ";
     private static final int HTTP_PREFIX_LEN = HTTP_PREFIX.length();
     private static final String HTTP_HEADER_DELIMITER = ": ";
+    private static final int HTTP_HEADER_DELIMITER_LEN = HTTP_HEADER_DELIMITER.length();
 
     private int code = 200;
     private HttpHeaders headers = new HttpHeaders();
     private StringTemplate body = new StringTemplate();
+    private boolean readingHeaders = false;
 
     public MockResource(String resource) {
         fromString(resource);
@@ -27,10 +29,8 @@ public class MockResource {
 
     private void fromString(String resource) {
         try (BufferedReader reader = new BufferedReader(new StringReader(resource))) {
-            String line = reader.readLine();
-            boolean readingHeaders = false;
 
-            while (line != null) {
+            reader.lines().forEach(line -> {
                 if (line.startsWith(HTTP_PREFIX)) {
                     readingHeaders = true;
                     processHttpCode(line);
@@ -41,8 +41,8 @@ public class MockResource {
                 } else {
                     processLine(line);
                 }
-                line = reader.readLine();
-            }
+            });
+
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -52,15 +52,14 @@ public class MockResource {
         try {
             this.code = Integer.parseInt(line.substring(HTTP_PREFIX_LEN).trim());
         } catch (NumberFormatException e) {
-            // do nothing
+            // ignore NaN
         }
     }
 
     private void processHeader(String line) {
         int delimiter = line.indexOf(HTTP_HEADER_DELIMITER);
-        int len = HTTP_HEADER_DELIMITER.length();
         String key = line.substring(0, delimiter);
-        String value = line.substring(delimiter + len);
+        String value = line.substring(delimiter + HTTP_HEADER_DELIMITER_LEN);
         headers.add(key, value);
     }
 
@@ -68,8 +67,8 @@ public class MockResource {
         body.add(line);
     }
 
-    public String getBody(@Nullable Map<String, String> variables, @Nullable Map<String, Supplier<String>> suppliers) {
-        return body.toString(variables, suppliers);
+    public String getBody(@Nullable Map<String, String> variables, @Nullable Map<String, Function<String[], String>> functions) {
+        return body.toString(variables, functions);
     }
 
     public int getCode() {

@@ -14,34 +14,42 @@ you may name it as you like).
 3. Create a new folder under `src/main/resources` folder.
 Name the folder as your controller (`AccountServiceController` in this case).
 4. Create data files under `src/main/resources/AccountServiceController` folder
-to supply data for each method (see `DemoServiceController` folder).
+to supply data for each method (see file naming format below).
 
 #
 ### File naming format
 
-    METHOD_request-mapping.json
+    METHOD_request_mapping.json
+
+
+`METHOD` is any of HTTP methods.
+Path variables are supported.
+All path delimiters `/` should be substituted with an underscores `_`.
 
 Only `.json` extension supported.
 
-`METHOD` is any of HTTP methods.
+Example:
 
-All standard path delimiters (`/`) should be substituted with an underscores (`_`).
-
-Path variables supported.
-Example: `api/entity/{id}` transforms into `api_entity_{id}`.
+    @GetMapping("api/entity/{id})
+    
+        corresponds to
+    
+    GET_api_entity_{id}.json
 
 > Important note. Except for HTTP method name (which should be in upper case)
 all file names should be in lower case to avoid any errors
 on case-sensitive (Unix-based) file systems.
 
 #
-### Customizing HTTP status code and headers
+### Data file contents format
 
-You can specify status code and headers at the beginning
-or at the end of a data file to override defaults (default status code is 200).
+By default a data file could contain any JSON.
 
-If you want to specify headers only you'd have to provide a status code as well.
-Data file parser looks for 'HTTP/1.1' at the beginning of a line
+Also it is possible to specify status code and additional headers at the beginning
+or at the end of a file to override defaults (default status code is 200).
+
+It is not possible to specify headers only.
+Data file parser looks for `HTTP/1.1` at the beginning of a line
 of a data file as an indication this file not only contains payload
 but also status code and headers.
 
@@ -52,11 +60,11 @@ Example:
     HTTP/1.1 201
     Custom-Header: header value
     
-    ... body content here ...
+    {"some_key": "some value"}
     
 or
 
-    ... body content here ...
+    {"message": "Internal error"}
 
     HTTP/1.1 400
     Custom-Header: header value
@@ -69,9 +77,14 @@ There could be multiple options for different services in one header
 separated by spaces.
 
 There are two versions of this header:
-- service name / option
-- service name / endpoint path / option.
 
+    service_name/option
+    
+    ...or...
+    
+    service_name/endpoint_path/option
+    
+Example:
 
     Mock: AccountServiceController/option3 StoreServiceController/api_v1_item_{id}/option2
 
@@ -90,16 +103,19 @@ a file with `#option2` before the extension would be loaded
 In JSON files you can use predefined variables, those would be substituted
 with their values each time an endpoint is fetched.
 
-List of predefined variables:
+List of predefined variables (template functions):
 
-- ${sequence} - sequence of integers starting from 1
-- ${random_int} - random integer between 1 and 1 000 000
-- ${random_uuid} - random UUID
-- ${random_string} - a string of 20 random characters [a-z]
-- ${random_date} - random date in yyyy-MM-dd format
-- ${random_timestamp} - random timestamp in yyyy-MM-dd HH:mm:ss.SSS format
-- ${current_date} - current date in yyyy-MM-dd format
-- ${current_timestamp} - current timestamp in yyyy-MM-dd HH:mm:ss.SSS format.
+- `${sequence}` - sequence of integers starting from 1
+- `${random_int}` - random integer between 1 and 10 000
+- `${random_int:min:max}` - random integer between `min` and `max`
+- `${random_uuid}` - random UUID
+- `${random_string}` - a string of 20 random characters in `[a-z]`
+- `${random_string:min:max}` - a string of `min` to `max` random characters in `[a-z]`
+- `${random_strings:str1:str2:...}` - a random string of given arguments (may be useful to represent enum values)
+- `${random_date}` - random date in yyyy-MM-dd format
+- `${random_timestamp}` - random timestamp in yyyy-MM-dd HH:mm:ss.SSS format
+- `${current_date}` - current date in yyyy-MM-dd format
+- `${current_timestamp}` - current timestamp in yyyy-MM-dd HH:mm:ss.SSS format.
 
 #
 ### Using provided variables in JSON
@@ -110,7 +126,7 @@ Variables have the following format:
 
     ${var_name}
     
-    or
+    ...or...
     
     ${var_name:default_value}
 
@@ -123,6 +139,20 @@ All fields of the JSON would be collected into the map which in turn
 would be flattened.
 4. `Mock-Variable` header (see below).
 
+While flattening JSON hierarchy is preserved. For example for object:
+
+    {
+        "key1": "value 1",
+        "key2": {
+            "key1": "other value 1"
+        }
+    }
+
+the following variables would be created
+
+    ${key1}
+    ${key2.key1}
+
 #
 ### Mock-Variable header
 
@@ -130,9 +160,14 @@ You can include multiple headers `Mock-Variable` in HTTP request.
 Each header defines exactly one variable.
 
 There are two versions of this header:
-- service name / variable name / value
-- service name / endpoint path / variable name / value.
 
+    service_name/variable_name/value
+    
+    ...or...
+    
+    service_name/endpoint_path/variable_name/value
+    
+Example:
 
     Mock-Variable: AccountServiceController/total/1000
     Mock-Variable: StoreServiceController/api_v1_item_{id}/item_name/iPhone 12 Pro
