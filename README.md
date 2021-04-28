@@ -134,12 +134,12 @@ Mock engine makes available variables from the following sources:
 
 1. Path variables. Example of mapping: `/api/v1/account/{id}`.
 2. Request parameters. Example of request: `/api/v1/account?id=1`.
-3. Request body. Body should contain JSON for this to work.
-All fields of the JSON would be collected into the map which in turn
-would be flattened.
-4. `Mock-Variable` header (see below).
+3. Request body (for non-GET requests). Body should contain JSON for this to work.
+All fields of the JSON would be collected and made available as variables.
+Hierarchy is being preserved (see example below).
+4. `Mock-Variable` header (see section below).
 
-While flattening JSON hierarchy is preserved. For example for object:
+Example of request body:
 
     {
         "key1": "value 1",
@@ -148,7 +148,7 @@ While flattening JSON hierarchy is preserved. For example for object:
         }
     }
 
-the following variables would be created
+The following variables would be created:
 
     ${key1}
     ${key2.key1}

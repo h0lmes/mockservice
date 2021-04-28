@@ -45,10 +45,9 @@ public class HttpServletRequestFacade {
             } catch (IOException e) {
                 // Body processed elsewhere. Do nothing.
             }
-            if (body != null && !body.trim().isEmpty()) {
+            if (body != null && !body.isEmpty()) {
                 try {
-                    Map<String, String> bodyAsVariables = jsonToFlatMap(body);
-                    bodyAsVariables.forEach(variables::putIfAbsent);
+                    jsonToFlatMap(body).forEach(variables::putIfAbsent);
                 } catch (JsonProcessingException e) {
                     // Not a valid JSON. Ignore.
                 }
@@ -60,9 +59,9 @@ public class HttpServletRequestFacade {
             ((Map<String, String>) pathVariables).forEach(variables::putIfAbsent);
         }
 
-        Map<String, String[]> requestParams = request.getParameterMap();
-        requestParams.forEach((k, v) -> variables.putIfAbsent(k, v[0]));
+        request.getParameterMap().forEach((k, v) -> variables.putIfAbsent(k, v[0]));
 
+        // Mock-Variable overrides existing variable of the same name
         getMockVariables(folder, request).forEach(variables::put);
 
         return variables;

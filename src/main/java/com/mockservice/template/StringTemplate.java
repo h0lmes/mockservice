@@ -105,7 +105,7 @@ public class StringTemplate {
                     tokens.add(line.substring(start, end));
                     at = end;
                 } else {
-                    throw new IllegalArgumentException("Invalid token at position " + start + " in:" + NEW_LINE + line);
+                    throw new IllegalArgumentException(String.format("Invalid token at position %d in:%n%s", start, line));
                 }
             } else {
                 if (start < 0) {
@@ -132,17 +132,16 @@ public class StringTemplate {
     private String map(String token, @Nullable Map<String, String> variables, @Nullable Map<String, Function<String[], String>> functions) {
         if (isTokenVariable(token)) {
             String[] args = token.substring(VAR_START_LEN, token.length() - VAR_END_LEN).split(VAR_SPLIT);
-            String name = args[0];
 
-            if (name.isEmpty()) {
-                throw new IllegalArgumentException("Token name must not be empty (" + token + ")");
+            if (args[0].isEmpty()) {
+                throw new IllegalArgumentException(String.format("Token must not be empty: %s", token));
             }
 
-            if (variables != null && variables.containsKey(name)) {
-                return variables.get(name);
+            if (variables != null && variables.containsKey(args[0])) {
+                return variables.get(args[0]);
             }
-            if (functions != null && functions.containsKey(name)) {
-                return functions.get(name).apply(args);
+            if (functions != null && functions.containsKey(args[0])) {
+                return functions.get(args[0]).apply(args);
             }
 
             if (args.length > 1) {
