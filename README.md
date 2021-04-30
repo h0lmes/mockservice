@@ -111,7 +111,7 @@ List of predefined variables (template functions):
 - `${random_uuid}` - random UUID
 - `${random_string}` - a string of 20 random characters in `[a-z]`
 - `${random_string:min:max}` - a string of `min` to `max` random characters in `[a-z]`
-- `${random_strings:str1:str2:...}` - a random string of given arguments (may be useful to represent enum values)
+- `${random_string_of:str1:str2:...}` - a random string of given arguments (may be useful to represent enum values)
 - `${random_date}` - random date in yyyy-MM-dd format
 - `${random_timestamp}` - random timestamp in yyyy-MM-dd HH:mm:ss.SSS format
 - `${current_date}` - current date in yyyy-MM-dd format

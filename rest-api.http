@@ -1,43 +1,43 @@
-GET http://localhost:8080/demo/api/entity
+GET http://localhost:8081/api/v1/entity
 Accept: */*
 Cache-Control: no-cache
 
 ###
 
-GET http://localhost:8080/demo/api/entity
+GET http://localhost:8081/api/v1/entity
 Accept: */*
 Cache-Control: no-cache
-Mock: demoservicecontroller/demo_api_entity/error
+Mock: demoservicecontroller/api_v1_entity/error
 Mock-Timeout: demoservice/1000
 
 ###
 
-GET http://localhost:8080/demo/api/entity/2
+GET http://localhost:8081/api/v1/entity/2
 Accept: */*
 Cache-Control: no-cache
 
 ###
 
-GET http://localhost:8080/demo/api/entity/2
+GET http://localhost:8081/api/v1/entity/2
 Mock-Variable: demoservicecontroller/id/1000
 Accept: */*
 Cache-Control: no-cache
 
 ###
 
-GET http://localhost:8080/demo/api/entity/filter?a=aaa&b=bbb
+GET http://localhost:8081/api/v1/entity/filter?a=aaa&b=bbb
 Accept: */*
 Cache-Control: no-cache
 
 ###
 
-GET http://localhost:8080/demo/api/entity/filter?a=non-default a
+GET http://localhost:8081/api/v1/entity/filter?a=non-default a
 Accept: */*
 Cache-Control: no-cache
 
 ###
 
-POST http://localhost:8080/demo/api/entity HTTP/1.1
+POST http://localhost:8081/api/v1/entity HTTP/1.1
 Content-Type: application/json
 
 { "name": "arbitrary name" }

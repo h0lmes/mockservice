@@ -1,4 +1,4 @@
-package com.mockservice.request;
+package com.mockservice.util;
 
 import java.util.Objects;
 

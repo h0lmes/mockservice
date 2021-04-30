@@ -1,5 +1,0 @@
-HTTP/1.1 201
-Content-Type: application/json
-Demo-Header: demo-header-value
-
-{"id": ${random_int}, "name": "${name}"}

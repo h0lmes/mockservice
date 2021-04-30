@@ -14,9 +14,10 @@ public enum TemplateFunction {
 
     SEQUENCE_INT("sequence", IntSequenceFunction::new),
     RANDOM_INT("random_int", () -> TemplateFunction::randomInt),
+    RANDOM_LONG("random_long", () -> TemplateFunction::randomLong),
     RANDOM_UUID("random_uuid", () -> TemplateFunction::randomUuid),
     RANDOM_STRING("random_string", () -> TemplateFunction::randomString),
-    RANDOM_STRINGS("random_strings", () -> TemplateFunction::randomStrings),
+    RANDOM_STRINGS("random_string_of", () -> TemplateFunction::randomStringOf),
     RANDOM_DATE("random_date", () -> TemplateFunction::randomDate),
     RANDOM_TIMESTAMP("random_timestamp", () -> TemplateFunction::randomTimestamp),
     CURRENT_DATE("current_date", () -> TemplateFunction::currentDate),
@@ -50,6 +51,18 @@ public enum TemplateFunction {
         return def;
     }
 
+    // helper function
+    private static long argumentLong(String[] args, int index, long def) {
+        try {
+            if (args.length > index) {
+                return Long.parseLong(args[index]);
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        return def;
+    }
+
     private static String randomInt(String[] args) {
         int origin = argumentInt(args,1, 1);
         int bound = argumentInt(args,2, 10000) + 1;
@@ -57,6 +70,15 @@ public enum TemplateFunction {
             bound = origin + 1;
         }
         return "" + ThreadLocalRandom.current().nextInt(origin, bound);
+    }
+
+    private static String randomLong(String[] args) {
+        long origin = argumentLong(args,1, 1);
+        long bound = argumentLong(args,2, 1_000_000_000_000_000L) + 1;
+        if (bound <= origin) {
+            bound = origin + 1;
+        }
+        return "" + ThreadLocalRandom.current().nextLong(origin, bound);
     }
 
     @SuppressWarnings("unused")
@@ -79,7 +101,7 @@ public enum TemplateFunction {
                 .toString();
     }
 
-    private static String randomStrings(String[] args) {
+    private static String randomStringOf(String[] args) {
         if (args.length > 1) {
             int index = ThreadLocalRandom.current().nextInt(1, args.length);
             return args[index];

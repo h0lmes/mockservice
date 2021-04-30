@@ -1,4 +1,4 @@
-package com.mockservice.service;
+package com.mockservice.resource;
 
 import com.mockservice.template.StringTemplate;
 import org.springframework.http.HttpHeaders;
@@ -9,9 +9,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
 import java.util.Map;
-import java.util.function.Function;
 
-public class MockResource {
+public abstract class AbstractMockResource implements MockResource {
 
     private static final String HTTP_PREFIX = "HTTP/1.1 ";
     private static final int HTTP_PREFIX_LEN = HTTP_PREFIX.length();
@@ -23,7 +22,7 @@ public class MockResource {
     private StringTemplate body = new StringTemplate();
     private boolean readingHeaders = false;
 
-    public MockResource(String resource) {
+    public AbstractMockResource(String resource) {
         fromString(resource);
     }
 
@@ -67,14 +66,17 @@ public class MockResource {
         body.add(line);
     }
 
-    public String getBody(@Nullable Map<String, String> variables, @Nullable Map<String, Function<String[], String>> functions) {
-        return body.toString(variables, functions);
+    @Override
+    public String getBody(@Nullable Map<String, String> variables) {
+        return body.toString(variables);
     }
 
+    @Override
     public int getCode() {
         return code;
     }
 
+    @Override
     public HttpHeaders getHeaders() {
         return headers;
     }

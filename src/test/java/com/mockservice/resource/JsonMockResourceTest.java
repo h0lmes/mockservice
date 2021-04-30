@@ -1,10 +1,10 @@
-package com.mockservice.service;
+package com.mockservice.resource;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MockResourceTest {
+public class JsonMockResourceTest {
 
     private static final Integer TEST_HTTP_CODE = 201;
     private static final String TEST_BODY = "{\"test\": \"test\"}";
@@ -12,7 +12,7 @@ public class MockResourceTest {
 
     @Test
     public void parserTest() {
-        MockResource wrapper = new MockResource(TEST_RESOURCE_STRING);
+        MockResource wrapper = new JsonMockResource(TEST_RESOURCE_STRING);
 
         assertEquals(TEST_HTTP_CODE.intValue(), wrapper.getCode());
         assertEquals(TEST_BODY, wrapper.getBody(null, null));

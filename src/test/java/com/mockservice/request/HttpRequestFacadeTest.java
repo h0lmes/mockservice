@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 
-public class HttpServletRequestFacadeTest {
+public class HttpRequestFacadeTest {
 
     @Test
     public void jsonToFlatMapTest() throws JsonProcessingException {
@@ -27,7 +27,7 @@ public class HttpServletRequestFacadeTest {
                     "}" +
                 "}";
 
-        Map<String, String> map = HttpServletRequestFacade.jsonToFlatMap(json);
+        Map<String, String> map = JsonHttpRequestFacade.jsonToFlatMap(json);
 
         Assertions.assertEquals(5, map.size());
         Assertions.assertEquals("value 1", map.get("key1"));

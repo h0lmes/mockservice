@@ -3,6 +3,7 @@ package com.mockservice.template;
 import org.springframework.lang.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -34,13 +35,13 @@ public class StringTemplate {
     private static final String VAR_SPLIT = ":";
     private static final String NEW_LINE = System.lineSeparator();
 
+    private static final TemplateFunction[] templateFunctions = TemplateFunction.values();
+
     /**
      * Internal list holds data in the following way:
      * - each line holds a text only (with possible line breaks) or a variable only
      * - one variable per line
-     * - there could be no consecutive text lines, though could be consecutive lines holding variables.
-     *
-     * The third rule is for performance.
+     * - there could be no consecutive text lines, though could be consecutive lines holding variables (for performance).
      */
     private final List<String> strings = new ArrayList<>();
     private State state = State.EMPTY;
@@ -123,16 +124,28 @@ public class StringTemplate {
 
     // builder
 
-    public String toString(@Nullable Map<String, String> variables, @Nullable Map<String, Function<String[], String>> functions) {
+    public String toString(@Nullable Map<String, String> variables) {
+        // per request, to support stateful functions (e.g. sequence)
+        Map<String, Function<String[], String>> functions = makeFunctions();
+
         StringBuilder builder = new StringBuilder();
         strings.forEach(s -> builder.append(map(s, variables, functions)));
         return builder.toString();
     }
 
-    private String map(String token, @Nullable Map<String, String> variables, @Nullable Map<String, Function<String[], String>> functions) {
-        if (isTokenVariable(token)) {
-            String[] args = token.substring(VAR_START_LEN, token.length() - VAR_END_LEN).split(VAR_SPLIT);
+    private Map<String, Function<String[], String>> makeFunctions() {
+        Map<String, Function<String[], String>> functions = new HashMap<>();
+        for (TemplateFunction function : templateFunctions) {
+            functions.put(function.getName(), function.getFunction());
+        }
+        return functions;
+    }
 
+    private String map(String token, @Nullable Map<String, String> variables, Map<String, Function<String[], String>> functions) {
+        if (isTokenVariable(token)) {
+            String[] args = token
+                    .substring(VAR_START_LEN, token.length() - VAR_END_LEN)
+                    .split(VAR_SPLIT);
             if (args[0].isEmpty()) {
                 throw new IllegalArgumentException(String.format("Token must not be empty: %s", token));
             }

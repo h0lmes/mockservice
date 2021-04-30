@@ -1,7 +1,5 @@
 package com.mockservice.web.rest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mockservice.model.Entity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,26 +7,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("demo/api")
-public class DemoServiceController extends MockController {
+@RequestMapping("api/v1")
+public class DemoServiceController extends AbstractRestController {
 
     @GetMapping("entity/filter")
-    public ResponseEntity<String> getUntypedResult() {
+    public ResponseEntity<String> getEntityWithParameters() {
         return mock();
     }
 
     @GetMapping("entity/{id}")
-    public ResponseEntity<Entity> getTypedEntity() throws JsonProcessingException {
-        return mock(Entity.class);
+    public ResponseEntity<String> getEntityById() {
+        return mock();
     }
 
     @GetMapping("entity")
-    public ResponseEntity<String> getUntypedListOfEntities() {
+    public ResponseEntity<String> listEntity() {
         return mock();
     }
 
     @PostMapping("entity")
-    public ResponseEntity<Entity> postTypedEntity() throws JsonProcessingException {
-        return mock(Entity.class);
+    public ResponseEntity<String> postEntity() {
+        return mock();
     }
 }
