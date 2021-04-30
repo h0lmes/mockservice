@@ -65,7 +65,7 @@ public enum TemplateFunction {
 
     private static String randomInt(String[] args) {
         int origin = argumentInt(args,1, 1);
-        int bound = argumentInt(args,2, 10000) + 1;
+        int bound = argumentInt(args,2, 10_000) + 1;
         if (bound <= origin) {
             bound = origin + 1;
         }
