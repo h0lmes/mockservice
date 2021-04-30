@@ -1,0 +1,11 @@
+{
+  "key1": "value 1",
+  "key2": {
+    "key1": "2021-04-19",
+    "key2": {
+      "key1": 10101,
+      "key2": null,
+      "key3": ["value 1", "value 2"]
+    }
+  }
+}

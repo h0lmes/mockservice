@@ -4,25 +4,31 @@ import com.mockservice.request.HttpRequestFacade;
 import com.mockservice.request.JsonHttpRequestFacade;
 import com.mockservice.resource.JsonMockResource;
 import com.mockservice.resource.MockResource;
+import com.mockservice.util.ResourceReader;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @Service("restMockService")
-public class RestMockService extends AbstractMockService implements MockService {
+public class RestMockService implements MockService {
 
+    @Autowired
+    HttpServletRequest request;
+    private final ResourceLoader resourceLoader;
     private final ConcurrentLruCache<String, MockResource> resourceCache;
 
     public RestMockService(ResourceLoader resourceLoader) {
-        super(resourceLoader);
+        this.resourceLoader = resourceLoader;
         resourceCache = new ConcurrentLruCache<>(256, this::loadResource);
     }
 
     private MockResource loadResource(String path) {
-        return new JsonMockResource(loadResourceString(path));
+        return new JsonMockResource(ResourceReader.asString(resourceLoader.getResource(path)));
     }
 
     @Override
@@ -31,7 +37,9 @@ public class RestMockService extends AbstractMockService implements MockService 
         MockResource resource = resourceCache.get(requestFacade.getPath());
         requestFacade.mockTimeout();
         Map<String, String> requestVariables = requestFacade.getVariables(variables);
-        String body = resource.getBody(requestVariables);
-        return ResponseEntity.status(resource.getCode()).headers(resource.getHeaders()).body(body);
+        return ResponseEntity
+                .status(resource.getCode())
+                .headers(resource.getHeaders())
+                .body(resource.getBody(requestVariables));
     }
 }

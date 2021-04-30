@@ -53,7 +53,7 @@ public class JsonHttpRequestFacade extends HttpRequestFacade {
         String body = getBody();
         if (body != null && !body.isEmpty()) {
             try {
-                return jsonToFlatMap(body);
+                return flattenMap(jsonToMap(body));
             } catch (JsonProcessingException e) {
                 // Not a valid JSON. Ignore.
             }
@@ -62,19 +62,18 @@ public class JsonHttpRequestFacade extends HttpRequestFacade {
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String, String> jsonToFlatMap(String json) throws JsonProcessingException {
+    public static Map<String, Object> jsonToMap(String json) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         JavaTimeModule module = new JavaTimeModule();
         mapper.registerModule(module);
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-        Map<String, Object> map = mapper.readValue(json, Map.class);
-        return flattenMap(map);
+        return mapper.readValue(json, Map.class);
     }
 
     @SuppressWarnings("unchecked")
-    private static Map<String, String> flattenMap(Map<String, Object> map) {
+    public static Map<String, String> flattenMap(Map<String, Object> map) {
         Queue<Pair<String, Pair<String, Object>>> q = new ArrayDeque<>();
         Map<String, String> result = new HashMap<>();
 

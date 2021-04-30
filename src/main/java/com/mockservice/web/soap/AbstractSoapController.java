@@ -1,4 +1,4 @@
-package com.mockservice.web.ws;
+package com.mockservice.web.soap;
 
 import com.mockservice.service.MockService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,14 +7,14 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Map;
 
-public class AbstractWsController {
+public class AbstractSoapController {
 
     @Autowired
-    @Qualifier("wsMockService")
+    @Qualifier("soapMockService")
     MockService mockService;
     private final String folder;
 
-    public AbstractWsController() {
+    public AbstractSoapController() {
         folder = this.getClass().getSimpleName();
     }
 
