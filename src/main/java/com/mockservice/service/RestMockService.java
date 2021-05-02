@@ -5,7 +5,7 @@ import com.mockservice.request.JsonHttpRequestFacade;
 import com.mockservice.resource.JsonMockResource;
 import com.mockservice.resource.MockResource;
 import com.mockservice.util.ResourceReader;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,16 +14,17 @@ import org.springframework.util.ConcurrentLruCache;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
-@Service("restMockService")
+@Service
+@Primary
 public class RestMockService implements MockService {
 
-    @Autowired
-    HttpServletRequest request;
     private final ResourceLoader resourceLoader;
+    private final HttpServletRequest request;
     private final ConcurrentLruCache<String, MockResource> resourceCache;
 
-    public RestMockService(ResourceLoader resourceLoader) {
+    public RestMockService(ResourceLoader resourceLoader, HttpServletRequest request) {
         this.resourceLoader = resourceLoader;
+        this.request = request;
         resourceCache = new ConcurrentLruCache<>(256, this::loadResource);
     }
 

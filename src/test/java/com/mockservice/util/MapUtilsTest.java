@@ -1,21 +1,18 @@
-package com.mockservice.request;
-
+package com.mockservice.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mockservice.util.ResourceReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-
-public class JsonHttpRequestFacadeTest {
+public class MapUtilsTest {
 
     @Test
     public void jsonToFlatMapTest() throws JsonProcessingException {
         String json = ResourceReader.asString("classpath:map.json");
-        Map<String, Object> objectMap = JsonHttpRequestFacade.jsonToMap(json);
-        Map<String, String> map = JsonHttpRequestFacade.flattenMap(objectMap);
+        Map<String, Object> objectMap = MapUtils.jsonToMap(json);
+        Map<String, String> map = MapUtils.flattenMap(objectMap);
 
         Assertions.assertEquals(2, objectMap.size());
         Assertions.assertEquals(5, map.size());

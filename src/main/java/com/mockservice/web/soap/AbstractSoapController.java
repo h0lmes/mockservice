@@ -10,7 +10,7 @@ import java.util.Map;
 public class AbstractSoapController {
 
     @Autowired
-    @Qualifier("soapMockService")
+    @Qualifier("soap")
     MockService mockService;
     private final String folder;
 

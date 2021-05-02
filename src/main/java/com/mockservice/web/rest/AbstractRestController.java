@@ -10,7 +10,6 @@ import java.util.Map;
 public class AbstractRestController {
 
     @Autowired
-    @Qualifier("restMockService")
     MockService mockService;
     private final String folder;
 

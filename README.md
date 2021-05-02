@@ -1,21 +1,24 @@
-### Mock service
+### MockService
 
-A very simple to use yet extensible service to mock REST services.
+A very simple to use yet extensible service to mock REST and SOAP services.
 Suitable for integration testing and similar use cases.
 
+> Important note. SOAP support is somewhat limited and "crutchy", though straightforward.
+It requires valid SOAP envelope in XML data files. There is NO support for WSDL/XSD.
+
 #
-### Creating new controller
+### Where to start
+
+To create new endpoints in MockService:
 
 1. Create new controller extending `AbstractRestController` or `AbstractSoapController`
 (for example `AccountServiceController`, there is no enforced convention
 for controller names).
-2. Create required methods in the controller (see example controllers in this project).
-3. Create a new folder under `src/main/resources` folder and
+2. Create required methods in the controller (see examples under `web/rest`
+and `web/soap`).
+3. Create a new folder under `src/main/resources` and
 name it as your controller (`AccountServiceController`).
 4. Create data files under that folder (see file naming format below).
-
-> Important note. SOAP support is somewhat limited and "crutchy". It requires
-valid SOAP envelope in XML data files. There is NO support for WSDL/XSD.
 
 #
 ### File naming format
@@ -35,7 +38,7 @@ Example:
 
     @GetMapping("api/entity/{id})  ->  GET_api_entity_{id}.json
 
-As you see path delimiters `/` substituted with an underscores `_`.
+As you see path delimiters `/` are substituted with underscores `_`.
 
 > Important note. Except for HTTP method name (which should be in upper case)
 all file names should be in lower case to avoid any errors
@@ -45,6 +48,8 @@ on case-sensitive (Unix-based) file systems.
 ### Data file contents
 
 Data file can contain any JSON or XML (any textual data actually).
+
+See examples in `resources` folder.
 
 You can specify HTTP status code and headers in JSON files (not possible to specify headers only).
 Data file parser looks for `HTTP/1.1` to start reading status code and headers.
@@ -65,32 +70,34 @@ or
     Custom-Header: header value
 
 #
-### Customizing response of an API method
+### Multiple data files per endpoint
 
-You can include `Mock` header in HTTP request. There are two formats of this header:
+Multiple `Mock` headers supported per HTTP request.
 
-    service_name/option
+There are two formats of this header:
+
+    service_name/option_name
+    service_name/request_mapping/option_name
     
-    service_name/request_mapping/option
-    
-Example (multiple options separated with spaces):
+Example (two headers, first one contains 2 options):
 
-    Mock: AccountServiceController/option3 StoreServiceController/api_v1_item_{id}/option2
+    Mock: AccountServiceController/error404 CartServiceController/empty
+    Mock: StoreServiceController/api_v1_item_{id}/invalid_format
 
 In the example above if you call any endpoint of the `AccountServiceController`
-then a file with `#option3` before the extension would be loaded
-(e.g. `resources/AccountServiceController/GET_accounts#option3.json`).
+then a file with `#error404` before the extension would be loaded
+(e.g. `GET_accounts#error404.json`).
 
 And if you call an endpoint `api/v1/item/{id}` of the `StoreServiceController`
-then `resources/StoreServiceController/GET_api_v1_item_{id}#option2.json` would be loaded.
+then `GET_api_v1_item_{id}#invalid_format.json` would be loaded.
 
 #
-### Using predefined variables
+### Predefined variables
 
-In data files you can use predefined variables, those would be substituted
+You can use predefined variables in data files, those would be substituted
 with their values each time an endpoint is fetched.
 
-List of predefined variables (template functions):
+List of predefined variables:
 
 - `${sequence}` - sequence of integers starting from 1
 - `${random_int}` - random integer between 1 and 10_000
@@ -107,14 +114,13 @@ List of predefined variables (template functions):
 - `${current_timestamp}` - current timestamp in yyyy-MM-dd HH:mm:ss.SSS format.
 
 #
-### Using provided variables in JSON
+### Provided variables
 
-In data files you can use variables which are provided on a per-request basis.
+You can use variables which are provided on a per-request basis.
 
-Variables have the following format:
+Variables have the following format in data file:
 
     ${var_name}
-    
     ${var_name:default_value}
 
 Mock engine makes available variables from the following sources:
@@ -149,7 +155,6 @@ Each header defines exactly one variable.
 Header can have two formats:
 
     service_name/variable_name/value
-    
     service_name/request_mapping/variable_name/value
     
 Example:
