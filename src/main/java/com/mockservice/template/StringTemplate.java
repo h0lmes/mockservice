@@ -46,6 +46,12 @@ public class StringTemplate {
     private final List<String> strings = new ArrayList<>();
     private State state = State.EMPTY;
 
+    public StringTemplate() {}
+
+    public StringTemplate(String content) {
+        add(content);
+    }
+
     // parser
 
     public void add(String line) {
