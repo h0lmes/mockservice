@@ -20,6 +20,8 @@ and `web/soap`).
 name it as your controller (`AccountServiceController`).
 4. Create data files under that folder (see file naming format below).
 
+> Note. See example requests in `rest-api.http` in the root of the project.
+
 #
 ### File naming format
 

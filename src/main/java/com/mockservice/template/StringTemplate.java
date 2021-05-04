@@ -160,7 +160,6 @@ public class StringTemplate {
             if (args.length > 1) {
                 return args[1];
             }
-            return token;
         }
         return token;
     }
