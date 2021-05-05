@@ -43,3 +43,7 @@ Content-Type: application/json
 { "name": "arbitrary name" }
 
 ###
+
+GET http://localhost:8081/api/v1/err
+
+###

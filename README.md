@@ -32,6 +32,9 @@ name it as your controller (`AccountServiceController`).
     request_mapping.xml 
 
 
+> The convention is that HTTP method should be in the upper case
+and the rest in the lower case.
+
 `METHOD` is any of HTTP methods.
 
 Path variables supported in request mapping.
@@ -41,10 +44,6 @@ Example:
     @GetMapping("api/entity/{id})  ->  GET_api_entity_{id}.json
 
 As you see path delimiters `/` are substituted with underscores `_`.
-
-> Important note. Except for HTTP method name (which should be in upper case)
-all file names should be in lower case to avoid any errors
-on case-sensitive (Unix-based) file systems.
 
 #
 ### Data file contents

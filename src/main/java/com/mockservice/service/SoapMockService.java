@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Map;
 
 @Service("soap")
@@ -27,7 +29,11 @@ public class SoapMockService implements MockService {
     }
 
     private MockResource loadResource(String path) {
-        return new XmlMockResource(ResourceReader.asString(resourceLoader.getResource(path)));
+        try {
+            return new XmlMockResource(ResourceReader.asStringOrFind(resourceLoader, path));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     public ResponseEntity<String> mock(String folder, Map<String, String> variables) {

@@ -29,4 +29,9 @@ public class DemoServiceController extends AbstractRestController {
     public ResponseEntity<String> postEntity() {
         return mock();
     }
+
+    @GetMapping("err")
+    public ResponseEntity<String> testDataFileNotFound() {
+        return mock();
+    }
 }

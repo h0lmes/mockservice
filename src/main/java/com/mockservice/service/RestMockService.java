@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Map;
 
 @Service
@@ -29,7 +31,11 @@ public class RestMockService implements MockService {
     }
 
     private MockResource loadResource(String path) {
-        return new JsonMockResource(ResourceReader.asString(resourceLoader.getResource(path)));
+        try {
+            return new JsonMockResource(ResourceReader.asStringOrFind(resourceLoader, path));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     @Override

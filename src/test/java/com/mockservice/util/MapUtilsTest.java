@@ -1,15 +1,15 @@
 package com.mockservice.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class MapUtilsTest {
 
     @Test
-    public void jsonToFlatMapTest() throws JsonProcessingException {
+    public void jsonToFlatMapTest() throws IOException {
         String json = ResourceReader.asString("classpath:map.json");
         Map<String, Object> objectMap = MapUtils.jsonToMap(json);
         Map<String, String> map = MapUtils.flattenMap(objectMap);
