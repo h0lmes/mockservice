@@ -17,7 +17,7 @@ public enum TemplateFunction {
     RANDOM_LONG("random_long", () -> TemplateFunction::randomLong),
     RANDOM_UUID("random_uuid", () -> TemplateFunction::randomUuid),
     RANDOM_STRING("random_string", () -> TemplateFunction::randomString),
-    RANDOM_STRINGS("random_string_of", () -> TemplateFunction::randomStringOf),
+    RANDOM_STRINGS("of", () -> TemplateFunction::of),
     RANDOM_DATE("random_date", () -> TemplateFunction::randomDate),
     RANDOM_TIMESTAMP("random_timestamp", () -> TemplateFunction::randomTimestamp),
     CURRENT_DATE("current_date", () -> TemplateFunction::currentDate),
@@ -101,7 +101,7 @@ public enum TemplateFunction {
                 .toString();
     }
 
-    private static String randomStringOf(String[] args) {
+    private static String of(String[] args) {
         if (args.length > 1) {
             int index = ThreadLocalRandom.current().nextInt(1, args.length);
             return args[index];
