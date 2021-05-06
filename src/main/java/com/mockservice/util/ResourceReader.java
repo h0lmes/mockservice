@@ -18,16 +18,13 @@ public class ResourceReader {
 
     private static final Logger log = LoggerFactory.getLogger(ResourceReader.class);
 
+    private static final String CLASSPATH_PREFIX = "classpath:";
     private static final String JSON_EXTENSION = ".json";
     private static final String XML_EXTENSION = ".xml";
     private static final Map<String, String> files = findFiles();
 
     private ResourceReader() {
         // hidden
-    }
-
-    public static String asString(String path) throws IOException {
-        return asString(new DefaultResourceLoader(), path);
     }
 
     public static String asStringOrFind(ResourceLoader resourceLoader, String path) throws IOException {
@@ -41,7 +38,7 @@ public class ResourceReader {
                 throw new IOException("File not found in list: " + path, e);
             }
             try {
-                return asString(resourceLoader, "classpath:" + pathListed);
+                return asString(resourceLoader, pathListed);
             } catch (IOException ex) {
                 throw new IOException("Error loading listed file: " + pathListed, ex);
             }
@@ -50,7 +47,14 @@ public class ResourceReader {
         }
     }
 
+    public static String asString(String path) throws IOException {
+        return asString(new DefaultResourceLoader(), path);
+    }
+
     private static String asString(ResourceLoader resourceLoader, String path) throws IOException {
+        if (!path.startsWith(CLASSPATH_PREFIX)) {
+            path = CLASSPATH_PREFIX + path;
+        }
         return asString(resourceLoader.getResource(path));
     }
 

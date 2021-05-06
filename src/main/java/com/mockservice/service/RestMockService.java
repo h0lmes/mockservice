@@ -5,6 +5,8 @@ import com.mockservice.request.JsonHttpRequestFacade;
 import com.mockservice.resource.JsonMockResource;
 import com.mockservice.resource.MockResource;
 import com.mockservice.util.ResourceReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,8 @@ import java.util.Map;
 @Service
 @Primary
 public class RestMockService implements MockService {
+
+    private static final Logger log = LoggerFactory.getLogger(RestMockService.class);
 
     private final ResourceLoader resourceLoader;
     private final HttpServletRequest request;
@@ -41,7 +45,9 @@ public class RestMockService implements MockService {
     @Override
     public ResponseEntity<String> mock(String folder, Map<String, String> variables) {
         HttpRequestFacade requestFacade = new JsonHttpRequestFacade(request, folder);
-        MockResource resource = resourceCache.get(requestFacade.getPath());
+        String path = requestFacade.getPath();
+        log.info("File requested: {}", path);
+        MockResource resource = resourceCache.get(path);
         requestFacade.mockTimeout();
         Map<String, String> requestVariables = requestFacade.getVariables(variables);
         return ResponseEntity

@@ -18,8 +18,7 @@ public class XmlHttpRequestFacade extends HttpRequestFacade {
 
     @Override
     public String getPath() {
-        return "classpath:"
-                + getFolder()
+        return getFolder()
                 + PATH_DELIMITER
                 + getEncodedEndpoint()
                 + getMockOption()

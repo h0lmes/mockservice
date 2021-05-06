@@ -14,7 +14,7 @@ public class JsonMockResourceTest {
 
     @Test
     public void parserTest() throws IOException {
-        String json = ResourceReader.asString("classpath:resource.json");
+        String json = ResourceReader.asString("resource.json");
         MockResource resource = new JsonMockResource(json);
 
         assertEquals(TEST_HTTP_CODE.intValue(), resource.getCode());

@@ -64,8 +64,8 @@ public enum TemplateFunction {
     }
 
     private static String randomInt(String[] args) {
-        int origin = argumentInt(args,1, 1);
-        int bound = argumentInt(args,2, 10_000) + 1;
+        int origin = argumentInt(args, 1, 1);
+        int bound = argumentInt(args, 2, 10_000) + 1;
         if (bound <= origin) {
             bound = origin + 1;
         }
@@ -73,8 +73,8 @@ public enum TemplateFunction {
     }
 
     private static String randomLong(String[] args) {
-        long origin = argumentLong(args,1, 1);
-        long bound = argumentLong(args,2, 1_000_000_000_000_000L) + 1;
+        long origin = argumentLong(args, 1, 1);
+        long bound = argumentLong(args, 2, 1_000_000_000_000_000L) + 1;
         if (bound <= origin) {
             bound = origin + 1;
         }
@@ -87,8 +87,8 @@ public enum TemplateFunction {
     }
 
     private static String randomString(String[] args) {
-        int minLen = argumentInt(args,1, 10);
-        int maxLen = argumentInt(args,2, 20) + 1;
+        int minLen = argumentInt(args, 1, 10);
+        int maxLen = argumentInt(args, 2, 20) + 1;
         if (maxLen <= minLen) {
             maxLen = minLen + 1;
         }

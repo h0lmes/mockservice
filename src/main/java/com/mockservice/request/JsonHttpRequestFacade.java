@@ -20,8 +20,7 @@ public class JsonHttpRequestFacade extends HttpRequestFacade {
 
     @Override
     public String getPath() {
-        return "classpath:"
-                + getFolder()
+        return getFolder()
                 + PATH_DELIMITER
                 + getRequest().getMethod().toUpperCase()
                 + PATH_DELIMITER_SUBSTITUTE

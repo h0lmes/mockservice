@@ -5,6 +5,8 @@ import com.mockservice.request.XmlHttpRequestFacade;
 import com.mockservice.resource.MockResource;
 import com.mockservice.resource.XmlMockResource;
 import com.mockservice.util.ResourceReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,8 @@ import java.util.Map;
 
 @Service("soap")
 public class SoapMockService implements MockService {
+
+    private static final Logger log = LoggerFactory.getLogger(SoapMockService.class);
 
     private final ResourceLoader resourceLoader;
     private final HttpServletRequest request;
@@ -38,7 +42,9 @@ public class SoapMockService implements MockService {
 
     public ResponseEntity<String> mock(String folder, Map<String, String> variables) {
         HttpRequestFacade requestFacade = new XmlHttpRequestFacade(request, folder);
-        MockResource resource = resourceCache.get(requestFacade.getPath());
+        String path = requestFacade.getPath();
+        log.info("File requested: {}", path);
+        MockResource resource = resourceCache.get(path);
         Map<String, String> requestVariables = requestFacade.getVariables(variables);
         return ResponseEntity
                 .status(resource.getCode())
