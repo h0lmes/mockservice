@@ -1,10 +1,10 @@
 [
   {
     "id": 2,
-    "name": "entity name ${a:default a}"
+    "name": "${a:default a}"
   },
   {
     "id": 3,
-    "name": "entity name ${b:default b}"
+    "name": "${b:${of:default B1:default B2:default B3}}"
   }
 ]

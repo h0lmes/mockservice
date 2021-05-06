@@ -1,2 +1,6 @@
 server:
   port: 8081
+
+logging:
+  level:
+    ROOT: ${LOGGING_LEVEL:INFO}
