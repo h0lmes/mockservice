@@ -94,7 +94,7 @@ public class StringTemplate {
 
     private static String map(String token, @Nullable Map<String, String> variables, Map<String, Function<String[], String>> functions) {
         if (TemplateParser.isToken(token)) {
-            String[] args = TemplateParser.tokenToArguments(token);
+            String[] args = TemplateParser.splitToken(token);
 
             if (variables != null && variables.containsKey(args[0])) {
                 String var = variables.get(args[0]);
