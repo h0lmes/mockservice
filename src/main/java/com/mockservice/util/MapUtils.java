@@ -13,11 +13,14 @@ import java.util.Queue;
 
 public class MapUtils {
 
+    private MapUtils() {
+        // hidden
+    }
+
     @SuppressWarnings("unchecked")
     public static Map<String, Object> jsonToMap(String json) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        JavaTimeModule module = new JavaTimeModule();
-        mapper.registerModule(module);
+        mapper.registerModule(new JavaTimeModule());
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
@@ -26,21 +29,37 @@ public class MapUtils {
 
     @SuppressWarnings("unchecked")
     public static Map<String, String> flattenMap(Map<String, Object> map) {
-        Queue<Pair<String, Pair<String, Object>>> q = new ArrayDeque<>();
         Map<String, String> result = new HashMap<>();
 
-        map.forEach((k, v) -> q.offer(new Pair<>(null, new Pair<>(k, v))));
+        Queue<TriEntry> queue = new ArrayDeque<>();
+        map.forEach((k, v) -> queue.offer(new TriEntry(null, k, v)));
 
-        while (!q.isEmpty()) {
-            Pair<String, Pair<String, Object>> el = q.poll();
-            String key = el.getKey() == null ? el.getValue().getKey() : el.getKey() + "." + el.getValue().getKey();
-            Object obj = el.getValue().getValue();
-            if (obj instanceof Map) {
-                ((Map<String, Object>) obj).forEach((k, v) -> q.offer(new Pair<>(key, new Pair<>(k, v))));
+        while (!queue.isEmpty()) {
+            TriEntry entry = queue.poll();
+            String key = entry.getFullKey();
+            Object value = entry.value;
+            if (value instanceof Map) {
+                ((Map<String, Object>) value).forEach((k, v) -> queue.offer(new TriEntry(key, k, v)));
             } else {
-                result.put(key, obj == null ? "null" : obj.toString());
+                result.put(key, value == null ? null : value.toString());
             }
         }
         return result;
+    }
+
+    private static class TriEntry {
+        private String parent;
+        private String key;
+        private Object value;
+
+        TriEntry(String parent, String key, Object value) {
+            this.parent = parent;
+            this.key = key;
+            this.value = value;
+        }
+
+        String getFullKey() {
+            return parent == null ? key : parent + "." + key;
+        }
     }
 }

@@ -19,7 +19,7 @@ public class MapUtilsTest {
         Assertions.assertEquals("value 1", map.get("key1"));
         Assertions.assertEquals("2021-04-19", map.get("key2.key1"));
         Assertions.assertEquals("10101", map.get("key2.key2.key1"));
-        Assertions.assertEquals("null", map.get("key2.key2.key2"));
+        Assertions.assertNull(map.get("key2.key2.key2"));
         Assertions.assertEquals("[value 1, value 2]", map.get("key2.key2.key3"));
     }
 }

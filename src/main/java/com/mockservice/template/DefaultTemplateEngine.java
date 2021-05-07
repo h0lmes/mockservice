@@ -1,45 +1,47 @@
 package com.mockservice.template;
 
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public enum TemplateFunction {
+@Component
+public class DefaultTemplateEngine implements TemplateEngine {
 
-    SEQUENCE_INT("sequence", IntSequenceFunction::new),
-    RANDOM_INT("random_int", () -> TemplateFunction::randomInt),
-    RANDOM_LONG("random_long", () -> TemplateFunction::randomLong),
-    RANDOM_UUID("random_uuid", () -> TemplateFunction::randomUuid),
-    RANDOM_STRING("random_string", () -> TemplateFunction::randomString),
-    RANDOM_STRINGS("of", () -> TemplateFunction::of),
-    RANDOM_DATE("random_date", () -> TemplateFunction::randomDate),
-    RANDOM_TIMESTAMP("random_timestamp", () -> TemplateFunction::randomTimestamp),
-    CURRENT_DATE("current_date", () -> TemplateFunction::currentDate),
-    CURRENT_TIMESTAMP("current_timestamp", () -> TemplateFunction::currentTimestamp);
+    private final Map<String, Supplier<Function<String[], String>>> suppliers = new LinkedHashMap<>();
 
-    private String name;
-    private Supplier<Function<String[], String>> supplier;
-
-    TemplateFunction(String name, Supplier<Function<String[], String>> supplier) {
-        this.name = name;
-        this.supplier = supplier;
+    public DefaultTemplateEngine() {
+        suppliers.put("sequence", IntSequenceFunction::new);
+        suppliers.put("random_int", () -> DefaultTemplateEngine::randomInt);
+        suppliers.put("random_long", () -> DefaultTemplateEngine::randomLong);
+        suppliers.put("random_uuid", () -> DefaultTemplateEngine::randomUuid);
+        suppliers.put("random_string", () -> DefaultTemplateEngine::randomString);
+        suppliers.put("of", () -> DefaultTemplateEngine::of);
+        suppliers.put("random_date", () -> DefaultTemplateEngine::randomDate);
+        suppliers.put("random_timestamp", () -> DefaultTemplateEngine::randomTimestamp);
+        suppliers.put("current_date", () -> DefaultTemplateEngine::currentDate);
+        suppliers.put("current_timestamp", () -> DefaultTemplateEngine::currentTimestamp);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Function<String[], String> getFunction() {
-        return supplier.get();
+    @Override
+    public Map<String, Function<String[], String>> getFunctions() {
+        Map<String, Function<String[], String>> functions = new HashMap<>();
+        suppliers.forEach((name, supplier) -> functions.put(name, supplier.get()));
+        return functions;
     }
 
     // helper function
+
     private static int argumentInt(String[] args, int index, int def) {
         try {
             if (args.length > index) {
@@ -50,8 +52,8 @@ public enum TemplateFunction {
         }
         return def;
     }
-
     // helper function
+
     private static long argumentLong(String[] args, int index, long def) {
         try {
             if (args.length > index) {
@@ -110,7 +112,7 @@ public enum TemplateFunction {
     }
 
     @SuppressWarnings("unused")
-    public static String randomDate(String[] args) {
+    private static String randomDate(String[] args) {
         long startEpochDay = LocalDate.of(1970, 1, 1).toEpochDay();
         long endEpochDay = LocalDate.of(2100, 1, 1).toEpochDay();
         long randomEpochDay = ThreadLocalRandom.current().nextLong(startEpochDay, endEpochDay);
@@ -129,12 +131,12 @@ public enum TemplateFunction {
     }
 
     @SuppressWarnings("unused")
-    public static String currentDate(String[] args) {
+    private static String currentDate(String[] args) {
         return LocalDate.now().toString();
     }
 
     @SuppressWarnings("unused")
-    public static String currentTimestamp(String[] args) {
+    private static String currentTimestamp(String[] args) {
         return ZonedDateTime
                 .now(ZoneId.systemDefault())
                 .format(DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss.SSS"));

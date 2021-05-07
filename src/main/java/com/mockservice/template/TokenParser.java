@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
-public class TemplateParser {
+public class TokenParser {
 
     private static final String TOKEN_START = "${";
     private static final int TOKEN_START_LEN = TOKEN_START.length();
@@ -16,12 +16,12 @@ public class TemplateParser {
     private static final char CLOSING_BRACKET_CHAR = '}';
     private static final char TOKEN_ARGS_SPLIT_CHAR = ':';
 
-    private TemplateParser() {
+    private TokenParser() {
         // hidden
     }
 
-    public static boolean isToken(String s) {
-        return s.startsWith(TOKEN_START);
+    public static boolean isToken(String str) {
+        return str != null && str.startsWith(TOKEN_START) && str.endsWith(TOKEN_END);
     }
 
     public static List<String> tokenize(String text) {
@@ -77,7 +77,7 @@ public class TemplateParser {
         }
     }
 
-    public static String[] splitToken(String token) {
+    public static String[] parseToken(String token) {
         token = token.substring(TOKEN_START_LEN, token.length() - TOKEN_END_LEN);
 
         List<String> arguments = new ArrayList<>();

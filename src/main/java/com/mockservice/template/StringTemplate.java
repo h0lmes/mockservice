@@ -3,7 +3,6 @@ package com.mockservice.template;
 import org.springframework.lang.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -27,9 +26,6 @@ public class StringTemplate {
         TOKEN // last line is a token
     }
 
-    private static final String NEW_LINE = System.lineSeparator();
-    private static final TemplateFunction[] templateFunctions = TemplateFunction.values();
-
     /**
      * Internal list holds data in the following way:
      * - each line holds a text only (with possible line breaks) or a token only
@@ -38,19 +34,23 @@ public class StringTemplate {
      */
     private final List<String> strings = new ArrayList<>();
     private State state = State.EMPTY;
+    private final TemplateEngine engine;
 
-    public StringTemplate() {}
+    public StringTemplate(TemplateEngine engine) {
+        this.engine = engine;
+    }
 
-    public StringTemplate(String content) {
+    public StringTemplate(TemplateEngine engine, String content) {
+        this(engine);
         add(content);
     }
 
     // parser
 
     public void add(String line) {
-        List<String> tokens = TemplateParser.tokenize(line);
+        List<String> tokens = TokenParser.tokenize(line);
         if (!State.EMPTY.equals(state)) {
-            putToken(NEW_LINE);
+            putToken(System.lineSeparator());
         }
 
         for (String token : tokens) {
@@ -59,7 +59,7 @@ public class StringTemplate {
     }
 
     private void putToken(String token) {
-        if (TemplateParser.isToken(token)) {
+        if (TokenParser.isToken(token)) {
             strings.add(token);
             state = State.TOKEN;
         } else {
@@ -76,29 +76,29 @@ public class StringTemplate {
     // builder
 
     public String toString(@Nullable Map<String, String> variables) {
-        // per request, to support stateful functions (e.g. sequence)
-        Map<String, Function<String[], String>> functions = makeFunctions();
+        Map<String, Function<String[], String>> functions = null;
+        if (engine != null) {
+            functions = engine.getFunctions();
+        }
 
         StringBuilder builder = new StringBuilder();
-        strings.forEach(s -> builder.append(map(s, variables, functions)));
+        for (String s : strings) {
+            String value = map(s, variables, functions);
+            if (value == null) {
+                value = "null";
+            }
+            builder.append(value);
+        }
         return builder.toString();
     }
 
-    private Map<String, Function<String[], String>> makeFunctions() {
-        Map<String, Function<String[], String>> functions = new HashMap<>();
-        for (TemplateFunction function : templateFunctions) {
-            functions.put(function.getName(), function.getFunction());
-        }
-        return functions;
-    }
-
     private static String map(String token, @Nullable Map<String, String> variables, Map<String, Function<String[], String>> functions) {
-        if (TemplateParser.isToken(token)) {
-            String[] args = TemplateParser.splitToken(token);
+        if (TokenParser.isToken(token)) {
+            String[] args = TokenParser.parseToken(token);
 
             if (variables != null && variables.containsKey(args[0])) {
                 String var = variables.get(args[0]);
-                while (TemplateParser.isToken(var)) {
+                while (TokenParser.isToken(var)) {
                     var = map(var, variables, functions);
                 }
                 return var;
@@ -110,7 +110,7 @@ public class StringTemplate {
 
             if (args.length > 1) {
                 String var = args[1];
-                while (TemplateParser.isToken(var)) {
+                while (TokenParser.isToken(var)) {
                     var = map(var, variables, functions);
                 }
                 return var;

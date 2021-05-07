@@ -4,6 +4,7 @@ import com.mockservice.request.HttpRequestFacade;
 import com.mockservice.request.XmlHttpRequestFacade;
 import com.mockservice.resource.MockResource;
 import com.mockservice.resource.XmlMockResource;
+import com.mockservice.template.TemplateEngine;
 import com.mockservice.util.ResourceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,16 +26,18 @@ public class SoapMockService implements MockService {
     private final ResourceLoader resourceLoader;
     private final HttpServletRequest request;
     private final ConcurrentLruCache<String, MockResource> resourceCache;
+    private final TemplateEngine engine;
 
-    public SoapMockService(ResourceLoader resourceLoader, HttpServletRequest request) {
+    public SoapMockService(ResourceLoader resourceLoader, HttpServletRequest request, TemplateEngine engine) {
         this.resourceLoader = resourceLoader;
         this.request = request;
+        this.engine = engine;
         resourceCache = new ConcurrentLruCache<>(256, this::loadResource);
     }
 
     private MockResource loadResource(String path) {
         try {
-            return new XmlMockResource(ResourceReader.asStringOrFind(resourceLoader, path));
+            return new XmlMockResource(engine, ResourceReader.asStringOrFind(resourceLoader, path));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

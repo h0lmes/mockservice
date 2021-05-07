@@ -1,6 +1,7 @@
 package com.mockservice.resource;
 
 import com.mockservice.template.StringTemplate;
+import com.mockservice.template.TemplateEngine;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.Nullable;
 
@@ -18,11 +19,12 @@ public class JsonMockResource implements MockResource {
     private static final int HTTP_HEADER_DELIMITER_LEN = HTTP_HEADER_DELIMITER.length();
 
     private int code = 200;
-    private HttpHeaders headers = new HttpHeaders();
-    private StringTemplate body = new StringTemplate();
+    private final HttpHeaders headers = new HttpHeaders();
+    private final StringTemplate body;
     private boolean readingHeaders = false;
 
-    public JsonMockResource(String resource) {
+    public JsonMockResource(TemplateEngine engine, String resource) {
+        body = new StringTemplate(engine);
         fromString(resource);
         headers.add(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8");
     }

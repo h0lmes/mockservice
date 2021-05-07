@@ -4,6 +4,7 @@ import com.mockservice.request.HttpRequestFacade;
 import com.mockservice.request.JsonHttpRequestFacade;
 import com.mockservice.resource.JsonMockResource;
 import com.mockservice.resource.MockResource;
+import com.mockservice.template.TemplateEngine;
 import com.mockservice.util.ResourceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,16 +28,18 @@ public class RestMockService implements MockService {
     private final ResourceLoader resourceLoader;
     private final HttpServletRequest request;
     private final ConcurrentLruCache<String, MockResource> resourceCache;
+    private final TemplateEngine engine;
 
-    public RestMockService(ResourceLoader resourceLoader, HttpServletRequest request) {
+    public RestMockService(ResourceLoader resourceLoader, HttpServletRequest request, TemplateEngine engine) {
         this.resourceLoader = resourceLoader;
         this.request = request;
+        this.engine = engine;
         resourceCache = new ConcurrentLruCache<>(256, this::loadResource);
     }
 
     private MockResource loadResource(String path) {
         try {
-            return new JsonMockResource(ResourceReader.asStringOrFind(resourceLoader, path));
+            return new JsonMockResource(engine, ResourceReader.asStringOrFind(resourceLoader, path));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

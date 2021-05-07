@@ -1,6 +1,7 @@
 package com.mockservice.resource;
 
 import com.mockservice.template.StringTemplate;
+import com.mockservice.template.TemplateEngine;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.Nullable;
 
@@ -8,10 +9,11 @@ import java.util.Map;
 
 public class XmlMockResource implements MockResource {
 
-    private HttpHeaders headers = new HttpHeaders();
-    private StringTemplate body = new StringTemplate();
+    private final HttpHeaders headers = new HttpHeaders();
+    private final StringTemplate body;
 
-    public XmlMockResource(String resource) {
+    public XmlMockResource(TemplateEngine engine, String resource) {
+        body = new StringTemplate(engine);
         body.add(resource);
         headers.add(HttpHeaders.CONTENT_TYPE, "text/xml;charset=UTF-8");
     }
