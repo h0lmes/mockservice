@@ -4,3 +4,13 @@ server:
 logging:
   level:
     ROOT: ${LOGGING_LEVEL:INFO}
+
+spring:
+  application:
+    name: MockService
+
+  thymeleaf:
+    cache: false
+    enabled: true
+    prefix: classpath:/webapp/
+    suffix: .html

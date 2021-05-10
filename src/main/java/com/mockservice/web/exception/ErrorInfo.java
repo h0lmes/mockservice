@@ -1,4 +1,4 @@
-package com.mockservice.web.rest.exception;
+package com.mockservice.web.exception;
 
 public class ErrorInfo {
 
@@ -6,7 +6,7 @@ public class ErrorInfo {
     private String message;
 
     public ErrorInfo(Throwable t) {
-        this(t.getClass().getSimpleName(), t.getMessage());
+        this(t.getClass().getSimpleName(), t.getLocalizedMessage());
     }
 
     public ErrorInfo(String type, String message) {

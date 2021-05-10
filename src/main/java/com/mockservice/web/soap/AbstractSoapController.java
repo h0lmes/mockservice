@@ -18,7 +18,7 @@ import java.util.Map;
 public class AbstractSoapController {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractSoapController.class);
-    private static final String FAULT_DATA_FILE = "soapFault.xml";
+    private static final String FAULT_DATA_FILE = "assets/soapFault.xml";
     private static final String FAULT_CODE_PLACEHOLDER = "${code}";
     private static final String FAULT_MESSAGE_PLACEHOLDER = "${message}";
 
@@ -30,6 +30,7 @@ public class AbstractSoapController {
 
     public AbstractSoapController() {
         folder = this.getClass().getSimpleName();
+
         try {
             faultXml = ResourceReader.asString(FAULT_DATA_FILE);
         } catch (IOException e) {

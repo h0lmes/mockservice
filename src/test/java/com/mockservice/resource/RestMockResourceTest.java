@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class JsonMockResourceTest {
+public class RestMockResourceTest {
 
     private static final Integer TEST_HTTP_CODE = 201;
     private static final String TEST_BODY = "{\"test\": \"test\"}";
@@ -15,7 +15,7 @@ public class JsonMockResourceTest {
     @Test
     public void parserTest() throws IOException {
         String json = ResourceReader.asString("resource.json");
-        MockResource resource = new JsonMockResource(null, json);
+        MockResource resource = new RestMockResource(null, json);
 
         assertEquals(TEST_HTTP_CODE.intValue(), resource.getCode());
         assertEquals(TEST_BODY, resource.getBody(null));

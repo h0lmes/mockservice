@@ -1,0 +1,65 @@
+* {
+    line-height: 1.2;
+    margin: 0;
+}
+body {
+    background-color: #222;
+    font-family: sans-serif;
+    font-size: 16px;
+}
+
+#page {
+    position: absolute;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+}
+#page-contents {
+    padding: 6rem 2rem;
+}
+
+h1 {
+    font-size: 2rem;
+    line-height: 2.5rem;
+    letter-spacing: -1px;
+}
+h1, h2, h3, h4, h5 {
+    font-weight: 700;
+    margin: 0 0 1rem;
+}
+
+p {
+    padding: .25em;
+    text-shadow: 0 0 1px #fff;
+    margin: 0 0 1rem;
+}
+
+@media only screen and (max-width: 280px) {
+
+    body, p {
+        width: 95%;
+    }
+
+    h1 {
+        font-size: 1.5em;
+        margin: 0 0 0.3em;
+    }
+}
+
+.card {
+    background-color: rgba(255,255,255,.8);
+    border-radius: .25rem;
+    box-shadow: 0 1px 0 rgba(0,0,0,.25);
+    padding: 2rem 2rem 1rem;
+    margin: 0 auto 2rem;
+    position: relative;
+    border: 1px solid #ddd;
+    max-width: 29em;
+}
+
+.card h1 {
+    text-align: center;
+}

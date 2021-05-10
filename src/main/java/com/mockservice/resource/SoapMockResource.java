@@ -7,12 +7,12 @@ import org.springframework.lang.Nullable;
 
 import java.util.Map;
 
-public class XmlMockResource implements MockResource {
+public class SoapMockResource implements MockResource {
 
     private final HttpHeaders headers = new HttpHeaders();
     private final StringTemplate body;
 
-    public XmlMockResource(TemplateEngine engine, String resource) {
+    public SoapMockResource(TemplateEngine engine, String resource) {
         body = new StringTemplate(engine);
         body.add(resource);
         headers.add(HttpHeaders.CONTENT_TYPE, "text/xml;charset=UTF-8");

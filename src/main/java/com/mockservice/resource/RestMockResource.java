@@ -9,21 +9,22 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-public class JsonMockResource implements MockResource {
+public class RestMockResource implements MockResource {
 
     private static final String HTTP_PREFIX = "HTTP/1.1 ";
-    private static final int HTTP_PREFIX_LEN = HTTP_PREFIX.length();
-    private static final String HTTP_HEADER_DELIMITER = ": ";
+    private static final String HTTP_HEADER_DELIMITER = ":";
     private static final int HTTP_HEADER_DELIMITER_LEN = HTTP_HEADER_DELIMITER.length();
 
     private int code = 200;
     private final HttpHeaders headers = new HttpHeaders();
     private final StringTemplate body;
-    private boolean readingHeaders = false;
 
-    public JsonMockResource(TemplateEngine engine, String resource) {
+    public RestMockResource(TemplateEngine engine, String resource) {
         body = new StringTemplate(engine);
         fromString(resource);
         headers.add(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8");
@@ -45,42 +46,46 @@ public class JsonMockResource implements MockResource {
     }
 
     private void fromString(String resource) {
+        List<String> lines = toList(resource);
+        List<String> payload = new ArrayList<>();
+        boolean readingHeaders = false;
+
+        for (String line : lines) {
+            if (line.startsWith(HTTP_PREFIX)) {
+                readingHeaders = true;
+                setHttpCode(line);
+            } else if (readingHeaders && line.trim().isEmpty()) {
+                readingHeaders = false;
+            } else if (readingHeaders) {
+                addHeader(line);
+            } else {
+                payload.add(line);
+            }
+        }
+
+        payload.forEach(body::add);
+    }
+
+    private List<String> toList(String resource) {
         try (BufferedReader reader = new BufferedReader(new StringReader(resource))) {
-
-            reader.lines().forEach(line -> {
-                if (line.startsWith(HTTP_PREFIX)) {
-                    readingHeaders = true;
-                    processHttpCode(line);
-                } else if (readingHeaders && line.trim().isEmpty()) {
-                    readingHeaders = false;
-                } else if (readingHeaders) {
-                    processHeader(line);
-                } else {
-                    processLine(line);
-                }
-            });
-
+            return reader.lines().collect(Collectors.toList());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    private void processHttpCode(String line) {
+    private void setHttpCode(String line) {
         try {
-            this.code = Integer.parseInt(line.substring(HTTP_PREFIX_LEN).trim());
+            this.code = Integer.parseInt(line.substring(HTTP_PREFIX.length()).trim());
         } catch (NumberFormatException e) {
             // ignore NaN
         }
     }
 
-    private void processHeader(String line) {
+    private void addHeader(String line) {
         int delimiter = line.indexOf(HTTP_HEADER_DELIMITER);
         String key = line.substring(0, delimiter);
-        String value = line.substring(delimiter + HTTP_HEADER_DELIMITER_LEN);
+        String value = line.substring(delimiter + HTTP_HEADER_DELIMITER_LEN).trim();
         headers.add(key, value);
-    }
-
-    private void processLine(String line) {
-        body.add(line);
     }
 }

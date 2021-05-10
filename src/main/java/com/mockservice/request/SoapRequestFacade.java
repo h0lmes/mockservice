@@ -7,12 +7,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-public class XmlHttpRequestFacade extends HttpRequestFacade {
+public class SoapRequestFacade extends AbstractRequestFacade {
 
     private static final String XML_FILE_EXTENSION = ".xml";
 
-    public XmlHttpRequestFacade(@NonNull HttpServletRequest request,
-                                @NonNull String folder) {
+    public SoapRequestFacade(@NonNull HttpServletRequest request,
+                             @NonNull String folder) {
         super(request, folder);
     }
 

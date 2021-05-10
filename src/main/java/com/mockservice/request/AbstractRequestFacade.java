@@ -1,7 +1,6 @@
 package com.mockservice.request;
 
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -11,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public abstract class HttpRequestFacade {
+public abstract class AbstractRequestFacade implements RequestFacade {
 
     static final String PATH_DELIMITER = "/";
     static final String PATH_DELIMITER_SUBSTITUTE = "_";
@@ -24,18 +23,20 @@ public abstract class HttpRequestFacade {
     private String folder;
     private HttpServletRequest request;
 
-    public HttpRequestFacade(@NonNull HttpServletRequest request,
-                             @NonNull String folder) {
+    public AbstractRequestFacade(@NonNull HttpServletRequest request,
+                                 @NonNull String folder) {
         Assert.notNull(request, "Request must not be null");
         Assert.notNull(folder, "Folder must not be null");
         this.request = request;
         this.folder = folder;
     }
 
+    @Override
     public String getFolder() {
         return folder;
     }
 
+    @Override
     public HttpServletRequest getRequest() {
         return request;
     }
@@ -48,10 +49,6 @@ public abstract class HttpRequestFacade {
             return null;
         }
     }
-
-    public abstract String getPath();
-
-    public abstract Map<String, String> getVariables(@Nullable Map<String, String> variables);
 
     @SuppressWarnings("unchecked")
     Map<String, String> getPathVariables() {
@@ -118,6 +115,7 @@ public abstract class HttpRequestFacade {
         return "";
     }
 
+    @Override
     public void mockTimeout() {
         String endpoint = getEncodedEndpoint();
 

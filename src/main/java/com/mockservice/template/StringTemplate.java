@@ -40,11 +40,6 @@ public class StringTemplate {
         this.engine = engine;
     }
 
-    public StringTemplate(TemplateEngine engine, String content) {
-        this(engine);
-        add(content);
-    }
-
     // parser
 
     public void add(String line) {

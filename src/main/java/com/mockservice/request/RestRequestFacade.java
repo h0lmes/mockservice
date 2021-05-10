@@ -9,12 +9,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JsonHttpRequestFacade extends HttpRequestFacade {
+public class RestRequestFacade extends AbstractRequestFacade {
 
     private static final String JSON_FILE_EXTENSION = ".json";
 
-    public JsonHttpRequestFacade(@NonNull HttpServletRequest request,
-                                 @NonNull String folder) {
+    public RestRequestFacade(@NonNull HttpServletRequest request,
+                             @NonNull String folder) {
         super(request, folder);
     }
 

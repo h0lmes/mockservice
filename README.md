@@ -124,7 +124,7 @@ Variables have the following format in data file:
     ${var_name}
     ${var_name:default_value}
 
-Mock engine makes available variables from the following sources:
+Mock templateEngine makes available variables from the following sources:
 
 1. Path variables. Example of mapping: `api/v1/account/{id}`.
 2. Request parameters. Example of request: `api/v1/account?id=1`.

@@ -1,15 +1,12 @@
 package com.mockservice.service;
 
-import com.mockservice.request.HttpRequestFacade;
-import com.mockservice.request.JsonHttpRequestFacade;
-import com.mockservice.resource.JsonMockResource;
+import com.mockservice.request.RequestFacade;
+import com.mockservice.request.RestRequestFacade;
 import com.mockservice.resource.MockResource;
+import com.mockservice.resource.RestMockResource;
 import com.mockservice.template.TemplateEngine;
-import com.mockservice.util.ResourceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Primary;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
@@ -19,27 +16,26 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
 
-@Service
-@Primary
+@Service("rest")
 public class RestMockService implements MockService {
 
     private static final Logger log = LoggerFactory.getLogger(RestMockService.class);
 
-    private final ResourceLoader resourceLoader;
     private final HttpServletRequest request;
+    private final ResourceService resourceService;
+    private final TemplateEngine templateEngine;
     private final ConcurrentLruCache<String, MockResource> resourceCache;
-    private final TemplateEngine engine;
 
-    public RestMockService(ResourceLoader resourceLoader, HttpServletRequest request, TemplateEngine engine) {
-        this.resourceLoader = resourceLoader;
+    public RestMockService(HttpServletRequest request, ResourceService resourceService, TemplateEngine templateEngine) {
         this.request = request;
-        this.engine = engine;
+        this.resourceService = resourceService;
+        this.templateEngine = templateEngine;
         resourceCache = new ConcurrentLruCache<>(256, this::loadResource);
     }
 
     private MockResource loadResource(String path) {
         try {
-            return new JsonMockResource(engine, ResourceReader.asStringOrFind(resourceLoader, path));
+            return new RestMockResource(templateEngine, resourceService.load(path));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -47,7 +43,7 @@ public class RestMockService implements MockService {
 
     @Override
     public ResponseEntity<String> mock(String folder, Map<String, String> variables) {
-        HttpRequestFacade requestFacade = new JsonHttpRequestFacade(request, folder);
+        RequestFacade requestFacade = new RestRequestFacade(request, folder);
         String path = requestFacade.getPath();
         log.info("File requested: {}", path);
         MockResource resource = resourceCache.get(path);

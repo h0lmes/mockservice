@@ -3,7 +3,6 @@ package com.mockservice.template;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("WeakerAccess")
 public class TokenParser {
 
     private static final String TOKEN_START = "${";
@@ -17,7 +16,7 @@ public class TokenParser {
     private static final char TOKEN_ARGS_SPLIT_CHAR = ':';
 
     private TokenParser() {
-        // hidden
+        // private
     }
 
     public static boolean isToken(String str) {
