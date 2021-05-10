@@ -29,17 +29,17 @@ public class DefaultResourceService implements ResourceService {
     private static final String PATH_DELIMITER = "/";
 
     private final ResourceLoader resourceLoader;
-    private final Map<String, String> files;
+    private final Map<String, String> mockDataFiles;
 
     public DefaultResourceService(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
-        files = findDataFiles();
+        mockDataFiles = findDataFiles();
     }
 
     @Override
     public List<String> files() {
         List<String> list = new ArrayList<>();
-        files.forEach((k, v) -> list.add(v));
+        mockDataFiles.forEach((k, v) -> list.add(v));
         return list;
     }
 
@@ -48,7 +48,7 @@ public class DefaultResourceService implements ResourceService {
         try {
             return ResourceReader.asString(resourceLoader, DATA_FOLDER + PATH_DELIMITER + path);
         } catch (FileNotFoundException e) {
-            String pathListed = files.get(path.toLowerCase());
+            String pathListed = mockDataFiles.get(path.toLowerCase());
             log.warn("File not found: {}", path);
             log.info("Lookup in list: {}", pathListed);
             if (pathListed == null) {
@@ -66,38 +66,38 @@ public class DefaultResourceService implements ResourceService {
 
     private static Map<String, String> findDataFiles() {
         Map<String, String> result = new HashMap<>();
+        Pattern pattern = Pattern.compile(DATA_FILE_REGEX, Pattern.CASE_INSENSITIVE + Pattern.UNICODE_CASE);
         try {
-            find(s -> result.put(s.toLowerCase(), s), DATA_FILE_REGEX);
+            findResourcesMatchingPattern(s -> result.put(s.toLowerCase(), s), pattern);
         } catch (URISyntaxException | IOException e) {
             log.error("", e);
         }
         return result;
     }
 
-    private static void find(Consumer<String> consumer, String regex) throws URISyntaxException, IOException {
+    private static void findResourcesMatchingPattern(Consumer<String> consumer, Pattern pattern) throws URISyntaxException, IOException {
         CodeSource src = DefaultResourceService.class.getProtectionDomain().getCodeSource();
         URL url = src.getLocation();
         URI uri = url.toURI();
         if (uri.getScheme().equals("jar")) {
-            walkJar(uri, consumer, regex);
+            walkJar(uri, consumer, pattern);
         } else {
-            walkPath(Paths.get(uri), consumer, regex);
+            walkPath(Paths.get(uri), consumer, pattern);
         }
     }
 
-    private static void walkJar(URI uri, Consumer<String> consumer, String regex) throws IOException {
+    private static void walkJar(URI uri, Consumer<String> consumer, Pattern pattern) throws IOException {
         try (FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
             for (Path path : fileSystem.getRootDirectories()) {
-                walkPath(path, consumer, regex);
+                walkPath(path, consumer, pattern);
             }
         }
     }
 
-    private static void walkPath(Path path, Consumer<String> consumer, String regex) throws IOException {
-        try (Stream<Path> walk = Files.walk(path, 10)) {
-            for (Iterator<Path> it = walk.iterator(); it.hasNext(); ) {
+    private static void walkPath(Path path, Consumer<String> consumer, Pattern pattern) throws IOException {
+        try (Stream<Path> files = Files.walk(path, 10)) {
+            for (Iterator<Path> it = files.iterator(); it.hasNext(); ) {
                 String file = it.next().toString();
-                Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE + Pattern.UNICODE_CASE);
                 Matcher matcher = pattern.matcher(file);
                 if (matcher.find()) {
                     consumer.accept(matcher.group(1));

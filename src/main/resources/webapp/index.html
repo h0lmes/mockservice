@@ -3,10 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mock Service - Index</title>
+    <title>Mock Service</title>
 </head>
 <link rel="stylesheet" href="/resources/webapp/main.css">
 <body>
-
+    <div id="page">
+        <div id="page-contents">
+            <div class="card">
+                <h1>Data files</h1>
+                <p id="list"></p>
+            </div>
+        </div>
+    </div>
 </body>
+<script lang="javascript">
+    fetch('/web-api/datafiles')
+        .then(res => res.json())
+        .then((out) => {
+            let p = document.getElementById('list');
+            for (const file of out) {
+                p.innerHTML += file + '<br>';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+        });
+</script>
 </html>

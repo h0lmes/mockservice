@@ -4,6 +4,7 @@
 }
 body {
     background-color: #222;
+    color: #ddd;
     font-family: sans-serif;
     font-size: 16px;
 }
@@ -51,6 +52,7 @@ p {
 
 .card {
     background-color: rgba(255,255,255,.8);
+    color: #000;
     border-radius: .25rem;
     box-shadow: 0 1px 0 rgba(0,0,0,.25);
     padding: 2rem 2rem 1rem;
