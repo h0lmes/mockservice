@@ -7,6 +7,7 @@ import com.mockservice.resource.SoapMockResource;
 import com.mockservice.template.TemplateEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
@@ -26,7 +27,9 @@ public class SoapMockService implements MockService {
     private final TemplateEngine templateEngine;
     private final ConcurrentLruCache<String, MockResource> resourceCache;
 
-    public SoapMockService(HttpServletRequest request, ResourceService resourceService, TemplateEngine templateEngine) {
+    public SoapMockService(@Autowired HttpServletRequest request,
+                           @Autowired ResourceService resourceService,
+                           @Autowired TemplateEngine templateEngine) {
         this.request = request;
         this.resourceService = resourceService;
         this.templateEngine = templateEngine;

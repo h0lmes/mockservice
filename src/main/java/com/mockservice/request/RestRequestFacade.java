@@ -6,26 +6,28 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class RestRequestFacade extends AbstractRequestFacade {
 
     private static final String JSON_FILE_EXTENSION = ".json";
 
     public RestRequestFacade(@NonNull HttpServletRequest request,
-                             @NonNull String folder) {
-        super(request, folder);
+                             @NonNull String service) {
+        super(request, service);
     }
 
     @Override
     public String getPath() {
-        return getFolder()
-                + PATH_DELIMITER
-                + getRequest().getMethod().toUpperCase()
-                + PATH_DELIMITER_SUBSTITUTE
-                + getEncodedEndpoint()
-                + getMockOption()
+        return getService()
+                + File.separator
+                + getRequest().getMethod().toLowerCase()
+                + NAME_DELIMITER
+                + getEndpoint()
+                + getOption()
                 + JSON_FILE_EXTENSION;
     }
 
@@ -35,7 +37,7 @@ public class RestRequestFacade extends AbstractRequestFacade {
         vars.putAll(getBodyAsVariables());
         vars.putAll(getPathVariables());
         vars.putAll(getRequestParams());
-        vars.putAll(getMockVariables());
+        vars.putAll(getHeaderVariables());
         if (variables != null) {
             vars.putAll(variables);
         }
@@ -43,7 +45,7 @@ public class RestRequestFacade extends AbstractRequestFacade {
     }
 
     private Map<String, String> getBodyAsVariables() {
-        String body = getBody();
+        String body = getBody().collect(Collectors.joining(System.lineSeparator()));
         if (body != null && !body.isEmpty()) {
             try {
                 return MapUtils.flattenMap(MapUtils.jsonToMap(body));

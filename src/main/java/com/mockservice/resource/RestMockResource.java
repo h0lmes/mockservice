@@ -48,15 +48,15 @@ public class RestMockResource implements MockResource {
     private void fromString(String resource) {
         List<String> lines = toList(resource);
         List<String> payload = new ArrayList<>();
-        boolean readingHeaders = false;
+        boolean head = false;
 
         for (String line : lines) {
             if (line.startsWith(HTTP_PREFIX)) {
-                readingHeaders = true;
+                head = true;
                 setHttpCode(line);
-            } else if (readingHeaders && line.trim().isEmpty()) {
-                readingHeaders = false;
-            } else if (readingHeaders) {
+            } else if (head && line.trim().isEmpty()) {
+                head = false;
+            } else if (head) {
                 addHeader(line);
             } else {
                 payload.add(line);

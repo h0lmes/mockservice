@@ -7,6 +7,7 @@ import com.mockservice.resource.RestMockResource;
 import com.mockservice.template.TemplateEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
@@ -26,7 +27,9 @@ public class RestMockService implements MockService {
     private final TemplateEngine templateEngine;
     private final ConcurrentLruCache<String, MockResource> resourceCache;
 
-    public RestMockService(HttpServletRequest request, ResourceService resourceService, TemplateEngine templateEngine) {
+    public RestMockService(@Autowired HttpServletRequest request,
+                           @Autowired ResourceService resourceService,
+                           @Autowired TemplateEngine templateEngine) {
         this.request = request;
         this.resourceService = resourceService;
         this.templateEngine = templateEngine;
@@ -47,7 +50,6 @@ public class RestMockService implements MockService {
         String path = requestFacade.getPath();
         log.info("File requested: {}", path);
         MockResource resource = resourceCache.get(path);
-        requestFacade.mockTimeout();
         Map<String, String> requestVariables = requestFacade.getVariables(variables);
         return ResponseEntity
                 .status(resource.getCode())

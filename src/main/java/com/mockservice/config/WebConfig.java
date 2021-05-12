@@ -15,5 +15,9 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceHandler("/resources/**")
                 .addResourceLocations("classpath:")
                 .setCachePeriod(1);
+        registry
+                .addResourceHandler("/_nuxt/**")
+                .addResourceLocations("classpath:webapp/_nuxt/");
+
     }
 }

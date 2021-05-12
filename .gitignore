@@ -1,8 +1,13 @@
-HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+
+src/main/resources/webapp/*
+
+webapp/node_modules/
+webapp/.nuxt/
+webapp/dist/
 
 ### STS ###
 .apt_generated

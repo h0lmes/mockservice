@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -26,7 +27,6 @@ public class DefaultResourceService implements ResourceService {
 
     private static final String DATA_FOLDER = "data";
     private static final String DATA_FILE_REGEX = ".+" + DATA_FOLDER + "[\\/\\\\](.+\\.json|.+\\.xml)$";
-    private static final String PATH_DELIMITER = "/";
 
     private final ResourceLoader resourceLoader;
     private final Map<String, String> mockDataFiles;
@@ -40,13 +40,14 @@ public class DefaultResourceService implements ResourceService {
     public List<String> files() {
         List<String> list = new ArrayList<>();
         mockDataFiles.forEach((k, v) -> list.add(v));
+        list.sort(String::compareToIgnoreCase);
         return list;
     }
 
     @Override
     public String load(String path) throws IOException {
         try {
-            return ResourceReader.asString(resourceLoader, DATA_FOLDER + PATH_DELIMITER + path);
+            return ResourceReader.asString(resourceLoader, DATA_FOLDER + File.separator + path);
         } catch (FileNotFoundException e) {
             String pathListed = mockDataFiles.get(path.toLowerCase());
             log.warn("File not found: {}", path);
@@ -55,7 +56,7 @@ public class DefaultResourceService implements ResourceService {
                 throw new IOException("File not found in list: " + path, e);
             }
             try {
-                return ResourceReader.asString(resourceLoader, DATA_FOLDER + PATH_DELIMITER + pathListed);
+                return ResourceReader.asString(resourceLoader, DATA_FOLDER + File.separator + pathListed);
             } catch (IOException ex) {
                 throw new IOException("Error loading listed file: " + pathListed, ex);
             }

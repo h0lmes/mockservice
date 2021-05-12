@@ -27,21 +27,24 @@ public class MapUtils {
         return mapper.readValue(json, Map.class);
     }
 
-    @SuppressWarnings("unchecked")
     public static Map<String, String> flattenMap(Map<String, Object> map) {
-        Map<String, String> result = new HashMap<>();
-
         Queue<TriEntry> queue = new ArrayDeque<>();
         map.forEach((k, v) -> queue.offer(new TriEntry(null, k, v)));
+        return runBfs(queue);
+    }
 
+    @SuppressWarnings("unchecked")
+    private static Map<String, String> runBfs(Queue<TriEntry> queue) {
+        Map<String, String> result = new HashMap<>();
         while (!queue.isEmpty()) {
             TriEntry entry = queue.poll();
-            String key = entry.getFullKey();
             Object value = entry.value;
             if (value instanceof Map) {
-                ((Map<String, Object>) value).forEach((k, v) -> queue.offer(new TriEntry(key, k, v)));
+                ((Map<String, Object>) value).forEach((k, v) ->
+                        queue.offer(new TriEntry(entry.getParent(), k, v))
+                );
             } else {
-                result.put(key, value == null ? null : value.toString());
+                result.put(entry.getParent(), value == null ? null : value.toString());
             }
         }
         return result;
@@ -58,7 +61,7 @@ public class MapUtils {
             this.value = value;
         }
 
-        String getFullKey() {
+        String getParent() {
             return parent == null ? key : parent + "." + key;
         }
     }

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/v1")
-public class DemoServiceController extends AbstractRestController {
+public class DemoService extends AbstractRestController {
 
     @GetMapping("entity/filter")
     public ResponseEntity<String> getEntityWithParameters() {

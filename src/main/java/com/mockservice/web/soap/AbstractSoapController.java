@@ -25,12 +25,9 @@ public class AbstractSoapController {
     @Autowired
     @Qualifier("soap")
     MockService mockService;
-    private final String folder;
     private final String faultXml;
 
     public AbstractSoapController() {
-        folder = this.getClass().getSimpleName();
-
         try {
             faultXml = ResourceReader.asString(FAULT_DATA_FILE);
         } catch (IOException e) {
@@ -39,11 +36,11 @@ public class AbstractSoapController {
     }
 
     public ResponseEntity<String> mock() {
-        return mockService.mock(folder, null);
+        return mockService.mock(this.getClass().getSimpleName(), null);
     }
 
     public ResponseEntity<String> mock(Map<String, String> variables) {
-        return mockService.mock(folder, variables);
+        return mockService.mock(this.getClass().getSimpleName(), variables);
     }
 
     @ExceptionHandler

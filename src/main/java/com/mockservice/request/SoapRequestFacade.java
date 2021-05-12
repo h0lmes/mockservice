@@ -4,6 +4,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,16 +13,16 @@ public class SoapRequestFacade extends AbstractRequestFacade {
     private static final String XML_FILE_EXTENSION = ".xml";
 
     public SoapRequestFacade(@NonNull HttpServletRequest request,
-                             @NonNull String folder) {
-        super(request, folder);
+                             @NonNull String service) {
+        super(request, service);
     }
 
     @Override
     public String getPath() {
-        return getFolder()
-                + PATH_DELIMITER
-                + getEncodedEndpoint()
-                + getMockOption()
+        return getService()
+                + File.separator
+                + getEndpoint()
+                + getOption()
                 + XML_FILE_EXTENSION;
     }
 
@@ -30,7 +31,7 @@ public class SoapRequestFacade extends AbstractRequestFacade {
         Map<String, String> vars = new HashMap<>();
         vars.putAll(getPathVariables());
         vars.putAll(getRequestParams());
-        vars.putAll(getMockVariables());
+        vars.putAll(getHeaderVariables());
         if (variables != null) {
             vars.putAll(variables);
         }

@@ -1,62 +1,57 @@
-### MockService
+### Mock Service
 
-A very simple to use yet extensible service to mock REST and SOAP services.
-Suitable for integration testing and similar use cases.
+An easy to use yet extensible service to mock REST and SOAP services.
+Suitable for integration testing and similar purposes.
 
-> Important note. SOAP support is somewhat limited and "crutchy", though straightforward.
+> Important: SOAP support is somewhat limited and "crutchy", though straightforward.
 It requires valid SOAP envelope in XML data files. There is NO support for WSDL/XSD.
 
 #
 ### Where to start
 
-To create new endpoints in MockService:
+To create new endpoints:
 
 1. Create new controller extending `AbstractRestController` or `AbstractSoapController`
-(for example `AccountServiceController`, there is no enforced convention
+(for example `AccountService`, there is no enforced convention
 for controller names).
 2. Create required methods in the controller (see examples under `web/rest`
 and `web/soap`).
 3. Create a new folder under `src/main/resources` and
-name it as your controller (`AccountServiceController`).
+name it as your controller (`AccountService`).
 4. Create data files under that folder (see file naming format below).
 
-> Note. See example requests in `rest-api.http` in the root of the project.
+> Note. See example requests in `rest-api.http`.
 
 #
 ### File naming format
 
-    // for REST controllers
-    METHOD_request_mapping.json
+    // for REST
+    method-request-mapping.json
+    or
+    method-request-mapping--option.json
     
-    // for SOAP controllers
-    request_mapping.xml 
+    // for SOAP
+    request-mapping.xml 
 
 
-> The convention is that HTTP method should be in the upper case
-and the rest in the lower case.
-
-`METHOD` is any of HTTP methods.
-
-Path variables supported in request mapping.
+Method is any of HTTP methods. Path variables supported.
 
 Example:
 
-    @GetMapping("api/entity/{id})  ->  GET_api_entity_{id}.json
-
-As you see path delimiters `/` are substituted with underscores `_`.
+    @GetMapping("api/entity/{id}")  ->  get-api-entity-{id}.json
 
 #
 ### Data file contents
 
 Data file can contain any JSON or XML (any textual data actually).
 
-See examples in `resources` folder.
+See examples in `resources/data` folder.
 
 You can specify HTTP status code and headers in JSON files (not possible to specify headers only).
 Data file parser looks for `HTTP/1.1` to start reading status code and headers.
 Put empty line (or end of file) after headers.
 
-Example:
+Examples:
 
     HTTP/1.1 201
     Custom-Header: header value
@@ -73,24 +68,25 @@ or
 #
 ### Multiple data files per endpoint
 
-Multiple `Mock` headers supported per HTTP request.
+Multiple `Mock-Option` headers supported per HTTP request.
+Each header defines exactly one option.
 
 There are two formats of this header:
 
-    service_name/option_name
-    service_name/request_mapping/option_name
+    controller/option
+    controller/request-mapping/option
     
-Example (two headers, first one contains 2 options):
+Example:
 
-    Mock: AccountServiceController/error404 CartServiceController/empty
-    Mock: StoreServiceController/api_v1_item_{id}/invalid_format
+    Mock-Option: AccountService/error404
+    Mock-Option: StoreService/api-v1-item-{id}/invalid_format
 
-In the example above if you call any endpoint of the `AccountServiceController`
-then a file with `#error404` before the extension would be loaded
-(e.g. `GET_accounts#error404.json`).
+In the example above if you call any endpoint of the `AccountService`
+then a file with `error404` before the extension would be loaded
+(e.g. `get-accounts--error404.json`).
 
-And if you call an endpoint `api/v1/item/{id}` of the `StoreServiceController`
-then `GET_api_v1_item_{id}#invalid_format.json` would be loaded.
+And if you call an endpoint `api/v1/item/{id}` of the `StoreService`
+then `get-api-v1-item-{id}--invalid_format.json` would be loaded.
 
 #
 ### Predefined variables
@@ -124,16 +120,16 @@ Variables have the following format in data file:
     ${var_name}
     ${var_name:default_value}
 
-Mock templateEngine makes available variables from the following sources:
+Service makes available variables from the following sources:
 
-1. Path variables. Example of mapping: `api/v1/account/{id}`.
-2. Request parameters. Example of request: `api/v1/account?id=1`.
-3. Request body if it contains JSON.
-All fields of the JSON would be collected and made available as variables.
-Hierarchy is being preserved (see example below).
+1. Path variables (example `api/v1/account/{id}`).
+2. Request parameters (example `api/v1/account?id=1`).
+3. Request payload (if it is in JSON).
+All fields of the JSON would be collected and made available as variables
+(preserving hierarchy, see example below).
 4. `Mock-Variable` header (see section below).
 
-Example of request body:
+Example of request payload:
 
     {
         "key1": "value 1",
@@ -142,7 +138,7 @@ Example of request body:
         }
     }
 
-The following variables would be created:
+The following variables would be available:
 
     ${key1}
     ${key2.key1}
@@ -155,16 +151,16 @@ Each header defines exactly one variable.
 
 Header can have two formats:
 
-    service_name/variable_name/value
-    service_name/request_mapping/variable_name/value
+    controller/name_of_variable/value
+    controller/request-mapping/name_of_variable/value
     
 Example:
 
-    Mock-Variable: AccountServiceController/total/1000
-    Mock-Variable: StoreServiceController/api_v1_item_{id}/item_name/iPhone 12 Pro
+    Mock-Variable: AccountService/total/1000
+    Mock-Variable: StoreService/api-v1-item-{id}/item_name/iPhone 12 Pro
 
-In the example above if you call any endpoint of the `AccountServiceController`
+In the example above if you call any endpoint of the `AccountService`
 a variable `total` with value `1000` would be available.
 
-And if you call an endpoint `api/v1/item/{id}` of the `StoreServiceController`
+And if you call an endpoint `api/v1/item/{id}` of the `StoreService`
 a variable `item_name` with value `iPhone 12 Pro` would be available.

@@ -1,39 +1,45 @@
 package com.mockservice.request;
 
 import org.springframework.lang.NonNull;
-import org.springframework.util.Assert;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.Stream;
 
 public abstract class AbstractRequestFacade implements RequestFacade {
 
-    static final String PATH_DELIMITER = "/";
-    static final String PATH_DELIMITER_SUBSTITUTE = "_";
-    private static final String MOCK_HEADER = "Mock";
-    private static final String MOCK_TIMEOUT_HEADER = "Mock-Timeout";
-    private static final String MOCK_VARIABLE_HEADER = "Mock-Variable";
-    private static final String MOCK_HEADER_SPLIT_REGEX = "\\s+";
-    private static final String MOCK_OPTION_DELIMITER = "#";
+    private static final String REQUEST_MAPPING_DELIMITER = "/";
+    static final String NAME_DELIMITER = "-";
+    private static final String OPTION_DELIMITER = "--";
+    private static final String OPTION_HEADER = "Mock-Option";
+    private static final String VARIABLE_HEADER = "Mock-Variable";
+    private static final String HEADER_SPLIT = "/";
 
-    private String folder;
+    private String service;
     private HttpServletRequest request;
+    private String endpoint;
 
     public AbstractRequestFacade(@NonNull HttpServletRequest request,
-                                 @NonNull String folder) {
-        Assert.notNull(request, "Request must not be null");
-        Assert.notNull(folder, "Folder must not be null");
+                                 @NonNull String service) {
         this.request = request;
-        this.folder = folder;
+        this.service = service;
+        this.endpoint = getEndpointInternal(request);
+    }
+
+    private String getEndpointInternal(HttpServletRequest request) {
+        String path = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        if (path.startsWith(REQUEST_MAPPING_DELIMITER)) {
+            path = path.substring(1);
+        }
+        String[] pathParts = path.split(REQUEST_MAPPING_DELIMITER);
+        path = String.join(NAME_DELIMITER, pathParts);
+        return path.toLowerCase();
     }
 
     @Override
-    public String getFolder() {
-        return folder;
+    public String getService() {
+        return service;
     }
 
     @Override
@@ -41,12 +47,16 @@ public abstract class AbstractRequestFacade implements RequestFacade {
         return request;
     }
 
-    String getBody() {
+    String getEndpoint() {
+        return endpoint;
+    }
+
+    Stream<String> getBody() {
         try {
-            return request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+            return request.getReader().lines();
         } catch (Exception e) {
             // Body processed elsewhere. Do nothing.
-            return null;
+            return Stream.empty();
         }
     }
 
@@ -61,88 +71,44 @@ public abstract class AbstractRequestFacade implements RequestFacade {
 
     Map<String, String> getRequestParams() {
         Map<String, String> result = new HashMap<>();
-        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-            result.put(entry.getKey(), entry.getValue()[0]);
-        }
+        request.getParameterMap().forEach(
+                (k, v) -> result.put(k, v[0])
+        );
         return result;
     }
 
-    Map<String, String> getMockVariables() {
-        Map<String, String> result = new HashMap<>();
-        String endpoint = getEncodedEndpoint();
-
-        Enumeration<String> headers = request.getHeaders(MOCK_VARIABLE_HEADER);
+    private List<String[]> getHeadersParts(String headerName) {
+        List<String[]> result = new ArrayList<>();
+        Enumeration<String> headers = request.getHeaders(headerName);
         while (headers.hasMoreElements()) {
             String header = headers.nextElement();
             if (header != null && !header.isEmpty()) {
-                String[] parts = header.trim().split(PATH_DELIMITER);
-                if (parts.length == 3 && folder.equalsIgnoreCase(parts[0])) {
-                    result.put(parts[1], parts[2]);
-                } else if (parts.length > 3 && folder.equalsIgnoreCase(parts[0]) && endpoint.equals(parts[1])) {
-                    result.put(parts[2], parts[3]);
-                }
+                result.add(header.trim().split(HEADER_SPLIT));
             }
         }
         return result;
     }
 
-    String getEncodedEndpoint() {
-        String path = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-        if (path.startsWith(PATH_DELIMITER)) {
-            path = path.substring(1);
-        }
-        return String.join(PATH_DELIMITER_SUBSTITUTE, path.split(PATH_DELIMITER)).toLowerCase();
+    Map<String, String> getHeaderVariables() {
+        Map<String, String> result = new HashMap<>();
+        getHeadersParts(VARIABLE_HEADER).forEach(parts -> {
+            if (parts.length == 3 && service.equalsIgnoreCase(parts[0])) {
+                result.put(parts[1], parts[2]);
+            } else if (parts.length > 3 && service.equalsIgnoreCase(parts[0]) && endpoint.equals(parts[1])) {
+                result.put(parts[2], parts[3]);
+            }
+        });
+        return result;
     }
 
-    String getMockOption() {
-        String endpoint = getEncodedEndpoint();
-
-        Enumeration<String> headers = request.getHeaders(MOCK_HEADER);
-        while (headers.hasMoreElements()) {
-            String header = headers.nextElement();
-            if (header != null && !header.isEmpty()) {
-
-                for (String option : header.split(MOCK_HEADER_SPLIT_REGEX)) {
-                    String[] parts = option.split(PATH_DELIMITER);
-                    if (parts.length == 2 && folder.equalsIgnoreCase(parts[0])) {
-                        return MOCK_OPTION_DELIMITER + parts[1];
-                    } else if (parts.length > 2 && folder.equalsIgnoreCase(parts[0]) && endpoint.equals(parts[1])) {
-                        return MOCK_OPTION_DELIMITER + parts[2];
-                    }
-                }
+    String getOption() {
+        for (String[] parts : getHeadersParts(OPTION_HEADER)) {
+            if (parts.length == 2 && service.equalsIgnoreCase(parts[0])) {
+                return OPTION_DELIMITER + parts[1];
+            } else if (parts.length > 2 && service.equalsIgnoreCase(parts[0]) && endpoint.equals(parts[1])) {
+                return OPTION_DELIMITER + parts[2];
             }
         }
         return "";
-    }
-
-    @Override
-    public void mockTimeout() {
-        String endpoint = getEncodedEndpoint();
-
-        Enumeration<String> headers = request.getHeaders(MOCK_TIMEOUT_HEADER);
-        while (headers.hasMoreElements()) {
-            String header = headers.nextElement();
-            if (header != null && !header.isEmpty()) {
-
-                for (String option : header.split(MOCK_HEADER_SPLIT_REGEX)) {
-                    String[] parts = option.split(PATH_DELIMITER);
-                    if (parts.length == 2 && folder.equalsIgnoreCase(parts[0])) {
-                        sleep(parts[1]);
-                    } else if (parts.length > 2 && folder.equalsIgnoreCase(parts[0]) && endpoint.equals(parts[1])) {
-                        sleep(parts[2]);
-                    }
-                }
-            }
-        }
-    }
-
-    private static void sleep(String ms) {
-        try {
-            Thread.sleep(Long.valueOf(ms));
-        } catch (NumberFormatException e) {
-            // do nothing
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
     }
 }
