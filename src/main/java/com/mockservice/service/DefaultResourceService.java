@@ -1,5 +1,7 @@
 package com.mockservice.service;
 
+import com.mockservice.model.DataFileInfo;
+import com.mockservice.model.DataFileSource;
 import com.mockservice.util.ResourceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,18 +31,18 @@ public class DefaultResourceService implements ResourceService {
     private static final String DATA_FILE_REGEX = ".+" + DATA_FOLDER + "[\\/\\\\](.+\\.json|.+\\.xml)$";
 
     private final ResourceLoader resourceLoader;
-    private final Map<String, String> mockDataFiles;
+    private final Map<String, DataFileInfo> dataFiles;
 
     public DefaultResourceService(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
-        mockDataFiles = findDataFiles();
+        dataFiles = findResourceDataFiles();
     }
 
     @Override
-    public List<String> files() {
-        List<String> list = new ArrayList<>();
-        mockDataFiles.forEach((k, v) -> list.add(v));
-        list.sort(String::compareToIgnoreCase);
+    public List<DataFileInfo> files() {
+        List<DataFileInfo> list = new ArrayList<>();
+        dataFiles.forEach((k, v) -> list.add(v));
+        list.sort(Comparator.comparing(DataFileInfo::getName));
         return list;
     }
 
@@ -49,7 +51,7 @@ public class DefaultResourceService implements ResourceService {
         try {
             return ResourceReader.asString(resourceLoader, DATA_FOLDER + File.separator + path);
         } catch (FileNotFoundException e) {
-            String pathListed = mockDataFiles.get(path.toLowerCase());
+            String pathListed = dataFiles.get(path.toLowerCase()).getName();
             log.warn("File not found: {}", path);
             log.info("Lookup in list: {}", pathListed);
             if (pathListed == null) {
@@ -65,11 +67,14 @@ public class DefaultResourceService implements ResourceService {
         }
     }
 
-    private static Map<String, String> findDataFiles() {
-        Map<String, String> result = new HashMap<>();
+    private static Map<String, DataFileInfo> findResourceDataFiles() {
+        Map<String, DataFileInfo> result = new HashMap<>();
         Pattern pattern = Pattern.compile(DATA_FILE_REGEX, Pattern.CASE_INSENSITIVE + Pattern.UNICODE_CASE);
         try {
-            findResourcesMatchingPattern(s -> result.put(s.toLowerCase(), s), pattern);
+            findResourcesMatchingPattern(s ->
+                    result.put(s.toLowerCase(), new DataFileInfo(s, DataFileSource.RESOURCE)),
+                    pattern
+            );
         } catch (URISyntaxException | IOException e) {
             log.error("", e);
         }

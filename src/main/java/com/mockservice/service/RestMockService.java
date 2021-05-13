@@ -8,6 +8,7 @@ import com.mockservice.template.TemplateEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
@@ -27,13 +28,16 @@ public class RestMockService implements MockService {
     private final TemplateEngine templateEngine;
     private final ConcurrentLruCache<String, MockResource> resourceCache;
 
+    @Value("${application.cache.rest-mock-resource}")
+    private int cacheSizeLimit;
+
     public RestMockService(@Autowired HttpServletRequest request,
                            @Autowired ResourceService resourceService,
                            @Autowired TemplateEngine templateEngine) {
         this.request = request;
         this.resourceService = resourceService;
         this.templateEngine = templateEngine;
-        resourceCache = new ConcurrentLruCache<>(256, this::loadResource);
+        resourceCache = new ConcurrentLruCache<>(cacheSizeLimit, this::loadResource);
     }
 
     private MockResource loadResource(String path) {

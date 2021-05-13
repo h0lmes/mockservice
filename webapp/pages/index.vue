@@ -1,38 +1,37 @@
 <template>
     <div id="page">
         <div id="page-contents">
-            <div class="card">
-                <h1>Data files</h1>
-
-                <p v-if="$fetchState.pending">Loading....</p>
-                <p v-else-if="$fetchState.error">Error while fetching</p>
-                <ul v-else>
-                    <li v-for="(datafile, index) in datafiles" :key="index">
-                        {{ datafile }}
-                    </li>
-                </ul>
-            </div>
+            <DataFileList :datafiles="datafiles"
+                          :pending="$fetchState.pending"
+                          :error="$fetchState.error">
+            </DataFileList>
         </div>
     </div>
 </template>
-
 <script>
+    import { mapActions } from 'vuex';
+    import DataFileList from "../components/DataFileList";
     export default {
         name: "index",
+        components: {DataFileList},
         data() {
-            return {
-                datafiles: []
+            return {}
+        },
+        computed: {
+            datafiles () {
+                return this.$store.state.datafiles
             }
         },
         async fetch() {
-            // TODO remove hardcoded localhost
-            this.datafiles = await fetch(
-                'http://localhost:8081/web-api/datafiles'
-            ).then(res => res.json())
+            this.fetchDataFiles();
+        },
+        methods: {
+            ...mapActions({
+                fetchDataFiles: 'fetchDataFiles'
+            })
         }
     }
 </script>
-
 <style scoped>
 
 </style>

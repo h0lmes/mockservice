@@ -7,6 +7,33 @@ body {
     font-size: 16px;
     background-color: #2e4860;
     color: #dde6ee;
+    width: 100%;
+    overflow: hidden;
+}
+h1, h2, h3, h4, h5 {
+    font-weight: 500;
+    margin: 0 0 1.5rem;
+}
+h1 {
+    font-size: 2.25rem;
+    line-height: 1.5rem;
+}
+h2 {
+    font-size: 1.75rem;
+    line-height: 1.3rem;
+}
+p {
+    padding: .25em;
+    text-shadow: 0 0 1px #fff;
+}
+
+.page-enter-active,
+.page-leave-active {
+    transition: opacity 0.5s;
+}
+.page-enter,
+.page-leave-to {
+    opacity: 0;
 }
 
 #page {
@@ -22,21 +49,9 @@ body {
     padding: 6rem 2rem;
 }
 
-h1, h2, h3, h4, h5 {
-    font-weight: 500;
-    margin: 0 0 1.5rem;
+.monospace {
+    font-family: monospace, monospace;
 }
-h1 {
-    font-size: 2.25rem;
-    line-height: 1.5rem;
-}
-
-p {
-    padding: .25em;
-    text-shadow: 0 0 1px #fff;
-    margin: 0 0 1rem;
-}
-
 .card {
     background-color: #1e344c;
     border: 1px solid #1e344c;
@@ -44,9 +59,4 @@ p {
     padding: 2rem 2rem 1.5rem;
     margin: 0 auto 2rem;
     position: relative;
-    max-width: 35em;
-}
-
-.card h1 {
-    text-align: center;
 }

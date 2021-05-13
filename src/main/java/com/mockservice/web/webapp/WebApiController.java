@@ -1,5 +1,6 @@
 package com.mockservice.web.webapp;
 
+import com.mockservice.model.DataFileInfo;
 import com.mockservice.service.ResourceService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("web-api")
+@CrossOrigin(origins = "*")
 public class WebApiController {
 
     private final ResourceService resourceService;
@@ -20,7 +21,7 @@ public class WebApiController {
     }
 
     @GetMapping("datafiles")
-    public List<String> dataFiles() {
+    public List<DataFileInfo> dataFiles() {
         return resourceService.files();
     }
 }
