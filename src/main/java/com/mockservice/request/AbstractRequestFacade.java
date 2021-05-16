@@ -11,23 +11,22 @@ public abstract class AbstractRequestFacade implements RequestFacade {
 
     private static final String REQUEST_MAPPING_DELIMITER = "/";
     static final String NAME_DELIMITER = "-";
-    private static final String OPTION_DELIMITER = "--";
-    private static final String OPTION_HEADER = "Mock-Option";
+    private static final String SUFFIX_HEADER = "Mock-Suffix";
+    private static final String SUFFIX_DELIMITER = "--";
     private static final String VARIABLE_HEADER = "Mock-Variable";
     private static final String HEADER_SPLIT = "/";
 
-    private String service;
+    private String group;
     private HttpServletRequest request;
     private String endpoint;
 
-    public AbstractRequestFacade(@NonNull HttpServletRequest request,
-                                 @NonNull String service) {
+    public AbstractRequestFacade(@NonNull String group, @NonNull HttpServletRequest request) {
+        this.group = group;
         this.request = request;
-        this.service = service;
-        this.endpoint = getEndpointInternal(request);
+        this.endpoint = encodeEndpoint(request);
     }
 
-    private String getEndpointInternal(HttpServletRequest request) {
+    private String encodeEndpoint(HttpServletRequest request) {
         String path = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         if (path.startsWith(REQUEST_MAPPING_DELIMITER)) {
             path = path.substring(1);
@@ -38,8 +37,13 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     }
 
     @Override
-    public String getService() {
-        return service;
+    public String getGroup() {
+        return group;
+    }
+
+    @Override
+    public String getMethod() {
+        return getRequest().getMethod().toLowerCase();
     }
 
     @Override
@@ -92,21 +96,21 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     Map<String, String> getHeaderVariables() {
         Map<String, String> result = new HashMap<>();
         getHeadersParts(VARIABLE_HEADER).forEach(parts -> {
-            if (parts.length == 3 && service.equalsIgnoreCase(parts[0])) {
+            if (parts.length == 3 && group.equalsIgnoreCase(parts[0])) {
                 result.put(parts[1], parts[2]);
-            } else if (parts.length > 3 && service.equalsIgnoreCase(parts[0]) && endpoint.equals(parts[1])) {
+            } else if (parts.length > 3 && group.equalsIgnoreCase(parts[0]) && endpoint.equals(parts[1])) {
                 result.put(parts[2], parts[3]);
             }
         });
         return result;
     }
 
-    String getOption() {
-        for (String[] parts : getHeadersParts(OPTION_HEADER)) {
-            if (parts.length == 2 && service.equalsIgnoreCase(parts[0])) {
-                return OPTION_DELIMITER + parts[1];
-            } else if (parts.length > 2 && service.equalsIgnoreCase(parts[0]) && endpoint.equals(parts[1])) {
-                return OPTION_DELIMITER + parts[2];
+    String getSuffix() {
+        for (String[] parts : getHeadersParts(SUFFIX_HEADER)) {
+            if (parts.length == 2 && group.equalsIgnoreCase(parts[0])) {
+                return SUFFIX_DELIMITER + parts[1];
+            } else if (parts.length > 2 && group.equalsIgnoreCase(parts[0]) && endpoint.equals(parts[1])) {
+                return SUFFIX_DELIMITER + parts[2];
             }
         }
         return "";

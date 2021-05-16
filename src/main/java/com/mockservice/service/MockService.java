@@ -5,5 +5,5 @@ import org.springframework.http.ResponseEntity;
 import java.util.Map;
 
 public interface MockService {
-    ResponseEntity<String> mock(String folder, Map<String, String> variables);
+    ResponseEntity<String> mock(String group, Map<String, String> variables);
 }

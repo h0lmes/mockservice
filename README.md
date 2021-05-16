@@ -1,6 +1,6 @@
 ### Mock Service
 
-An easy to use yet extensible service to mock REST and SOAP services.
+An easy to use yet extensible group to mock REST and SOAP services.
 Suitable for integration testing and similar purposes.
 
 > Important: SOAP support is somewhat limited and "crutchy", though straightforward.
@@ -28,7 +28,7 @@ name it as your controller (`AccountService`).
     // for REST
     method-request-mapping.json
     or
-    method-request-mapping--option.json
+    method-request-mapping--suffix.json
     
     // for SOAP
     request-mapping.xml 
@@ -68,13 +68,13 @@ or
 #
 ### Multiple data files per endpoint
 
-Multiple `Mock-Option` headers supported per HTTP request.
-Each header defines exactly one option.
+Multiple `Mock-Suffix` headers supported per HTTP request.
+Each header defines exactly one suffix.
 
 There are two formats of this header:
 
-    controller/option
-    controller/request-mapping/option
+    controller/suffix
+    controller/request-mapping/suffix
     
 Example:
 
@@ -82,7 +82,7 @@ Example:
     Mock-Option: StoreService/api-v1-item-{id}/invalid_format
 
 In the example above if you call any endpoint of the `AccountService`
-then a file with `error404` before the extension would be loaded
+then a file with `error404` suffix would be loaded
 (e.g. `get-accounts--error404.json`).
 
 And if you call an endpoint `api/v1/item/{id}` of the `StoreService`

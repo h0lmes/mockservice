@@ -15,7 +15,7 @@
 	<version>0.0.2</version>
     <packaging>jar</packaging>
     <name>mockservice</name>
-	<description>Mock service application</description>
+	<description>Mock Service application</description>
 
 	<properties>
 		<java.version>1.8</java.version>

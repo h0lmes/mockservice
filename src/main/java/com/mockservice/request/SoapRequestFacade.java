@@ -12,17 +12,16 @@ public class SoapRequestFacade extends AbstractRequestFacade {
 
     private static final String XML_FILE_EXTENSION = ".xml";
 
-    public SoapRequestFacade(@NonNull HttpServletRequest request,
-                             @NonNull String service) {
-        super(request, service);
+    public SoapRequestFacade(@NonNull String group, @NonNull HttpServletRequest request) {
+        super(group, request);
     }
 
     @Override
     public String getPath() {
-        return getService()
+        return getGroup()
                 + File.separator
                 + getEndpoint()
-                + getOption()
+                + getSuffix()
                 + XML_FILE_EXTENSION;
     }
 

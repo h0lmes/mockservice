@@ -9,7 +9,6 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,11 +30,24 @@ public class DefaultResourceService implements ResourceService {
     private static final String DATA_FILE_REGEX = ".+" + DATA_FOLDER + "[\\/\\\\](.+\\.json|.+\\.xml)$";
 
     private final ResourceLoader resourceLoader;
-    private final Map<String, DataFileInfo> dataFiles;
+    private final Map<String, DataFileInfo> dataFiles = new HashMap<>();
+    private final Map<String, String> memoryFiles = new HashMap<>();
 
     public DefaultResourceService(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
-        dataFiles = findResourceDataFiles();
+        findResourceDataFiles();
+    }
+
+    private void findResourceDataFiles() {
+        Pattern pattern = Pattern.compile(DATA_FILE_REGEX, Pattern.CASE_INSENSITIVE + Pattern.UNICODE_CASE);
+        try {
+            findResourcesMatchingPattern(
+                    resource -> dataFiles.put(resource.toLowerCase(), new DataFileInfo(resource, DataFileSource.RESOURCE)),
+                    pattern
+            );
+        } catch (URISyntaxException | IOException e) {
+            log.error("", e);
+        }
     }
 
     @Override
@@ -48,37 +60,33 @@ public class DefaultResourceService implements ResourceService {
 
     @Override
     public String load(String path) throws IOException {
+        DataFileInfo info = dataFiles.get(path.toLowerCase());
+        if (info == null) {
+            log.warn("File info not found: {}", path);
+            return loadFromResource(path);
+        }
+        if (DataFileSource.RESOURCE.equals(info.getSource())) {
+            return loadFromResource(info.getName());
+        }
+        if (DataFileSource.MEMORY.equals(info.getSource())) {
+            return loadFromMemory(info.getName());
+        }
+        throw new IOException("Unsupported resource type: " + info.getSource());
+    }
+
+    private String loadFromResource(String path) throws IOException {
         try {
             return ResourceReader.asString(resourceLoader, DATA_FOLDER + File.separator + path);
-        } catch (FileNotFoundException e) {
-            String pathListed = dataFiles.get(path.toLowerCase()).getName();
-            log.warn("File not found: {}", path);
-            log.info("Lookup in list: {}", pathListed);
-            if (pathListed == null) {
-                throw new IOException("File not found in list: " + path, e);
-            }
-            try {
-                return ResourceReader.asString(resourceLoader, DATA_FOLDER + File.separator + pathListed);
-            } catch (IOException ex) {
-                throw new IOException("Error loading listed file: " + pathListed, ex);
-            }
         } catch (IOException e) {
             throw new IOException("Error loading file: " + path, e);
         }
     }
 
-    private static Map<String, DataFileInfo> findResourceDataFiles() {
-        Map<String, DataFileInfo> result = new HashMap<>();
-        Pattern pattern = Pattern.compile(DATA_FILE_REGEX, Pattern.CASE_INSENSITIVE + Pattern.UNICODE_CASE);
-        try {
-            findResourcesMatchingPattern(s ->
-                    result.put(s.toLowerCase(), new DataFileInfo(s, DataFileSource.RESOURCE)),
-                    pattern
-            );
-        } catch (URISyntaxException | IOException e) {
-            log.error("", e);
+    private String loadFromMemory(String path) throws IOException {
+        if (!memoryFiles.containsKey(path.toLowerCase())) {
+            throw new IOException("No memory file found: " + path);
         }
-        return result;
+        return memoryFiles.get(path.toLowerCase());
     }
 
     private static void findResourcesMatchingPattern(Consumer<String> consumer, Pattern pattern) throws URISyntaxException, IOException {

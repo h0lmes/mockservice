@@ -15,19 +15,18 @@ public class RestRequestFacade extends AbstractRequestFacade {
 
     private static final String JSON_FILE_EXTENSION = ".json";
 
-    public RestRequestFacade(@NonNull HttpServletRequest request,
-                             @NonNull String service) {
-        super(request, service);
+    public RestRequestFacade(@NonNull String group, @NonNull HttpServletRequest request) {
+        super(group, request);
     }
 
     @Override
     public String getPath() {
-        return getService()
+        return getGroup()
                 + File.separator
-                + getRequest().getMethod().toLowerCase()
+                + getMethod()
                 + NAME_DELIMITER
                 + getEndpoint()
-                + getOption()
+                + getSuffix()
                 + JSON_FILE_EXTENSION;
     }
 

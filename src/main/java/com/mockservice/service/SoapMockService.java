@@ -49,8 +49,8 @@ public class SoapMockService implements MockService {
     }
 
     @Override
-    public ResponseEntity<String> mock(String folder, Map<String, String> variables) {
-        RequestFacade requestFacade = new SoapRequestFacade(request, folder);
+    public ResponseEntity<String> mock(String group, Map<String, String> variables) {
+        RequestFacade requestFacade = new SoapRequestFacade(group, request);
         String path = requestFacade.getPath();
         log.info("File requested: {}", path);
         MockResource resource = resourceCache.get(path);

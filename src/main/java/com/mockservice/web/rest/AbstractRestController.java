@@ -42,7 +42,7 @@ public class AbstractRestController {
         private String message;
 
         public ErrorInfo(Throwable t) {
-            this(t.getClass().getSimpleName(), t.getLocalizedMessage());
+            this(t.getClass().getSimpleName(), t.getMessage());
         }
 
         public ErrorInfo(String type, String message) {

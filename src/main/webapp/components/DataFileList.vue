@@ -12,7 +12,7 @@
     </div>
 </template>
 <script>
-    import DataFileInfo from "../components/DataFileInfo";
+    import DataFileInfo from "./DataFileInfo";
     export default {
         name: "DataFileList",
         components: {DataFileInfo},
