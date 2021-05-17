@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-class SoapController extends AbstractSoapController {
+class NumberConversion extends BaseSoapController {
 
     @PostMapping("mockNumberConversion")
     public ResponseEntity<String> mockNumberConversion() {

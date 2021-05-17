@@ -1,6 +1,6 @@
 package com.mockservice.service;
 
-import com.mockservice.model.DataFileInfo;
+import com.mockservice.service.model.DataFileInfo;
 
 import java.io.IOException;
 import java.util.List;

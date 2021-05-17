@@ -1,0 +1,54 @@
+groups:
+- name: SomeService
+  routes:
+  - disabled: false
+    type: REST
+    method: GET
+    path: api/v2/entity
+    suffix: null
+    response: |-
+      [
+        {"id": ${sequence}, "name": "${random_string}"},
+        {"id": ${sequence}, "name": "${of:Java:C++:Python:JavaScript}"},
+        {"id": ${sequence}, "name": "${random_uuid}"},
+        {"id": ${sequence}, "name": "${random_date}"},
+        {"id": ${sequence}, "name": "${random_timestamp}"},
+        {"id": ${sequence}, "name": "${current_date}"},
+        {"id": ${sequence}, "name": "${current_timestamp}"}
+      ]
+  - disabled: false
+    type: REST
+    method: GET
+    path: api/v2/entity
+    suffix: error
+    response: |-
+      HTTP/1.1 400
+
+      []
+  - disabled: false
+    type: REST
+    method: GET
+    path: api/v2/entity/{id}
+    suffix: null
+    response: |-
+      {"id": ${id}, "name": "entity name"}
+  - disabled: false
+    type: REST
+    method: GET
+    path: api/v2/entity/filter
+    suffix: null
+    response: |-
+      [
+        {"id": 2, "name": "${a:default a}"},
+        {"id": 3, "name": "${b:${of:default B1:default B2:default B3}}"}
+      ]
+  - disabled: false
+    type: REST
+    method: POST
+    path: api/v2/entity
+    suffix: null
+    response: |-
+      HTTP/1.1 201
+      Custom-Header: entity-created
+
+      {"id": ${random_int}, "name": "${name}"}

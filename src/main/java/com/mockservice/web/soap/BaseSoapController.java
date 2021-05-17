@@ -1,5 +1,7 @@
 package com.mockservice.web.soap;
 
+import com.mockservice.config.RegistrableController;
+import com.mockservice.mockconfig.RouteType;
 import com.mockservice.service.MockService;
 import com.mockservice.util.ResourceReader;
 import org.slf4j.Logger;
@@ -15,9 +17,9 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
 
-public class AbstractSoapController {
+public class BaseSoapController implements RegistrableController {
 
-    private static final Logger log = LoggerFactory.getLogger(AbstractSoapController.class);
+    private static final Logger log = LoggerFactory.getLogger(BaseSoapController.class);
     private static final String FAULT_DATA_FILE = "assets/soapFault.xml";
     private static final String FAULT_CODE_PLACEHOLDER = "${code}";
     private static final String FAULT_MESSAGE_PLACEHOLDER = "${message}";
@@ -27,7 +29,7 @@ public class AbstractSoapController {
     MockService mockService;
     private final String faultXml;
 
-    public AbstractSoapController() {
+    public BaseSoapController() {
         try {
             faultXml = ResourceReader.asString(FAULT_DATA_FILE);
         } catch (IOException e) {
@@ -36,11 +38,16 @@ public class AbstractSoapController {
     }
 
     public ResponseEntity<String> mock() {
-        return mockService.mock(this.getClass().getSimpleName(), null);
+        return mockService.mock(null);
     }
 
     public ResponseEntity<String> mock(Map<String, String> variables) {
-        return mockService.mock(this.getClass().getSimpleName(), variables);
+        return mockService.mock(variables);
+    }
+
+    @Override
+    public RouteType getRouteType() {
+        return RouteType.SOAP;
     }
 
     @ExceptionHandler

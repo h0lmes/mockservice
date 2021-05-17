@@ -1,5 +1,7 @@
 package com.mockservice.web.rest;
 
+import com.mockservice.config.RegistrableController;
+import com.mockservice.mockconfig.RouteType;
 import com.mockservice.service.MockService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,20 +13,25 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.Map;
 
-public class AbstractRestController {
+public class BaseRestController implements RegistrableController {
 
-    private static final Logger log = LoggerFactory.getLogger(AbstractRestController.class);
+    private static final Logger log = LoggerFactory.getLogger(BaseRestController.class);
 
     @Autowired
     @Qualifier("rest")
     MockService mockService;
 
     public ResponseEntity<String> mock() {
-        return mockService.mock(this.getClass().getSimpleName(), null);
+        return mockService.mock(null);
     }
 
     public ResponseEntity<String> mock(Map<String, String> variables) {
-        return mockService.mock(this.getClass().getSimpleName(), variables);
+        return mockService.mock(variables);
+    }
+
+    @Override
+    public RouteType getRouteType() {
+        return RouteType.REST;
     }
 
     @ExceptionHandler

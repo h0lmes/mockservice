@@ -1,6 +1,6 @@
 package com.mockservice.web.webapp;
 
-import com.mockservice.model.DataFileInfo;
+import com.mockservice.service.model.DataFileInfo;
 import com.mockservice.service.ResourceService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;

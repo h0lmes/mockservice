@@ -1,11 +1,11 @@
 package com.mockservice.request;
 
-import org.springframework.lang.NonNull;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 public abstract class AbstractRequestFacade implements RequestFacade {
 
@@ -16,29 +16,33 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     private static final String VARIABLE_HEADER = "Mock-Variable";
     private static final String HEADER_SPLIT = "/";
 
-    private String group;
     private HttpServletRequest request;
     private String endpoint;
+    private String encodedEndpoint;
+    private String body;
 
-    public AbstractRequestFacade(@NonNull String group, @NonNull HttpServletRequest request) {
-        this.group = group;
+    public AbstractRequestFacade(HttpServletRequest request) {
         this.request = request;
-        this.endpoint = encodeEndpoint(request);
-    }
-
-    private String encodeEndpoint(HttpServletRequest request) {
-        String path = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-        if (path.startsWith(REQUEST_MAPPING_DELIMITER)) {
-            path = path.substring(1);
+        endpoint = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        encodedEndpoint = encodeEndpoint(endpoint);
+        try {
+            body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        } catch (Exception e) {
+            // Body processed elsewhere. Do nothing.
         }
-        String[] pathParts = path.split(REQUEST_MAPPING_DELIMITER);
-        path = String.join(NAME_DELIMITER, pathParts);
-        return path.toLowerCase();
     }
 
-    @Override
-    public String getGroup() {
-        return group;
+    private String encodeEndpoint(String endpoint) {
+        if (endpoint.startsWith(REQUEST_MAPPING_DELIMITER)) {
+            endpoint = endpoint.substring(1);
+        }
+        String[] pathParts = endpoint.split(REQUEST_MAPPING_DELIMITER);
+        endpoint = String.join(NAME_DELIMITER, pathParts);
+        return endpoint.toLowerCase();
+    }
+
+    HttpServletRequest getRequest() {
+        return request;
     }
 
     @Override
@@ -47,21 +51,21 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     }
 
     @Override
-    public HttpServletRequest getRequest() {
-        return request;
+    public RequestMethod getRequestMethod() {
+        return RequestMethod.valueOf(getRequest().getMethod());
     }
 
-    String getEndpoint() {
+    @Override
+    public String getEndpoint() {
         return endpoint;
     }
 
-    Stream<String> getBody() {
-        try {
-            return request.getReader().lines();
-        } catch (Exception e) {
-            // Body processed elsewhere. Do nothing.
-            return Stream.empty();
-        }
+    String getEncodedEndpoint() {
+        return encodedEndpoint;
+    }
+
+    String getBody() {
+        return body;
     }
 
     @SuppressWarnings("unchecked")
@@ -93,23 +97,23 @@ public abstract class AbstractRequestFacade implements RequestFacade {
         return result;
     }
 
-    Map<String, String> getHeaderVariables() {
+    Map<String, String> getHeaderVariables(String group) {
         Map<String, String> result = new HashMap<>();
         getHeadersParts(VARIABLE_HEADER).forEach(parts -> {
             if (parts.length == 3 && group.equalsIgnoreCase(parts[0])) {
                 result.put(parts[1], parts[2]);
-            } else if (parts.length > 3 && group.equalsIgnoreCase(parts[0]) && endpoint.equals(parts[1])) {
+            } else if (parts.length > 3 && group.equalsIgnoreCase(parts[0]) && encodedEndpoint.equals(parts[1])) {
                 result.put(parts[2], parts[3]);
             }
         });
         return result;
     }
 
-    String getSuffix() {
+    String getSuffix(String group) {
         for (String[] parts : getHeadersParts(SUFFIX_HEADER)) {
             if (parts.length == 2 && group.equalsIgnoreCase(parts[0])) {
                 return SUFFIX_DELIMITER + parts[1];
-            } else if (parts.length > 2 && group.equalsIgnoreCase(parts[0]) && endpoint.equals(parts[1])) {
+            } else if (parts.length > 2 && group.equalsIgnoreCase(parts[0]) && encodedEndpoint.equals(parts[1])) {
                 return SUFFIX_DELIMITER + parts[2];
             }
         }

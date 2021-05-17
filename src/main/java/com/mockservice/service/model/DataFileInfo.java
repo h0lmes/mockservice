@@ -1,4 +1,4 @@
-package com.mockservice.model;
+package com.mockservice.service.model;
 
 public class DataFileInfo {
 

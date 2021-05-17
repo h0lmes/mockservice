@@ -1,22 +1,23 @@
 ### Mock Service
 
-An easy to use yet extensible group to mock REST and SOAP services.
+An easy to use service to mock REST and SOAP services.
 Suitable for integration testing and similar purposes.
 
-> Important: SOAP support is somewhat limited and "crutchy", though straightforward.
-It requires valid SOAP envelope in XML data files. There is NO support for WSDL/XSD.
+> Important: SOAP support is very simplistic and limited.
+It requires you to provide valid SOAP envelope as a response.
+There is NO support for WSDL/XSD.
 
 #
 ### Where to start
 
 To create new endpoints:
 
-1. Create new controller extending `AbstractRestController` or `AbstractSoapController`
+1. Create new controller extending `BaseRestController` or `BaseSoapController`
 (for example `AccountService`, there is no enforced convention
-for controller names).
+for controller names, controller name would mean group of routes).
 2. Create required methods in the controller (see examples under `web/rest`
 and `web/soap`).
-3. Create a new folder under `src/main/resources` and
+3. Create a new folder under `src/main/resources/data` and
 name it as your controller (`AccountService`).
 4. Create data files under that folder (see file naming format below).
 
@@ -73,8 +74,8 @@ Each header defines exactly one suffix.
 
 There are two formats of this header:
 
-    controller/suffix
-    controller/request-mapping/suffix
+    group/suffix
+    group/request-mapping/suffix
     
 Example:
 
@@ -151,8 +152,8 @@ Each header defines exactly one variable.
 
 Header can have two formats:
 
-    controller/name_of_variable/value
-    controller/request-mapping/name_of_variable/value
+    group/name_of_variable/value
+    group/request-mapping/name_of_variable/value
     
 Example:
 

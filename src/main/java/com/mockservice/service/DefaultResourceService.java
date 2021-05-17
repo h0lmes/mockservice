@@ -1,7 +1,7 @@
 package com.mockservice.service;
 
-import com.mockservice.model.DataFileInfo;
-import com.mockservice.model.DataFileSource;
+import com.mockservice.service.model.DataFileInfo;
+import com.mockservice.service.model.DataFileSource;
 import com.mockservice.util.ResourceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
