@@ -26,23 +26,26 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Service
 public class YamlConfigService implements ConfigService {
 
-    @Value("${application.config-path}")
-    private String configPath = "classpath:data/config.yml";
+    private final String defaultConfigPath;
     private Config config;
 
-    public YamlConfigService() {
+    public YamlConfigService(@Value("${application.default-config-path}") String defaultConfigPath) {
+        this.defaultConfigPath = defaultConfigPath;
+
         try {
-            readConfigFromResource();
-            String path = new File(".\\config.yml").getCanonicalPath();
-            saveConfigToFile(path);
+            readConfigFromFile();
         } catch (IOException e) {
-            config = new Config();
+            try {
+                readConfigFromResource();
+            } catch (IOException ex) {
+                config = new Config();
+            }
         }
     }
 
     private void readConfigFromResource() throws IOException {
         ResourceLoader resourceLoader = new DefaultResourceLoader();
-        Resource resource = resourceLoader.getResource(configPath);
+        Resource resource = resourceLoader.getResource(defaultConfigPath);
         try (Reader reader = new InputStreamReader(resource.getInputStream(), UTF_8)) {
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
             mapper.findAndRegisterModules();
@@ -50,13 +53,17 @@ public class YamlConfigService implements ConfigService {
         }
     }
 
-    private void readConfigFromFile(String path) throws IOException {
+    private void readConfigFromFile() throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         mapper.findAndRegisterModules();
-        config = mapper.readValue(new File(path), Config.class);
+        config = mapper.readValue(getConfigFile(), Config.class);
     }
 
-    private void saveConfigToFile(String path) throws IOException {
+    private File getConfigFile() {
+        return new File(".\\config.yml");
+    }
+
+    private void saveConfigToFile() throws IOException {
         YAMLFactory factory = new YAMLFactory();
         factory.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER);
         factory.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES);
@@ -65,7 +72,7 @@ public class YamlConfigService implements ConfigService {
         factory.disable(YAMLGenerator.Feature.SPLIT_LINES);
         ObjectMapper mapper = new ObjectMapper(factory);
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        mapper.writeValue(new File(path), config);
+        mapper.writeValue(getConfigFile(), config);
     }
 
     @Override
@@ -74,7 +81,7 @@ public class YamlConfigService implements ConfigService {
     }
 
     @Override
-    public Stream<Route> getActiveRoutes() {
+    public Stream<Route> getEnabledRoutes() {
         return getConfig().getGroups().stream()
                 .flatMap(
                         group -> group.getRoutes().stream()
@@ -84,16 +91,12 @@ public class YamlConfigService implements ConfigService {
     }
 
     @Override
-    public Optional<Route> getActiveRoute(RouteType type, RequestMethod method, String path) {
-        return getActiveRoutes()
-                .filter(route -> type.equals(route.getType()) && method.equals(route.getMethod()) && path.equals(route.getPath()))
-                .findFirst();
-    }
-
-    @Override
-    public Optional<Route> getActiveRoute(Route lookFor) {
-        return getActiveRoutes()
-                .filter(route -> route.equals(lookFor))
+    public Optional<Route> getEnabledRoute(RouteType type, RequestMethod method, String path, String suffix) {
+        return getEnabledRoutes()
+                .filter(route -> type.equals(route.getType())
+                        && method.equals(route.getMethod())
+                        && path.equals(route.getPath())
+                        && suffix.equals(route.getSuffix()))
                 .findFirst();
     }
 }

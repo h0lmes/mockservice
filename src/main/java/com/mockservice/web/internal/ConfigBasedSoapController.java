@@ -6,7 +6,7 @@ import com.mockservice.service.MockService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,15 +16,15 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import java.lang.reflect.Method;
 
 @RestController
-public class ConfigBasedRestController {
+public class ConfigBasedSoapController {
 
-    private static final Logger log = LoggerFactory.getLogger(ConfigBasedRestController.class);
+    private static final Logger log = LoggerFactory.getLogger(ConfigBasedSoapController.class);
 
     private final MockService mockService;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
     private final ConfigService configService;
 
-    public ConfigBasedRestController(@Qualifier("rest") MockService mockService,
+    public ConfigBasedSoapController(@Qualifier("soap") MockService mockService,
                                      RequestMappingHandlerMapping requestMappingHandlerMapping,
                                      ConfigService configService) {
         this.mockService = mockService;
@@ -42,7 +42,7 @@ public class ConfigBasedRestController {
         Method method = this.getClass().getMethod("mock");
 
         configService.getEnabledRoutes()
-                .filter(route -> RouteType.REST.equals(route.getType()))
+                .filter(route -> RouteType.SOAP.equals(route.getType()))
                 .forEach(route -> {
                     RequestMappingInfo mappingInfo = RequestMappingInfo
                             .paths(route.getPath())
@@ -60,8 +60,7 @@ public class ConfigBasedRestController {
     protected ResponseEntity<String> handleException(Throwable t) {
         log.error("", t);
         return ResponseEntity
-                .badRequest()
-                .contentType(MediaType.APPLICATION_JSON)
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(mockService.mockError(t));
     }
 }

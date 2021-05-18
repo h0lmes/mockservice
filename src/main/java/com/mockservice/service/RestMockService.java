@@ -1,5 +1,7 @@
 package com.mockservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.config.RegisteredRoutesHolder;
 import com.mockservice.mockconfig.Route;
 import com.mockservice.mockconfig.RouteType;
@@ -8,6 +10,7 @@ import com.mockservice.request.RestRequestFacade;
 import com.mockservice.resource.MockResource;
 import com.mockservice.resource.RestMockResource;
 import com.mockservice.service.exception.RouteNotFoundException;
+import com.mockservice.service.model.RestErrorResponse;
 import com.mockservice.template.TemplateEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,14 +36,12 @@ public class RestMockService implements MockService {
     private final RegisteredRoutesHolder registeredRoutesHolder;
     private final ConcurrentLruCache<String, MockResource> resourceCache;
 
-    @Value("${application.cache.rest-mock-resource}")
-    private int cacheSizeLimit;
-
     public RestMockService(HttpServletRequest request,
                            ResourceService resourceService,
                            TemplateEngine templateEngine,
                            ConfigService configService,
-                           RegisteredRoutesHolder registeredRoutesHolder) {
+                           RegisteredRoutesHolder registeredRoutesHolder,
+                           @Value("${application.cache.rest-resource}") int cacheSizeLimit) {
         this.request = request;
         this.resourceService = resourceService;
         this.templateEngine = templateEngine;
@@ -61,13 +62,13 @@ public class RestMockService implements MockService {
     public ResponseEntity<String> mock(Map<String, String> variables) {
         RequestFacade requestFacade = new RestRequestFacade(request);
 
-        Route lookFor = new Route(RouteType.REST, requestFacade.getRequestMethod(), requestFacade.getEndpoint());
         String group = registeredRoutesHolder
-                .getRegisteredRoute(lookFor)
+                .getRegisteredRoute(RouteType.REST, requestFacade.getRequestMethod(), requestFacade.getEndpoint(), "")
                 .map(Route::getGroup)
                 .orElse(null);
         if (group == null) {
-            group = configService.getActiveRoute(lookFor)
+            group = configService
+                    .getEnabledRoute(RouteType.REST, requestFacade.getRequestMethod(), requestFacade.getEndpoint(), "")
                     .map(Route::getGroup)
                     .orElseThrow(RouteNotFoundException::new);
         }
@@ -80,5 +81,15 @@ public class RestMockService implements MockService {
                 .status(resource.getCode())
                 .headers(resource.getHeaders())
                 .body(resource.getBody(requestVariables));
+    }
+
+    @Override
+    public String mockError(Throwable t) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(new RestErrorResponse(t));
+        } catch (JsonProcessingException e) {
+            return "";
+        }
     }
 }

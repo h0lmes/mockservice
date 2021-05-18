@@ -7,9 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 
 import java.util.Map;
 
@@ -35,34 +35,11 @@ public class BaseRestController implements RegistrableController {
     }
 
     @ExceptionHandler
-    protected ResponseEntity<ErrorInfo> handleException(Throwable t, WebRequest request) {
+    protected ResponseEntity<String> handleException(Throwable t) {
         log.error("", t);
-
         return ResponseEntity
                 .badRequest()
-                .body(new ErrorInfo(t));
-    }
-
-    private static class ErrorInfo {
-
-        private String type;
-        private String message;
-
-        public ErrorInfo(Throwable t) {
-            this(t.getClass().getSimpleName(), t.getMessage());
-        }
-
-        public ErrorInfo(String type, String message) {
-            this.type = type;
-            this.message = message;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public String getMessage() {
-            return message;
-        }
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(mockService.mockError(t));
     }
 }

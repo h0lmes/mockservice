@@ -3,7 +3,6 @@ package com.mockservice.web.soap;
 import com.mockservice.config.RegistrableController;
 import com.mockservice.mockconfig.RouteType;
 import com.mockservice.service.MockService;
-import com.mockservice.util.ResourceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,31 +10,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Map;
 
 public class BaseSoapController implements RegistrableController {
 
     private static final Logger log = LoggerFactory.getLogger(BaseSoapController.class);
-    private static final String FAULT_DATA_FILE = "assets/soapFault.xml";
-    private static final String FAULT_CODE_PLACEHOLDER = "${code}";
-    private static final String FAULT_MESSAGE_PLACEHOLDER = "${message}";
 
     @Autowired
     @Qualifier("soap")
     MockService mockService;
-    private final String faultXml;
-
-    public BaseSoapController() {
-        try {
-            faultXml = ResourceReader.asString(FAULT_DATA_FILE);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
 
     public ResponseEntity<String> mock() {
         return mockService.mock(null);
@@ -51,14 +35,10 @@ public class BaseSoapController implements RegistrableController {
     }
 
     @ExceptionHandler
-    protected ResponseEntity<Object> handleException(Throwable t, WebRequest request) {
+    protected ResponseEntity<String> handleException(Throwable t) {
         log.error("", t);
-
-        String body = faultXml
-                .replace(FAULT_CODE_PLACEHOLDER, t.getClass().getSimpleName())
-                .replace(FAULT_MESSAGE_PLACEHOLDER, t.getMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(body);
+                .body(mockService.mockError(t));
     }
 }

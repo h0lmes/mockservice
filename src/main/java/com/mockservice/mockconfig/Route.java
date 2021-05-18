@@ -7,77 +7,71 @@ import java.util.Objects;
 
 public class Route {
 
-    private boolean disabled;
-    private RouteType type;
-    private RequestMethod method;
-    private String path;
-    private String suffix;
-    private String response;
-    private String group;
+    private String path = "";
+    private RequestMethod method = RequestMethod.GET;
+    private RouteType type = RouteType.REST;
+    private String suffix = "";
+    private String response = "";
+    private boolean disabled = false;
+    private String group = ""; // non serializable
 
     public Route() {
         // default
-    }
-
-    public Route(RouteType type, RequestMethod method, String path) {
-        this.type = type;
-        this.method = method;
-        this.path = path;
-    }
-
-    public Route(RouteType type, RequestMethod method, String path, String group) {
-        this.type = type;
-        this.method = method;
-        this.path = path;
-        this.group = group;
-    }
-
-    public RouteType getType() {
-        return type;
-    }
-
-    public void setType(RouteType type) {
-        this.type = type;
-    }
-
-    public RequestMethod getMethod() {
-        return method;
-    }
-
-    public void setMethod(RequestMethod method) {
-        this.method = method;
     }
 
     public String getPath() {
         return path;
     }
 
-    public void setPath(String path) {
+    public Route setPath(String path) {
         this.path = path;
+        return this;
+    }
+
+    public RequestMethod getMethod() {
+        return method;
+    }
+
+    public Route setMethod(RequestMethod method) {
+        this.method = method;
+        return this;
+    }
+
+    public RouteType getType() {
+        return type;
+    }
+
+    public Route setType(RouteType type) {
+        Objects.requireNonNull(type, "Route type can not be null");
+        this.type = type;
+        return this;
     }
 
     public String getSuffix() {
         return suffix;
     }
 
-    public void setSuffix(String suffix) {
+    public Route setSuffix(String suffix) {
         this.suffix = suffix;
+        return this;
     }
 
     public String getResponse() {
         return response;
     }
 
-    public void setResponse(String response) {
+    public Route setResponse(String response) {
         this.response = response;
+        return this;
     }
 
     public boolean getDisabled() {
         return disabled;
     }
 
-    public void setDisabled(boolean disabled) {
+    public Route setDisabled(boolean disabled) {
         this.disabled = disabled;
+        return this;
     }
 
     @JsonIgnore
@@ -85,8 +79,9 @@ public class Route {
         return group;
     }
 
-    public void setGroup(String group) {
+    public Route setGroup(String group) {
         this.group = group;
+        return this;
     }
 
     @Override
@@ -100,11 +95,12 @@ public class Route {
         Route other = (Route) o;
         return type.equals(other.getType())
                 && method.equals(other.getMethod())
-                && path.equals(other.getPath());
+                && path.equals(other.getPath())
+                && suffix.equals(other.getSuffix());
     }
 
     @Override
     public  String toString() {
-        return String.format("(disabled=%s, type=%s, method=%s, path=%s, suffix=%s, group=%s)", disabled, type, method, path, suffix, group);
+        return String.format("(path=%s, method=%s, type=%s, suffix=%s, disabled=%s, group=%s)", path, method, type, suffix, disabled, group);
     }
 }

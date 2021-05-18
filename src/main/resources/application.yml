@@ -16,7 +16,8 @@ spring:
     suffix: .html
 
 application:
-  config-path: classpath:data/config.yml
+  default-config-path: classpath:defaultConfig.yml
+  soap-error-data-file: soapFault.xml
   cache:
-    rest-mock-resource: 256
-    soap-mock-resource: 256
+    rest-resource: 256
+    soap-resource: 256

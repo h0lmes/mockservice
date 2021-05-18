@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 
 public interface ConfigService {
     Config getConfig();
-    Stream<Route> getActiveRoutes();
-    Optional<Route> getActiveRoute(RouteType routeType, RequestMethod method, String path);
-    Optional<Route> getActiveRoute(Route lookFor);
+    Stream<Route> getEnabledRoutes();
+    Optional<Route> getEnabledRoute(RouteType routeType, RequestMethod method, String path, String suffix);
 }
