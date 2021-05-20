@@ -1,11 +1,12 @@
 package com.mockservice.mockconfig;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Group {
 
-    private String name;
-    private List<Route> routes;
+    private String name = "";
+    private List<Route> routes = new ArrayList<>();
 
     public Group() {
         // default

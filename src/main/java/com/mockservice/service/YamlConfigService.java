@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.mockservice.mockconfig.Config;
+import com.mockservice.mockconfig.Group;
 import com.mockservice.mockconfig.Route;
 import com.mockservice.mockconfig.RouteType;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -27,10 +29,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class YamlConfigService implements ConfigService {
 
     private final String defaultConfigPath;
+    private final String configPath;
     private Config config;
 
-    public YamlConfigService(@Value("${application.default-config-path}") String defaultConfigPath) {
+    public YamlConfigService(@Value("${application.config.default-path}") String defaultConfigPath,
+                             @Value("${application.config.path}") String configPath) {
         this.defaultConfigPath = defaultConfigPath;
+        this.configPath = configPath;
 
         try {
             readConfigFromFile();
@@ -60,7 +65,7 @@ public class YamlConfigService implements ConfigService {
     }
 
     private File getConfigFile() {
-        return new File(".\\config.yml");
+        return new File(configPath);
     }
 
     private void saveConfigToFile() throws IOException {

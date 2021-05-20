@@ -2,14 +2,12 @@ package com.mockservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mockservice.config.RegisteredRoutesHolder;
 import com.mockservice.mockconfig.Route;
 import com.mockservice.mockconfig.RouteType;
 import com.mockservice.request.RequestFacade;
 import com.mockservice.request.RestRequestFacade;
 import com.mockservice.resource.MockResource;
 import com.mockservice.resource.RestMockResource;
-import com.mockservice.service.exception.RouteNotFoundException;
 import com.mockservice.service.model.RestErrorResponse;
 import com.mockservice.template.TemplateEngine;
 import org.slf4j.Logger;
@@ -20,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
@@ -34,26 +31,31 @@ public class RestMockService implements MockService {
     private final ResourceService resourceService;
     private final TemplateEngine templateEngine;
     private final ConfigService configService;
-    private final RegisteredRoutesHolder registeredRoutesHolder;
-    private final ConcurrentLruCache<String, MockResource> resourceCache;
+    private final ConcurrentLruCache<Route, MockResource> resourceCache;
 
     public RestMockService(HttpServletRequest request,
                            ResourceService resourceService,
                            TemplateEngine templateEngine,
                            ConfigService configService,
-                           RegisteredRoutesHolder registeredRoutesHolder,
                            @Value("${application.cache.rest-resource}") int cacheSizeLimit) {
         this.request = request;
         this.resourceService = resourceService;
         this.templateEngine = templateEngine;
         this.configService = configService;
-        this.registeredRoutesHolder = registeredRoutesHolder;
         resourceCache = new ConcurrentLruCache<>(cacheSizeLimit, this::loadResource);
     }
 
-    private MockResource loadResource(String path) {
+    private MockResource loadResource(Route route) {
+        Route configuredRoute = configService
+                .getEnabledRoute(route.getType(), route.getMethod(), route.getPath(), route.getSuffix())
+                .orElse(null);
+        if (configuredRoute != null) {
+            return new RestMockResource(templateEngine, configuredRoute.getResponse());
+        }
+
         try {
-            return new RestMockResource(templateEngine, resourceService.load(path));
+
+            return new RestMockResource(templateEngine, resourceService.load(route));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -62,21 +64,9 @@ public class RestMockService implements MockService {
     @Override
     public ResponseEntity<String> mock(Map<String, String> variables) {
         RequestFacade requestFacade = new RestRequestFacade(request);
-
-//        String group = registeredRoutesHolder
-//                .getRegisteredRoute(RouteType.REST, requestFacade.getRequestMethod(), requestFacade.getEndpoint(), "")
-//                .map(Route::getGroup)
-//                .orElse(null);
-//        if (group == null) {
-//            group = configService
-//                    .getEnabledRoute(RouteType.REST, requestFacade.getRequestMethod(), requestFacade.getEndpoint(), "")
-//                    .map(Route::getGroup)
-//                    .orElseThrow(RouteNotFoundException::new);
-//        }
-
-        String path = getPath(requestFacade);
-        log.info("File requested: {}", path);
-        MockResource resource = resourceCache.get(path);
+        Route route = getRoute(requestFacade);
+        log.info("File requested: {}", route);
+        MockResource resource = resourceCache.get(route);
         Map<String, String> requestVariables = requestFacade.getVariables(variables);
         return ResponseEntity
                 .status(resource.getCode())
@@ -84,12 +74,12 @@ public class RestMockService implements MockService {
                 .body(resource.getBody(requestVariables));
     }
 
-    private String getPath(RequestFacade requestFacade) {
-        return requestFacade.getMethod()
-                + "-"
-                + requestFacade.getEncodedEndpoint()
-                + requestFacade.getSuffix()
-                + RouteType.REST.getExt();
+    private Route getRoute(RequestFacade requestFacade) {
+        return new Route()
+                .setType(RouteType.REST)
+                .setMethod(requestFacade.getRequestMethod())
+                .setPath(requestFacade.getEndpoint())
+                .setSuffix(requestFacade.getSuffix());
     }
 
     @Override

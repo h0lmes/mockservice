@@ -4,6 +4,12 @@ Cache-Control: no-cache
 
 ###
 
+GET http://localhost:8081/api/v2/entity
+Accept: */*
+Cache-Control: no-cache
+
+###
+
 GET http://localhost:8081/api/v1/entity
 Accept: */*
 Cache-Control: no-cache
@@ -18,9 +24,9 @@ Cache-Control: no-cache
 ###
 
 GET http://localhost:8081/api/v1/entity/2
-Mock-Variable: api-v1-entity-{id}/id/1000
 Accept: */*
 Cache-Control: no-cache
+Mock-Variable: api-v1-entity-{id}/id/1000
 
 ###
 

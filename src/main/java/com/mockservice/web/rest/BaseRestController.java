@@ -34,6 +34,11 @@ public class BaseRestController implements RegistrableController {
         return RouteType.REST;
     }
 
+    @Override
+    public String getRouteGroup() {
+        return getClass().getSimpleName();
+    }
+
     @ExceptionHandler
     protected ResponseEntity<String> handleException(Throwable t) {
         log.error("", t);

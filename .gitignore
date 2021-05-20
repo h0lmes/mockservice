@@ -5,9 +5,9 @@ target/
 
 src/main/resources/webapp/*
 
-webapp/node_modules/
-webapp/.nuxt/
-webapp/dist/
+src/main/webapp/node_modules/
+src/main/webapp/.nuxt/
+src/main/webapp/dist/
 
 ### STS ###
 .apt_generated

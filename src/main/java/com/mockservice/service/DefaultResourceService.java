@@ -39,7 +39,7 @@ public class DefaultResourceService implements ResourceService {
     private void findResourceDataFiles() {
         Pattern pattern = Pattern.compile(DATA_FILE_REGEX, Pattern.CASE_INSENSITIVE + Pattern.UNICODE_CASE);
         try {
-            findResourcesMatchingPattern(this::addRoute, pattern);
+            findResourcesMatchingPattern(pattern, this::addRoute);
         } catch (URISyntaxException | IOException e) {
             log.error("", e);
         }
@@ -50,11 +50,13 @@ public class DefaultResourceService implements ResourceService {
         if (parts.length == 2) {
             String group = parts[0];
             String filename = parts[1];
-            dataFiles.put(filename.toLowerCase(), Route.fromFileName(filename).setGroup(group));
+            Route.fromFileName(filename)
+                    .map(r -> r.setGroup(group))
+                    .ifPresent(route -> dataFiles.put(filename.toLowerCase(), route));
         }
     }
 
-    private static void findResourcesMatchingPattern(Consumer<String> consumer, Pattern pattern) throws URISyntaxException, IOException {
+    private static void findResourcesMatchingPattern(Pattern pattern, Consumer<String> consumer) throws URISyntaxException, IOException {
         CodeSource src = DefaultResourceService.class.getProtectionDomain().getCodeSource();
         URL url = src.getLocation();
         URI uri = url.toURI();
@@ -94,13 +96,16 @@ public class DefaultResourceService implements ResourceService {
     }
 
     @Override
-    public String load(String path) throws IOException {
-        Route route = dataFiles.get(path.toLowerCase());
+    public String load(Route lookFor) throws IOException {
+        Route route = findRoute(lookFor);
         if (route == null) {
-            log.warn("File info not found: {}", path);
-            return loadFromResource(path);
+            throw new IOException("File info not found for: " + lookFor.toString());
         }
         return loadFromResource(route.toPathFileName());
+    }
+
+    private Route findRoute(Route lookFor) {
+        return dataFiles.get(lookFor.toFileName().toLowerCase());
     }
 
     private String loadFromResource(String path) throws IOException {

@@ -72,22 +72,16 @@ or
 Multiple `Mock-Suffix` headers supported per HTTP request.
 Each header defines exactly one suffix.
 
-There are two formats of this header:
+Header format:
 
-    group/suffix
-    group/request-mapping/suffix
+    request-mapping/suffix
     
 Example:
 
-    Mock-Option: AccountService/error404
-    Mock-Option: StoreService/api-v1-item-{id}/invalid_format
+    Mock-Option: api-v1-item-{id}/invalid_format
 
-In the example above if you call any endpoint of the `AccountService`
-then a file with `error404` suffix would be loaded
-(e.g. `get-accounts--error404.json`).
-
-And if you call an endpoint `api/v1/item/{id}` of the `StoreService`
-then `get-api-v1-item-{id}--invalid_format.json` would be loaded.
+In the example above if you call an endpoint `GET api/v1/item/{id}`
+then `get-api-v1-item-{id}--invalid_format.json` file would be loaded.
 
 #
 ### Predefined variables
@@ -150,18 +144,13 @@ The following variables would be available:
 Multiple `Mock-Variable` headers supported per HTTP request.
 Each header defines exactly one variable.
 
-Header can have two formats:
+Header format:
 
-    group/name_of_variable/value
-    group/request-mapping/name_of_variable/value
+    request-mapping/variable_name/value
     
 Example:
 
-    Mock-Variable: AccountService/total/1000
-    Mock-Variable: StoreService/api-v1-item-{id}/item_name/iPhone 12 Pro
+    Mock-Variable: api-v1-item-{id}/item_name/iPhone 12 Pro
 
-In the example above if you call any endpoint of the `AccountService`
-a variable `total` with value `1000` would be available.
-
-And if you call an endpoint `api/v1/item/{id}` of the `StoreService`
+In the example above if you call an endpoint `api/v1/item/{id}`
 a variable `item_name` with value `iPhone 12 Pro` would be available.

@@ -34,6 +34,11 @@ public class BaseSoapController implements RegistrableController {
         return RouteType.SOAP;
     }
 
+    @Override
+    public String getRouteGroup() {
+        return getClass().getSimpleName();
+    }
+
     @ExceptionHandler
     protected ResponseEntity<String> handleException(Throwable t) {
         log.error("", t);

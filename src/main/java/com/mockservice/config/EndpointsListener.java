@@ -36,19 +36,20 @@ public class EndpointsListener implements ApplicationListener<ContextRefreshedEv
 
     private void registerRoute(ApplicationContext applicationContext, RequestMappingInfo mappingInfo, HandlerMethod handlerMethod) {
         Class<?> beanType = handlerMethod.getBeanType();
+        log.info("{} - {}", mappingInfo, handlerMethod);
         if (RegistrableController.class.isAssignableFrom(beanType) && mappingInfo.getPatternsCondition() != null) {
-            String group = beanType.getSimpleName();
             String beanName = (String) handlerMethod.getBean();
             RegistrableController controller = (RegistrableController) applicationContext.getBean(beanName, beanType);
-            if (controller != null) {
-                mappingInfo.getPatternsCondition().getPatterns().forEach(path ->
+            mappingInfo.getPatternsCondition().getPatterns().forEach(path ->
                     mappingInfo.getMethodsCondition().getMethods().forEach(method ->
-                        registeredRoutes.add(
-                                new Route().setType(controller.getRouteType()).setMethod(method).setPath(path).setGroup(group)
-                        )
+                            registeredRoutes.add(new Route()
+                                    .setType(controller.getRouteType())
+                                    .setMethod(method)
+                                    .setPath(path)
+                                    .setGroup(controller.getRouteGroup())
+                            )
                     )
-                );
-            }
+            );
         }
     }
 

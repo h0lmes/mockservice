@@ -5,14 +5,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Route {
 
-    private static final String REQUEST_MAPPING_DELIMITER = "/";
-    private static final String NAME_DELIMITER = "-";
     private static final String DATA_FILE_REGEX = "(get|post|put|patch|delete)(-)(.+)(--)(.+)(\\.json|.+\\.xml)$|(get|post|put|patch|delete)(-)(.+)(\\.json|.+\\.xml)$";
+    private static final String REQUEST_MAPPING_DELIMITER = "/";
+    private static final String NAME_SEPARATOR = "-";
+    private static final String SUFFIX_SEPARATOR = "--";
 
     private String path = "";
     private RequestMethod method = RequestMethod.GET;
@@ -26,30 +28,12 @@ public class Route {
         // default
     }
 
-    public static Route fromFileName(String filename) {
-        Pattern pattern = Pattern.compile(DATA_FILE_REGEX, Pattern.CASE_INSENSITIVE + Pattern.UNICODE_CASE);
-        Matcher matcher = pattern.matcher(filename);
-        if (!matcher.find()) {
-            return null;
-        }
-
-        String method = matcher.group(1) == null ? matcher.group(7) : matcher.group(1);
-        String path = matcher.group(3) == null ? matcher.group(9) : matcher.group(3);
-        String suffix = matcher.group(5) == null ? "" : matcher.group(5);
-        String ext = matcher.group(6) == null ? matcher.group(10) : matcher.group(6);
-        return new Route()
-                .setType(RouteType.ofExt(ext))
-                .setMethod(RequestMethod.valueOf(method.toUpperCase()))
-                .setPath(path)
-                .setSuffix(suffix);
-    }
-
     public String getPath() {
         return path;
     }
 
     public Route setPath(String path) {
-        this.path = path;
+        this.path = path == null ? "" : path;
         return this;
     }
 
@@ -58,6 +42,7 @@ public class Route {
     }
 
     public Route setMethod(RequestMethod method) {
+        Objects.requireNonNull(method, "Route method can not be null");
         this.method = method;
         return this;
     }
@@ -77,7 +62,7 @@ public class Route {
     }
 
     public Route setSuffix(String suffix) {
-        this.suffix = suffix;
+        this.suffix = suffix == null ? "" : suffix;
         return this;
     }
 
@@ -86,7 +71,7 @@ public class Route {
     }
 
     public Route setResponse(String response) {
-        this.response = response;
+        this.response = response == null ? "" : response;
         return this;
     }
 
@@ -105,15 +90,37 @@ public class Route {
     }
 
     public Route setGroup(String group) {
-        this.group = group;
+        this.group = group == null ? "" : group;
         return this;
     }
 
+    public static Optional<Route> fromFileName(String filename) {
+        Pattern pattern = Pattern.compile(DATA_FILE_REGEX, Pattern.CASE_INSENSITIVE + Pattern.UNICODE_CASE);
+        Matcher matcher = pattern.matcher(filename);
+        if (!matcher.find()) {
+            return Optional.empty();
+        }
+
+        String method = matcher.group(1) == null ? matcher.group(7) : matcher.group(1);
+        String path = matcher.group(3) == null ? matcher.group(9) : matcher.group(3);
+        String suffix = matcher.group(5) == null ? "" : matcher.group(5);
+        String ext = matcher.group(6) == null ? matcher.group(10) : matcher.group(6);
+        return Optional.of(new Route()
+                .setType(RouteType.ofExt(ext))
+                .setMethod(RequestMethod.valueOf(method.toUpperCase()))
+                .setPath(path)
+                .setSuffix(suffix));
+    }
+
     public String toFileName() {
+        String suffixPart = getSuffix();
+        if (!suffixPart.isEmpty()) {
+            suffixPart = SUFFIX_SEPARATOR + suffixPart;
+        }
         return getMethod().toString()
-                + "-"
-                + getEncodedPath()
-                + getSuffix()
+                + NAME_SEPARATOR
+                + toEncodedPath()
+                + suffixPart
                 + type.getExt();
     }
 
@@ -121,13 +128,13 @@ public class Route {
         return getGroup() + File.separator + toFileName();
     }
 
-    private String getEncodedPath() {
+    private String toEncodedPath() {
         String result = path;
         if (result.startsWith(REQUEST_MAPPING_DELIMITER)) {
             result = result.substring(1);
         }
         String[] pathParts = result.split(REQUEST_MAPPING_DELIMITER);
-        result = String.join(NAME_DELIMITER, pathParts);
+        result = String.join(NAME_SEPARATOR, pathParts);
         return result.toLowerCase();
     }
 
@@ -147,7 +154,7 @@ public class Route {
     }
 
     @Override
-    public  String toString() {
+    public String toString() {
         return String.format("(path=%s, method=%s, type=%s, suffix=%s, disabled=%s, group=%s)", path, method, type, suffix, disabled, group);
     }
 }

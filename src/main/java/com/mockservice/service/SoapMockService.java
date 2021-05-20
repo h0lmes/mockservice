@@ -1,13 +1,11 @@
 package com.mockservice.service;
 
-import com.mockservice.config.RegisteredRoutesHolder;
 import com.mockservice.mockconfig.Route;
 import com.mockservice.mockconfig.RouteType;
 import com.mockservice.request.RequestFacade;
 import com.mockservice.request.SoapRequestFacade;
 import com.mockservice.resource.MockResource;
 import com.mockservice.resource.SoapMockResource;
-import com.mockservice.service.exception.RouteNotFoundException;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.util.ResourceReader;
 import org.slf4j.Logger;
@@ -18,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
@@ -35,22 +32,19 @@ public class SoapMockService implements MockService {
     private final ResourceService resourceService;
     private final TemplateEngine templateEngine;
     private final ConfigService configService;
-    private final RegisteredRoutesHolder registeredRoutesHolder;
-    private final ConcurrentLruCache<String, MockResource> resourceCache;
+    private final ConcurrentLruCache<Route, MockResource> resourceCache;
     private String errorBody;
 
     public SoapMockService(HttpServletRequest request,
                            ResourceService resourceService,
                            TemplateEngine templateEngine,
                            ConfigService configService,
-                           RegisteredRoutesHolder registeredRoutesHolder,
                            @Value("${application.cache.soap-resource}") int cacheSizeLimit,
                            @Value("${application.soap-error-data-file}") String soapErrorDataFile) {
         this.request = request;
         this.resourceService = resourceService;
         this.templateEngine = templateEngine;
         this.configService = configService;
-        this.registeredRoutesHolder = registeredRoutesHolder;
         resourceCache = new ConcurrentLruCache<>(cacheSizeLimit, this::loadResource);
 
         try {
@@ -61,9 +55,16 @@ public class SoapMockService implements MockService {
         }
     }
 
-    private MockResource loadResource(String path) {
+    private MockResource loadResource(Route route) {
+        Route configuredRoute = configService
+                .getEnabledRoute(route.getType(), route.getMethod(), route.getPath(), route.getSuffix())
+                .orElse(null);
+        if (configuredRoute != null) {
+            return new SoapMockResource(templateEngine, configuredRoute.getResponse());
+        }
+
         try {
-            return new SoapMockResource(templateEngine, resourceService.load(path));
+            return new SoapMockResource(templateEngine, resourceService.load(route));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -72,21 +73,9 @@ public class SoapMockService implements MockService {
     @Override
     public ResponseEntity<String> mock(Map<String, String> variables) {
         RequestFacade requestFacade = new SoapRequestFacade(request);
-
-//        String group = registeredRoutesHolder
-//                .getRegisteredRoute(RouteType.SOAP, requestFacade.getRequestMethod(), requestFacade.getEndpoint(), "")
-//                .map(Route::getGroup)
-//                .orElse(null);
-//        if (group == null) {
-//            group = configService
-//                    .getEnabledRoute(RouteType.SOAP, requestFacade.getRequestMethod(), requestFacade.getEndpoint(), "")
-//                    .map(Route::getGroup)
-//                    .orElseThrow(RouteNotFoundException::new);
-//        }
-
-        String path = getPath(requestFacade);
-        log.info("File requested: {}", path);
-        MockResource resource = resourceCache.get(path);
+        Route route = getRoute(requestFacade);
+        log.info("File requested: {}", route);
+        MockResource resource = resourceCache.get(route);
         Map<String, String> requestVariables = requestFacade.getVariables(variables);
         return ResponseEntity
                 .status(resource.getCode())
@@ -94,12 +83,12 @@ public class SoapMockService implements MockService {
                 .body(resource.getBody(requestVariables));
     }
 
-    private String getPath(RequestFacade requestFacade) {
-        return requestFacade.getMethod()
-                + "-"
-                + requestFacade.getEncodedEndpoint()
-                + requestFacade.getSuffix()
-                + RouteType.SOAP.getExt();
+    private Route getRoute(RequestFacade requestFacade) {
+        return new Route()
+                .setType(RouteType.SOAP)
+                .setMethod(requestFacade.getRequestMethod())
+                .setPath(requestFacade.getEndpoint())
+                .setSuffix(requestFacade.getSuffix());
     }
 
     @Override

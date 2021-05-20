@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ResourceService {
     List<Route> files();
-    String load(String path) throws IOException;
+    String load(Route route) throws IOException;
 }
