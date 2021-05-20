@@ -3,9 +3,16 @@ package com.mockservice.mockconfig;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.io.File;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Route {
+
+    private static final String REQUEST_MAPPING_DELIMITER = "/";
+    private static final String NAME_DELIMITER = "-";
+    private static final String DATA_FILE_REGEX = "(get|post|put|patch|delete)(-)(.+)(--)(.+)(\\.json|.+\\.xml)$|(get|post|put|patch|delete)(-)(.+)(\\.json|.+\\.xml)$";
 
     private String path = "";
     private RequestMethod method = RequestMethod.GET;
@@ -17,6 +24,24 @@ public class Route {
 
     public Route() {
         // default
+    }
+
+    public static Route fromFileName(String filename) {
+        Pattern pattern = Pattern.compile(DATA_FILE_REGEX, Pattern.CASE_INSENSITIVE + Pattern.UNICODE_CASE);
+        Matcher matcher = pattern.matcher(filename);
+        if (!matcher.find()) {
+            return null;
+        }
+
+        String method = matcher.group(1) == null ? matcher.group(7) : matcher.group(1);
+        String path = matcher.group(3) == null ? matcher.group(9) : matcher.group(3);
+        String suffix = matcher.group(5) == null ? "" : matcher.group(5);
+        String ext = matcher.group(6) == null ? matcher.group(10) : matcher.group(6);
+        return new Route()
+                .setType(RouteType.ofExt(ext))
+                .setMethod(RequestMethod.valueOf(method.toUpperCase()))
+                .setPath(path)
+                .setSuffix(suffix);
     }
 
     public String getPath() {
@@ -84,9 +109,31 @@ public class Route {
         return this;
     }
 
+    public String toFileName() {
+        return getMethod().toString()
+                + "-"
+                + getEncodedPath()
+                + getSuffix()
+                + type.getExt();
+    }
+
+    public String toPathFileName() {
+        return getGroup() + File.separator + toFileName();
+    }
+
+    private String getEncodedPath() {
+        String result = path;
+        if (result.startsWith(REQUEST_MAPPING_DELIMITER)) {
+            result = result.substring(1);
+        }
+        String[] pathParts = result.split(REQUEST_MAPPING_DELIMITER);
+        result = String.join(NAME_DELIMITER, pathParts);
+        return result.toLowerCase();
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(type, method, path);
+        return Objects.hash(type, method, path, suffix);
     }
 
     @Override

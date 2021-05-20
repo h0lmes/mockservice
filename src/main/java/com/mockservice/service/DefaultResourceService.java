@@ -1,7 +1,6 @@
 package com.mockservice.service;
 
-import com.mockservice.service.model.DataFileInfo;
-import com.mockservice.service.model.DataFileSource;
+import com.mockservice.mockconfig.Route;
 import com.mockservice.util.ResourceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +29,7 @@ public class DefaultResourceService implements ResourceService {
     private static final String DATA_FILE_REGEX = ".+" + DATA_FOLDER + "[\\/\\\\](.+\\.json|.+\\.xml)$";
 
     private final ResourceLoader resourceLoader;
-    private final Map<String, DataFileInfo> dataFiles = new HashMap<>();
-    private final Map<String, String> memoryFiles = new HashMap<>();
+    private final Map<String, Route> dataFiles = new HashMap<>();
 
     public DefaultResourceService(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
@@ -41,52 +39,19 @@ public class DefaultResourceService implements ResourceService {
     private void findResourceDataFiles() {
         Pattern pattern = Pattern.compile(DATA_FILE_REGEX, Pattern.CASE_INSENSITIVE + Pattern.UNICODE_CASE);
         try {
-            findResourcesMatchingPattern(
-                    resource -> dataFiles.put(resource.toLowerCase(), new DataFileInfo(resource, DataFileSource.RESOURCE)),
-                    pattern
-            );
+            findResourcesMatchingPattern(this::addRoute, pattern);
         } catch (URISyntaxException | IOException e) {
             log.error("", e);
         }
     }
 
-    @Override
-    public List<DataFileInfo> files() {
-        List<DataFileInfo> list = new ArrayList<>();
-        dataFiles.forEach((k, v) -> list.add(v));
-        list.sort(Comparator.comparing(DataFileInfo::getName));
-        return list;
-    }
-
-    @Override
-    public String load(String path) throws IOException {
-        DataFileInfo info = dataFiles.get(path.toLowerCase());
-        if (info == null) {
-            log.warn("File info not found: {}", path);
-            return loadFromResource(path);
+    private void addRoute(String resource) {
+        String[] parts = resource.split("[/\\\\]");
+        if (parts.length == 2) {
+            String group = parts[0];
+            String filename = parts[1];
+            dataFiles.put(filename.toLowerCase(), Route.fromFileName(filename).setGroup(group));
         }
-        if (DataFileSource.RESOURCE.equals(info.getSource())) {
-            return loadFromResource(info.getName());
-        }
-        if (DataFileSource.MEMORY.equals(info.getSource())) {
-            return loadFromMemory(info.getName());
-        }
-        throw new IOException("Unsupported resource type: " + info.getSource());
-    }
-
-    private String loadFromResource(String path) throws IOException {
-        try {
-            return ResourceReader.asString(resourceLoader, DATA_FOLDER + File.separator + path);
-        } catch (IOException e) {
-            throw new IOException("Error loading file: " + path, e);
-        }
-    }
-
-    private String loadFromMemory(String path) throws IOException {
-        if (!memoryFiles.containsKey(path.toLowerCase())) {
-            throw new IOException("No memory file found: " + path);
-        }
-        return memoryFiles.get(path.toLowerCase());
     }
 
     private static void findResourcesMatchingPattern(Consumer<String> consumer, Pattern pattern) throws URISyntaxException, IOException {
@@ -117,6 +82,32 @@ public class DefaultResourceService implements ResourceService {
                     consumer.accept(matcher.group(1));
                 }
             }
+        }
+    }
+
+    @Override
+    public List<Route> files() {
+        List<Route> list = new ArrayList<>();
+        dataFiles.forEach((k, v) -> list.add(v));
+        list.sort(Comparator.comparing(Route::getGroup).thenComparing(Route::getMethod).thenComparing(Route::getPath).thenComparing(Route::getSuffix));
+        return list;
+    }
+
+    @Override
+    public String load(String path) throws IOException {
+        Route route = dataFiles.get(path.toLowerCase());
+        if (route == null) {
+            log.warn("File info not found: {}", path);
+            return loadFromResource(path);
+        }
+        return loadFromResource(route.toPathFileName());
+    }
+
+    private String loadFromResource(String path) throws IOException {
+        try {
+            return ResourceReader.asString(resourceLoader, DATA_FOLDER + File.separator + path);
+        } catch (IOException e) {
+            throw new IOException("Error loading file: " + path, e);
         }
     }
 }

@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractRequestFacade implements RequestFacade {
 
     private static final String REQUEST_MAPPING_DELIMITER = "/";
-    static final String NAME_DELIMITER = "-";
+    public static final String NAME_DELIMITER = "-";
     private static final String SUFFIX_HEADER = "Mock-Suffix";
     private static final String SUFFIX_DELIMITER = "--";
     private static final String VARIABLE_HEADER = "Mock-Variable";
@@ -60,7 +60,8 @@ public abstract class AbstractRequestFacade implements RequestFacade {
         return endpoint;
     }
 
-    String getEncodedEndpoint() {
+    @Override
+    public String getEncodedEndpoint() {
         return encodedEndpoint;
     }
 
@@ -97,24 +98,21 @@ public abstract class AbstractRequestFacade implements RequestFacade {
         return result;
     }
 
-    Map<String, String> getHeaderVariables(String group) {
+    Map<String, String> getHeaderVariables() {
         Map<String, String> result = new HashMap<>();
         getHeadersParts(VARIABLE_HEADER).forEach(parts -> {
-            if (parts.length == 3 && group.equalsIgnoreCase(parts[0])) {
+            if (parts.length > 2 && encodedEndpoint.equals(parts[0])) {
                 result.put(parts[1], parts[2]);
-            } else if (parts.length > 3 && group.equalsIgnoreCase(parts[0]) && encodedEndpoint.equals(parts[1])) {
-                result.put(parts[2], parts[3]);
             }
         });
         return result;
     }
 
-    String getSuffix(String group) {
+    @Override
+    public String getSuffix() {
         for (String[] parts : getHeadersParts(SUFFIX_HEADER)) {
-            if (parts.length == 2 && group.equalsIgnoreCase(parts[0])) {
+            if (parts.length > 1 && encodedEndpoint.equals(parts[0])) {
                 return SUFFIX_DELIMITER + parts[1];
-            } else if (parts.length > 2 && group.equalsIgnoreCase(parts[0]) && encodedEndpoint.equals(parts[1])) {
-                return SUFFIX_DELIMITER + parts[2];
             }
         }
         return "";

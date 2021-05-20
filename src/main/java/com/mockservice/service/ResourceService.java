@@ -1,11 +1,11 @@
 package com.mockservice.service;
 
-import com.mockservice.service.model.DataFileInfo;
+import com.mockservice.mockconfig.Route;
 
 import java.io.IOException;
 import java.util.List;
 
 public interface ResourceService {
-    List<DataFileInfo> files();
+    List<Route> files();
     String load(String path) throws IOException;
 }

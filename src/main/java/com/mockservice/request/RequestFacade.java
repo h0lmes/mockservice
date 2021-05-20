@@ -9,6 +9,7 @@ public interface RequestFacade {
     String getMethod();
     RequestMethod getRequestMethod();
     String getEndpoint();
-    String getPath(String group);
-    Map<String, String> getVariables(String group, @Nullable Map<String, String> variables);
+    String getEncodedEndpoint();
+    String getSuffix();
+    Map<String, String> getVariables(@Nullable Map<String, String> variables);
 }

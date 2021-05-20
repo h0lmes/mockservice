@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
@@ -72,25 +73,33 @@ public class SoapMockService implements MockService {
     public ResponseEntity<String> mock(Map<String, String> variables) {
         RequestFacade requestFacade = new SoapRequestFacade(request);
 
-        String group = registeredRoutesHolder
-                .getRegisteredRoute(RouteType.SOAP, requestFacade.getRequestMethod(), requestFacade.getEndpoint(), "")
-                .map(Route::getGroup)
-                .orElse(null);
-        if (group == null) {
-            group = configService
-                    .getEnabledRoute(RouteType.SOAP, requestFacade.getRequestMethod(), requestFacade.getEndpoint(), "")
-                    .map(Route::getGroup)
-                    .orElseThrow(RouteNotFoundException::new);
-        }
+//        String group = registeredRoutesHolder
+//                .getRegisteredRoute(RouteType.SOAP, requestFacade.getRequestMethod(), requestFacade.getEndpoint(), "")
+//                .map(Route::getGroup)
+//                .orElse(null);
+//        if (group == null) {
+//            group = configService
+//                    .getEnabledRoute(RouteType.SOAP, requestFacade.getRequestMethod(), requestFacade.getEndpoint(), "")
+//                    .map(Route::getGroup)
+//                    .orElseThrow(RouteNotFoundException::new);
+//        }
 
-        String path = requestFacade.getPath(group);
+        String path = getPath(requestFacade);
         log.info("File requested: {}", path);
         MockResource resource = resourceCache.get(path);
-        Map<String, String> requestVariables = requestFacade.getVariables(group, variables);
+        Map<String, String> requestVariables = requestFacade.getVariables(variables);
         return ResponseEntity
                 .status(resource.getCode())
                 .headers(resource.getHeaders())
                 .body(resource.getBody(requestVariables));
+    }
+
+    private String getPath(RequestFacade requestFacade) {
+        return requestFacade.getMethod()
+                + "-"
+                + requestFacade.getEncodedEndpoint()
+                + requestFacade.getSuffix()
+                + RouteType.SOAP.getExt();
     }
 
     @Override

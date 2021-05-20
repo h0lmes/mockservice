@@ -1,8 +1,7 @@
 <template>
     <div class="holder">
-        <span class="source">{{ datafile.source }}</span>
-        <span class="part name" v-if="!hasParts">{{ datafile.name }}</span>
-        <span class="part group" v-if="hasParts">{{ group }}</span><span class="part name" v-if="hasParts">{{ fileSeparator }}</span><span class="part http-method" v-if="hasParts">{{ httpMethod }}</span><span class="part name" v-if="hasParts">{{ requestMapping }}</span><span class="part option" v-if="hasParts">{{ option }}</span><span class="part file-extension" v-if="hasParts">{{ fileExtension }}</span>
+        <span class="source">RESOURCE</span>
+        <span class="part group">{{ datafile.group }}</span><span class="part name" v-if="datafile.group">-</span><span class="part http-method">{{ datafile.method }}</span><span class="part name" v-if="datafile.method">-</span><span class="part name">{{ datafile.path }}</span><span class="part name" v-if="datafile.suffix">--</span><span class="part suffix">{{ datafile.suffix }}</span>
     </div>
 </template>
 <script>
@@ -15,44 +14,7 @@
             datafile: Object
         },
         computed: {
-            parts() {
-                if (this.datafile && this.datafile.name) {
-                    const regex = /^(.+)(\\|\/)(get|post|put|delete|patch)?(.+)(\.json|\.xml)$/;
-                    return this.datafile.name.match(regex);
-                }
-                return [];
-            },
-            hasParts() {
-                return this.parts ? this.parts.length > 0 : false;
-            },
-            group() {
-                return this.hasParts ? this.parts[1] : '';
-            },
-            fileSeparator() {
-                return this.hasParts ? this.parts[2] : '';
-            },
-            httpMethod() {
-                return this.hasParts ? this.parts[3] : '';
-            },
-            requestMapping() {
-                if (this.hasParts) {
-                    const regex = /^(.+)(--.+)$/;
-                    let found = this.parts[4].match(regex);
-                    return found ? found[1] : this.parts[4];
-                }
-                return '';
-            },
-            option() {
-                if (this.hasParts) {
-                    const regex = /^(.+)(--.+)$/;
-                    let found = this.parts[4].match(regex);
-                    return found ? found[2] : '';
-                }
-                return '';
-            },
-            fileExtension() {
-                return this.hasParts ? this.parts[5] : '';
-            }
+
         }
     }
 </script>
@@ -80,10 +42,10 @@
     .http-method {
         color: rgb(140 255 153);
     }
-    .option {
+    .suffix {
         color: rgb(255 218 47);
     }
-    .file-extension {
+    .ext {
         color: rgb(255 91 143);
     }
 </style>
