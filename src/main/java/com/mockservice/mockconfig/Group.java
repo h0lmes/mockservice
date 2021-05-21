@@ -16,15 +16,35 @@ public class Group {
         return name;
     }
 
-    public void setName(String name) {
+    public Group setName(String name) {
         this.name = name;
+        return this;
     }
 
     public List<Route> getRoutes() {
         return routes;
     }
 
-    public void setRoutes(List<Route> routes) {
+    public Group setRoutes(List<Route> routes) {
         this.routes = routes;
+        return this;
+    }
+
+    public void putRoute(Route route) {
+        Route maybeRoute = routes.stream()
+                .filter(route::equals)
+                .findFirst()
+                .orElse(null);
+        if (maybeRoute == null) {
+            maybeRoute = route;
+            routes.add(maybeRoute);
+        } else {
+            maybeRoute.setDisabled(route.getDisabled());
+            maybeRoute.setResponse(route.getResponse());
+        }
+    }
+
+    public void deleteRoute(Route route) {
+        routes.remove(route);
     }
 }

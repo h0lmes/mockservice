@@ -1,7 +1,5 @@
 package com.mockservice.web.soap;
 
-import com.mockservice.config.RegistrableController;
-import com.mockservice.mockconfig.RouteType;
 import com.mockservice.service.MockService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.Map;
 
-public class BaseSoapController implements RegistrableController {
+public class BaseSoapController {
 
     private static final Logger log = LoggerFactory.getLogger(BaseSoapController.class);
 
@@ -27,16 +25,6 @@ public class BaseSoapController implements RegistrableController {
 
     public ResponseEntity<String> mock(Map<String, String> variables) {
         return mockService.mock(variables);
-    }
-
-    @Override
-    public RouteType getRouteType() {
-        return RouteType.SOAP;
-    }
-
-    @Override
-    public String getRouteGroup() {
-        return getClass().getSimpleName();
     }
 
     @ExceptionHandler

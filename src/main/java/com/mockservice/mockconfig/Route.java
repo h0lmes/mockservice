@@ -42,7 +42,6 @@ public class Route {
     }
 
     public Route setMethod(RequestMethod method) {
-        Objects.requireNonNull(method, "Route method can not be null");
         this.method = method;
         return this;
     }
@@ -52,7 +51,6 @@ public class Route {
     }
 
     public Route setType(RouteType type) {
-        Objects.requireNonNull(type, "Route type can not be null");
         this.type = type;
         return this;
     }

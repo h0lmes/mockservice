@@ -10,7 +10,7 @@
     import { mapActions } from 'vuex';
     import DataFileList from "../components/DataFileList";
     export default {
-        name: "index",
+        name: "datafiles",
         components: {DataFileList},
         data() {
             return {}

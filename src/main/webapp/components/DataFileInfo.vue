@@ -1,6 +1,5 @@
 <template>
     <div class="holder">
-        <span class="source">RESOURCE</span>
         <span class="part group">{{ datafile.group }}</span><span class="part name" v-if="datafile.group">-</span><span class="part http-method">{{ datafile.method }}</span><span class="part name" v-if="datafile.method">-</span><span class="part name">{{ datafile.path }}</span><span class="part name" v-if="datafile.suffix">--</span><span class="part suffix">{{ datafile.suffix }}</span>
     </div>
 </template>

@@ -8,14 +8,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.lang.reflect.Method;
 
-@RestController
+@Component
 public class ConfigBasedRestController {
 
     private static final Logger log = LoggerFactory.getLogger(ConfigBasedRestController.class);
@@ -41,8 +41,8 @@ public class ConfigBasedRestController {
     private void register() throws NoSuchMethodException {
         Method method = this.getClass().getMethod("mock");
 
-        configService.getEnabledRoutes()
-                .filter(route -> RouteType.REST.equals(route.getType()))
+        configService
+                .getRoutesDistinctByPathAndMethod(RouteType.REST)
                 .forEach(route -> {
                     RequestMappingInfo mappingInfo = RequestMappingInfo
                             .paths(route.getPath())

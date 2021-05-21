@@ -46,16 +46,9 @@ public class RestMockService implements MockService {
     }
 
     private MockResource loadResource(Route route) {
-        Route configuredRoute = configService
-                .getEnabledRoute(route.getType(), route.getMethod(), route.getPath(), route.getSuffix())
-                .orElse(null);
-        if (configuredRoute != null) {
-            return new RestMockResource(templateEngine, configuredRoute.getResponse());
-        }
-
+        Route configuredRoute = configService.getEnabledRoute(route).orElse(null);
         try {
-
-            return new RestMockResource(templateEngine, resourceService.load(route));
+            return new RestMockResource(templateEngine, configuredRoute == null ? resourceService.load(route) : configuredRoute.getResponse());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

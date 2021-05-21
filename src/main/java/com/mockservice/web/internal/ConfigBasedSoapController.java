@@ -41,8 +41,8 @@ public class ConfigBasedSoapController {
     private void register() throws NoSuchMethodException {
         Method method = this.getClass().getMethod("mock");
 
-        configService.getEnabledRoutes()
-                .filter(route -> RouteType.SOAP.equals(route.getType()))
+        configService
+                .getRoutesDistinctByPathAndMethod(RouteType.SOAP)
                 .forEach(route -> {
                     RequestMappingInfo mappingInfo = RequestMappingInfo
                             .paths(route.getPath())

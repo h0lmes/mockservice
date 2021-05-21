@@ -19,8 +19,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -48,16 +51,6 @@ public class YamlConfigService implements ConfigService {
         }
     }
 
-    private void readConfigFromResource() throws IOException {
-        ResourceLoader resourceLoader = new DefaultResourceLoader();
-        Resource resource = resourceLoader.getResource(defaultConfigPath);
-        try (Reader reader = new InputStreamReader(resource.getInputStream(), UTF_8)) {
-            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-            mapper.findAndRegisterModules();
-            config = mapper.readValue(reader, Config.class);
-        }
-    }
-
     private void readConfigFromFile() throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         mapper.findAndRegisterModules();
@@ -80,6 +73,16 @@ public class YamlConfigService implements ConfigService {
         mapper.writeValue(getConfigFile(), config);
     }
 
+    private void readConfigFromResource() throws IOException {
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+        Resource resource = resourceLoader.getResource(defaultConfigPath);
+        try (Reader reader = new InputStreamReader(resource.getInputStream(), UTF_8)) {
+            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+            mapper.findAndRegisterModules();
+            config = mapper.readValue(reader, Config.class);
+        }
+    }
+
     @Override
     public Config getConfig() {
         return config;
@@ -87,12 +90,24 @@ public class YamlConfigService implements ConfigService {
 
     @Override
     public Stream<Route> getEnabledRoutes() {
-        return getConfig().getGroups().stream()
+        return config.getGroups().stream()
                 .flatMap(
                         group -> group.getRoutes().stream()
                                 .filter(route -> !route.getDisabled())
                                 .peek(route -> route.setGroup(group.getName()))
                 );
+    }
+
+    @Override
+    public Stream<Route> getRoutesDistinctByPathAndMethod(RouteType type) {
+        return getEnabledRoutes()
+                .filter(route -> type.equals(route.getType()))
+                .filter(distinctByKey(r -> r.getMethod().toString() + r.getPath()));
+    }
+
+    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
     @Override
@@ -103,5 +118,24 @@ public class YamlConfigService implements ConfigService {
                         && path.equals(route.getPath())
                         && suffix.equals(route.getSuffix()))
                 .findFirst();
+    }
+
+    @Override
+    public Optional<Route> getEnabledRoute(Route route) {
+        return getEnabledRoute(route.getType(), route.getMethod(), route.getPath(), route.getSuffix());
+    }
+
+    @Override
+    public Config putRoute(Route route) throws IOException {
+        config.getOrCreateGroup(route.getGroup()).putRoute(route);
+        saveConfigToFile();
+        return config;
+    }
+
+    @Override
+    public Config deleteRoute(Route route) throws IOException {
+        config.getOrCreateGroup(route.getGroup()).deleteRoute(route);
+        saveConfigToFile();
+        return config;
     }
 }

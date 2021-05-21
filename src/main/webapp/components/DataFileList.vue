@@ -1,6 +1,5 @@
 <template>
     <div class="card monospace">
-        <h2>Data files</h2>
         <p v-if="pending">Loading...</p>
         <p v-else-if="error">Error while fetching</p>
         <p v-else-if="datafiles.empty">No files</p>

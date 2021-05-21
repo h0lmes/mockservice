@@ -26,6 +26,10 @@ p {
     padding: .25em;
     text-shadow: 0 0 1px #fff;
 }
+a {
+    text-decoration: none;
+    background-color: transparent;
+}
 
 .page-enter-active,
 .page-leave-active {
@@ -34,19 +38,6 @@ p {
 .page-enter,
 .page-leave-to {
     opacity: 0;
-}
-
-#page {
-    position: absolute;
-    overflow: hidden;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    width: 100%;
-}
-#page-contents {
-    padding: 6rem 2rem;
 }
 
 .monospace {
@@ -60,3 +51,114 @@ p {
     margin: 0 auto 2rem;
     position: relative;
 }
+
+/* default layout ------------------------------------------ */
+
+.navbar {
+    z-index: 1000;
+    width: 220px;
+    height: 100vh;
+    position: fixed;
+    display: block;
+    background-color: #18212d;
+}
+.sidebar-mini .navbar {
+    width: 60px;
+}
+.nav {
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+}
+.nav-header {
+    padding: 18px 25px;
+    border: 0;
+    border-bottom: 1px solid #263448;
+}
+.nav > li {
+    display: block;
+    width: 100%;
+    position: relative;
+}
+.nav > li > a {
+    color: #a7b1c2;
+    font-weight: 400;
+    padding: 14px 20px 14px 25px;
+    display: block;
+}
+.nav > li > a i {
+    margin-right: 6px;
+}
+.nav > li.active > a {
+    color: #ffffff;
+}
+.navbar .nav > li > a:hover,
+.navbar .nav > li > a:focus {
+    background-color: #283546;
+    color: white;
+}
+.sidebar-mini .nav-label {
+    display: none;
+}
+.nav-label-mini {
+    display: none;
+}
+.sidebar-mini .nav-label-mini {
+    display: initial;
+}
+.fa {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#page {
+    overflow: hidden;
+    width: 100%;
+    display: flex;
+}
+.page-wrapper {
+    padding: 0 15px;
+    position: relative !important;
+    flex-shrink: 1;
+    width: calc(100% - 220px);
+    margin-left: 220px;
+}
+.sidebar-mini .page-wrapper {
+    width: calc(100% - 60px);
+    margin-left: 60px;
+}
+#page-contents {
+    padding: 2rem 2rem;
+}
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+.row-header {
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid #263448;
+    background-color: #1f2a38;
+}
+
+.btn {
+    cursor: pointer;
+    border-radius: 3px;
+}
+.navbar-minimize {
+    padding: 4px 12px;
+    margin: 14px 5px 14px 20px;
+    color: #fff;
+    background-color: #344956;
+    border-color: #344956;
+}
+
+/* --------------------------------------------------------- */
