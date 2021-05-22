@@ -1,7 +1,11 @@
 export default {
-    css: [
-        '~/assets/main.css'
-    ],
+    buildModules: ['@nuxtjs/fontawesome'],
+    fontawesome: {
+        icons: {
+            solid: ['faBars', 'faRoute', 'faFileCode', 'faPlay']
+        }
+    },
+    css: ['~/assets/main.css', '~/assets/default-layout.css'],
     head: {
         title: 'Mock Service',
         meta: [

@@ -12,6 +12,8 @@
     "all": "npm-run-all build clean copy"
   },
   "dependencies": {
+    "@fortawesome/free-solid-svg-icons": "^5.15.3",
+    "@nuxtjs/fontawesome": "^1.1.2",
     "nuxt": "^2.15.6"
   },
   "devDependencies": {

@@ -89,6 +89,15 @@ public class YamlConfigService implements ConfigService {
     }
 
     @Override
+    public Stream<Route> getRoutes() {
+        return config.getGroups().stream()
+                .flatMap(
+                        group -> group.getRoutes().stream()
+                                .map(route -> route.setGroup(group.getName()))
+                );
+    }
+
+    @Override
     public Stream<Route> getEnabledRoutes() {
         return config.getGroups().stream()
                 .flatMap(

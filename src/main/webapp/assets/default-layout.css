@@ -1,0 +1,82 @@
+#page {
+    overflow: hidden;
+    width: 100%;
+}
+#page-contents {
+    padding: 2rem;
+}
+
+.navbar {
+    z-index: 1000;
+    width: 220px;
+    height: 100vh;
+    position: fixed;
+    display: block;
+    background-color: #212325;
+    transition: all 0.2s;
+}
+.navbar-mini .navbar {
+    width: 70px;
+}
+.page-wrapper {
+    padding: 0;
+    position: relative !important;
+    width: calc(100% - 220px);
+    margin-left: 220px;
+    transition: all 0.2s;
+}
+.navbar-mini .page-wrapper {
+    width: calc(100% - 70px);
+    margin-left: 70px;
+}
+.nav {
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+}
+.nav-header {
+    padding: 0;
+    border: 0;
+}
+.nav > li {
+    display: block;
+    width: 100%;
+    position: relative;
+}
+.nav > li > a {
+    color: #a7b1c2;
+    font-weight: 400;
+    padding: 14px 20px 14px 25px;
+    display: block;
+}
+.nav > li > a .nav-icon {
+    margin-right: 6px;
+}
+.nav > li.active > a {
+    color: #ffffff;
+}
+.navbar .nav > li > a:hover,
+.navbar .nav > li > a:focus {
+    background-color: #292b2d;
+    color: white;
+}
+.navbar-mini .nav-label,
+.navbar-no-labels .nav-label {
+    display: none;
+}
+
+.btn-minimize-navbar {
+    cursor: pointer;
+    border-radius: 3px;
+    padding: 4px 12px;
+    margin: 0;
+    color: #fff;
+    background-color: #22474a;
+}
+.navbar .nav > li > a.btn-minimize-navbar:hover,
+.navbar .nav > li > a.btn-minimize-navbar:focus {
+    background-color: #275154;
+    color: white;
+}

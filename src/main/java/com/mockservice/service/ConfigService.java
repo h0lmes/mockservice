@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 public interface ConfigService {
     Config getConfig();
+    Stream<Route> getRoutes();
     Stream<Route> getEnabledRoutes();
     Stream<Route> getRoutesDistinctByPathAndMethod(RouteType type);
     Optional<Route> getEnabledRoute(RouteType routeType, RequestMethod method, String path, String suffix);

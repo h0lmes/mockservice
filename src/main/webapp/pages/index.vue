@@ -1,31 +1,31 @@
 <template>
     <div>
-        <DataFileList :datafiles="datafiles"
-                      :pending="$fetchState.pending"
-                      :error="$fetchState.error">
-        </DataFileList>
+        <Routes :routes="routes"
+                :pending="$fetchState.pending"
+                :error="$fetchState.error">
+        </Routes>
     </div>
 </template>
 <script>
     import { mapActions } from 'vuex';
-    import DataFileList from "../components/DataFileList";
+    import Routes from "../components/Routes";
     export default {
         name: "index",
-        components: {DataFileList},
+        components: {Routes},
         data() {
             return {}
         },
         computed: {
-            datafiles () {
-                return this.$store.state.datafiles
+            routes () {
+                return this.$store.state.routes
             }
         },
         async fetch() {
-            this.fetchDataFiles();
+            this.fetchRoutes();
         },
         methods: {
             ...mapActions({
-                fetchDataFiles: 'fetchDataFiles'
+                fetchRoutes: 'fetchRoutes'
             })
         }
     }

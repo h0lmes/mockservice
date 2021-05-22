@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("web-api")
@@ -33,9 +34,9 @@ public class WebApiController {
         return resourceService.files();
     }
 
-    @GetMapping("config")
-    public Config config() {
-        return configService.getConfig();
+    @GetMapping("routes")
+    public List<Route> config() {
+        return configService.getRoutes().collect(Collectors.toList());
     }
 
     @PutMapping("route")

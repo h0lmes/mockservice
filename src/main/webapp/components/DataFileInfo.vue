@@ -11,24 +11,12 @@
         },
         props: {
             datafile: Object
-        },
-        computed: {
-
         }
     }
 </script>
 <style scoped>
     .holder {
         padding: .1rem;
-    }
-    .source {
-        font-size: .7rem;
-        background-color: #317373;
-        color: rgba(255,255,255,.5);
-        border: 0 none;
-        border-radius: .25rem;
-        padding: .1rem .3rem;
-        margin: 0 .3rem 0 0;
     }
     .part {
         display: inline;

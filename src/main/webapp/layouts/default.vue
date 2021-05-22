@@ -1,34 +1,36 @@
 <template>
-    <div id="page" class="sidebar">
+    <div id="page">
         <div class="navbar" role="navigation">
             <ul class="nav">
                 <li class="nav-header">
-                    <span class="nav-label">Mock Service</span>
-                    <span class="nav-label-mini">&nbsp;</span>
+                    <a class="btn btn-minimize-navbar" v-on:click="toggleSidebar">
+                        <FontAwesomeIcon icon="bars"/>
+                    </a>
                 </li>
                 <li>
                     <NuxtLink to="/">
-                        <i class="fa fa-bar-chart-o"></i>
+                        <FontAwesomeIcon icon="route" class="nav-icon"/>
                         <span class="nav-label">Routes</span>
                     </NuxtLink>
                 </li>
                 <li>
                     <NuxtLink to="/datafiles">
-                        <i class="fa fa-bar-chart-o"></i>
+                        <FontAwesomeIcon icon="file-code" class="nav-icon"/>
                         <span class="nav-label">Data files</span>
+                    </NuxtLink>
+                </li>
+                <li>
+                    <NuxtLink to="/scenarios">
+                        <FontAwesomeIcon icon="play" class="nav-icon"/>
+                        <span class="nav-label">Scenarios</span>
                     </NuxtLink>
                 </li>
             </ul>
         </div>
 
         <div class="page-wrapper">
-            <div class="row row-header">
-                <a class="navbar-minimize btn" v-on:click="toggleSidebar"><i class="fa fa-bars"></i>_</a>
-            </div>
-            <div class="row">
-                <div id="page-contents">
-                    <Nuxt/>
-                </div>
+            <div id="page-contents">
+                <Nuxt/>
             </div>
         </div>
     </div>
@@ -37,8 +39,12 @@
     export default {
         methods: {
             toggleSidebar() {
-                var menu = document.querySelector('#page');
-                menu.classList.toggle('sidebar-mini');
+                let page = document.querySelector('#page');
+                page.classList.toggle('navbar-no-labels');
+                page.classList.toggle('navbar-mini');
+                setTimeout(() => {
+                    page.classList.toggle('navbar-no-labels');
+                }, 200);
             }
         }
     }
