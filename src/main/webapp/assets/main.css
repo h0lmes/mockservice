@@ -75,9 +75,6 @@ a {
     opacity: 0;
 }
 
-.monospace {
-    font-family: monospace, monospace;
-}
 .card {
     background-color: var(--bg);
     border: 1px solid var(--border-color);
@@ -86,3 +83,5 @@ a {
     margin: 0 auto 2rem;
     position: relative;
 }
+
+

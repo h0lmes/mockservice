@@ -19,9 +19,42 @@ export const actions = {
             res => res.json()
         ))
     },
+
     async fetchRoutes({ commit }) {
         let host = location.protocol + '//' + location.hostname + ':8081';
         commit('setRoutes', await fetch(host + '/web-api/routes').then(
+            res => res.json()
+        ))
+    },
+
+    async saveRoute({ commit }, routes) {
+        let host = location.protocol + '//' + location.hostname + ':8081';
+        commit('setRoutes', await fetch(
+            host + '/web-api/route',
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(routes)
+            }
+        ).then(
+            res => res.json()
+        ))
+    },
+
+    async deleteRoute({ commit }, route) {
+        let host = location.protocol + '//' + location.hostname + ':8081';
+        commit('setRoutes', await fetch(
+            host + '/web-api/route',
+            {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(route)
+            }
+        ).then(
             res => res.json()
         ))
     }

@@ -1,0 +1,130 @@
+:root {
+  --btn-color: #ccc;
+  --btn-color-hilight: #ffffff;
+  --btn-bg: #676867;
+}
+.dark-mode {
+  --btn-bg: #676867;
+}
+.sepia-mode {
+  --btn-bg: #504231;
+}
+
+.btn {
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  touch-action: manipulation;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  user-select: none;
+  background-color: var(--btn-bg);
+  color: var(--btn-color);
+
+  &,
+  &:active,
+  &.active {
+    &:focus,
+    &.focus {
+      outline-offset: -2px;
+    }
+  }
+
+  &:hover,
+  &:focus,
+  &.focus {
+    color: var(--btn-color-hilight);
+    text-decoration: none;
+  }
+
+  &:active,
+  &.active {
+    background-image: none;
+    outline: 0;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    cursor: none;
+    opacity: .65;
+    box-shadow: none;
+  }
+
+  a& {
+    &.disabled,
+    fieldset[disabled] & {
+      pointer-events: none;
+    }
+  }
+}
+.btn-sm {
+  padding: 4px 8px;
+  font-size: smaller;
+  line-height: 1.2;
+}
+
+
+.btn-primary {
+  background-color: var(--blue);
+}
+.btn-secondary {
+  background-color: var(--blue);
+}
+.btn-success {
+  background-color: var(--green);
+}
+.btn-info {
+  background-color: var(--teal);
+}
+.btn-warning {
+  background-color: var(--orange);
+}
+.btn-danger {
+  background-color: var(--red);
+}
+
+
+
+.btn-link {
+  font-weight: 400;
+  color: var(--btn-color);
+  border-radius: 0;
+
+  &,
+  &:active,
+  &.active,
+  &[disabled],
+  fieldset[disabled] & {
+    background-color: transparent;
+    box-shadow: none;
+  }
+  &,
+  &:hover,
+  &:focus,
+  &:active {
+    border-color: transparent;
+  }
+  &:hover,
+  &:focus {
+    color: var(--btn-color-hilight);
+    text-decoration: underline;
+    background-color: transparent;
+  }
+  &[disabled],
+  fieldset[disabled] & {
+    &:hover,
+    &:focus {
+      color: var(--btn-color);
+      text-decoration: none;
+    }
+  }
+}

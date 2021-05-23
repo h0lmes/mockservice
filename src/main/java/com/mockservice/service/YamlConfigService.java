@@ -6,6 +6,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.mockservice.mockconfig.Config;
 import com.mockservice.mockconfig.Route;
+import com.mockservice.mockconfig.RouteAlreadyExistsException;
 import com.mockservice.mockconfig.RouteType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -18,11 +19,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -121,16 +124,16 @@ public class YamlConfigService implements ConfigService {
     }
 
     @Override
-    public Config putRoute(Route route) throws IOException {
-        config.putRoute(route);
+    public List<Route> putRoute(Route route, Route replacement) throws IOException, RouteAlreadyExistsException {
+        config.putRoute(route, replacement);
         saveConfigToFile();
-        return config;
+        return getRoutes().collect(Collectors.toList());
     }
 
     @Override
-    public Config deleteRoute(Route route) throws IOException {
+    public List<Route> deleteRoute(Route route) throws IOException {
         config.deleteRoute(route);
         saveConfigToFile();
-        return config;
+        return getRoutes().collect(Collectors.toList());
     }
 }

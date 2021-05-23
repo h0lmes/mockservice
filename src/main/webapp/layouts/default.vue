@@ -3,7 +3,7 @@
         <div class="navbar" role="navigation">
             <ul class="nav">
                 <li class="nav-header">
-                    <a class="btn btn-minimize-navbar" v-on:click="toggleSidebar">
+                    <a class="btn-minimize-navbar" v-on:click="toggleSidebar">
                         <FontAwesomeIcon icon="bars"/>
                     </a>
                 </li>

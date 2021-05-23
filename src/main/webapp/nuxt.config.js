@@ -1,5 +1,6 @@
 export default {
     buildModules: [
+        '@nuxtjs/style-resources',
         '@nuxtjs/fontawesome',
         '@nuxtjs/svg',
         '@nuxtjs/color-mode'
@@ -9,7 +10,13 @@ export default {
             solid: ['faBars', 'faRoute', 'faFileCode', 'faPlay']
         }
     },
-    css: ['~/assets/main.css', '~/assets/default-layout.css'],
+    css: [
+        '~/assets/main.css',
+        '~/assets/helpers.css',
+        '~/assets/buttons.less',
+        '~/assets/forms.scss',
+        '~/assets/default-layout.css'
+    ],
     head: {
         title: 'Mock Service',
         meta: [

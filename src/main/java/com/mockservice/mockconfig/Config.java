@@ -20,18 +20,30 @@ public class Config {
         return this;
     }
 
-    public void putRoute(Route route) {
-        Route maybeRoute = routes.stream()
+    public void putRoute(Route route, Route replacement) throws RouteAlreadyExistsException {
+        // do not allow duplicates
+        if (!route.equals(replacement)) {
+            Route maybeRoute = findRoute(replacement);
+            if (maybeRoute != null) {
+                throw new RouteAlreadyExistsException();
+            }
+        }
+
+        Route maybeRoute = findRoute(route);
+        if (maybeRoute == null) {
+            routes.add(replacement);
+        } else {
+            maybeRoute.assignFrom(replacement);
+        }
+
+        routes.sort(Route::compareTo);
+    }
+
+    private Route findRoute(Route route) {
+        return routes.stream()
                 .filter(route::equals)
                 .findFirst()
                 .orElse(null);
-        if (maybeRoute == null) {
-            maybeRoute = route;
-            routes.add(maybeRoute);
-        } else {
-            maybeRoute.setDisabled(route.getDisabled());
-            maybeRoute.setResponse(route.getResponse());
-        }
     }
 
     public void deleteRoute(Route route) {

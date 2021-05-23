@@ -1,7 +1,7 @@
 package com.mockservice.web.webapp;
 
-import com.mockservice.mockconfig.Config;
 import com.mockservice.mockconfig.Route;
+import com.mockservice.mockconfig.RouteAlreadyExistsException;
 import com.mockservice.service.ConfigService;
 import com.mockservice.service.ResourceService;
 import com.mockservice.service.model.RestErrorResponse;
@@ -40,12 +40,18 @@ public class WebApiController {
     }
 
     @PutMapping("route")
-    public Config putRoute(@RequestBody Route route) throws IOException {
-        return configService.putRoute(route);
+    public List<Route> putRoute(@RequestBody List<Route> routes) throws IOException, RouteAlreadyExistsException {
+        if (routes == null || routes.size() < 2) {
+            throw new IllegalArgumentException();
+        }
+        return configService.putRoute(routes.get(0), routes.get(1));
     }
 
     @DeleteMapping("route")
-    public Config deleteRoute(@RequestBody Route route) throws IOException {
+    public List<Route> deleteRoute(@RequestBody Route route) throws IOException {
+        if (route == null) {
+            throw new IllegalArgumentException();
+        }
         return configService.deleteRoute(route);
     }
 

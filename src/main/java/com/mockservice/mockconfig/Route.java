@@ -8,8 +8,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Route {
-
+public class Route implements Comparable<Route> {
     private static final String DATA_FILE_REGEX = "(get|post|put|patch|delete)(-)(.+)(--)(.+)(\\.json|\\.xml)$|(get|post|put|patch|delete)(-)(.+)(\\.json|\\.xml)$";
     private static final String REQUEST_MAPPING_DELIMITER = "/";
     private static final String NAME_SEPARATOR = "-";
@@ -50,7 +49,7 @@ public class Route {
     }
 
     public Route setMethod(RequestMethod method) {
-        this.method = method;
+        this.method = method == null ? RequestMethod.GET : method;
         return this;
     }
 
@@ -59,7 +58,7 @@ public class Route {
     }
 
     public Route setType(RouteType type) {
-        this.type = type;
+        this.type = type == null ? RouteType.REST : type;
         return this;
     }
 
@@ -88,6 +87,16 @@ public class Route {
     public Route setDisabled(boolean disabled) {
         this.disabled = disabled;
         return this;
+    }
+
+    public void assignFrom(Route route) {
+        setGroup(route.getGroup());
+        setPath(route.getPath());
+        setMethod(route.getMethod());
+        setType(route.getType());
+        setSuffix(route.getSuffix());
+        setResponse(route.getResponse());
+        setDisabled(route.getDisabled());
     }
 
     public static Optional<Route> fromFileName(String filename) {
@@ -136,15 +145,14 @@ public class Route {
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, method, path, suffix);
+        return Objects.hash(method, path, suffix);
     }
 
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Route)) return false;
         Route other = (Route) o;
-        return type.equals(other.getType())
-                && method.equals(other.getMethod())
+        return method.equals(other.getMethod())
                 && path.equals(other.getPath())
                 && suffix.equals(other.getSuffix());
     }
@@ -152,5 +160,20 @@ public class Route {
     @Override
     public String toString() {
         return String.format("(group=%s, path=%s, method=%s, type=%s, suffix=%s, disabled=%s)", group, path, method, type, suffix, disabled);
+    }
+
+    @Override
+    public int compareTo(Route o) {
+        int c;
+        c = this.group.compareTo(o.getGroup());
+        if (c != 0) return c;
+        c = this.type.compareTo(o.getType());
+        if (c != 0) return c;
+        c = this.method.compareTo(o.getMethod());
+        if (c != 0) return c;
+        c = this.path.compareTo(o.getPath());
+        if (c != 0) return c;
+        c = this.suffix.compareTo(o.getSuffix());
+        return c;
     }
 }
