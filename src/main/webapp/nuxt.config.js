@@ -1,5 +1,9 @@
 export default {
-    buildModules: ['@nuxtjs/fontawesome'],
+    buildModules: [
+        '@nuxtjs/fontawesome',
+        '@nuxtjs/svg',
+        '@nuxtjs/color-mode'
+    ],
     fontawesome: {
         icons: {
             solid: ['faBars', 'faRoute', 'faFileCode', 'faPlay']

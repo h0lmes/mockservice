@@ -5,29 +5,36 @@ import java.util.List;
 
 public class Config {
 
-    private List<Group> groups = new ArrayList<>();
+    private List<Route> routes = new ArrayList<>();
 
     public Config() {
         // default
     }
 
-    public List<Group> getGroups() {
-        return groups;
+    public List<Route> getRoutes() {
+        return routes;
     }
 
-    public void setGroups(List<Group> groups) {
-        this.groups = groups;
+    public Config setRoutes(List<Route> routes) {
+        this.routes = routes;
+        return this;
     }
 
-    public Group getOrCreateGroup(String groupName) {
-        Group maybeGroup = groups.stream()
-                .filter(group -> groupName.equalsIgnoreCase(group.getName()))
+    public void putRoute(Route route) {
+        Route maybeRoute = routes.stream()
+                .filter(route::equals)
                 .findFirst()
                 .orElse(null);
-        if (maybeGroup == null) {
-            maybeGroup = new Group().setName(groupName);
-            groups.add(maybeGroup);
+        if (maybeRoute == null) {
+            maybeRoute = route;
+            routes.add(maybeRoute);
+        } else {
+            maybeRoute.setDisabled(route.getDisabled());
+            maybeRoute.setResponse(route.getResponse());
         }
-        return maybeGroup;
+    }
+
+    public void deleteRoute(Route route) {
+        routes.remove(route);
     }
 }

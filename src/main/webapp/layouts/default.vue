@@ -25,6 +25,9 @@
                         <span class="nav-label">Scenarios</span>
                     </NuxtLink>
                 </li>
+                <li class="container hidden-when-mini">
+                    <ColorModePicker></ColorModePicker>
+                </li>
             </ul>
         </div>
 
@@ -36,16 +39,25 @@
     </div>
 </template>
 <script>
+    import ColorModePicker from "../components/ColorModePicker";
     export default {
+        components: {ColorModePicker},
         methods: {
             toggleSidebar() {
                 let page = document.querySelector('#page');
-                page.classList.toggle('navbar-no-labels');
+                page.classList.toggle('navbar-maximizing');
                 page.classList.toggle('navbar-mini');
                 setTimeout(() => {
-                    page.classList.toggle('navbar-no-labels');
+                    page.classList.toggle('navbar-maximizing');
                 }, 200);
             }
         }
     }
 </script>
+<style scoped>
+    .container {
+        width: 100%;
+        text-align: center;
+        padding: 5px;
+    }
+</style>

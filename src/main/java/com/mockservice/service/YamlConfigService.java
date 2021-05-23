@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.mockservice.mockconfig.Config;
-import com.mockservice.mockconfig.Group;
 import com.mockservice.mockconfig.Route;
 import com.mockservice.mockconfig.RouteType;
 import org.springframework.beans.factory.annotation.Value;
@@ -84,27 +83,14 @@ public class YamlConfigService implements ConfigService {
     }
 
     @Override
-    public Config getConfig() {
-        return config;
-    }
-
-    @Override
     public Stream<Route> getRoutes() {
-        return config.getGroups().stream()
-                .flatMap(
-                        group -> group.getRoutes().stream()
-                                .map(route -> route.setGroup(group.getName()))
-                );
+        return config.getRoutes().stream();
     }
 
     @Override
     public Stream<Route> getEnabledRoutes() {
-        return config.getGroups().stream()
-                .flatMap(
-                        group -> group.getRoutes().stream()
-                                .filter(route -> !route.getDisabled())
-                                .peek(route -> route.setGroup(group.getName()))
-                );
+        return getRoutes()
+                .filter(route -> !route.getDisabled());
     }
 
     @Override
@@ -136,14 +122,14 @@ public class YamlConfigService implements ConfigService {
 
     @Override
     public Config putRoute(Route route) throws IOException {
-        config.getOrCreateGroup(route.getGroup()).putRoute(route);
+        config.putRoute(route);
         saveConfigToFile();
         return config;
     }
 
     @Override
     public Config deleteRoute(Route route) throws IOException {
-        config.getOrCreateGroup(route.getGroup()).deleteRoute(route);
+        config.deleteRoute(route);
         saveConfigToFile();
         return config;
     }

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <span>Scenarios ... under construction</span>
+        <span>Coming soon ...</span>
     </div>
 </template>
 <script>
@@ -9,8 +9,6 @@
         name: "scenarios",
         data() {
             return {}
-        },
-        computed: {
         },
     }
 </script>

@@ -1,28 +1,28 @@
 <template>
     <div class="route-holder monospace">
-        <div class="field">
-            <div class="header">GROUP</div>
-            <div class="value">{{ route.group }}</div>
+        <div class="route-field">
+            <div class="route-field-header">GROUP</div>
+            <div class="route-field-value">{{ route.group }}</div>
         </div>
-        <div class="field">
-            <div class="header">TYPE</div>
-            <div class="value">{{ route.type }}</div>
+        <div class="route-field">
+            <div class="route-field-header">TYPE</div>
+            <div class="route-field-value" :class="{ 'blue' : routeIsSoap }">{{ route.type }}</div>
         </div>
-        <div class="field">
-            <div class="header">METHOD</div>
-            <div class="value">{{ route.method }}</div>
+        <div class="route-field">
+            <div class="route-field-header">METHOD</div>
+            <div class="route-field-value">{{ route.method }}</div>
         </div>
-        <div class="field wide-field">
-            <div class="header">PATH</div>
-            <div class="value">{{ route.path }}</div>
+        <div class="route-field route-field-wide">
+            <div class="route-field-header">PATH</div>
+            <div class="route-field-value">{{ route.path }}</div>
         </div>
-        <div class="field">
-            <div class="header">SUFFIX</div>
-            <div class="value">{{ route.suffix }}</div>
+        <div class="route-field">
+            <div class="route-field-header">SUFFIX</div>
+            <div class="route-field-value">{{ route.suffix }}</div>
         </div>
-        <div class="field">
-            <div class="header">DISABLED</div>
-            <div class="value">{{ route.disabled }}</div>
+        <div class="route-field">
+            <div class="route-field-header">DISABLED</div>
+            <div class="route-field-value" :class="{ 'red' : route.disabled }">{{ disabled }}</div>
         </div>
     </div>
 </template>
@@ -35,35 +35,50 @@
                 default: {}
             }
         },
+        computed: {
+            routeIsSoap() {
+                return this.route.type === 'SOAP'
+            },
+            disabled() {
+                return this.route.disabled ? 'yes' : 'no'
+            }
+        }
     }
 </script>
 <style scoped>
     .route-holder {
         margin-bottom: 2rem;
-        padding: .1rem;
-        background-color: #212325;
+        padding: .1rem 2rem;
+        background-color: var(--bg-secondary);
         border-radius: 5px;
         font-size: smaller;
     }
-    .field {
+    .route-field {
         display: inline-block;
+        box-sizing: border-box;
         margin: 0;
-        padding: 1rem 1.5rem;
-        min-width: 6%;
+        padding: .8rem .5rem;
+        min-width: 7%;
         vertical-align: top;
     }
-    .wide-field {
-        min-width: 20%;
+    .route-field-wide {
+        min-width: 25%;
     }
-    .header {
-        color: #6a6d76;
+    .route-field-header {
+        color: var(--color-primary);
         width: 100%;
         text-align: center;
         margin-bottom: .5rem;
     }
-    .value {
-        color: #c0c4d0;
+    .route-field-value {
+        color: var(--color-secondary);
         width: 100%;
         text-align: center;
+    }
+    .red {
+        color: var(--red);
+    }
+    .blue {
+        color: var(--cyan);
     }
 </style>

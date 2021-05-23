@@ -1,6 +1,5 @@
 package com.mockservice.mockconfig;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.File;
@@ -11,21 +10,30 @@ import java.util.regex.Pattern;
 
 public class Route {
 
-    private static final String DATA_FILE_REGEX = "(get|post|put|patch|delete)(-)(.+)(--)(.+)(\\.json|.+\\.xml)$|(get|post|put|patch|delete)(-)(.+)(\\.json|.+\\.xml)$";
+    private static final String DATA_FILE_REGEX = "(get|post|put|patch|delete)(-)(.+)(--)(.+)(\\.json|\\.xml)$|(get|post|put|patch|delete)(-)(.+)(\\.json|\\.xml)$";
     private static final String REQUEST_MAPPING_DELIMITER = "/";
     private static final String NAME_SEPARATOR = "-";
     private static final String SUFFIX_SEPARATOR = "--";
 
+    private String group = "";
     private String path = "";
     private RequestMethod method = RequestMethod.GET;
     private RouteType type = RouteType.REST;
     private String suffix = "";
     private String response = "";
     private boolean disabled = false;
-    private String group = ""; // non serializable
 
     public Route() {
         // default
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public Route setGroup(String group) {
+        this.group = group == null ? "" : group;
+        return this;
     }
 
     public String getPath() {
@@ -79,16 +87,6 @@ public class Route {
 
     public Route setDisabled(boolean disabled) {
         this.disabled = disabled;
-        return this;
-    }
-
-    @JsonIgnore
-    public String getGroup() {
-        return group;
-    }
-
-    public Route setGroup(String group) {
-        this.group = group == null ? "" : group;
         return this;
     }
 
@@ -153,6 +151,6 @@ public class Route {
 
     @Override
     public String toString() {
-        return String.format("(path=%s, method=%s, type=%s, suffix=%s, disabled=%s, group=%s)", path, method, type, suffix, disabled, group);
+        return String.format("(group=%s, path=%s, method=%s, type=%s, suffix=%s, disabled=%s)", group, path, method, type, suffix, disabled);
     }
 }

@@ -1,3 +1,28 @@
+:root {
+    --color-nav: #b9c1c7;
+    --color-nav-active: white;
+    --bg-nav: #2b343d;
+    --bg-nav-active: #333d47;
+    --bg-nav-accent: #158876;
+    --bg-nav-accent-active: #18a28d;
+}
+.dark-mode {
+    --color-nav: #6a6d76;
+    --color-nav-active: #aeb3bf;
+    --bg-nav: #212325;
+    --bg-nav-active: #292b2d;
+    --bg-nav-accent: #22474a;
+    --bg-nav-accent-active: #275154;
+}
+.sepia-mode {
+    --color-nav: #f1e7d0;
+    --color-nav-active: white;
+    --bg-nav: #433422;
+    --bg-nav-active: #504231;
+    --bg-nav-accent: #4e372d;
+    --bg-nav-accent-active: #614438;
+}
+
 #page {
     overflow: hidden;
     width: 100%;
@@ -12,7 +37,7 @@
     height: 100vh;
     position: fixed;
     display: block;
-    background-color: #212325;
+    background-color: var(--bg-nav);
     transition: all 0.2s;
 }
 .navbar-mini .navbar {
@@ -44,9 +69,10 @@
     display: block;
     width: 100%;
     position: relative;
+    color: var(--color-nav);
 }
 .nav > li > a {
-    color: #a7b1c2;
+    color: var(--color-nav);
     font-weight: 400;
     padding: 14px 20px 14px 25px;
     display: block;
@@ -55,15 +81,17 @@
     margin-right: 6px;
 }
 .nav > li.active > a {
-    color: #ffffff;
+    color: var(--color-nav-active);
 }
 .navbar .nav > li > a:hover,
 .navbar .nav > li > a:focus {
-    background-color: #292b2d;
-    color: white;
+    background-color: var(--bg-nav-active);
+    color: var(--color-nav-active);
 }
 .navbar-mini .nav-label,
-.navbar-no-labels .nav-label {
+.navbar-maximizing .nav-label,
+.navbar-mini .hidden-when-mini,
+.navbar-maximizing .hidden-when-mini {
     display: none;
 }
 
@@ -72,11 +100,11 @@
     border-radius: 3px;
     padding: 4px 12px;
     margin: 0;
-    color: #fff;
-    background-color: #22474a;
+    background-color: var(--bg-nav-accent);
+    color: var(--color-nav);
 }
 .navbar .nav > li > a.btn-minimize-navbar:hover,
 .navbar .nav > li > a.btn-minimize-navbar:focus {
-    background-color: #275154;
-    color: white;
+    background-color: var(--bg-nav-accent-active);
+    color: var(--color-nav-active);
 }

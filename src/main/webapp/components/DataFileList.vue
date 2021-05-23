@@ -1,13 +1,13 @@
 <template>
-    <div class="card monospace">
+    <div class="monospace">
         <p v-if="pending">Loading...</p>
         <p v-else-if="error">Error while fetching</p>
         <p v-else-if="datafiles.empty">No files</p>
-        <ul v-else>
-            <li v-for="(datafile, index) in datafiles" :key="index">
+        <div v-else>
+            <div v-for="(datafile, index) in datafiles" :key="index">
                 <DataFileInfo :datafile="datafile"></DataFileInfo>
-            </li>
-        </ul>
+            </div>
+        </div>
     </div>
 </template>
 <script>

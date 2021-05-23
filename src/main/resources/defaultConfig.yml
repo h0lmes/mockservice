@@ -1,70 +1,72 @@
-groups:
-- name: ExampleRestService
-  routes:
-  - path: /api/v2/entity
-    method: GET
-    type: REST
-    suffix: null
-    response: |-
-      [
-        {"id": ${sequence}, "name": "${random_string}"},
-        {"id": ${sequence}, "name": "${of:Java:C++:Python:JavaScript}"},
-        {"id": ${sequence}, "name": "${random_uuid}"},
-        {"id": ${sequence}, "name": "${random_date}"},
-        {"id": ${sequence}, "name": "${random_timestamp}"},
-        {"id": ${sequence}, "name": "${current_date}"},
-        {"id": ${sequence}, "name": "${current_timestamp}"}
-      ]
-    disabled: false
-  - path: /api/v2/entity
-    method: GET
-    type: REST
-    suffix: error
-    response: |-
-      HTTP/1.1 400
+routes:
+- group: ExampleRestService
+  path: /api/v2/entity
+  method: GET
+  type: REST
+  suffix: null
+  response: |-
+    [
+      {"id": ${sequence}, "name": "${random_string}"},
+      {"id": ${sequence}, "name": "${of:Java:C++:Python:JavaScript}"},
+      {"id": ${sequence}, "name": "${random_uuid}"},
+      {"id": ${sequence}, "name": "${random_date}"},
+      {"id": ${sequence}, "name": "${random_timestamp}"},
+      {"id": ${sequence}, "name": "${current_date}"},
+      {"id": ${sequence}, "name": "${current_timestamp}"}
+    ]
+  disabled: false
+- group: ExampleRestService
+  path: /api/v2/entity
+  method: GET
+  type: REST
+  suffix: error
+  response: |-
+    HTTP/1.1 400
 
-      []
-    disabled: false
-  - path: /api/v2/entity/{id}
-    method: GET
-    type: REST
-    suffix: null
-    response: |-
-      {"id": ${id}, "name": "entity name"}
-    disabled: false
-  - path: /api/v2/entity/filter
-    method: GET
-    type: REST
-    suffix: null
-    response: |-
-      [
-        {"id": 2, "name": "${a:default a}"},
-        {"id": 3, "name": "${b:${of:default B1:default B2:default B3}}"}
-      ]
-    disabled: false
-  - path: /api/v2/entity
-    method: POST
-    type: REST
-    suffix: null
-    response: |-
-      HTTP/1.1 201
-      Custom-Header: entity-created
+    []
+  disabled: false
+- group: ExampleRestService
+  path: /api/v2/entity/{id}
+  method: GET
+  type: REST
+  suffix: null
+  response: |-
+    {"id": ${id}, "name": "entity name"}
+  disabled: false
+- group: ExampleRestService
+  path: /api/v2/entity/filter
+  method: GET
+  type: REST
+  suffix: null
+  response: |-
+    [
+      {"id": 2, "name": "${a:default a}"},
+      {"id": 3, "name": "${b:${of:default B1:default B2:default B3}}"}
+    ]
+  disabled: false
+- group: ExampleRestService
+  path: /api/v2/entity
+  method: POST
+  type: REST
+  suffix: null
+  response: |-
+    HTTP/1.1 201
+    Custom-Header: entity-created
 
-      {"id": ${random_int}, "name": "${name}"}
-    disabled: false
-- name: ExampleSoapService
-  routes:
-  - path: /mockNumberConversion2
-    method: POST
-    type: SOAP
-    suffix: null
-    response: |-
-      <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://www.dataaccess.com/webservicesserver/">
-        <soapenv:Header/>
-        <soapenv:Body>
-          <web:NumberToDollarsResponse>
-            <web:NumberToDollarsResult>${random_string_of:TEST1:TEST2}</web:NumberToDollarsResult>
-          </web:NumberToDollarsResponse>
-        </soapenv:Body>
-      </soapenv:Envelope>
-    disabled: false
+    {"id": ${random_int}, "name": "${name}"}
+  disabled: false
+- group: ExampleSoapService
+  path: /mockNumberConversion2
+  method: POST
+  type: SOAP
+  suffix: null
+  response: |-
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://www.dataaccess.com/webservicesserver/">
+      <soapenv:Header/>
+      <soapenv:Body>
+        <web:NumberToDollarsResponse>
+          <web:NumberToDollarsResult>${random_string_of:TEST1:TEST2}</web:NumberToDollarsResult>
+        </web:NumberToDollarsResponse>
+      </soapenv:Body>
+    </soapenv:Envelope>
+  disabled: false

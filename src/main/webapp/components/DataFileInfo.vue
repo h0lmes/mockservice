@@ -1,6 +1,13 @@
 <template>
     <div class="holder">
-        <span class="part group">{{ datafile.group }}</span><span class="part name" v-if="datafile.group">-</span><span class="part http-method">{{ datafile.method }}</span><span class="part name" v-if="datafile.method">-</span><span class="part name">{{ datafile.path }}</span><span class="part name" v-if="datafile.suffix">--</span><span class="part suffix">{{ datafile.suffix }}</span>
+        <span class="part group">{{ datafile.group }}</span>
+        <span class="part name" v-if="datafile.group">/</span>
+        <span class="part http-method">{{ datafile.method }}</span>
+        <span class="part name" v-if="datafile.method">-</span>
+        <span class="part name">{{ datafile.path }}</span>
+        <span class="part name" v-if="datafile.suffix">--</span>
+        <span class="part suffix">{{ datafile.suffix }}</span>
+        <span class="part ext">{{ ext }}</span>
     </div>
 </template>
 <script>
@@ -11,6 +18,11 @@
         },
         props: {
             datafile: Object
+        },
+        computed: {
+            ext() {
+                return this.datafile.type === 'REST' ? '.json' : '.xml';
+            }
         }
     }
 </script>
@@ -24,15 +36,15 @@
         padding: 0;
     }
     .group {
-        color: rgb(203 141 255);
+        color: var(--purple);
     }
     .http-method {
-        color: rgb(140 255 153);
+        color: var(--teal);
     }
     .suffix {
-        color: rgb(255 218 47);
+        color: var(--yellow);
     }
     .ext {
-        color: rgb(255 91 143);
+        color: var(--pink);
     }
 </style>
