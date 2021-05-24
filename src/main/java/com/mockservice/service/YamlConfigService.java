@@ -19,10 +19,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -36,6 +39,9 @@ public class YamlConfigService implements ConfigService {
     private final String defaultConfigPath;
     private final String configPath;
     private Config config;
+    private final List<Consumer<Route>> routeCreatedListeners = new ArrayList<>();
+    private final List<BiConsumer<Route, Route>> routeUpdatedListeners = new ArrayList<>();
+    private final List<Consumer<Route>> routeDeletedListeners = new ArrayList<>();
 
     public YamlConfigService(@Value("${application.config.default-path}") String defaultConfigPath,
                              @Value("${application.config.path}") String configPath) {
@@ -125,15 +131,65 @@ public class YamlConfigService implements ConfigService {
 
     @Override
     public List<Route> putRoute(Route route, Route replacement) throws IOException, RouteAlreadyExistsException {
-        config.putRoute(route, replacement);
+        boolean updated = config.putRoute(route, replacement);
         saveConfigToFile();
+        if (updated) {
+            notifyRouteUpdated(route, replacement);
+        } else {
+            notifyRouteCreated(replacement);
+        }
         return getRoutes().collect(Collectors.toList());
     }
 
     @Override
     public List<Route> deleteRoute(Route route) throws IOException {
-        config.deleteRoute(route);
+        boolean deleted = config.deleteRoute(route);
         saveConfigToFile();
+        if (deleted) {
+            notifyRouteDeleted(route);
+        }
         return getRoutes().collect(Collectors.toList());
+    }
+
+    private void notifyRouteCreated(Route route) {
+        routeCreatedListeners.forEach(c -> c.accept(route));
+    }
+
+    private void notifyRouteUpdated(Route route, Route replacement) {
+        routeUpdatedListeners.forEach(c -> c.accept(route, replacement));
+    }
+
+    private void notifyRouteDeleted(Route route) {
+        routeDeletedListeners.forEach(c -> c.accept(route));
+    }
+
+    @Override
+    public void registerRouteCreatedListener(Consumer<Route> listener) {
+        routeCreatedListeners.add(listener);
+    }
+
+    @Override
+    public void registerRouteUpdatedListener(BiConsumer<Route, Route> listener) {
+        routeUpdatedListeners.add(listener);
+    }
+
+    @Override
+    public void registerRouteDeletedListener(Consumer<Route> listener) {
+        routeDeletedListeners.add(listener);
+    }
+
+    @Override
+    public void unregisterRouteCreatedListener(Consumer<Route> listener) {
+        routeCreatedListeners.remove(listener);
+    }
+
+    @Override
+    public void unregisterRouteUpdatedListener(BiConsumer<Route, Route> listener) {
+        routeUpdatedListeners.remove(listener);
+    }
+
+    @Override
+    public void unregisterRouteDeletedListener(Consumer<Route> listener) {
+        routeDeletedListeners.remove(listener);
     }
 }

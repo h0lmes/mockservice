@@ -1,5 +1,6 @@
 package com.mockservice.web.internal;
 
+import com.mockservice.mockconfig.Route;
 import com.mockservice.mockconfig.RouteType;
 import com.mockservice.service.ConfigService;
 import com.mockservice.service.MockService;
@@ -50,6 +51,62 @@ public class ConfigBasedSoapController {
                             .build();
                     requestMappingHandlerMapping.registerMapping(mappingInfo, this, method);
                 });
+
+        configService.registerRouteCreatedListener(this::routeCreated);
+        configService.registerRouteUpdatedListener(this::routeUpdated);
+        configService.registerRouteDeletedListener(this::routeDeleted);
+    }
+
+    private void routeCreated(Route route) {
+        try {
+            if (RouteType.SOAP.equals(route.getType())) {
+                registerRoute(route);
+            }
+        } catch (Exception e) {
+            log.error("", e);
+        }
+    }
+
+    private void routeUpdated(Route route, Route replacement) {
+        try {
+            if (RouteType.SOAP.equals(route.getType())) {
+                unregisterRoute(route);
+                mockService.cacheRemove(route);
+            }
+            if (RouteType.SOAP.equals(replacement.getType())) {
+                registerRoute(replacement);
+            }
+        } catch (Exception e) {
+            log.error("", e);
+        }
+    }
+
+    private void routeDeleted(Route route) {
+        try {
+            if (RouteType.SOAP.equals(route.getType())) {
+                unregisterRoute(route);
+                mockService.cacheRemove(route);
+            }
+        } catch (Exception e) {
+            log.error("", e);
+        }
+    }
+
+    private void registerRoute(Route route) throws NoSuchMethodException {
+        Method method = this.getClass().getMethod("mock");
+        RequestMappingInfo mappingInfo = RequestMappingInfo
+                .paths(route.getPath())
+                .methods(route.getMethod())
+                .build();
+        requestMappingHandlerMapping.registerMapping(mappingInfo, this, method);
+    }
+
+    private void unregisterRoute(Route route) {
+        RequestMappingInfo mappingInfo = RequestMappingInfo
+                .paths(route.getPath())
+                .methods(route.getMethod())
+                .build();
+        requestMappingHandlerMapping.unregisterMapping(mappingInfo);
     }
 
     public ResponseEntity<String> mock() {

@@ -65,6 +65,11 @@ public class SoapMockService implements MockService {
     }
 
     @Override
+    public void cacheRemove(Route route) {
+        resourceCache.remove(route);
+    }
+
+    @Override
     public ResponseEntity<String> mock(Map<String, String> variables) {
         RequestFacade requestFacade = new SoapRequestFacade(request);
         Route route = getRoute(requestFacade);

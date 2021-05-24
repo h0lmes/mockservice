@@ -103,25 +103,20 @@
             },
             save() {
                 this.editing = false;
-                this.saveRoute(
-                    [
-                        {
-                            type: this.route.type,
-                            method: this.route.method,
-                            path: this.route.path,
-                            suffix: this.route.suffix
-                        },
-                        this.editingRoute
-                    ]
-                );
+                let originalRoute = {
+                    type: this.route.type,
+                    method: this.route.method,
+                    path: this.route.path,
+                    suffix: this.route.suffix
+                };
+                this.saveRoute([originalRoute, this.editingRoute]);
             },
             saveAsCopy() {
                 this.editing = false;
                 this.saveRoute([{}, this.editingRoute]);
             },
             del() {
-                if (confirm('You\'re about to permanently delete a route.\nDo you confirm this?')) {
-                    console.log("Deleted: ", this.route);
+                if (confirm('You\'re about to permanently delete a route.\nWe need your confirmation for such a devastating action =)')) {
                     this.deleteRoute(this.route);
                 }
             }

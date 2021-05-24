@@ -20,7 +20,7 @@ public class Config {
         return this;
     }
 
-    public void putRoute(Route route, Route replacement) throws RouteAlreadyExistsException {
+    public boolean putRoute(Route route, Route replacement) throws RouteAlreadyExistsException {
         // do not allow duplicates
         if (!route.equals(replacement)) {
             Route maybeRoute = findRoute(replacement);
@@ -29,14 +29,17 @@ public class Config {
             }
         }
 
+        boolean updated = false;
         Route maybeRoute = findRoute(route);
         if (maybeRoute == null) {
             routes.add(replacement);
         } else {
             maybeRoute.assignFrom(replacement);
+            updated = true;
         }
 
         routes.sort(Route::compareTo);
+        return updated;
     }
 
     private Route findRoute(Route route) {
@@ -46,7 +49,7 @@ public class Config {
                 .orElse(null);
     }
 
-    public void deleteRoute(Route route) {
-        routes.remove(route);
+    public boolean deleteRoute(Route route) {
+        return routes.remove(route);
     }
 }

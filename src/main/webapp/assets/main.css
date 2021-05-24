@@ -43,7 +43,7 @@ body {
     background-color: var(--bg);
     color: var(--color);
     width: 100%;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 h1, h2, h3, h4, h5 {
     font-weight: 500;
@@ -74,14 +74,3 @@ a {
 .page-leave-to {
     opacity: 0;
 }
-
-.card {
-    background-color: var(--bg);
-    border: 1px solid var(--border-color);
-    border-radius: .25rem;
-    padding: 2rem 2rem 1.5rem;
-    margin: 0 auto 2rem;
-    position: relative;
-}
-
-
