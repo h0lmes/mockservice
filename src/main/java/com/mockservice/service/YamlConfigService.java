@@ -8,6 +8,8 @@ import com.mockservice.mockconfig.Config;
 import com.mockservice.mockconfig.Route;
 import com.mockservice.mockconfig.RouteAlreadyExistsException;
 import com.mockservice.mockconfig.RouteType;
+import com.mockservice.service.model.PlainConfig;
+import com.mockservice.util.ResourceReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -42,6 +44,7 @@ public class YamlConfigService implements ConfigService {
     private final List<Consumer<Route>> routeCreatedListeners = new ArrayList<>();
     private final List<BiConsumer<Route, Route>> routeUpdatedListeners = new ArrayList<>();
     private final List<Consumer<Route>> routeDeletedListeners = new ArrayList<>();
+
 
     public YamlConfigService(@Value("${application.config.default-path}") String defaultConfigPath,
                              @Value("${application.config.path}") String configPath) {
@@ -88,6 +91,23 @@ public class YamlConfigService implements ConfigService {
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
             mapper.findAndRegisterModules();
             config = mapper.readValue(reader, Config.class);
+        }
+    }
+
+    @Override
+    public PlainConfig getConfig() {
+        try {
+            return new PlainConfig()
+                    .setData(ResourceReader.asString(getConfigFile()))
+                    .setFile(true);
+        } catch (IOException e) {
+            try {
+                return new PlainConfig()
+                        .setData(ResourceReader.asString(defaultConfigPath))
+                        .setResource(true);
+            } catch (IOException ex) {
+                return new PlainConfig();
+            }
         }
     }
 

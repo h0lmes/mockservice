@@ -4,6 +4,7 @@ import com.mockservice.mockconfig.Route;
 import com.mockservice.mockconfig.RouteAlreadyExistsException;
 import com.mockservice.service.ConfigService;
 import com.mockservice.service.ResourceService;
+import com.mockservice.service.model.PlainConfig;
 import com.mockservice.service.model.RestErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ public class WebApiController {
     }
 
     @GetMapping("routes")
-    public List<Route> config() {
+    public List<Route> routes() {
         return configService.getRoutes().collect(Collectors.toList());
     }
 
@@ -53,6 +54,11 @@ public class WebApiController {
             throw new IllegalArgumentException();
         }
         return configService.deleteRoute(route);
+    }
+
+    @GetMapping("config")
+    public PlainConfig config() {
+        return configService.getConfig();
     }
 
     @ExceptionHandler

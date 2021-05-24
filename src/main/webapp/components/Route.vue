@@ -133,6 +133,7 @@
     }
 
     .route-buttons {
+        cursor: default;
         display: inline-block;
         box-sizing: border-box;
         margin: 0;
@@ -164,7 +165,7 @@
         display: inline-block;
         box-sizing: border-box;
         margin: 0;
-        padding: .8rem .5rem;
+        padding: .8rem .1rem;
         width: 7%;
         height: 100%;
         vertical-align: top;

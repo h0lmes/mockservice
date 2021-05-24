@@ -7,11 +7,11 @@ export default {
     ],
     fontawesome: {
         icons: {
-            solid: ['faBars', 'faRoute', 'faFileCode', 'faPlay']
+            solid: ['faBars', 'faRoute', 'faFileCode', 'faPlay', 'faCogs', 'faQuestionCircle']
         }
     },
     css: [
-        '~/assets/main.css',
+        '~/assets/main.scss',
         '~/assets/helpers.css',
         '~/assets/buttons.less',
         '~/assets/forms.scss',

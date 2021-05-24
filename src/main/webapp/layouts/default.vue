@@ -2,7 +2,7 @@
     <div id="page">
         <div class="navbar" role="navigation">
             <ul class="nav">
-                <li class="nav-header">
+                <li class="nav-header mb-2">
                     <a class="btn-minimize-navbar" v-on:click="toggleSidebar">
                         <FontAwesomeIcon icon="bars"/>
                     </a>
@@ -25,7 +25,19 @@
                         <span class="nav-label">Scenarios</span>
                     </NuxtLink>
                 </li>
-                <li class="container hidden-when-mini">
+                <li>
+                    <NuxtLink to="/settings">
+                        <FontAwesomeIcon icon="cogs" class="nav-icon"/>
+                        <span class="nav-label">Settings</span>
+                    </NuxtLink>
+                </li>
+                <li>
+                    <NuxtLink to="/about">
+                        <FontAwesomeIcon icon="question-circle" class="nav-icon"/>
+                        <span class="nav-label">About</span>
+                    </NuxtLink>
+                </li>
+                <li class="container hidden-when-mini mt-3">
                     <ColorModePicker></ColorModePicker>
                 </li>
             </ul>

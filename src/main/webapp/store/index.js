@@ -1,6 +1,7 @@
 export const state = () => ({
     datafiles: [],
-    routes: []
+    routes: [],
+    config: {}
 });
 
 export const mutations = {
@@ -9,6 +10,9 @@ export const mutations = {
     },
     setRoutes(state, routes) {
         state.routes = routes
+    },
+    setConfig(state, config) {
+        state.config = config
     }
 };
 
@@ -57,5 +61,12 @@ export const actions = {
         ).then(
             res => res.json()
         ))
-    }
+    },
+
+    async fetchConfig({ commit }) {
+        let host = location.protocol + '//' + location.hostname + ':8081';
+        commit('setConfig', await fetch(host + '/web-api/config').then(
+            res => res.json()
+        ))
+    },
 };

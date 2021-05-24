@@ -87,6 +87,7 @@
 .navbar .nav > li > a:focus {
     background-color: var(--bg-nav-active);
     color: var(--color-nav-active);
+    text-decoration: none;
 }
 .navbar-mini .nav-label,
 .navbar-maximizing .nav-label,

@@ -31,6 +31,12 @@
   border: 1px solid var(--form-control-border);
   border-radius: .25rem;
   transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  outline: none;
+  box-shadow: none;
+
+  &:focus {
+    box-shadow: 0 0 5px #57a5ff;
+  }
 
   &::placeholder {
     color: var(--form-control-border);
@@ -42,6 +48,10 @@
     background-color: var(--form-control-bg-disabled);
     color: var(--form-control-color-disabled);
     opacity: 1;
+  }
+
+  &.noborder {
+    border: 1px solid var(--form-control-bg);
   }
 }
 

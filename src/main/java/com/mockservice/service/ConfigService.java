@@ -3,6 +3,7 @@ package com.mockservice.service;
 import com.mockservice.mockconfig.Route;
 import com.mockservice.mockconfig.RouteAlreadyExistsException;
 import com.mockservice.mockconfig.RouteType;
+import com.mockservice.service.model.PlainConfig;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public interface ConfigService {
+    PlainConfig getConfig();
     Stream<Route> getRoutes();
     Stream<Route> getEnabledRoutes();
     Stream<Route> getRoutesDistinctByPathAndMethod(RouteType type);

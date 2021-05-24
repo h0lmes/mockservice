@@ -2,6 +2,8 @@
     --color: #243746;
     --color-primary: #158876;
     --color-secondary: #0e2233;
+    --color-link: #007bff;
+    --color-link-hover: #0056b3;
     --bg: #f3f5f4;
     --bg-secondary: #fff;
     --border-color: #ddd;
@@ -59,11 +61,22 @@ h2 {
 }
 p {
     padding: .25em;
-    text-shadow: 0 0 1px var(--color-secondary);
 }
 a {
+    color: var(--color-link);
     text-decoration: none;
     background-color: transparent;
+
+    &:visited {
+        color: var(--color-link);
+    }
+    &:hover {
+        color: var(--color-link-hover);
+        text-decoration: underline;
+    }
+    &:focus {
+        outline: 0;
+    }
 }
 
 .page-enter-active,
