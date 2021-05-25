@@ -1,12 +1,15 @@
 :root {
   --btn-color: #ccc;
+  --btn-color-link: #243746;
   --btn-color-hilight: #ffffff;
   --btn-bg: #676867;
 }
 .dark-mode {
+  --btn-color-link: #a7b1c2;
   --btn-bg: #676867;
 }
 .sepia-mode {
+  --btn-color-link: #433422;
   --btn-bg: #504231;
 }
 
@@ -66,12 +69,12 @@
     }
   }
 }
+
 .btn-sm {
   padding: 4px 8px;
   font-size: smaller;
   line-height: 1.2;
 }
-
 
 .btn-primary {
   background-color: var(--blue);
@@ -96,7 +99,7 @@
 
 .btn-link {
   font-weight: 400;
-  color: var(--btn-color);
+  color: --var(--btn-color-link);
   border-radius: 0;
 
   &,
@@ -115,7 +118,7 @@
   }
   &:hover,
   &:focus {
-    color: var(--btn-color-hilight);
+    color: var(--btn-color-hilight) !important;
     text-decoration: underline;
     background-color: transparent;
   }

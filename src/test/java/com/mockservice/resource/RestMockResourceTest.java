@@ -1,6 +1,6 @@
 package com.mockservice.resource;
 
-import com.mockservice.util.ResourceReader;
+import com.mockservice.util.ReaderWriter;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ public class RestMockResourceTest {
 
     @Test
     public void parserTest() throws IOException {
-        String json = ResourceReader.asString("resource.json");
+        String json = ReaderWriter.asString("resource.json");
         MockResource resource = new RestMockResource(null, json);
 
         assertEquals(TEST_HTTP_CODE.intValue(), resource.getCode());

@@ -39,18 +39,9 @@ public class ConfigBasedRestController {
         }
     }
 
-    private void register() throws NoSuchMethodException {
-        Method method = this.getClass().getMethod("mock");
-
-        configService
-                .getRoutesDistinctByPathAndMethod(RouteType.REST)
-                .forEach(route -> {
-                    RequestMappingInfo mappingInfo = RequestMappingInfo
-                            .paths(route.getPath())
-                            .methods(route.getMethod())
-                            .build();
-                    requestMappingHandlerMapping.registerMapping(mappingInfo, this, method);
-                });
+    private void register() {
+        configService.getRoutesDistinctByPathAndMethod(RouteType.REST)
+                .forEach(this::registerRoute);
 
         configService.registerRouteCreatedListener(this::routeCreated);
         configService.registerRouteUpdatedListener(this::routeUpdated);
@@ -58,47 +49,42 @@ public class ConfigBasedRestController {
     }
 
     private void routeCreated(Route route) {
-        try {
-            if (RouteType.REST.equals(route.getType())) {
-                registerRoute(route);
-            }
-        } catch (Exception e) {
-            log.error("", e);
+        if (RouteType.REST.equals(route.getType())) {
+            registerRoute(route);
         }
     }
 
     private void routeUpdated(Route route, Route replacement) {
-        try {
-            if (RouteType.REST.equals(route.getType())) {
-                unregisterRoute(route);
-                mockService.cacheRemove(route);
-            }
-            if (RouteType.REST.equals(replacement.getType())) {
-                registerRoute(replacement);
-            }
-        } catch (Exception e) {
-            log.error("", e);
+        if (RouteType.REST.equals(route.getType())) {
+            unregisterRoute(route);
+            mockService.cacheRemove(route);
+        }
+        if (RouteType.REST.equals(replacement.getType())) {
+            registerRoute(replacement);
         }
     }
 
     private void routeDeleted(Route route) {
-        try {
-            if (RouteType.REST.equals(route.getType())) {
-                unregisterRoute(route);
-                mockService.cacheRemove(route);
-            }
-        } catch (Exception e) {
-            log.error("", e);
+        if (RouteType.REST.equals(route.getType())) {
+            unregisterRoute(route);
+            mockService.cacheRemove(route);
         }
     }
 
-    private void registerRoute(Route route) throws NoSuchMethodException {
-        Method method = this.getClass().getMethod("mock");
-        RequestMappingInfo mappingInfo = RequestMappingInfo
-                .paths(route.getPath())
-                .methods(route.getMethod())
-                .build();
-        requestMappingHandlerMapping.registerMapping(mappingInfo, this, method);
+    @SuppressWarnings("Duplicates")
+    private void registerRoute(Route route) {
+        try {
+            if (!route.getDisabled()) {
+                Method method = this.getClass().getMethod("mock");
+                RequestMappingInfo mappingInfo = RequestMappingInfo
+                        .paths(route.getPath())
+                        .methods(route.getMethod())
+                        .build();
+                requestMappingHandlerMapping.registerMapping(mappingInfo, this, method);
+            }
+        } catch (NoSuchMethodException e) {
+            log.error("", e);
+        }
     }
 
     private void unregisterRoute(Route route) {

@@ -1,7 +1,7 @@
 package com.mockservice.service;
 
 import com.mockservice.mockconfig.Route;
-import com.mockservice.util.ResourceReader;
+import com.mockservice.util.ReaderWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ResourceLoader;
@@ -110,7 +110,7 @@ public class DefaultResourceService implements ResourceService {
 
     private String loadFromResource(String path) throws IOException {
         try {
-            return ResourceReader.asString(resourceLoader, DATA_FOLDER + File.separator + path);
+            return ReaderWriter.asString(resourceLoader, DATA_FOLDER + File.separator + path);
         } catch (IOException e) {
             throw new IOException("Error loading file: " + path, e);
         }

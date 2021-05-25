@@ -9,11 +9,11 @@ import java.io.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class ResourceReader {
+public class ReaderWriter {
 
     private static final String CLASSPATH = "classpath:";
 
-    private ResourceReader() {
+    private ReaderWriter() {
         // private
     }
 
@@ -37,6 +37,13 @@ public class ResourceReader {
     public static String asString(File file) throws IOException {
         try (Reader reader = new InputStreamReader(new FileInputStream(file), UTF_8)) {
             return FileCopyUtils.copyToString(reader);
+        }
+    }
+
+    public static void writeFile(File file, String data) throws IOException {
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            byte[] strToBytes = data.getBytes();
+            outputStream.write(strToBytes);
         }
     }
 }

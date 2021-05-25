@@ -14,7 +14,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public interface ConfigService {
-    PlainConfig getConfig();
+    PlainConfig getConfigData();
+    void writeConfigData(PlainConfig config) throws IOException;
     Stream<Route> getRoutes();
     Stream<Route> getEnabledRoutes();
     Stream<Route> getRoutesDistinctByPathAndMethod(RouteType type);

@@ -9,7 +9,7 @@ import com.mockservice.mockconfig.Route;
 import com.mockservice.mockconfig.RouteAlreadyExistsException;
 import com.mockservice.mockconfig.RouteType;
 import com.mockservice.service.model.PlainConfig;
-import com.mockservice.util.ResourceReader;
+import com.mockservice.util.ReaderWriter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -38,19 +38,22 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Service
 public class YamlConfigService implements ConfigService {
 
-    private final String defaultConfigPath;
-    private final String configPath;
+    private final String resourceConfigPath;
+    private final String fileConfigPath;
     private Config config;
     private final List<Consumer<Route>> routeCreatedListeners = new ArrayList<>();
     private final List<BiConsumer<Route, Route>> routeUpdatedListeners = new ArrayList<>();
     private final List<Consumer<Route>> routeDeletedListeners = new ArrayList<>();
 
 
-    public YamlConfigService(@Value("${application.config.default-path}") String defaultConfigPath,
-                             @Value("${application.config.path}") String configPath) {
-        this.defaultConfigPath = defaultConfigPath;
-        this.configPath = configPath;
+    public YamlConfigService(@Value("${application.config.resource}") String resourceConfigPath,
+                             @Value("${application.config.file}") String fileConfigPath) {
+        this.resourceConfigPath = resourceConfigPath;
+        this.fileConfigPath = fileConfigPath;
+        readConfig();
+    }
 
+    private void readConfig() {
         try {
             readConfigFromFile();
         } catch (IOException e) {
@@ -62,14 +65,14 @@ public class YamlConfigService implements ConfigService {
         }
     }
 
+    private File getConfigFile() {
+        return new File(fileConfigPath);
+    }
+
     private void readConfigFromFile() throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         mapper.findAndRegisterModules();
         config = mapper.readValue(getConfigFile(), Config.class);
-    }
-
-    private File getConfigFile() {
-        return new File(configPath);
     }
 
     private void saveConfigToFile() throws IOException {
@@ -86,7 +89,7 @@ public class YamlConfigService implements ConfigService {
 
     private void readConfigFromResource() throws IOException {
         ResourceLoader resourceLoader = new DefaultResourceLoader();
-        Resource resource = resourceLoader.getResource(defaultConfigPath);
+        Resource resource = resourceLoader.getResource(resourceConfigPath);
         try (Reader reader = new InputStreamReader(resource.getInputStream(), UTF_8)) {
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
             mapper.findAndRegisterModules();
@@ -95,20 +98,36 @@ public class YamlConfigService implements ConfigService {
     }
 
     @Override
-    public PlainConfig getConfig() {
+    public PlainConfig getConfigData() {
         try {
             return new PlainConfig()
-                    .setData(ResourceReader.asString(getConfigFile()))
+                    .setData(ReaderWriter.asString(getConfigFile()))
                     .setFile(true);
         } catch (IOException e) {
             try {
                 return new PlainConfig()
-                        .setData(ResourceReader.asString(defaultConfigPath))
+                        .setData(ReaderWriter.asString(resourceConfigPath))
                         .setResource(true);
             } catch (IOException ex) {
                 return new PlainConfig();
             }
         }
+    }
+
+    @Override
+    public void writeConfigData(PlainConfig config) throws IOException {
+        ReaderWriter.writeFile(getConfigFile(), config.getData());
+        unregisterAllRoutes();
+        readConfig();
+        registerAllRoutes();
+    }
+
+    private void unregisterAllRoutes() {
+        getRoutes().forEach(this::notifyRouteDeleted);
+    }
+
+    private void registerAllRoutes() {
+        getRoutes().forEach(this::notifyRouteCreated);
     }
 
     @Override
@@ -164,8 +183,8 @@ public class YamlConfigService implements ConfigService {
     @Override
     public List<Route> deleteRoute(Route route) throws IOException {
         boolean deleted = config.deleteRoute(route);
-        saveConfigToFile();
         if (deleted) {
+            saveConfigToFile();
             notifyRouteDeleted(route);
         }
         return getRoutes().collect(Collectors.toList());

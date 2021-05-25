@@ -7,7 +7,7 @@ import com.mockservice.request.SoapRequestFacade;
 import com.mockservice.resource.MockResource;
 import com.mockservice.resource.SoapMockResource;
 import com.mockservice.template.TemplateEngine;
-import com.mockservice.util.ResourceReader;
+import com.mockservice.util.ReaderWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +48,7 @@ public class SoapMockService implements MockService {
         resourceCache = new ConcurrentLruCache<>(cacheSizeLimit, this::loadResource);
 
         try {
-            errorBody = ResourceReader.asString(soapErrorDataFile);
+            errorBody = ReaderWriter.asString(soapErrorDataFile);
         } catch (IOException e) {
             log.error("Error loading SOAP error data file, using fallback.", e);
             errorBody = "<code>" + FAULT_CODE_PLACEHOLDER + "</code>\n<message>" + FAULT_MESSAGE_PLACEHOLDER + "</message>";

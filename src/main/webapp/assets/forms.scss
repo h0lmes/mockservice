@@ -4,17 +4,22 @@
   --form-control-bg: var(--bg-secondary);
   --form-control-bg-disabled: #e9ecef;
   --form-control-border: #ced4da;
+  --form-control-placeholder: #ccc;
+  --form-control-bg-hilight-shadow: #57a5ff;
 }
 .dark-mode {
   --form-control-color: #909ea7;
   --form-control-color-disabled: #6c757d;
   --form-control-bg-disabled: #787979;
   --form-control-border: #5f6060;
+  --form-control-placeholder: #3a3e42;
 }
 .sepia-mode {
   --form-control-color: #433422;
   --form-control-bg-disabled: #bbbec1;
-  --form-control-border: #504231;
+  --form-control-border: #b4a185;
+  --form-control-placeholder: #d2b592;
+  --form-control-bg-hilight-shadow: #b0795d;
 }
 
 .form-control {
@@ -35,11 +40,11 @@
   box-shadow: none;
 
   &:focus {
-    box-shadow: 0 0 5px #57a5ff;
+    box-shadow: 0 0 5px var(--form-control-bg-hilight-shadow);
   }
 
   &::placeholder {
-    color: var(--form-control-border);
+    color: var(--form-control-placeholder);
     opacity: 1;
   }
 
@@ -91,5 +96,6 @@ select.form-control-sm {
   position: relative;
   display: block;
   padding-left: 1.25rem;
-  margin-top: 1rem;
+  width: initial;
+  margin: 1rem auto 0;
 }

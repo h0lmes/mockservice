@@ -58,7 +58,12 @@ public class WebApiController {
 
     @GetMapping("config")
     public PlainConfig config() {
-        return configService.getConfig();
+        return configService.getConfigData();
+    }
+
+    @PutMapping("config")
+    public void putConfig(@RequestBody PlainConfig config) throws IOException {
+        configService.writeConfigData(config);
     }
 
     @ExceptionHandler

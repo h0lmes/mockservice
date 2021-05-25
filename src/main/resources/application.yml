@@ -17,8 +17,8 @@ spring:
 
 application:
   config:
-    default-path: classpath:defaultConfig.yml
-    path: .\config.yml
+    resource: classpath:defaultConfig.yml
+    file: .\config.yml
   soap-error-data-file: soapFault.xml
   cache:
     rest-resource: 256

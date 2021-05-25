@@ -1,4 +1,5 @@
 export const state = () => ({
+    host: location.protocol + '//' + location.hostname + ':8081',
     datafiles: [],
     routes: [],
     config: {}
@@ -11,30 +12,34 @@ export const mutations = {
     setRoutes(state, routes) {
         state.routes = routes
     },
+    addRoute(state, route) {
+        state.routes.unshift(route);
+    },
     setConfig(state, config) {
         state.config = config
     }
 };
 
 export const actions = {
-    async fetchDataFiles({ commit }) {
-        let host = location.protocol + '//' + location.hostname + ':8081';
-        commit('setDataFiles', await fetch(host + '/web-api/datafiles').then(
-            res => res.json()
-        ))
+    async fetchDataFiles({commit, state}) {
+        commit('setDataFiles',
+            await fetch(state.host + '/web-api/datafiles').then(
+                res => res.json()
+            )
+        )
     },
 
-    async fetchRoutes({ commit }) {
-        let host = location.protocol + '//' + location.hostname + ':8081';
-        commit('setRoutes', await fetch(host + '/web-api/routes').then(
-            res => res.json()
-        ))
+    async fetchRoutes({commit, state}) {
+        commit('setRoutes',
+            await fetch(state.host + '/web-api/routes').then(
+                res => res.json()
+            )
+        )
     },
 
-    async saveRoute({ commit }, routes) {
-        let host = location.protocol + '//' + location.hostname + ':8081';
+    async saveRoute({commit, state}, routes) {
         commit('setRoutes', await fetch(
-            host + '/web-api/route',
+            state.host + '/web-api/route',
             {
                 method: 'PUT',
                 headers: {
@@ -47,10 +52,9 @@ export const actions = {
         ))
     },
 
-    async deleteRoute({ commit }, route) {
-        let host = location.protocol + '//' + location.hostname + ':8081';
+    async deleteRoute({commit, state}, route) {
         commit('setRoutes', await fetch(
-            host + '/web-api/route',
+            state.host + '/web-api/route',
             {
                 method: 'DELETE',
                 headers: {
@@ -63,10 +67,29 @@ export const actions = {
         ))
     },
 
-    async fetchConfig({ commit }) {
-        let host = location.protocol + '//' + location.hostname + ':8081';
-        commit('setConfig', await fetch(host + '/web-api/config').then(
-            res => res.json()
-        ))
+    newRoute({commit}) {
+        commit('addRoute', {type: 'REST', method: 'GET', path: '/', suffix: ''});
+    },
+
+    async fetchConfig({commit, state}) {
+        commit('setConfig',
+            await fetch(state.host + '/web-api/config').then(
+                res => res.json()
+            )
+        )
+    },
+
+    async saveConfig({commit, state}, config) {
+        commit('setConfig', config);
+        await fetch(
+            state.host + '/web-api/config',
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(config)
+            }
+        )
     },
 };

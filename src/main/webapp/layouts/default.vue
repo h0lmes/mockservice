@@ -26,9 +26,9 @@
                     </NuxtLink>
                 </li>
                 <li>
-                    <NuxtLink to="/settings">
+                    <NuxtLink to="/config">
                         <FontAwesomeIcon icon="cogs" class="nav-icon"/>
-                        <span class="nav-label">Settings</span>
+                        <span class="nav-label">Config</span>
                     </NuxtLink>
                 </li>
                 <li>

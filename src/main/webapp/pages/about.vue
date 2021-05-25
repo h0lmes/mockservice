@@ -8,7 +8,7 @@
 </template>
 <script>
     export default {
-        name: "scenarios",
+        name: "about",
         data() {
             return {}
         },
