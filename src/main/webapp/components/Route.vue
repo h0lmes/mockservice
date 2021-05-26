@@ -1,23 +1,23 @@
 <template>
-    <div class="route-holder monospace">
+    <div class="route-holder">
 
         <div class="route-field w2">
             <div class="route-field-header">GROUP</div>
-            <div v-show="!editing" class="route-field-value">{{ route.group }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingRoute.group"/>
+            <div v-show="!editing" class="route-field-value link" @click="filter(route.group)">{{ route.group }}</div>
+            <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.group"/>
         </div>
         <div class="route-field">
             <div class="route-field-header">TYPE</div>
-            <div v-show="!editing" class="route-field-value">{{ route.type }}</div>
-            <select v-show="editing" class="form-control form-control-sm" v-model="editingRoute.type">
+            <div v-show="!editing" class="route-field-value link" @click="filter(route.type)">{{ route.type }}</div>
+            <select v-show="editing" class="form-control form-control-sm monospace" v-model="editingRoute.type">
                 <option>REST</option>
                 <option>SOAP</option>
             </select>
         </div>
         <div class="route-field">
             <div class="route-field-header">METHOD</div>
-            <div v-show="!editing" class="route-field-value">{{ route.method }}</div>
-            <select v-show="editing" class="form-control form-control-sm" v-model="editingRoute.method">
+            <div v-show="!editing" class="route-field-value link" @click="filter(route.method)">{{ route.method }}</div>
+            <select v-show="editing" class="form-control form-control-sm monospace" v-model="editingRoute.method">
                 <option>GET</option>
                 <option>POST</option>
                 <option>PATCH</option>
@@ -27,31 +27,31 @@
         </div>
         <div class="route-field w3">
             <div class="route-field-header">PATH</div>
-            <div v-show="!editing" class="route-field-value">{{ route.path }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingRoute.path"/>
+            <div v-show="!editing" class="route-field-value link" @click="filter(route.path)">{{ route.path }}</div>
+            <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.path"/>
         </div>
         <div class="route-field w2">
             <div class="route-field-header">SUFFIX</div>
-            <div v-show="!editing" class="route-field-value">{{ route.suffix }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingRoute.suffix"/>
+            <div v-show="!editing" class="route-field-value link" @click="filter(route.suffix)">{{ route.suffix }}</div>
+            <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.suffix"/>
         </div>
         <div class="route-field">
             <div class="route-field-header">DISABLED</div>
-            <div v-show="!editing" class="route-field-value" :class="{ 'red' : route.disabled }">{{ disabled }}</div>
+            <div v-show="!editing" class="route-field-value" :class="{ 'red' : route.disabled }">{{ route.disabled }}</div>
             <input v-show="editing" type="checkbox" class="form-control form-check" v-model="editingRoute.disabled"/>
         </div>
 
         <div class="route-buttons">
-            <div class="btn btn-sm btn-primary mr-2" @click="edit">EDIT</div>
-            <div class="btn btn-sm mr-2" @click="test">TEST</div>
-            <div class="btn btn-sm btn-danger mr-2" @click="del">DELETE</div>
+            <a class="btn btn-link ml-2 mr-2" @click="edit">edit</a>
+            <a class="btn btn-link mr-2" @click="test">test</a>
+            <a class="btn btn-link btn-danger mr-2" @click="del">delete</a>
         </div>
 
         <div v-show="editing" class="route-field-memo">
-            <textarea class="form-control form-control-sm v-resize" rows="10" v-model="editingRoute.response"></textarea>
+            <textarea class="form-control form-control-sm v-resize monospace" rows="10" v-model="editingRoute.response"></textarea>
         </div>
 
-        <div v-show="editing" class="edit-buttons">
+        <div v-show="editing" class="edit-buttons-wrapper">
             <div class="btn btn-sm btn-primary mr-3" @click="save">SAVE</div>
             <div class="btn btn-sm btn-primary mr-3" @click="saveAsCopy">SAVE AS COPY</div>
             <div class="btn btn-sm btn-default" @click="cancel">CANCEL</div>
@@ -77,11 +77,6 @@
         props: {
             route: {type: Object}
         },
-        computed: {
-            disabled() {
-                return this.route.disabled ? 'yes' : 'no'
-            },
-        },
         methods: {
             ...mapActions({
                 saveRoute: 'saveRoute',
@@ -100,6 +95,10 @@
                 this.editing = false;
             },
             del() {
+                if (!!this.route.new) {
+                    this.deleteRoute(this.route);
+                    return;
+                }
                 if (confirm('You\'re about to permanently delete a route.\nWe need your confirmation for such a devastating action =)')) {
                     this.deleteRoute(this.route);
                 }
@@ -112,51 +111,61 @@
                 this.editing = false;
                 this.saveRoute([{}, this.editingRoute]);
             },
+            filter(value) {
+                this.$emit('filter', value);
+            }
         }
     }
 </script>
 <style scoped>
     .route-holder {
+        display: flex;
+        flex-wrap: wrap;
+        font-size: smaller;
         margin-bottom: 1.1rem;
         padding: .1rem .3rem;
-        background-color: var(--bg-secondary);
         border-radius: 5px;
-        font-size: smaller;
+        background-color: var(--bg-secondary);
     }
 
     .route-field {
-        display: inline-block;
+        flex: 1;
+        min-width: 5rem;
         box-sizing: border-box;
         margin: 0;
         padding: .8rem .5rem;
-        width: 8%;
-        height: 100%;
         vertical-align: top;
         text-align: center;
-        /*border: 1px dashed #7f828b;*/
     }
 
     .route-field.w2 {
-        width: 12%;
+        flex: 2;
     }
 
     .route-field.w3 {
-        width: 34%;
+        flex: 3;
     }
 
     .route-field-header {
         display: block;
         color: var(--color-primary);
         width: 100%;
-        text-align: center;
         margin-bottom: .5rem;
+        text-align: center;
     }
 
     .route-field-value {
+        cursor: default;
         display: block;
         color: var(--color-secondary);
         width: 100%;
         text-align: center;
+        word-wrap: break-word;
+    }
+
+    .route-field-value.link:hover {
+        cursor: pointer;
+        text-decoration: underline;
     }
 
     .route-field-memo {
@@ -165,34 +174,54 @@
         margin: 0;
         padding: 0 .5rem;
         width: 100%;
-        /*border: 1px dashed #7f828b;*/
     }
 
     .route-buttons {
         cursor: default;
-        display: inline-block;
         box-sizing: border-box;
         margin: 0;
-        padding: 1.3rem 1rem 1.2rem;
-        min-width: 5%;
-        height: 100%;
+        padding: 1.1rem .3rem 0.9rem;
         vertical-align: top;
         text-align: center;
-        /*border: 1px dashed #7f828b;*/
     }
 
-    .edit-buttons {
+    .edit-buttons-wrapper {
         cursor: default;
         display: block;
         box-sizing: border-box;
         margin: 0;
-        padding: 1.3rem 0 1.2rem;
+        padding: 0.7rem 0;
         width: 100%;
         text-align: center;
-        /*border: 1px dashed #7f828b;*/
     }
 
-    .red {
-        color: var(--red);
+    .new-route {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        width: 1.5rem;
+    }
+
+    @media screen and (max-width: 1599px) {
+        .route-field {
+            flex: 2;
+        }
+    }
+
+    @media screen and (max-width: 1099px) /*and (orientation: landscape)*/ {
+        .route-holder {
+            margin-bottom: 0.7rem;
+            padding: .1rem 0;
+        }
+
+        .route-field.w3 {
+            flex: 2;
+        }
+
+        .route-buttons {
+            display: block;
+            width: 100%;
+            padding: .2rem .3rem .6rem;
+        }
     }
 </style>

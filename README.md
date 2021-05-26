@@ -10,47 +10,17 @@ There is NO support for WSDL/XSD.
 #
 ### Where to start
 
-To create new endpoints:
-
-1. Create new controller extending `BaseRestController` or `BaseSoapController`
-(for example `AccountService`, there is no enforced convention
-for controller names, controller name would mean group of routes).
-2. Create required methods in the controller (see examples under `web/rest`
-and `web/soap`).
-3. Create a new folder under `src/main/resources/data` and
-name it as your controller (`AccountService`).
-4. Create data files under that folder (see file naming format below).
-
-> Note. See example requests in `rest-api.http`.
+Refer to README in `src/main/webapp` for instructions on how to build application.
 
 #
-### File naming format
+### Response of a Route
 
-    // for REST
-    method-request-mapping.json
-    or
-    method-request-mapping--suffix.json
-    
-    // for SOAP
-    request-mapping.xml 
+Response can contain any JSON or XML (any textual data actually).
 
-
-Method is any of HTTP methods. Path variables supported.
-
-Example:
-
-    @GetMapping("api/entity/{id}")  ->  get-api-entity-{id}.json
-
-#
-### Data file contents
-
-Data file can contain any JSON or XML (any textual data actually).
-
-See examples in `resources/data` folder.
-
-You can specify HTTP status code and headers in JSON files (not possible to specify headers only).
-Data file parser looks for `HTTP/1.1` to start reading status code and headers.
-Put empty line (or end of file) after headers.
+You can specify HTTP status code and headers for REST endpoints
+(not possible to specify headers only).
+Parser looks for `HTTP/1.1` to start reading status code and headers.
+Put empty line before body if headers go first.
 
 Examples:
 
@@ -67,8 +37,11 @@ or
     Custom-Header: header value
 
 #
-### Multiple data files per endpoint
+### Suffix of a Route
 
+Suffixes allow you to create multiple responses for a single path.
+
+To select a particular response send `Mock-Suffix` header in HTTP request.
 Multiple `Mock-Suffix` headers supported per HTTP request.
 Each header defines exactly one suffix.
 
@@ -78,15 +51,15 @@ Header format:
     
 Example:
 
-    Mock-Option: api-v1-item-{id}/invalid_format
+    Mock-Suffix: api-v1-item-{id}/invalid_format
 
-In the example above if you call an endpoint `GET api/v1/item/{id}`
-then `get-api-v1-item-{id}--invalid_format.json` file would be loaded.
+In the example above if you call an endpoint `GET /api/v1/item/{id}`
+then the Route with suffix `invalid_format` would be triggered.
 
 #
 ### Predefined variables
 
-You can use predefined variables in data files, those would be substituted
+You can use predefined variables in Response, those would be substituted
 with their values each time an endpoint is fetched.
 
 List of predefined variables:
@@ -110,7 +83,7 @@ List of predefined variables:
 
 You can use variables which are provided on a per-request basis.
 
-Variables have the following format in data file:
+Variables have the following format in Response:
 
     ${var_name}
     ${var_name:default_value}
@@ -150,7 +123,7 @@ Header format:
     
 Example:
 
-    Mock-Variable: api-v1-item-{id}/item_name/iPhone 12 Pro
+    Mock-Variable: api-v1-item-{id}/item_name/Chips
 
-In the example above if you call an endpoint `api/v1/item/{id}`
-a variable `item_name` with value `iPhone 12 Pro` would be available.
+In the example above if you call an endpoint `/api/v1/item/{id}`
+a variable `item_name` with the value `Chips` would be available.

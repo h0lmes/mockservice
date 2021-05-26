@@ -1,8 +1,8 @@
 <template>
     <div class="wrapper">
-        <textarea class="form-control form-control-sm v-resize" rows="10" v-model="testResult"></textarea>
-        <div class="buttons-wrapper">
-            <div class="btn btn-sm btn-primary mr-3" @click="test">RETRY</div>
+        <pre class="form-control form-control-sm monospace">{{ testResult }}</pre>
+        <div class="route-buttons">
+            <div class="btn btn-sm btn-primary mr-3" @click="test" v-cloak="inProgress">RETRY</div>
             <div class="btn btn-sm btn-default" @click="$emit('close')">CLOSE</div>
         </div>
     </div>
@@ -12,7 +12,8 @@
         name: "RouteTester",
         data() {
             return {
-                testResult: ''
+                testResult: '',
+                inProgress: false
             }
         },
         props: {
@@ -26,7 +27,7 @@
         },
         computed: {
             host() {
-                return this.$store.state.host;
+                return this.$store.state.BASE_URL;
             },
             encodedPath() {
                 let path = this.route.path;
@@ -52,30 +53,43 @@
         },
         methods: {
             async test() {
+                this.inProgress = true;
                 this.testResult = '';
-                this.testPrintln(this.route.method.toUpperCase() + ' ' + this.host + this.route.path);
-                this.testPrintln(JSON.stringify(this.testHeaders));
-                this.testPrintln('--- response ---');
+                this.println(this.route.method.toUpperCase() + ' ' + this.host + this.route.path);
+                this.println(JSON.stringify(this.testHeaders));
+                this.println('query running ...');
                 this.$nextTick();
 
                 try {
+                    const startTime = new Date();
                     const response = await fetch(this.host + this.route.path, {
                         method: this.route.method,
                         headers: this.testHeaders
                     });
+                    const body = await response.text();
+                    const elapsed = new Date() - startTime;
+                    this.println('');
+                    this.println('--- response in ' + elapsed + ' ms with status ' + response.status + ' ---');
+                    this.println(body);
+                    this.println('');
+                    this.println('--- headers ---');
                     for (let header of response.headers) {
-                        this.testPrintln(header);
+                        this.println(this.headerToString(header));
                     }
-                    this.testPrintln('--- body ---');
-                    this.testPrintln(await response.text());
-                    this.testPrintln('--- status code ---');
-                    this.testPrintln(response.status);
                 } catch (err) {
-                    this.testPrintln(err);
+                    this.println('------');
+                    this.println(err);
                 }
             },
-            testPrintln(text) {
+            println(text) {
                 this.testResult = this.testResult + text + '\n';
+            },
+            headerToString(header) {
+              if (Array.isArray(header)) {
+                  return header[0] + ': ' + header[1];
+              } else {
+                  return header;
+              }
             },
         }
     }
@@ -88,12 +102,12 @@
         padding: 0 .5rem;
         width: 100%;
     }
-    .buttons-wrapper {
+    .route-buttons {
         cursor: default;
         display: block;
         box-sizing: border-box;
         margin: 0;
-        padding: 1.3rem 0 1.2rem;
+        padding: 0.7rem 0;
         width: 100%;
         text-align: center;
     }

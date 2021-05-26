@@ -73,7 +73,7 @@ public class SoapMockService implements MockService {
     public ResponseEntity<String> mock(Map<String, String> variables) {
         RequestFacade requestFacade = new SoapRequestFacade(request);
         Route route = getRoute(requestFacade);
-        log.info("File requested: {}", route);
+        log.info("Route requested: {}", route);
         MockResource resource = resourceCache.get(route);
         Map<String, String> requestVariables = requestFacade.getVariables(variables);
         return ResponseEntity

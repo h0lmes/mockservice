@@ -30,6 +30,11 @@
 #page-contents {
     padding: 2rem;
 }
+@media screen and (max-width: 1099px) /*and (orientation: landscape)*/ {
+    #page-contents {
+        padding: 2rem .5rem;
+    }
+}
 
 .navbar {
     z-index: 1000;

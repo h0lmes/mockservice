@@ -12,10 +12,10 @@ export default {
     },
     css: [
         '~/assets/main.scss',
-        '~/assets/helpers.css',
         '~/assets/buttons.less',
         '~/assets/forms.scss',
-        '~/assets/default-layout.css'
+        '~/assets/default-layout.css',
+        '~/assets/helpers.css'
     ],
     head: {
         title: 'Mock Service',

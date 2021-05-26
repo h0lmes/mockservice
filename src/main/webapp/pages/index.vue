@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="monospace">
         <Routes :routes="routes"
                 :pending="$fetchState.pending"
                 :error="$fetchState.error">

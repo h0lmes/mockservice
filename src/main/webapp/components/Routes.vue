@@ -1,18 +1,21 @@
 <template>
     <div>
-        <p class="mb-3">
-            <input placeholder="search..." type="text" class="form-control noborder" @keyup="debounce($event.target.value)"/>
-        </p>
         <div class="mb-2">
-            <a class="btn btn-link" @click="newRoute">New route</a>
+            <input id="search" placeholder="search here or click on values" type="text" class="form-control noborder" @input="debounce($event.target.value)"/>
         </div>
+        <p class="mb-2">
+            <a class="btn btn-link mr-4" @click="newRoute">Add route</a>
+            <a class="btn btn-link mr-4" @click="setFilter('')">Clear filter</a>
+        </p>
         <div class="routes-holder">
             <p v-if="pending">Loading...</p>
             <p v-else-if="error">Error while fetching</p>
-            <p v-else-if="routes.empty">No routes</p>
+            <p v-else-if="routes.empty">
+                No routes found
+            </p>
             <div v-else>
-                <div v-for="route in filtered" :key="route.type + route.method + route.path + route.suffix">
-                    <Route :route="route"></Route>
+                <div v-for="(route, index) in filtered" :key="route.type + route.method + route.path + route.suffix">
+                    <Route :route="route" @filter="setFilter($event)"></Route>
                 </div>
             </div>
         </div>
@@ -27,6 +30,7 @@
         data() {
             return {
                 query: '',
+                queryApplied: '',
                 timeout: null
             }
         },
@@ -56,6 +60,10 @@
                 this.timeout = setTimeout(function () {
                     that.query = value.toLowerCase();
                 }, 500);
+            },
+            setFilter(value) {
+                document.querySelector('#search').value = value;
+                this.query = value.toLowerCase();
             }
         }
     }

@@ -4,8 +4,8 @@
         <p class="danger mb-5">It is easy to ruin config by editing it as plain text.</p>
         <textarea class="form-control form-control-sm v-resize" rows="16" v-model="config.data"></textarea>
         <div class="buttons mt-5">
-            <div class="btn btn-sm btn-danger mr-5" @click="save">SAVE</div>
-            <div class="btn btn-sm btn-primary mr-5" @click="saveAsFile">DOWNLOAD</div>
+            <div class="btn btn-sm btn-danger mr-3" @click="save">SAVE TO SERVER</div>
+            <div class="btn btn-sm btn-primary mr-3" @click="saveAsFile">DOWNLOAD</div>
         </div>
     </div>
 </template>

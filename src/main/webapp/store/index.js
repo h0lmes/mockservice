@@ -1,5 +1,5 @@
 export const state = () => ({
-    host: location.protocol + '//' + location.hostname + ':8081',
+    BASE_URL: location.protocol + '//' + location.hostname + ':8081',
     datafiles: [],
     routes: [],
     config: {}
@@ -23,7 +23,7 @@ export const mutations = {
 export const actions = {
     async fetchDataFiles({commit, state}) {
         commit('setDataFiles',
-            await fetch(state.host + '/web-api/datafiles').then(
+            await fetch(state.BASE_URL + '/web-api/datafiles').then(
                 res => res.json()
             )
         )
@@ -31,7 +31,7 @@ export const actions = {
 
     async fetchRoutes({commit, state}) {
         commit('setRoutes',
-            await fetch(state.host + '/web-api/routes').then(
+            await fetch(state.BASE_URL + '/web-api/routes').then(
                 res => res.json()
             )
         )
@@ -39,7 +39,7 @@ export const actions = {
 
     async saveRoute({commit, state}, routes) {
         commit('setRoutes', await fetch(
-            state.host + '/web-api/route',
+            state.BASE_URL + '/web-api/route',
             {
                 method: 'PUT',
                 headers: {
@@ -54,7 +54,7 @@ export const actions = {
 
     async deleteRoute({commit, state}, route) {
         commit('setRoutes', await fetch(
-            state.host + '/web-api/route',
+            state.BASE_URL + '/web-api/route',
             {
                 method: 'DELETE',
                 headers: {
@@ -68,12 +68,12 @@ export const actions = {
     },
 
     newRoute({commit}) {
-        commit('addRoute', {type: 'REST', method: 'GET', path: '/', suffix: ''});
+        commit('addRoute', {group: '', type: 'REST', method: 'GET', path: '/', suffix: '', new: true});
     },
 
     async fetchConfig({commit, state}) {
         commit('setConfig',
-            await fetch(state.host + '/web-api/config').then(
+            await fetch(state.BASE_URL + '/web-api/config').then(
                 res => res.json()
             )
         )
@@ -82,7 +82,7 @@ export const actions = {
     async saveConfig({commit, state}, config) {
         commit('setConfig', config);
         await fetch(
-            state.host + '/web-api/config',
+            state.BASE_URL + '/web-api/config',
             {
                 method: 'PUT',
                 headers: {
