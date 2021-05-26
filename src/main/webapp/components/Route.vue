@@ -117,7 +117,7 @@
         }
     }
 </script>
-<style scoped>
+<style lang="scss" scoped>
     .route-holder {
         display: flex;
         flex-wrap: wrap;
@@ -136,14 +136,14 @@
         padding: .8rem .5rem;
         vertical-align: top;
         text-align: center;
-    }
 
-    .route-field.w2 {
-        flex: 2;
-    }
+        &.w2 {
+            flex: 2;
+        }
 
-    .route-field.w3 {
-        flex: 3;
+        &.w3 {
+            flex: 3;
+        }
     }
 
     .route-field-header {
@@ -161,11 +161,11 @@
         width: 100%;
         text-align: center;
         word-wrap: break-word;
-    }
 
-    .route-field-value.link:hover {
-        cursor: pointer;
-        text-decoration: underline;
+        &.link:hover {
+            cursor: pointer;
+            text-decoration: underline;
+        }
     }
 
     .route-field-memo {
@@ -195,20 +195,13 @@
         text-align: center;
     }
 
-    .new-route {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        width: 1.5rem;
-    }
-
     @media screen and (max-width: 1599px) {
         .route-field {
             flex: 2;
         }
     }
 
-    @media screen and (max-width: 1099px) /*and (orientation: landscape)*/ {
+    @media screen and (max-width: 1099px) {
         .route-holder {
             margin-bottom: 0.7rem;
             padding: .1rem 0;
