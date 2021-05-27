@@ -10,6 +10,8 @@ import com.mockservice.mockconfig.RouteAlreadyExistsException;
 import com.mockservice.mockconfig.RouteType;
 import com.mockservice.service.model.PlainConfig;
 import com.mockservice.util.ReaderWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -23,13 +25,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,11 +35,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Service
 public class YamlConfigService implements ConfigService {
 
+    private static final Logger log = LoggerFactory.getLogger(YamlConfigService.class);
+
     private final String resourceConfigPath;
     private final String fileConfigPath;
     private Config config;
     private final List<Consumer<Route>> routeCreatedListeners = new ArrayList<>();
-    private final List<BiConsumer<Route, Route>> routeUpdatedListeners = new ArrayList<>();
     private final List<Consumer<Route>> routeDeletedListeners = new ArrayList<>();
 
 
@@ -57,9 +55,11 @@ public class YamlConfigService implements ConfigService {
         try {
             readConfigFromFile();
         } catch (IOException e) {
+            log.warn("Could not read config from file {}. Falling back to resource.", fileConfigPath);
             try {
                 readConfigFromResource();
             } catch (IOException ex) {
+                log.warn("Could not read config from resource {}. Using empty config.", resourceConfigPath);
                 config = new Config();
             }
         }
@@ -142,18 +142,6 @@ public class YamlConfigService implements ConfigService {
     }
 
     @Override
-    public Stream<Route> getRoutesDistinctByPathAndMethod(RouteType type) {
-        return getEnabledRoutes()
-                .filter(route -> type.equals(route.getType()))
-                .filter(distinctByKey(r -> r.getMethod().toString() + r.getPath()));
-    }
-
-    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
-        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
-    }
-
-    @Override
     public Optional<Route> getEnabledRoute(RouteType type, RequestMethod method, String path, String suffix) {
         return getEnabledRoutes()
                 .filter(route -> type.equals(route.getType())
@@ -171,12 +159,11 @@ public class YamlConfigService implements ConfigService {
     @Override
     public List<Route> putRoute(Route route, Route replacement) throws IOException, RouteAlreadyExistsException {
         boolean updated = config.putRoute(route, replacement);
-        saveConfigToFile();
         if (updated) {
-            notifyRouteUpdated(route, replacement);
-        } else {
-            notifyRouteCreated(replacement);
+            notifyRouteDeleted(route);
         }
+        notifyRouteCreated(replacement);
+        saveConfigToFile();
         return getRoutes().collect(Collectors.toList());
     }
 
@@ -184,18 +171,14 @@ public class YamlConfigService implements ConfigService {
     public List<Route> deleteRoute(Route route) throws IOException {
         boolean deleted = config.deleteRoute(route);
         if (deleted) {
-            saveConfigToFile();
             notifyRouteDeleted(route);
+            saveConfigToFile();
         }
         return getRoutes().collect(Collectors.toList());
     }
 
     private void notifyRouteCreated(Route route) {
         routeCreatedListeners.forEach(c -> c.accept(route));
-    }
-
-    private void notifyRouteUpdated(Route route, Route replacement) {
-        routeUpdatedListeners.forEach(c -> c.accept(route, replacement));
     }
 
     private void notifyRouteDeleted(Route route) {
@@ -208,27 +191,7 @@ public class YamlConfigService implements ConfigService {
     }
 
     @Override
-    public void registerRouteUpdatedListener(BiConsumer<Route, Route> listener) {
-        routeUpdatedListeners.add(listener);
-    }
-
-    @Override
     public void registerRouteDeletedListener(Consumer<Route> listener) {
         routeDeletedListeners.add(listener);
-    }
-
-    @Override
-    public void unregisterRouteCreatedListener(Consumer<Route> listener) {
-        routeCreatedListeners.remove(listener);
-    }
-
-    @Override
-    public void unregisterRouteUpdatedListener(BiConsumer<Route, Route> listener) {
-        routeUpdatedListeners.remove(listener);
-    }
-
-    @Override
-    public void unregisterRouteDeletedListener(Consumer<Route> listener) {
-        routeDeletedListeners.remove(listener);
     }
 }

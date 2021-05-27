@@ -1,5 +1,5 @@
 routes:
-- group: ExampleRestService
+- group: Example Rest Service
   path: /api/v2/entity
   method: GET
   type: REST
@@ -8,14 +8,11 @@ routes:
     [
       {"id": ${sequence}, "name": "${random_string}"},
       {"id": ${sequence}, "name": "${of:Java:C++:Python:JavaScript}"},
-      {"id": ${sequence}, "name": "${random_uuid}"},
-      {"id": ${sequence}, "name": "${random_date}"},
-      {"id": ${sequence}, "name": "${random_timestamp}"},
-      {"id": ${sequence}, "name": "${current_date}"},
-      {"id": ${sequence}, "name": "${current_timestamp}"}
+    {"id": ${sequence}, "name": "${of:Java:C++:Python:JavaScript}"},
+    {"id": ${sequence}, "name": "${of:Java:C++:Python:JavaScript}"}
     ]
   disabled: false
-- group: ExampleRestService
+- group: Example Rest Service
   path: /api/v2/entity
   method: GET
   type: REST
@@ -25,7 +22,7 @@ routes:
 
     []
   disabled: false
-- group: ExampleRestService
+- group: Example Rest Service
   path: /api/v2/entity/{id}
   method: GET
   type: REST
@@ -33,7 +30,7 @@ routes:
   response: |-
     {"id": ${id}, "name": "entity name"}
   disabled: false
-- group: ExampleRestService
+- group: Example Rest Service
   path: /api/v2/entity/filter
   method: GET
   type: REST
@@ -44,7 +41,7 @@ routes:
       {"id": 3, "name": "${b:${of:default B1:default B2:default B3}}"}
     ]
   disabled: false
-- group: ExampleRestService
+- group: Example Rest Service
   path: /api/v2/entity
   method: POST
   type: REST
@@ -55,7 +52,7 @@ routes:
 
     {"id": ${random_int}, "name": "${name}"}
   disabled: false
-- group: ExampleSoapService
+- group: Example Soap Service
   path: /mockNumberConversion2
   method: POST
   type: SOAP

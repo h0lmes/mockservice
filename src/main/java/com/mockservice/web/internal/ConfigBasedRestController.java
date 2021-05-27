@@ -11,19 +11,22 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
-public class ConfigBasedRestController {
+public class ConfigBasedRestController implements RouteRegisteringController {
 
     private static final Logger log = LoggerFactory.getLogger(ConfigBasedRestController.class);
 
     private final MockService mockService;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
     private final ConfigService configService;
+    private Method mockMethod = null;
+    private final Map<String, Integer> registeredRoutes = new ConcurrentHashMap<>();
 
     public ConfigBasedRestController(@Qualifier("rest") MockService mockService,
                                      RequestMappingHandlerMapping requestMappingHandlerMapping,
@@ -33,66 +36,36 @@ public class ConfigBasedRestController {
         this.configService = configService;
 
         try {
+            mockMethod = this.getClass().getMethod("mock");
+        } catch (NoSuchMethodException e) {
+            log.error("", e);
+        }
+
+        try {
             register();
         } catch (Exception e) {
             log.error("Failed to register configured routes.", e);
         }
     }
 
+    @Override
+    public RouteType getType() {
+        return RouteType.REST;
+    }
+
     private void register() {
-        configService.getRoutesDistinctByPathAndMethod(RouteType.REST)
-                .forEach(this::registerRoute);
+        configService.getRoutes().forEach(this::registerRoute);
 
-        configService.registerRouteCreatedListener(this::routeCreated);
-        configService.registerRouteUpdatedListener(this::routeUpdated);
-        configService.registerRouteDeletedListener(this::routeDeleted);
+        configService.registerRouteCreatedListener(this::registerRoute);
+        configService.registerRouteDeletedListener(this::unregisterRoute);
     }
 
-    private void routeCreated(Route route) {
-        if (RouteType.REST.equals(route.getType())) {
-            registerRoute(route);
-        }
-    }
-
-    private void routeUpdated(Route route, Route replacement) {
-        if (RouteType.REST.equals(route.getType())) {
-            unregisterRoute(route);
-            mockService.cacheRemove(route);
-        }
-        if (RouteType.REST.equals(replacement.getType())) {
-            registerRoute(replacement);
-        }
-    }
-
-    private void routeDeleted(Route route) {
-        if (RouteType.REST.equals(route.getType())) {
-            unregisterRoute(route);
-            mockService.cacheRemove(route);
-        }
-    }
-
-    @SuppressWarnings("Duplicates")
     private void registerRoute(Route route) {
-        try {
-            if (!route.getDisabled()) {
-                Method method = this.getClass().getMethod("mock");
-                RequestMappingInfo mappingInfo = RequestMappingInfo
-                        .paths(route.getPath())
-                        .methods(route.getMethod())
-                        .build();
-                requestMappingHandlerMapping.registerMapping(mappingInfo, this, method);
-            }
-        } catch (NoSuchMethodException e) {
-            log.error("", e);
-        }
+        this.registerRouteInt(route, registeredRoutes, mockMethod, requestMappingHandlerMapping, log);
     }
 
     private void unregisterRoute(Route route) {
-        RequestMappingInfo mappingInfo = RequestMappingInfo
-                .paths(route.getPath())
-                .methods(route.getMethod())
-                .build();
-        requestMappingHandlerMapping.unregisterMapping(mappingInfo);
+        this.unregisterRouteInt(route, registeredRoutes, requestMappingHandlerMapping, mockService, log);
     }
 
     public ResponseEntity<String> mock() {
