@@ -21,7 +21,7 @@
             }
         },
         async fetch() {
-            this.fetchRoutes();
+            return this.fetchRoutes();
         },
         methods: {
             ...mapActions({

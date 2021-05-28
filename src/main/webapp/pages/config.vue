@@ -1,5 +1,9 @@
 <template>
     <div class="monospace">
+
+        <p v-if="$fetchState.pending">Loading...</p>
+        <p v-else-if="lastError"></p>
+
         <p class="danger">Use with caution!</p>
         <p class="danger mb-5">It is easy to ruin config by editing it as plain text.</p>
         <textarea class="form-control form-control-sm v-resize" rows="16" v-model="config.data"></textarea>
@@ -7,10 +11,11 @@
             <div class="btn btn-sm btn-danger mr-3" @click="save">SAVE TO SERVER</div>
             <div class="btn btn-sm btn-primary mr-3" @click="saveAsFile">DOWNLOAD</div>
         </div>
+
     </div>
 </template>
 <script>
-    import { mapActions } from 'vuex';
+    import {mapActions} from 'vuex';
 
     function handleError(response) {
         if (!response.ok) {
@@ -27,11 +32,14 @@
             }
         },
         async fetch() {
-            this.fetchConfig();
+            return this.fetchConfig();
         },
         computed: {
             BASE_URL() {
                 return this.$store.state.BASE_URL
+            },
+            lastError() {
+                return this.$store.state.lastError
             }
         },
         methods: {
@@ -48,18 +56,14 @@
             },
 
             fetchConfig() {
-                fetch(
+                this.resetLastError();
+                return fetch(
                     this.BASE_URL + '/web-api/config'
-                ).then(
-                    handleError
+                ).then(handleError
+                ).then(response => response.json()
                 ).then(response => {
-                    return response.json();
-                }).then(response => {
                     this.config = response;
-                }).catch(error => {
-                    console.log('Error: ', error);
-                    this.setLastError(error);
-                });
+                }).catch(error => this.setLastError(error));
             },
 
             saveConfig() {
@@ -89,7 +93,7 @@
             },
 
             saveTextAsFile(text, fileName) {
-                let blob = new Blob([text], {type:'text/plain'});
+                let blob = new Blob([text], {type: 'text/plain'});
                 let link = document.createElement("a");
                 link.download = fileName;
                 link.innerHTML = "Download File";

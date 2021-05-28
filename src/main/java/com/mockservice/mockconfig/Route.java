@@ -159,7 +159,7 @@ public class Route implements Comparable<Route> {
 
     @Override
     public String toString() {
-        return String.format("(group=%s, path=%s, method=%s, type=%s, suffix=%s, disabled=%s)", group, path, method, type, suffix, disabled);
+        return String.format("(group=%s, type=%s, method=%s, path=%s, suffix=%s, disabled=%s)", group, type, method, path, suffix, disabled);
     }
 
     @Override

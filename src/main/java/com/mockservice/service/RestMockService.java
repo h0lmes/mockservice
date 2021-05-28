@@ -8,7 +8,7 @@ import com.mockservice.request.RequestFacade;
 import com.mockservice.request.RestRequestFacade;
 import com.mockservice.resource.MockResource;
 import com.mockservice.resource.RestMockResource;
-import com.mockservice.service.model.RestErrorResponse;
+import com.mockservice.web.webapp.ErrorInfo;
 import com.mockservice.template.TemplateEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +83,7 @@ public class RestMockService implements MockService {
     @Override
     public String mockError(Throwable t) {
         try {
-            return new ObjectMapper().writeValueAsString(new RestErrorResponse(t));
+            return new ObjectMapper().writeValueAsString(new ErrorInfo(t));
         } catch (JsonProcessingException e) {
             return "";
         }

@@ -95,7 +95,7 @@
                 this.editing = false;
             },
             del() {
-                if (!!this.route.new) {
+                if (!!this.route._new) {
                     this.deleteRoute(this.route);
                     return;
                 }

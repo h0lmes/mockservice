@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -104,11 +103,13 @@ public class YamlConfigService implements ConfigService {
                     .setData(ReaderWriter.asString(getConfigFile()))
                     .setFile(true);
         } catch (IOException e) {
+            log.warn("Could not read config from file {}. Falling back to resource.", fileConfigPath);
             try {
                 return new PlainConfig()
                         .setData(ReaderWriter.asString(resourceConfigPath))
                         .setResource(true);
             } catch (IOException ex) {
+                log.warn("Could not read config from resource {}. Using empty config.", resourceConfigPath);
                 return new PlainConfig();
             }
         }
@@ -116,7 +117,12 @@ public class YamlConfigService implements ConfigService {
 
     @Override
     public void writeConfigData(PlainConfig config) throws IOException {
-        ReaderWriter.writeFile(getConfigFile(), config.getData());
+        try {
+            ReaderWriter.writeFile(getConfigFile(), config.getData());
+            log.info("Written config to file {}.", fileConfigPath);
+        } catch (IOException e) {
+            throw new IOException("Could not write config to file. " + e.getMessage(), e);
+        }
         unregisterAllRoutes();
         readConfig();
         registerAllRoutes();
@@ -164,7 +170,7 @@ public class YamlConfigService implements ConfigService {
         }
         notifyRouteCreated(replacement);
         saveConfigToFile();
-        return getRoutes().collect(Collectors.toList());
+        return config.getRoutes();
     }
 
     @Override
@@ -174,7 +180,7 @@ public class YamlConfigService implements ConfigService {
             notifyRouteDeleted(route);
             saveConfigToFile();
         }
-        return getRoutes().collect(Collectors.toList());
+        return config.getRoutes();
     }
 
     private void notifyRouteCreated(Route route) {

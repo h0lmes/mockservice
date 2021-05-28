@@ -8,13 +8,10 @@
             <a class="btn btn-link mr-4" @click="setFilter('')">Clear filter</a>
         </p>
         <div class="routes-holder">
-            <p v-if="pending">Loading...</p>
-            <p v-else-if="error">Error while fetching</p>
-            <p v-else-if="routes.empty">
-                No routes found
-            </p>
+            <p v-if="pending" class="mb-3">Loading...</p>
+            <p v-if="routes.empty">No routes found</p>
             <div v-else>
-                <div v-for="(route, index) in filtered" :key="route.type + route.method + route.path + route.suffix">
+                <div v-for="route in filtered" :key="route.type + route.method + route.path + route.suffix">
                     <Route :route="route" @filter="setFilter($event)"></Route>
                 </div>
             </div>

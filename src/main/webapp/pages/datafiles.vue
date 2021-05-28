@@ -21,7 +21,7 @@
             }
         },
         async fetch() {
-            this.fetchDataFiles();
+            return this.fetchDataFiles();
         },
         methods: {
             ...mapActions({

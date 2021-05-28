@@ -25,7 +25,7 @@ public class Config {
         if (!route.equals(replacement)) {
             Route maybeRoute = findRoute(replacement);
             if (maybeRoute != null) {
-                throw new RouteAlreadyExistsException();
+                throw new RouteAlreadyExistsException(replacement);
             }
         }
 

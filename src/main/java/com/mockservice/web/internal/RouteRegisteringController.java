@@ -31,7 +31,7 @@ public interface RouteRegisteringController {
         int regCount = Math.max(0, registeredRoutes.getOrDefault(key, 0));
         registeredRoutes.put(key, regCount + 1);
         if (regCount > 0) {
-            log.info("Register route (skip): {} ", route);
+            log.info("Register route (skip):    {} ", route);
             return;
         }
 

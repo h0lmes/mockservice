@@ -45,6 +45,7 @@
 
         <div class="page-wrapper">
             <div id="page-contents">
+                <ErrorPanel></ErrorPanel>
                 <Nuxt/>
             </div>
         </div>
@@ -52,8 +53,9 @@
 </template>
 <script>
     import ColorModePicker from "../components/ColorModePicker";
+    import ErrorPanel from "../components/ErrorPanel";
     export default {
-        components: {ColorModePicker},
+        components: {ErrorPanel, ColorModePicker},
         methods: {
             toggleSidebar() {
                 let page = document.querySelector('#page');

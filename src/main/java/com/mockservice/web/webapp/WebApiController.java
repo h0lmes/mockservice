@@ -5,7 +5,6 @@ import com.mockservice.mockconfig.RouteAlreadyExistsException;
 import com.mockservice.service.ConfigService;
 import com.mockservice.service.ResourceService;
 import com.mockservice.service.model.PlainConfig;
-import com.mockservice.service.model.RestErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -42,17 +41,14 @@ public class WebApiController {
 
     @PutMapping("route")
     public List<Route> putRoute(@RequestBody List<Route> routes) throws IOException, RouteAlreadyExistsException {
-        if (routes == null || routes.size() < 2) {
-            throw new IllegalArgumentException();
+        if (routes.size() != 2) {
+            throw new IllegalArgumentException("There must be exactly 2 routes, the old and the new one.");
         }
         return configService.putRoute(routes.get(0), routes.get(1));
     }
 
     @DeleteMapping("route")
     public List<Route> deleteRoute(@RequestBody Route route) throws IOException {
-        if (route == null) {
-            throw new IllegalArgumentException();
-        }
         return configService.deleteRoute(route);
     }
 
@@ -67,10 +63,18 @@ public class WebApiController {
     }
 
     @ExceptionHandler
-    protected ResponseEntity<RestErrorResponse> handleException(Throwable t) {
-        log.error("", t);
+    protected ResponseEntity<ErrorInfo> handleRouteAlreadyExistsException(RouteAlreadyExistsException e) {
+        log.error(e.getMessage());
         return ResponseEntity
                 .badRequest()
-                .body(new RestErrorResponse(t));
+                .body(new ErrorInfo(e));
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<ErrorInfo> handleException(Exception e) {
+        log.error("", e);
+        return ResponseEntity
+                .badRequest()
+                .body(new ErrorInfo(e));
     }
 }

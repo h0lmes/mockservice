@@ -3,6 +3,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+/logs/
 src/main/resources/webapp/*
 
 src/main/webapp/node_modules/
