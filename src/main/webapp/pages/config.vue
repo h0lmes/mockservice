@@ -6,7 +6,7 @@
 
         <p class="danger">Use with caution!</p>
         <p class="danger mb-5">It is easy to ruin config by editing it as plain text.</p>
-        <textarea class="form-control form-control-sm v-resize" rows="16" v-model="config.data"></textarea>
+        <textarea class="form-control form-control-sm v-resize" rows="16" v-model="config"></textarea>
         <div class="buttons mt-5">
             <div class="btn btn-sm btn-danger mr-3" @click="save">SAVE TO SERVER</div>
             <div class="btn btn-sm btn-primary mr-3" @click="saveAsFile">DOWNLOAD</div>
@@ -17,9 +17,13 @@
 <script>
     import {mapActions} from 'vuex';
 
-    function handleError(response) {
+    async function handleError(response) {
+        if (response.status === 400) {
+            const errorInfo = await response.json();
+            throw Error(errorInfo.message || errorInfo);
+        }
         if (!response.ok) {
-            throw Error(response.statusText);
+            throw Error(response.statusText || response);
         }
         return response;
     }
@@ -28,7 +32,7 @@
         name: "config",
         data() {
             return {
-                config: {}
+                config: ''
             }
         },
         async fetch() {
@@ -44,52 +48,40 @@
         },
         methods: {
             ...mapActions({
-                fetchConfig: 'fetchConfig',
                 setLastError: 'setLastError',
                 resetLastError: 'resetLastError'
             }),
 
-            save() {
+            async save() {
                 if (confirm('Ye be warned =)')) {
-                    this.saveConfig();
+                    await this.saveConfig();
                 }
             },
 
             fetchConfig() {
                 this.resetLastError();
-                return fetch(
-                    this.BASE_URL + '/web-api/config'
+                return fetch(this.BASE_URL + '/web-api/config'
                 ).then(handleError
-                ).then(response => response.json()
-                ).then(response => {
-                    this.config = response;
-                }).catch(error => this.setLastError(error));
+                ).then(response => response.text()
+                ).then(response => this.config = response
+                ).catch(error => this.setLastError(error));
             },
 
             saveConfig() {
-                fetch(
-                    this.BASE_URL + '/web-api/config',
+                return fetch(this.BASE_URL + '/web-api/config',
                     {
                         method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(this.config)
+                        headers: {'Content-Type': 'text/plain'},
+                        body: this.config
                     }
-                ).then(
-                    handleError
-                ).then(response => {
-                    return response.text();
-                }).then(response => {
-                    this.resetLastError();
-                }).catch(error => {
-                    console.log('Error: ', error);
-                    this.setLastError(error);
-                });
+                ).then(handleError
+                ).then(response => response.text()
+                ).then(this.resetLastError()
+                ).catch(error => this.setLastError(error));
             },
 
             saveAsFile() {
-                this.saveTextAsFile(this.config.data, 'config.yml')
+                this.saveTextAsFile(this.config, 'config.yml')
             },
 
             saveTextAsFile(text, fileName) {

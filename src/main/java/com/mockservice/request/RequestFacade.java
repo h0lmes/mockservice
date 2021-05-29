@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.Map;
 
 public interface RequestFacade {
-    String getMethod();
     RequestMethod getRequestMethod();
     String getEndpoint();
     String getSuffix();

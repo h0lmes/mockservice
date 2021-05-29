@@ -10,10 +10,10 @@ There is NO support for WSDL/XSD.
 #
 ### Where to start
 
-Refer to README in `src/main/webapp` for instructions on how to build application.
+Refer to README in `src/main/webapp` for instructions on how to build web application.
 
 #
-### Response of a Route
+### Route Response
 
 Response can contain any JSON or XML (any textual data actually).
 
@@ -32,18 +32,17 @@ Examples:
 or
 
     {"message": "Internal error"}
-
     HTTP/1.1 400
     Custom-Header: header value
 
 #
-### Suffix of a Route
+### Route Suffix
 
 Suffixes allow you to create multiple responses for a single path.
 
 To select a particular response send `Mock-Suffix` header in HTTP request.
 Multiple `Mock-Suffix` headers supported per HTTP request.
-Each header defines exactly one suffix.
+Each header should define exactly one suffix.
 
 Header format:
 
@@ -53,8 +52,8 @@ Example:
 
     Mock-Suffix: api-v1-item-{id}/invalid_format
 
-In the example above if you call an endpoint `GET /api/v1/item/{id}`
-then the Route with suffix `invalid_format` would be triggered.
+In the example above if you call an endpoint `/api/v1/item/{id}`
+then the Route with the `invalid_format` suffix would match.
 
 #
 ### Predefined variables
@@ -72,23 +71,23 @@ List of predefined variables:
 - `${random_uuid}` - random UUID
 - `${random_string}` - a string of 20 random characters in `[a-z]`
 - `${random_string:min:max}` - a string of `min` to `max` random characters in `[a-z]`
-- `${of:str1:str2:...}` - a random of given arguments (may be useful to represent enum values)
 - `${random_date}` - random date in yyyy-MM-dd format
 - `${random_timestamp}` - random timestamp in yyyy-MM-dd HH:mm:ss.SSS format
 - `${current_date}` - current date in yyyy-MM-dd format
 - `${current_timestamp}` - current timestamp in yyyy-MM-dd HH:mm:ss.SSS format.
+- `${of:str1:str2:...}` - a random of given arguments (may be useful to represent enum values)
 
 #
 ### Provided variables
 
 You can use variables which are provided on a per-request basis.
 
-Variables have the following format in Response:
+Format:
 
     ${var_name}
     ${var_name:default_value}
 
-Service makes available variables from the following sources:
+Variables are collected from the following sources:
 
 1. Path variables (example `api/v1/account/{id}`).
 2. Request parameters (example `api/v1/account?id=1`).

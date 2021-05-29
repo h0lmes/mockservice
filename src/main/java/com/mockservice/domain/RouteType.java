@@ -1,4 +1,4 @@
-package com.mockservice.mockconfig;
+package com.mockservice.domain;
 
 public enum RouteType {
     REST(".json"),

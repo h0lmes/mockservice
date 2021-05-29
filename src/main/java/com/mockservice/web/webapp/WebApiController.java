@@ -1,9 +1,9 @@
 package com.mockservice.web.webapp;
 
-import com.mockservice.mockconfig.Route;
-import com.mockservice.mockconfig.RouteAlreadyExistsException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mockservice.domain.Route;
+import com.mockservice.domain.RouteAlreadyExistsException;
 import com.mockservice.service.ConfigService;
-import com.mockservice.model.PlainConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -45,18 +45,18 @@ public class WebApiController {
     }
 
     @GetMapping("config")
-    public PlainConfig config() {
+    public String config() throws JsonProcessingException {
         return configService.getConfigData();
     }
 
     @PutMapping("config")
-    public void putConfig(@RequestBody PlainConfig config) throws IOException {
-        configService.writeConfigData(config);
+    public void putConfig(@RequestBody String data) throws IOException {
+        configService.writeConfigData(data);
     }
 
     @ExceptionHandler
     protected ResponseEntity<ErrorInfo> handleRouteAlreadyExistsException(RouteAlreadyExistsException e) {
-        log.error(e.getMessage());
+        log.warn(e.getMessage());
         return ResponseEntity
                 .badRequest()
                 .body(new ErrorInfo(e));

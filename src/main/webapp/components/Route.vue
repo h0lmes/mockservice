@@ -99,7 +99,7 @@
                     this.deleteRoute(this.route);
                     return;
                 }
-                if (confirm('You\'re about to permanently delete a route.\nWe need your confirmation for such a devastating action =)')) {
+                if (confirm('Sure?')) {
                     this.deleteRoute(this.route);
                 }
             },

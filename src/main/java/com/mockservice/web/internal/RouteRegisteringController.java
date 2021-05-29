@@ -1,7 +1,7 @@
 package com.mockservice.web.internal;
 
-import com.mockservice.mockconfig.Route;
-import com.mockservice.mockconfig.RouteType;
+import com.mockservice.domain.Route;
+import com.mockservice.domain.RouteType;
 import com.mockservice.service.MockService;
 import org.slf4j.Logger;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;

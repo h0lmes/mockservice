@@ -9,11 +9,11 @@ import java.io.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class ReaderWriter {
+public class FileReaderWriterUtil {
 
     private static final String CLASSPATH = "classpath:";
 
-    private ReaderWriter() {
+    private FileReaderWriterUtil() {
         // private
     }
 

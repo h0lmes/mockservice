@@ -1,15 +1,12 @@
 package com.mockservice.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
-import com.mockservice.mockconfig.Config;
-import com.mockservice.mockconfig.Route;
-import com.mockservice.mockconfig.RouteAlreadyExistsException;
-import com.mockservice.mockconfig.RouteType;
-import com.mockservice.model.PlainConfig;
-import com.mockservice.util.ReaderWriter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.mockservice.domain.Config;
+import com.mockservice.domain.Route;
+import com.mockservice.domain.RouteAlreadyExistsException;
+import com.mockservice.domain.RouteType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,27 +35,29 @@ public class YamlConfigService implements ConfigService {
 
     private final String resourceConfigPath;
     private final String fileConfigPath;
-    private Config config;
+    private final ObjectReader yamlReader;
+    private final ObjectWriter yamlWriter;
     private final List<Consumer<Route>> routeCreatedListeners = new ArrayList<>();
     private final List<Consumer<Route>> routeDeletedListeners = new ArrayList<>();
+    private Config config;
 
 
     public YamlConfigService(@Value("${application.config.resource}") String resourceConfigPath,
-                             @Value("${application.config.file}") String fileConfigPath) {
+                             @Value("${application.config.file}") String fileConfigPath,
+                             YamlReaderWriterService yamlReaderWriterService) {
         this.resourceConfigPath = resourceConfigPath;
         this.fileConfigPath = fileConfigPath;
-        readConfig();
-    }
+        this.yamlReader = yamlReaderWriterService.reader();
+        this.yamlWriter = yamlReaderWriterService.writer();
 
-    private void readConfig() {
         try {
             readConfigFromFile();
         } catch (IOException e) {
-            log.warn("Could not read config from file {}. Falling back to resource.", fileConfigPath);
+            log.warn("Could not read config from file {}. Falling back to resource.", this.fileConfigPath);
             try {
                 readConfigFromResource();
             } catch (IOException ex) {
-                log.warn("Could not read config from resource {}. Using empty config.", resourceConfigPath);
+                log.error("Could not read config from resource {}. Using empty config.", this.resourceConfigPath);
                 config = new Config();
             }
         }
@@ -69,63 +68,49 @@ public class YamlConfigService implements ConfigService {
     }
 
     private void readConfigFromFile() throws IOException {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        mapper.findAndRegisterModules();
-        config = mapper.readValue(getConfigFile(), Config.class);
-    }
-
-    private void saveConfigToFile() throws IOException {
-        YAMLFactory factory = new YAMLFactory();
-        factory.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER);
-        factory.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES);
-        factory.enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE);
-        factory.disable(YAMLGenerator.Feature.INDENT_ARRAYS);
-        factory.disable(YAMLGenerator.Feature.SPLIT_LINES);
-        ObjectMapper mapper = new ObjectMapper(factory);
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        mapper.writeValue(getConfigFile(), config);
+        config = yamlReader.readValue(getConfigFile(), Config.class);
     }
 
     private void readConfigFromResource() throws IOException {
         ResourceLoader resourceLoader = new DefaultResourceLoader();
         Resource resource = resourceLoader.getResource(resourceConfigPath);
         try (Reader reader = new InputStreamReader(resource.getInputStream(), UTF_8)) {
-            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-            mapper.findAndRegisterModules();
-            config = mapper.readValue(reader, Config.class);
+            config = yamlReader.readValue(reader, Config.class);
         }
     }
 
-    @Override
-    public PlainConfig getConfigData() {
-        try {
-            return new PlainConfig()
-                    .setData(ReaderWriter.asString(getConfigFile()))
-                    .setFile(true);
-        } catch (IOException e) {
-            log.warn("Could not read config from file {}. Falling back to resource.", fileConfigPath);
-            try {
-                return new PlainConfig()
-                        .setData(ReaderWriter.asString(resourceConfigPath))
-                        .setResource(true);
-            } catch (IOException ex) {
-                log.warn("Could not read config from resource {}. Using empty config.", resourceConfigPath);
-                return new PlainConfig();
-            }
-        }
+    private void readConfigFromString(String yaml) throws IOException {
+        config = yamlReader.readValue(yaml, Config.class);
     }
 
-    @Override
-    public void writeConfigData(PlainConfig config) throws IOException {
+    private void trySaveConfigToFile() throws IOException {
         try {
-            ReaderWriter.writeFile(getConfigFile(), config.getData());
-            log.info("Written config to file {}.", fileConfigPath);
+            yamlWriter.writeValue(getConfigFile(), config);
         } catch (IOException e) {
             throw new IOException("Could not write config to file. " + e.getMessage(), e);
         }
-        unregisterAllRoutes();
-        readConfig();
-        registerAllRoutes();
+    }
+
+    private String saveConfigToString() throws JsonProcessingException {
+        return yamlWriter.writeValueAsString(config);
+    }
+
+    @Override
+    public String getConfigData() throws JsonProcessingException {
+        return saveConfigToString();
+    }
+
+    @Override
+    public void writeConfigData(String data) throws IOException {
+        try {
+            unregisterAllRoutes();
+            readConfigFromString(data);
+            registerAllRoutes();
+        } catch (IOException e) {
+            throw new IOException("Could not deserialize config. " + e.getMessage(), e);
+        }
+
+        trySaveConfigToFile();
     }
 
     private void unregisterAllRoutes() {
@@ -143,8 +128,7 @@ public class YamlConfigService implements ConfigService {
 
     @Override
     public Stream<Route> getEnabledRoutes() {
-        return getRoutes()
-                .filter(route -> !route.getDisabled());
+        return getRoutes().filter(route -> !route.getDisabled());
     }
 
     @Override
@@ -169,7 +153,7 @@ public class YamlConfigService implements ConfigService {
             notifyRouteDeleted(route);
         }
         notifyRouteCreated(replacement);
-        saveConfigToFile();
+        trySaveConfigToFile();
         return config.getRoutes();
     }
 
@@ -178,7 +162,7 @@ public class YamlConfigService implements ConfigService {
         boolean deleted = config.deleteRoute(route);
         if (deleted) {
             notifyRouteDeleted(route);
-            saveConfigToFile();
+            trySaveConfigToFile();
         }
         return config.getRoutes();
     }

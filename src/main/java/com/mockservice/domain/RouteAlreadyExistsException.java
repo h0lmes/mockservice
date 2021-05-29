@@ -1,4 +1,4 @@
-package com.mockservice.mockconfig;
+package com.mockservice.domain;
 
 public class RouteAlreadyExistsException extends Exception {
 

@@ -1,6 +1,6 @@
 package com.mockservice.service;
 
-import com.mockservice.mockconfig.Route;
+import com.mockservice.domain.Route;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Map;

@@ -1,9 +1,9 @@
 package com.mockservice.service;
 
-import com.mockservice.mockconfig.Route;
-import com.mockservice.mockconfig.RouteAlreadyExistsException;
-import com.mockservice.mockconfig.RouteType;
-import com.mockservice.model.PlainConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mockservice.domain.Route;
+import com.mockservice.domain.RouteAlreadyExistsException;
+import com.mockservice.domain.RouteType;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.IOException;
@@ -13,8 +13,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public interface ConfigService {
-    PlainConfig getConfigData();
-    void writeConfigData(PlainConfig config) throws IOException;
+    String getConfigData() throws JsonProcessingException;
+    void writeConfigData(String data) throws IOException;
     Stream<Route> getRoutes();
     Stream<Route> getEnabledRoutes();
     Optional<Route> getEnabledRoute(RouteType routeType, RequestMethod method, String path, String suffix);

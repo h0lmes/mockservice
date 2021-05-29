@@ -2,8 +2,8 @@ package com.mockservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mockservice.mockconfig.Route;
-import com.mockservice.mockconfig.RouteType;
+import com.mockservice.domain.Route;
+import com.mockservice.domain.RouteType;
 import com.mockservice.request.RequestFacade;
 import com.mockservice.request.RestRequestFacade;
 import com.mockservice.resource.MockResource;

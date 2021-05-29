@@ -1,4 +1,4 @@
-package com.mockservice.mockconfig;
+package com.mockservice.domain;
 
 import org.springframework.web.bind.annotation.RequestMethod;
 

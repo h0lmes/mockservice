@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractRequestFacade implements RequestFacade {
 
     private static final String REQUEST_MAPPING_DELIMITER = "/";
-    public static final String NAME_DELIMITER = "-";
+    private static final String NAME_DELIMITER = "-";
     private static final String SUFFIX_HEADER = "Mock-Suffix";
     private static final String VARIABLE_HEADER = "Mock-Variable";
     private static final String HEADER_SPLIT = "/";
@@ -40,18 +40,9 @@ public abstract class AbstractRequestFacade implements RequestFacade {
         return endpoint.toLowerCase();
     }
 
-    HttpServletRequest getRequest() {
-        return request;
-    }
-
-    @Override
-    public String getMethod() {
-        return getRequest().getMethod().toLowerCase();
-    }
-
     @Override
     public RequestMethod getRequestMethod() {
-        return RequestMethod.valueOf(getRequest().getMethod());
+        return RequestMethod.valueOf(request.getMethod());
     }
 
     @Override

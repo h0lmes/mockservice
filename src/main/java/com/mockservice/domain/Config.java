@@ -1,4 +1,4 @@
-package com.mockservice.mockconfig;
+package com.mockservice.domain;
 
 import java.util.ArrayList;
 import java.util.List;
