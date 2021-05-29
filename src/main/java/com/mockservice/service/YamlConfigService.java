@@ -8,7 +8,7 @@ import com.mockservice.mockconfig.Config;
 import com.mockservice.mockconfig.Route;
 import com.mockservice.mockconfig.RouteAlreadyExistsException;
 import com.mockservice.mockconfig.RouteType;
-import com.mockservice.service.model.PlainConfig;
+import com.mockservice.model.PlainConfig;
 import com.mockservice.util.ReaderWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

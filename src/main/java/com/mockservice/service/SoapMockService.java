@@ -17,7 +17,6 @@ import org.springframework.util.ConcurrentLruCache;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Map;
 
 @Service("soap")
@@ -29,20 +28,17 @@ public class SoapMockService implements MockService {
     private static final String FAULT_MESSAGE_PLACEHOLDER = "${message}";
 
     private final HttpServletRequest request;
-    private final ResourceService resourceService;
     private final TemplateEngine templateEngine;
     private final ConfigService configService;
     private final ConcurrentLruCache<Route, MockResource> resourceCache;
     private String errorBody;
 
     public SoapMockService(HttpServletRequest request,
-                           ResourceService resourceService,
                            TemplateEngine templateEngine,
                            ConfigService configService,
                            @Value("${application.cache.soap-resource}") int cacheSizeLimit,
                            @Value("${application.soap-error-data-file}") String soapErrorDataFile) {
         this.request = request;
-        this.resourceService = resourceService;
         this.templateEngine = templateEngine;
         this.configService = configService;
         resourceCache = new ConcurrentLruCache<>(cacheSizeLimit, this::loadResource);
@@ -56,12 +52,9 @@ public class SoapMockService implements MockService {
     }
 
     private MockResource loadResource(Route route) {
-        Route configuredRoute = configService.getEnabledRoute(route).orElse(null);
-        try {
-            return new SoapMockResource(templateEngine, configuredRoute == null ? resourceService.load(route) : configuredRoute.getResponse());
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        return configService.getEnabledRoute(route)
+                .map(r -> new SoapMockResource(templateEngine, r.getResponse()))
+                .orElse(null);
     }
 
     @Override

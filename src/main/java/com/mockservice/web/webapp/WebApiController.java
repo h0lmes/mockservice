@@ -3,8 +3,7 @@ package com.mockservice.web.webapp;
 import com.mockservice.mockconfig.Route;
 import com.mockservice.mockconfig.RouteAlreadyExistsException;
 import com.mockservice.service.ConfigService;
-import com.mockservice.service.ResourceService;
-import com.mockservice.service.model.PlainConfig;
+import com.mockservice.model.PlainConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -21,17 +20,10 @@ public class WebApiController {
 
     private static final Logger log = LoggerFactory.getLogger(WebApiController.class);
 
-    private final ResourceService resourceService;
     private final ConfigService configService;
 
-    public WebApiController(ResourceService resourceService, ConfigService configService) {
-        this.resourceService = resourceService;
+    public WebApiController(ConfigService configService) {
         this.configService = configService;
-    }
-
-    @GetMapping("datafiles")
-    public List<Route> dataFiles() {
-        return resourceService.files();
     }
 
     @GetMapping("routes")

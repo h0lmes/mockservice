@@ -1,14 +1,10 @@
 export const state = () => ({
     BASE_URL: location.protocol + '//' + location.hostname + ':8081',
-    datafiles: [],
     routes: [],
     lastError: ''
 });
 
 export const mutations = {
-    setDataFiles(state, payload) {
-        state.datafiles = payload
-    },
     setRoutes(state, payload) {
         state.routes = payload;
     },
@@ -44,16 +40,6 @@ export const actions = {
         commit('resetLastError');
     },
 
-    async fetchDataFiles({commit, state}) {
-        commit('resetLastError');
-        return fetch(
-            state.BASE_URL + '/web-api/datafiles'
-        ).then(handleError
-        ).then(response => response.json()
-        ).then(response => commit('setDataFiles', response)
-        ).catch(error => commit('setLastError', error));
-    },
-
     async fetchRoutes({commit, state}) {
         commit('resetLastError');
         return fetch(
@@ -63,7 +49,6 @@ export const actions = {
         ).then(response => commit('setRoutes', response)
         ).catch(error => commit('setLastError', error));
     },
-
     async saveRoute({commit, state}, routes) {
         commit('resetLastError');
         return fetch(
@@ -78,7 +63,6 @@ export const actions = {
         ).then(response => commit('setRoutes', response)
         ).catch(error => commit('setLastError', error));
     },
-
     async deleteRoute({commit, state}, route) {
         commit('resetLastError');
         return fetch(
@@ -93,7 +77,6 @@ export const actions = {
         ).then(response => commit('setRoutes', response)
         ).catch(error => commit('setLastError', error));
     },
-
     newRoute({commit}) {
         commit('addRoute', {group: '', type: 'REST', method: 'GET', path: '/', suffix: '', _new: true});
     },

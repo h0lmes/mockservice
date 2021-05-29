@@ -1,9 +1,0 @@
-[
-  {"id": ${sequence}, "name": "${random_string}"},
-  {"id": ${sequence}, "name": "${of:Java:C++:Python:JavaScript}"},
-  {"id": ${sequence}, "name": "${random_uuid}"},
-  {"id": ${sequence}, "name": "${random_date}"},
-  {"id": ${sequence}, "name": "${random_timestamp}"},
-  {"id": ${sequence}, "name": "${current_date}"},
-  {"id": ${sequence}, "name": "${current_timestamp}"}
-]

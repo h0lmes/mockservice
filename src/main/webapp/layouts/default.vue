@@ -14,12 +14,6 @@
                     </NuxtLink>
                 </li>
                 <li>
-                    <NuxtLink to="/datafiles">
-                        <FontAwesomeIcon icon="file-code" class="nav-icon"/>
-                        <span class="nav-label">Data files</span>
-                    </NuxtLink>
-                </li>
-                <li>
                     <NuxtLink to="/scenarios">
                         <FontAwesomeIcon icon="play" class="nav-icon"/>
                         <span class="nav-label">Scenarios</span>

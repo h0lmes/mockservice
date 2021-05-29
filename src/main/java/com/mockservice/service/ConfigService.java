@@ -3,7 +3,7 @@ package com.mockservice.service;
 import com.mockservice.mockconfig.Route;
 import com.mockservice.mockconfig.RouteAlreadyExistsException;
 import com.mockservice.mockconfig.RouteType;
-import com.mockservice.service.model.PlainConfig;
+import com.mockservice.model.PlainConfig;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.IOException;

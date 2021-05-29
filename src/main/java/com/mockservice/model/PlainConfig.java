@@ -1,4 +1,4 @@
-package com.mockservice.service.model;
+package com.mockservice.model;
 
 public class PlainConfig {
 
