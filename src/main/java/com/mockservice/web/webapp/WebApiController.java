@@ -3,6 +3,8 @@ package com.mockservice.web.webapp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteAlreadyExistsException;
+import com.mockservice.domain.Scenario;
+import com.mockservice.domain.ScenarioAlreadyExistsException;
 import com.mockservice.service.ConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +28,19 @@ public class WebApiController {
         this.configService = configService;
     }
 
+    @GetMapping("config")
+    public String getConfig() throws JsonProcessingException {
+        return configService.getConfigData();
+    }
+
+    @PutMapping("config")
+    public void putConfig(@RequestBody String data) throws IOException {
+        configService.writeConfigData(data);
+    }
+
     @GetMapping("routes")
     public List<Route> routes() {
-        return configService.getRoutes().collect(Collectors.toList());
+        return configService.getRoutesAsList();
     }
 
     @PutMapping("routes")
@@ -44,18 +56,34 @@ public class WebApiController {
         return configService.deleteRoute(route);
     }
 
-    @GetMapping("config")
-    public String config() throws JsonProcessingException {
-        return configService.getConfigData();
+    @GetMapping("scenarios")
+    public List<Scenario> scenarios() {
+        return configService.getScenariosAsList();
     }
 
-    @PutMapping("config")
-    public void putConfig(@RequestBody String data) throws IOException {
-        configService.writeConfigData(data);
+    @PutMapping("scenarios")
+    public List<Scenario> putScenario(@RequestBody List<Scenario> scenarios) throws IOException, ScenarioAlreadyExistsException {
+        if (scenarios.size() != 2) {
+            throw new IllegalArgumentException("There must be exactly 2 scenarios, the old and the new one.");
+        }
+        return configService.putScenario(scenarios.get(0), scenarios.get(1));
+    }
+
+    @DeleteMapping("scenarios")
+    public List<Scenario> deleteScenario(@RequestBody Scenario scenario) throws IOException {
+        return configService.deleteScenario(scenario);
     }
 
     @ExceptionHandler
     protected ResponseEntity<ErrorInfo> handleRouteAlreadyExistsException(RouteAlreadyExistsException e) {
+        log.warn(e.getMessage());
+        return ResponseEntity
+                .badRequest()
+                .body(new ErrorInfo(e));
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<ErrorInfo> handleScenarioAlreadyExistsException(ScenarioAlreadyExistsException e) {
         log.warn(e.getMessage());
         return ResponseEntity
                 .badRequest()

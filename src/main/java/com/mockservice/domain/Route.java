@@ -18,6 +18,11 @@ public class Route implements Comparable<Route> {
         // default
     }
 
+    public Route(String method, String path) {
+        this.method = RequestMethod.valueOf(method);
+        this.path = path;
+    }
+
     public String getGroup() {
         return group;
     }
@@ -81,14 +86,14 @@ public class Route implements Comparable<Route> {
         return this;
     }
 
-    public void assignFrom(Route route) {
-        setGroup(route.getGroup());
-        setPath(route.getPath());
-        setMethod(route.getMethod());
-        setType(route.getType());
-        setSuffix(route.getSuffix());
-        setResponse(route.getResponse());
-        setDisabled(route.getDisabled());
+    public void assignFrom(Route source) {
+        setGroup(source.getGroup());
+        setPath(source.getPath());
+        setMethod(source.getMethod());
+        setType(source.getType());
+        setSuffix(source.getSuffix());
+        setResponse(source.getResponse());
+        setDisabled(source.getDisabled());
     }
 
     @Override

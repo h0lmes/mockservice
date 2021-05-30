@@ -3,10 +3,7 @@ package com.mockservice.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.mockservice.domain.Config;
-import com.mockservice.domain.Route;
-import com.mockservice.domain.RouteAlreadyExistsException;
-import com.mockservice.domain.RouteType;
+import com.mockservice.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -80,7 +78,11 @@ public class YamlConfigService implements ConfigService {
     }
 
     private void readConfigFromString(String yaml) throws IOException {
-        config = yamlReader.readValue(yaml, Config.class);
+        try {
+            config = yamlReader.readValue(yaml, Config.class);
+        } catch (IOException e) {
+            throw new IOException("Could not deserialize config. " + e.getMessage(), e);
+        }
     }
 
     private void trySaveConfigToFile() throws IOException {
@@ -102,14 +104,9 @@ public class YamlConfigService implements ConfigService {
 
     @Override
     public void writeConfigData(String data) throws IOException {
-        try {
-            unregisterAllRoutes();
-            readConfigFromString(data);
-            registerAllRoutes();
-        } catch (IOException e) {
-            throw new IOException("Could not deserialize config. " + e.getMessage(), e);
-        }
-
+        unregisterAllRoutes();
+        readConfigFromString(data);
+        registerAllRoutes();
         trySaveConfigToFile();
     }
 
@@ -124,6 +121,11 @@ public class YamlConfigService implements ConfigService {
     @Override
     public Stream<Route> getRoutes() {
         return config.getRoutes().stream();
+    }
+
+    @Override
+    public List<Route> getRoutesAsList() {
+        return new ArrayList<>(config.getRoutes());
     }
 
     @Override
@@ -183,5 +185,26 @@ public class YamlConfigService implements ConfigService {
     @Override
     public void registerRouteDeletedListener(Consumer<Route> listener) {
         routeDeletedListeners.add(listener);
+    }
+
+    @Override
+    public List<Scenario> getScenariosAsList() {
+        return new ArrayList<>(config.getScenarios());
+    }
+
+    @Override
+    public List<Scenario> putScenario(Scenario scenario, Scenario replacement) throws IOException, ScenarioAlreadyExistsException {
+        config.putScenario(scenario, replacement);
+        trySaveConfigToFile();
+        return config.getScenarios();
+    }
+
+    @Override
+    public List<Scenario> deleteScenario(Scenario scenario) throws IOException {
+        boolean deleted = config.deleteScenario(scenario);
+        if (deleted) {
+            trySaveConfigToFile();
+        }
+        return config.getScenarios();
     }
 }
