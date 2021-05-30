@@ -67,16 +67,16 @@
         margin: 0;
         padding: 4px;
         background-color: var(--bg-secondary);
-        color: var(--color-secondary);
+        color: var(--color-primary);
         border: 2px solid transparent;
         border-radius: 5px;
         transition: all 0.1s ease;
     }
     .feather.preferred {
-        border-color: var(--color-primary);
+        border-color: var(--color-secondary);
     }
     .feather.selected {
-        color: var(--color-primary);
+        color: var(--color-secondary);
     }
     .scheme-info {
         font-size: smaller;

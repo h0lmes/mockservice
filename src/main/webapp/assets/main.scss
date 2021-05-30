@@ -1,52 +1,68 @@
 :root {
-  --color: #243746;
-  --color-primary: #158876;
-  --color-secondary: #0e2233;
-  --color-link: #007bff;
-  --color-link-hover: #0056b3;
-  --bg: #f3f5f4;
-  --bg-secondary: #fff;
-  --bg-secondary-hilight: #f2fcff;
-  --border-color: #ddd;
   --blue: #0077ff;
   --indigo: #5f1ce6;
   --purple: #7143bf;
   --pink: #e63e89;
   --red: #dc3545;
   --orange: #fc7c19;
+  --orange-yellow: #e68c17;
   --yellow: #ffb700;
   --green: #29a649;
   --teal: #1dc48d;
   --cyan: #1aaaba;
+  /**/
+  --color-primary: #243746;
+  --color-secondary: #158876;
+  --color-accent-one: var(--orange-yellow);
+  --color-link: #0056b3;
+  --color-link-hover: #007bff;
+  --bg-primary: #f3f5f4;
+  --bg-secondary: #fff;
+  --bg-border: #ddd;
 }
 .dark-mode {
-  --color: #a7b1c2;
-  --color-primary: #6a6d76;
-  --color-secondary: #c0c4d0;
-  --bg: #191b1d;
-  --bg-secondary: #212325;
-  --bg-secondary-hilight: #27292b;
-  --border-color: #212325;
   --blue: #005ab4;
   --indigo: #5624b3;
   --purple: #673eb3;
   --pink: #b3306d;
   --red: #b33642;
   --orange: #b3580e;
+  --orange-yellow: #b36b0e;
   --yellow: #cc9e14;
   --green: #388c49;
   --teal: #1f9974;
   --cyan: #1f8999;
+  /**/
+  --color-primary: #a7b1c2;
+  --color-secondary: #6a6d76;
+  --color-accent-one: var(--yellow);
+  --bg-primary: #191b1d;
+  --bg-secondary: #212325;
+  --bg-border: #212325;
 }
 .sepia-mode {
-  --color: #433422;
-  --color-primary: #792f27;
-  --color-secondary: #504231;
-  --bg: #f1e7d0;
+  --color-primary: #433422;
+  --color-secondary: #792f27;
+  --color-accent-one: var(--teal);
+  --bg-primary: #f1e7d0;
   --bg-secondary: #eae0c9;
-  --bg-secondary-hilight: #d9cdb2;
-  --border-color: #ded0bf;
+  --bg-border: #ded0bf;
 }
+
+.color-primary { color: var(--color-secondary)!important; }
+.color-secondary { color: var(--color-secondary)!important; }
+.color-accent-one { color: var(--color-accent-one)!important; }
+
+.red { color: var(--red)!important; }
+.orange { color: var(--orange)!important; }
+.yellow { color: var(--yellow)!important; }
+.green { color: var(--green)!important; }
+.teal { color: var(--teal)!important; }
+.cyan { color: var(--cyan)!important; }
+.blue { color: var(--blue)!important; }
+.indigo { color: var(--indigo)!important; }
+.purple { color: var(--purple)!important; }
+.pink { color: var(--pink)!important; }
 
 * {
     line-height: 1.2;
@@ -55,8 +71,8 @@
 body {
     font-family: -apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
     font-size: 16px;
-    background-color: var(--bg);
-    color: var(--color);
+    background-color: var(--bg-primary);
+    color: var(--color-primary);
     width: 100%;
     overflow-x: hidden;
 }

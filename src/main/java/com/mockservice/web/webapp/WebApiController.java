@@ -31,7 +31,7 @@ public class WebApiController {
         return configService.getRoutes().collect(Collectors.toList());
     }
 
-    @PutMapping("route")
+    @PutMapping("routes")
     public List<Route> putRoute(@RequestBody List<Route> routes) throws IOException, RouteAlreadyExistsException {
         if (routes.size() != 2) {
             throw new IllegalArgumentException("There must be exactly 2 routes, the old and the new one.");
@@ -39,7 +39,7 @@ public class WebApiController {
         return configService.putRoute(routes.get(0), routes.get(1));
     }
 
-    @DeleteMapping("route")
+    @DeleteMapping("routes")
     public List<Route> deleteRoute(@RequestBody Route route) throws IOException {
         return configService.deleteRoute(route);
     }

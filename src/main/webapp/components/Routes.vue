@@ -11,8 +11,10 @@
             <p v-if="pending" class="mb-3">Loading...</p>
             <p v-if="routes.empty">No routes found</p>
             <div v-else>
-                <div v-for="route in filtered" :key="route.type + route.method + route.path + route.suffix">
-                    <Route :route="route" @filter="setFilter($event)"></Route>
+                <div v-for="(route, index) in filtered" :key="route.type + route.method + route.path + route.suffix">
+                    <Route :route="route"
+                           :groupStart="groupStart(route, index)"
+                           @filter="setFilter($event)"></Route>
                 </div>
             </div>
         </div>
@@ -61,6 +63,9 @@
             setFilter(value) {
                 document.querySelector('#search').value = value;
                 this.query = value.toLowerCase();
+            },
+            groupStart(route, index) {
+                return index === 0 || route.group !== this.filtered[index - 1].group;
             }
         }
     }

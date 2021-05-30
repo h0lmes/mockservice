@@ -1,5 +1,5 @@
 <template>
-    <div class="route-holder">
+    <div class="route-holder" :class="{'group-start' : groupStart}">
 
         <div class="route-field w2">
             <div class="route-field-header">GROUP</div>
@@ -32,7 +32,7 @@
         </div>
         <div class="route-field w2">
             <div class="route-field-header">SUFFIX</div>
-            <div v-show="!editing" class="route-field-value link yellow" @click="filter(route.suffix)">{{ route.suffix }}</div>
+            <div v-show="!editing" class="route-field-value link color-accent-one" @click="filter(route.suffix)">{{ route.suffix }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.suffix"/>
         </div>
         <div class="route-field">
@@ -75,7 +75,8 @@
             }
         },
         props: {
-            route: {type: Object}
+            route: {type: Object},
+            groupStart: {type: Boolean}
         },
         methods: {
             ...mapActions({
@@ -126,6 +127,10 @@
         padding: 0 .3rem;
         border-radius: 5px;
         background-color: var(--bg-secondary);
+
+        &.group-start {
+            border-left: 2px solid var(--color-primary);
+        }
     }
 
     .route-field {
@@ -148,7 +153,7 @@
 
     .route-field-header {
         display: block;
-        color: var(--color-primary);
+        color: var(--color-secondary);
         width: auto;
         margin: 0 auto .5rem;
         text-align: center;
@@ -157,7 +162,7 @@
     .route-field-value {
         cursor: default;
         display: block;
-        color: var(--color-secondary);
+        color: var(--color-primary);
         width: auto;
         margin: 0 auto;
         text-align: center;

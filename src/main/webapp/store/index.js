@@ -52,7 +52,7 @@ export const actions = {
     async saveRoute({commit, state}, routes) {
         commit('resetLastError');
         return fetch(
-            state.BASE_URL + '/web-api/route',
+            state.BASE_URL + '/web-api/routes',
             {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
@@ -66,7 +66,7 @@ export const actions = {
     async deleteRoute({commit, state}, route) {
         commit('resetLastError');
         return fetch(
-            state.BASE_URL + '/web-api/route',
+            state.BASE_URL + '/web-api/routes',
             {
                 method: 'DELETE',
                 headers: {'Content-Type': 'application/json'},
