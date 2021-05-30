@@ -8,8 +8,8 @@ routes:
     [
       {"id": ${sequence}, "name": "${random_string}"},
       {"id": ${sequence}, "name": "${of:Java:C++:Python:JavaScript}"},
-    {"id": ${sequence}, "name": "${of:Java:C++:Python:JavaScript}"},
-    {"id": ${sequence}, "name": "${of:Java:C++:Python:JavaScript}"}
+      {"id": ${sequence}, "name": "${of:Java:C++:Python:JavaScript}"},
+      {"id": ${sequence}, "name": "${of:Java:C++:Python:JavaScript}"}
     ]
   disabled: false
 - group: Example Rest Service
