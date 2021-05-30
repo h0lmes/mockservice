@@ -6,6 +6,7 @@
   --color-link-hover: #0056b3;
   --bg: #f3f5f4;
   --bg-secondary: #fff;
+  --bg-secondary-hilight: #f2fcff;
   --border-color: #ddd;
   --blue: #0077ff;
   --indigo: #5f1ce6;
@@ -24,6 +25,7 @@
   --color-secondary: #c0c4d0;
   --bg: #191b1d;
   --bg-secondary: #212325;
+  --bg-secondary-hilight: #27292b;
   --border-color: #212325;
   --blue: #005ab4;
   --indigo: #5624b3;
@@ -42,6 +44,7 @@
   --color-secondary: #504231;
   --bg: #f1e7d0;
   --bg-secondary: #eae0c9;
+  --bg-secondary-hilight: #d9cdb2;
   --border-color: #ded0bf;
 }
 
@@ -50,7 +53,7 @@
     margin: 0;
 }
 body {
-    font-family: Quicksand,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+    font-family: -apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
     font-size: 16px;
     background-color: var(--bg);
     color: var(--color);

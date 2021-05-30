@@ -1,8 +1,8 @@
 :root {
     --color-nav: #b9c1c7;
     --color-nav-active: white;
-    --bg-nav: #2b343d;
-    --bg-nav-active: #333d47;
+    --bg-nav: #3a3f45;
+    --bg-nav-active: #40454d;
     --bg-nav-accent: #158876;
     --bg-nav-accent-active: #18a28d;
 }
@@ -32,7 +32,7 @@
 }
 @media screen and (max-width: 1099px) /*and (orientation: landscape)*/ {
     #page-contents {
-        padding: 2rem .5rem;
+        padding: 1rem .5rem;
     }
 }
 

@@ -32,7 +32,7 @@
         </div>
         <div class="route-field w2">
             <div class="route-field-header">SUFFIX</div>
-            <div v-show="!editing" class="route-field-value link" @click="filter(route.suffix)">{{ route.suffix }}</div>
+            <div v-show="!editing" class="route-field-value link yellow" @click="filter(route.suffix)">{{ route.suffix }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.suffix"/>
         </div>
         <div class="route-field">
@@ -122,8 +122,8 @@
         display: flex;
         flex-wrap: wrap;
         font-size: smaller;
-        margin-bottom: 1.1rem;
-        padding: .1rem .3rem;
+        margin-bottom: 1rem;
+        padding: 0 .3rem;
         border-radius: 5px;
         background-color: var(--bg-secondary);
     }
@@ -149,8 +149,8 @@
     .route-field-header {
         display: block;
         color: var(--color-primary);
-        width: 100%;
-        margin-bottom: .5rem;
+        width: auto;
+        margin: 0 auto .5rem;
         text-align: center;
     }
 
@@ -158,7 +158,8 @@
         cursor: default;
         display: block;
         color: var(--color-secondary);
-        width: 100%;
+        width: auto;
+        margin: 0 auto;
         text-align: center;
         word-wrap: break-word;
 
@@ -180,7 +181,7 @@
         cursor: default;
         box-sizing: border-box;
         margin: 0;
-        padding: 1.1rem .3rem 0.9rem;
+        padding: 1rem .3rem 0.9rem;
         vertical-align: top;
         text-align: center;
     }
