@@ -9,11 +9,11 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import org.springframework.stereotype.Service;
 
 @Service
-public class YamlReaderWriterService {
+public class YamlMapperService {
 
     private final ObjectMapper mapper;
 
-    public YamlReaderWriterService() {
+    public YamlMapperService() {
         this.mapper = getObjectMapper();
     }
 

@@ -1,69 +1,69 @@
 routes:
-- group: Example Rest Service
-  path: /api/v2/entity
+- group: -robot-
+  path: /api/robot
   method: GET
   type: REST
-  suffix: null
-  response: |-
-    [
-      {"id": ${sequence}, "name": "${random_string}"},
-      {"id": ${sequence}, "name": "${of:Java:C++:Python:JavaScript}"},
-      {"id": ${sequence}, "name": "${of:Java:C++:Python:JavaScript}"},
-      {"id": ${sequence}, "name": "${of:Java:C++:Python:JavaScript}"}
-    ]
+  suffix: ""
+  response: "{\"name\": \"Johnny 5\"}"
+  disabled: false
+- group: -robot-
+  path: /api/robot
+  method: GET
+  type: REST
+  suffix: R2D2
+  response: "{\"name\": \"R2D2\"}"
+  disabled: false
+- group: -robot-
+  path: /api/robot
+  method: GET
+  type: REST
+  suffix: terminator
+  response: "{\"name\": \"terminator\"}"
   disabled: false
 - group: Example Rest Service
   path: /api/v2/entity
   method: GET
   type: REST
-  suffix: error
-  response: |-
-    HTTP/1.1 400
-
-    []
+  suffix: ""
+  response: "[\n  {\"id\": ${sequence}, \"name\": \"${random_string}\"},\n  {\"id\": ${sequence}, \"name\": \"${of:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${of:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${of:Java:C++:Python:JavaScript}\"}\n]"
   disabled: false
 - group: Example Rest Service
-  path: /api/v2/entity/{id}
+  path: /api/v2/entity
   method: GET
   type: REST
-  suffix: null
-  response: |-
-    {"id": ${id}, "name": "entity name"}
+  suffix: 400
+  response: "HTTP/1.1 400\n\n[]"
   disabled: false
 - group: Example Rest Service
   path: /api/v2/entity/filter
   method: GET
   type: REST
-  suffix: null
-  response: |-
-    [
-      {"id": 2, "name": "${a:default a}"},
-      {"id": 3, "name": "${b:${of:default B1:default B2:default B3}}"}
-    ]
+  suffix: ""
+  response: "[\n  {\"id\": 2, \"name\": \"${a:default a}\"},\n  {\"id\": 3, \"name\": \"${b:${of:default B1:default B2:default B3}}\"}\n]"
+  disabled: false
+- group: Example Rest Service
+  path: "/api/v2/entity/{id}"
+  method: GET
+  type: REST
+  suffix: ""
+  response: "{\"id\": ${id}, \"name\": \"entity name\"}"
   disabled: false
 - group: Example Rest Service
   path: /api/v2/entity
   method: POST
   type: REST
-  suffix: null
-  response: |-
-    HTTP/1.1 201
-    Custom-Header: entity-created
-
-    {"id": ${random_int}, "name": "${name}"}
+  suffix: ""
+  response: "HTTP/1.1 201\nCustom-Header: entity-created\n\n{\"id\": ${random_int}, \"name\": \"${name}\"}"
   disabled: false
 - group: Example Soap Service
-  path: /mockNumberConversion2
+  path: /mockNumberConversion
   method: POST
   type: SOAP
-  suffix: null
-  response: |-
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://www.dataaccess.com/webservicesserver/">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <web:NumberToDollarsResponse>
-          <web:NumberToDollarsResult>${random_string_of:TEST1:TEST2}</web:NumberToDollarsResult>
-        </web:NumberToDollarsResponse>
-      </soapenv:Body>
-    </soapenv:Envelope>
+  suffix: ""
+  response: "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:web=\"http://www.dataaccess.com/webservicesserver/\">\n  <soapenv:Header/>\n  <soapenv:Body>\n    <web:NumberToDollarsResponse>\n      <web:NumberToDollarsResult>${random_string_of:TEST1:TEST2}</web:NumberToDollarsResult>\n    </web:NumberToDollarsResponse>\n  </soapenv:Body>\n</soapenv:Envelope>"
   disabled: false
+scenarios:
+- group: Default
+  alias: test
+  type: MAP
+  data: ""

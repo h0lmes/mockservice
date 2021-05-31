@@ -1,13 +1,15 @@
 package com.mockservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
 import com.mockservice.request.RequestFacade;
-import com.mockservice.request.SoapRequestFacade;
+import com.mockservice.request.RestRequestFacade;
 import com.mockservice.resource.MockResource;
-import com.mockservice.resource.SoapMockResource;
+import com.mockservice.resource.RestMockResource;
 import com.mockservice.template.TemplateEngine;
-import com.mockservice.util.FileReaderWriterUtil;
+import com.mockservice.web.webapp.ErrorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,44 +18,34 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.Map;
 
-@Service("soap")
-public class SoapMockService implements MockService {
+@Service("rest")
+public class MockRestService implements MockService {
 
-    private static final Logger log = LoggerFactory.getLogger(SoapMockService.class);
-
-    private static final String FAULT_CODE_PLACEHOLDER = "${code}";
-    private static final String FAULT_MESSAGE_PLACEHOLDER = "${message}";
+    private static final Logger log = LoggerFactory.getLogger(MockRestService.class);
 
     private final HttpServletRequest request;
     private final TemplateEngine templateEngine;
-    private final ConfigService configService;
+    private final RouteService routeService;
+    private final ScenarioService scenarioService;
     private final ConcurrentLruCache<Route, MockResource> resourceCache;
-    private String errorBody;
 
-    public SoapMockService(HttpServletRequest request,
+    public MockRestService(HttpServletRequest request,
                            TemplateEngine templateEngine,
-                           ConfigService configService,
-                           @Value("${application.cache.soap-resource}") int cacheSizeLimit,
-                           @Value("${application.soap-error-data-file}") String soapErrorDataFile) {
+                           RouteService routeService,
+                           ScenarioService scenarioService,
+                           @Value("${application.cache.rest-resource}") int cacheSizeLimit) {
         this.request = request;
         this.templateEngine = templateEngine;
-        this.configService = configService;
+        this.routeService = routeService;
+        this.scenarioService = scenarioService;
         resourceCache = new ConcurrentLruCache<>(cacheSizeLimit, this::loadResource);
-
-        try {
-            errorBody = FileReaderWriterUtil.asString(soapErrorDataFile);
-        } catch (IOException e) {
-            log.error("Error loading SOAP error data file, using fallback.", e);
-            errorBody = "<code>" + FAULT_CODE_PLACEHOLDER + "</code>\n<message>" + FAULT_MESSAGE_PLACEHOLDER + "</message>";
-        }
     }
 
     private MockResource loadResource(Route route) {
-        return configService.getEnabledRoute(route)
-                .map(r -> new SoapMockResource(templateEngine, r.getResponse()))
+        return routeService.getEnabledRoute(route)
+                .map(r -> new RestMockResource(templateEngine, r.getResponse()))
                 .orElse(null);
     }
 
@@ -64,7 +56,7 @@ public class SoapMockService implements MockService {
 
     @Override
     public ResponseEntity<String> mock(Map<String, String> variables) {
-        RequestFacade requestFacade = new SoapRequestFacade(request);
+        RequestFacade requestFacade = new RestRequestFacade(request);
         Route route = getRoute(requestFacade);
         log.info("Route requested: {}", route);
         MockResource resource = resourceCache.get(route);
@@ -77,10 +69,10 @@ public class SoapMockService implements MockService {
 
     private Route getRoute(RequestFacade requestFacade) {
         String suffix = requestFacade.getSuffix()
-                .or(() -> configService.getRouteSuffixFromScenario(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
+                .or(() -> scenarioService.getRouteSuffixFromScenario(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
                 .orElse("");
         return new Route()
-                .setType(RouteType.SOAP)
+                .setType(RouteType.REST)
                 .setMethod(requestFacade.getRequestMethod())
                 .setPath(requestFacade.getEndpoint())
                 .setSuffix(suffix);
@@ -88,8 +80,10 @@ public class SoapMockService implements MockService {
 
     @Override
     public String mockError(Throwable t) {
-        return errorBody
-                .replace(FAULT_CODE_PLACEHOLDER, t.getClass().getSimpleName())
-                .replace(FAULT_MESSAGE_PLACEHOLDER, t.getMessage());
+        try {
+            return new ObjectMapper().writeValueAsString(new ErrorInfo(t));
+        } catch (JsonProcessingException e) {
+            return "";
+        }
     }
 }

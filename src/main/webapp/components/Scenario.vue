@@ -1,59 +1,41 @@
 <template>
     <div class="fields-holder" :class="{'group-start' : groupStart}">
 
-        <div class="field-holder w2">
+        <div class="field-holder">
             <div class="field-header">GROUP</div>
-            <div v-show="!editing" class="field-value link" @click="filter(route.group)">{{ route.group }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.group"/>
+            <div v-show="!editing" class="field-value link" @click="filter(scenario.group)">{{ scenario.group }}</div>
+            <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingScenario.group"/>
+        </div>
+
+        <div class="field-holder">
+            <div class="field-header">ALIAS</div>
+            <div v-show="!editing" class="field-value link" @click="filter(scenario.alias)">{{ scenario.alias }}</div>
+            <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingScenario.alias"/>
         </div>
 
         <div class="field-holder">
             <div class="field-header">TYPE</div>
-            <div v-show="!editing" class="field-value link" @click="filter(route.type)">{{ route.type }}</div>
-            <select v-show="editing" class="form-control form-control-sm monospace" v-model="editingRoute.type">
-                <option>REST</option>
-                <option>SOAP</option>
+            <div v-show="!editing" class="field-value link" @click="filter(scenario.type)">{{ scenario.type }}</div>
+            <select v-show="editing" class="form-control form-control-sm monospace" v-model="editingScenario.type">
+                <option>MAP</option>
+                <option>QUEUE</option>
             </select>
         </div>
 
         <div class="field-holder">
-            <div class="field-header">METHOD</div>
-            <div v-show="!editing" class="field-value link" @click="filter(route.method)">{{ route.method }}</div>
-            <select v-show="editing" class="form-control form-control-sm monospace" v-model="editingRoute.method">
-                <option>GET</option>
-                <option>POST</option>
-                <option>PATCH</option>
-                <option>PUT</option>
-                <option>DELETE</option>
-            </select>
-        </div>
-
-        <div class="field-holder w3">
-            <div class="field-header">PATH</div>
-            <div v-show="!editing" class="field-value link" @click="filter(route.path)">{{ route.path }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.path"/>
-        </div>
-
-        <div class="field-holder w2">
-            <div class="field-header">SUFFIX</div>
-            <div v-show="!editing" class="field-value link color-accent-one" @click="filter(route.suffix)">{{ route.suffix }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.suffix"/>
-        </div>
-
-        <div class="field-holder">
-            <div class="field-header">DISABLED</div>
-            <div v-show="!editing" class="field-value" :class="{ 'red' : route.disabled }">{{ route.disabled }}</div>
-            <input v-show="editing" type="checkbox" class="form-control form-check" v-model="editingRoute.disabled"/>
+            <div class="field-header">ACTIVE</div>
+            <div class="field-value" :class="{ 'red' : active }">{{ active }}</div>
         </div>
 
         <div class="buttons-wrapper">
             <a class="btn btn-link ml-2 mr-2" @click="edit">edit</a>
-            <a class="btn btn-link mr-2" @click="test">test</a>
+            <a class="btn btn-link mr-2" @click="activate">(re)activate</a>
+            <a class="btn btn-link mr-2" @click="deactivate">deactivate</a>
             <a class="btn btn-link btn-danger mr-2" @click="del">delete</a>
         </div>
 
         <div v-show="editing" class="field-memo">
-            <textarea class="form-control form-control-sm v-resize monospace" rows="10" v-model="editingRoute.response"></textarea>
+            <textarea class="form-control form-control-sm v-resize monospace" rows="10" v-model="editingScenario.data"></textarea>
         </div>
 
         <div v-show="editing" class="edit-buttons-wrapper">
@@ -62,61 +44,58 @@
             <div class="btn btn-sm btn-default" @click="cancel">CANCEL</div>
         </div>
 
-        <RouteTester v-if="testing" :route="route" @close="testing = false"></RouteTester>
-
     </div>
 </template>
 <script>
     import {mapActions} from 'vuex';
-    import RouteTester from "./RouteTester";
 
     export default {
-        name: "Route",
-        components: {RouteTester},
+        name: "Scenario",
         data() {
             return {
                 editing: false,
-                editingRoute: {},
-                testing: false
+                editingScenario: {}
             }
         },
         props: {
-            route: {type: Object},
+            scenario: {type: Object},
+            active: {type: Boolean},
             groupStart: {type: Boolean}
         },
         methods: {
             ...mapActions({
-                saveRoute: 'saveRoute',
-                deleteRoute: 'deleteRoute'
+                saveScenario: 'saveScenario',
+                deleteScenario: 'deleteScenario'
             }),
             edit() {
-                this.editingRoute = {...this.route};
+                this.editingScenario = {...this.scenario};
                 this.editing = !this.editing;
-                this.testing = false;
             },
-            test() {
-                this.editing = false;
-                this.testing = !this.testing;
+            activate() {
+                // TODO
+            },
+            deactivate() {
+                // TODO
             },
             cancel() {
                 this.editing = false;
             },
             del() {
-                if (!!this.route._new) {
-                    this.deleteRoute(this.route);
+                if (!!this.scenario._new) {
+                    this.deleteScenario(this.scenario);
                     return;
                 }
                 if (confirm('Sure?')) {
-                    this.deleteRoute(this.route);
+                    this.deleteScenario(this.scenario);
                 }
             },
             save() {
-                this.saveRoute([{...this.route, response: ''}, this.editingRoute]);
+                this.saveScenario([{...this.scenario, data: ''}, this.editingScenario]);
                 this.editing = false;
             },
             saveAsCopy() {
                 this.editing = false;
-                this.saveRoute([{}, this.editingRoute]);
+                this.saveScenario([{}, this.editingScenario]);
             },
             filter(value) {
                 this.$emit('filter', value);

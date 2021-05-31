@@ -1,7 +1,8 @@
 package com.mockservice.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mockservice.domain.*;
+import com.mockservice.domain.Route;
+import com.mockservice.domain.RouteAlreadyExistsException;
+import com.mockservice.domain.RouteType;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.IOException;
@@ -10,9 +11,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public interface ConfigService {
-    String getConfigData() throws JsonProcessingException;
-    void writeConfigData(String data) throws IOException;
+public interface RouteService {
     Stream<Route> getRoutes();
     List<Route> getRoutesAsList();
     Stream<Route> getEnabledRoutes();
@@ -22,9 +21,4 @@ public interface ConfigService {
     List<Route> deleteRoute(Route route) throws IOException;
     void registerRouteCreatedListener(Consumer<Route> listener);
     void registerRouteDeletedListener(Consumer<Route> listener);
-
-    List<Scenario> getScenariosAsList();
-    List<Scenario> putScenario(Scenario scenario, Scenario replacement) throws IOException, ScenarioAlreadyExistsException;
-    List<Scenario> deleteScenario(Scenario scenario) throws IOException;
-    Optional<String> getRouteSuffixFromScenario(RequestMethod method, String path);
 }

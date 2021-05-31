@@ -18,6 +18,7 @@
     import IconLight from '@/assets/icons/light.svg?inline';
     import IconDark from '@/assets/icons/dark.svg?inline';
     import IconSepia from '@/assets/icons/sepia.svg?inline';
+
     export default {
         name: "ColorModePicker",
         components: {

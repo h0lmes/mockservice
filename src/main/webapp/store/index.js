@@ -1,6 +1,7 @@
 export const state = () => ({
     BASE_URL: location.protocol + '//' + location.hostname + ':8081',
     routes: [],
+    scenarios: [],
     lastError: ''
 });
 
@@ -10,6 +11,13 @@ export const mutations = {
     },
     addRoute(state, payload) {
         state.routes.unshift(payload);
+    },
+
+    setScenarios(state, payload) {
+        state.scenarios = payload;
+    },
+    addScenario(state, payload) {
+        state.scenarios.unshift(payload);
     },
 
     setLastError(state, payload) {
@@ -79,5 +87,46 @@ export const actions = {
     },
     newRoute({commit}) {
         commit('addRoute', {group: '', type: 'REST', method: 'GET', path: '/', suffix: '', _new: true});
+    },
+
+    async fetchScenarios({commit, state}) {
+        commit('resetLastError');
+        return fetch(
+            state.BASE_URL + '/web-api/scenarios'
+        ).then(handleError
+        ).then(response => response.json()
+        ).then(response => commit('setScenarios', response)
+        ).catch(error => commit('setLastError', error));
+    },
+    async saveScenario({commit, state}, scenarios) {
+        commit('resetLastError');
+        return fetch(
+            state.BASE_URL + '/web-api/scenarios',
+            {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(scenarios)
+            }
+        ).then(handleError
+        ).then(response => response.json()
+        ).then(response => commit('setScenarios', response)
+        ).catch(error => commit('setLastError', error));
+    },
+    async deleteScenario({commit, state}, scenario) {
+        commit('resetLastError');
+        return fetch(
+            state.BASE_URL + '/web-api/scenarios',
+            {
+                method: 'DELETE',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(scenario)
+            }
+        ).then(handleError
+        ).then(response => response.json()
+        ).then(response => commit('setScenarios', response)
+        ).catch(error => commit('setLastError', error));
+    },
+    newScenario({commit}) {
+        commit('addScenario', {group: 'Default', alias: 'New Alias', type: 'MAP', _new: true});
     },
 };

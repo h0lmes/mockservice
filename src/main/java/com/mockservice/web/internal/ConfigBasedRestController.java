@@ -2,8 +2,8 @@ package com.mockservice.web.internal;
 
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
-import com.mockservice.service.ConfigService;
 import com.mockservice.service.MockService;
+import com.mockservice.service.RouteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,16 +24,16 @@ public class ConfigBasedRestController implements RouteRegisteringController {
 
     private final MockService mockService;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
-    private final ConfigService configService;
+    private final RouteService routeService;
     private Method mockMethod = null;
     private final Map<String, Integer> registeredRoutes = new ConcurrentHashMap<>();
 
     public ConfigBasedRestController(@Qualifier("rest") MockService mockService,
                                      RequestMappingHandlerMapping requestMappingHandlerMapping,
-                                     ConfigService configService) {
+                                     RouteService routeService) {
         this.mockService = mockService;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
-        this.configService = configService;
+        this.routeService = routeService;
 
         try {
             mockMethod = this.getClass().getMethod("mock");
@@ -54,10 +54,10 @@ public class ConfigBasedRestController implements RouteRegisteringController {
     }
 
     private void register() {
-        configService.getRoutes().forEach(this::registerRoute);
+        routeService.getRoutes().forEach(this::registerRoute);
 
-        configService.registerRouteCreatedListener(this::registerRoute);
-        configService.registerRouteDeletedListener(this::unregisterRoute);
+        routeService.registerRouteCreatedListener(this::registerRoute);
+        routeService.registerRouteDeletedListener(this::unregisterRoute);
     }
 
     private void registerRoute(Route route) {

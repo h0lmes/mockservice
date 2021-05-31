@@ -48,6 +48,7 @@
 <script>
     import ColorModePicker from "../components/ColorModePicker";
     import ErrorPanel from "../components/ErrorPanel";
+
     export default {
         components: {ErrorPanel, ColorModePicker},
         methods: {
