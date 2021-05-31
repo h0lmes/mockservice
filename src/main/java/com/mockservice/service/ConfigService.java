@@ -26,4 +26,5 @@ public interface ConfigService {
     List<Scenario> getScenariosAsList();
     List<Scenario> putScenario(Scenario scenario, Scenario replacement) throws IOException, ScenarioAlreadyExistsException;
     List<Scenario> deleteScenario(Scenario scenario) throws IOException;
+    Optional<String> getRouteSuffixFromScenario(RequestMethod method, String path);
 }

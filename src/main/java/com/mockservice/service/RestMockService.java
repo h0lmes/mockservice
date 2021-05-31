@@ -19,6 +19,7 @@ import org.springframework.util.ConcurrentLruCache;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.util.Optional;
 
 @Service("rest")
 public class RestMockService implements MockService {
@@ -65,11 +66,14 @@ public class RestMockService implements MockService {
     }
 
     private Route getRoute(RequestFacade requestFacade) {
+        String suffix = requestFacade.getSuffix()
+                .or(() -> configService.getRouteSuffixFromScenario(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
+                .orElse("");
         return new Route()
                 .setType(RouteType.REST)
                 .setMethod(requestFacade.getRequestMethod())
                 .setPath(requestFacade.getEndpoint())
-                .setSuffix(requestFacade.getSuffix());
+                .setSuffix(suffix);
     }
 
     @Override

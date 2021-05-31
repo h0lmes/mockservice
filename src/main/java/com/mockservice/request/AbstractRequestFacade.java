@@ -94,12 +94,12 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     }
 
     @Override
-    public String getSuffix() {
+    public Optional<String> getSuffix() {
         for (String[] parts : getHeadersParts(SUFFIX_HEADER)) {
             if (parts.length > 1 && encodedEndpoint.equals(parts[0])) {
-                return parts[1];
+                return Optional.of(parts[1]);
             }
         }
-        return "";
+        return Optional.empty();
     }
 }

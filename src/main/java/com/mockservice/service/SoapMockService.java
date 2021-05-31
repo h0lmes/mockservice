@@ -76,11 +76,14 @@ public class SoapMockService implements MockService {
     }
 
     private Route getRoute(RequestFacade requestFacade) {
+        String suffix = requestFacade.getSuffix()
+                .or(() -> configService.getRouteSuffixFromScenario(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
+                .orElse("");
         return new Route()
                 .setType(RouteType.SOAP)
                 .setMethod(requestFacade.getRequestMethod())
                 .setPath(requestFacade.getEndpoint())
-                .setSuffix(requestFacade.getSuffix());
+                .setSuffix(suffix);
     }
 
     @Override

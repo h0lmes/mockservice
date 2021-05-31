@@ -207,4 +207,17 @@ public class YamlConfigService implements ConfigService {
         }
         return config.getScenarios();
     }
+
+    private Stream<Scenario> getActiveScenariosAsStream() {
+        return config.getScenarios().stream().filter(Scenario::getActive);
+    }
+
+    @Override
+    public Optional<String> getRouteSuffixFromScenario(RequestMethod method, String path) {
+        return getActiveScenariosAsStream()
+                .map(s -> s.getSuffix(method, path))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findFirst();
+    }
 }
