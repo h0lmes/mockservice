@@ -1,34 +1,9 @@
-GET http://localhost:8081/api/v1/entity
-Cache-Control: no-cache
-###
-GET http://localhost:8081/api/v1/entity
-Cache-Control: no-cache
-Mock-Suffix: api-v1-entity/error
-###
 GET http://localhost:8081/api/v2/entity
 Cache-Control: no-cache
-###
-GET http://localhost:8081/api/v2/entity
-Cache-Control: no-cache
-Mock-Suffix: api-v2-entity/error
-###
-GET http://localhost:8081/api/v1/entity/2
-Cache-Control: no-cache
-###
-GET http://localhost:8081/api/v1/entity/2
-Cache-Control: no-cache
-Mock-Variable: api-v1-entity-{id}/id/1000
-###
-GET http://localhost:8081/api/v1/entity/filter?a=aaa&b=bbb
-Cache-Control: no-cache
-###
-GET http://localhost:8081/api/v1/entity/filter?a=non-default a
-Cache-Control: no-cache
-###
-POST http://localhost:8081/api/v1/entity HTTP/1.1
-Content-Type: application/json
 
-{ "name": "arbitrary name" }
 ###
-GET http://localhost:8081/api/v1/err
+
+GET http://localhost:8081/api/robot
+Cache-Control: no-cache
+
 ###

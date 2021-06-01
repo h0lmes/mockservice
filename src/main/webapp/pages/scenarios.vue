@@ -11,7 +11,9 @@
             <p v-if="$fetchState.pending" class="mb-3">Loading...</p>
             <p v-if="filtered.length === 0">No scenarios found</p>
             <div v-else>
-                <Scenarios :scenarios="filtered" @filter="setFilter($event)"></Scenarios>
+                <Scenarios :scenarios="filtered"
+                           :activeScenarios="activeScenarios"
+                           @filter="setFilter($event)"></Scenarios>
             </div>
         </div>
     </div>
@@ -34,24 +36,28 @@
             scenarios () {
                 return this.$store.state.scenarios
             },
+            activeScenarios () {
+                return this.$store.state.activeScenarios
+            },
             filtered() {
                 if (!this.query.trim())
                     return this.scenarios;
 
                 return this.scenarios.filter(
-                    o => o.group.toLowerCase().includes(this.query)
-                        | o.alias.toLowerCase().includes(this.query)
-                        | o.type.toLowerCase().includes(this.query)
+                    v => v.group.toLowerCase().includes(this.query)
+                        || v.alias.toLowerCase().includes(this.query)
+                        || v.type.toLowerCase().includes(this.query)
                 );
             },
         },
         async fetch() {
-            return this.fetchScenarios();
+            return this.fetchScenarios().then(this.fetchActiveScenarios);
         },
         methods: {
             ...mapActions({
                 fetchScenarios: 'fetchScenarios',
-                newScenario: 'newScenario'
+                newScenario: 'newScenario',
+                fetchActiveScenarios: 'fetchActiveScenarios',
             }),
             debounce(value) {
                 clearTimeout(this.timeout);

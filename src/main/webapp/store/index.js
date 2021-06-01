@@ -2,6 +2,7 @@ export const state = () => ({
     BASE_URL: location.protocol + '//' + location.hostname + ':8081',
     routes: [],
     scenarios: [],
+    activeScenarios: [],
     lastError: ''
 });
 
@@ -18,6 +19,9 @@ export const mutations = {
     },
     addScenario(state, payload) {
         state.scenarios.unshift(payload);
+    },
+    setActiveScenarios(state, payload) {
+        state.activeScenarios = payload;
     },
 
     setLastError(state, payload) {
@@ -128,5 +132,42 @@ export const actions = {
     },
     newScenario({commit}) {
         commit('addScenario', {group: 'Default', alias: 'New Alias', type: 'MAP', _new: true});
+    },
+    async fetchActiveScenarios({commit, state}) {
+        commit('resetLastError');
+        return fetch(
+            state.BASE_URL + '/web-api/scenarios/active'
+        ).then(handleError
+        ).then(response => response.json()
+        ).then(response => commit('setActiveScenarios', response)
+        ).catch(error => commit('setLastError', error));
+    },
+    async activateScenario({commit, state}, alias) {
+        commit('resetLastError');
+        return fetch(
+            state.BASE_URL + '/web-api/scenarios/active',
+            {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: alias
+            }
+        ).then(handleError
+        ).then(response => response.json()
+        ).then(response => commit('setActiveScenarios', response)
+        ).catch(error => commit('setLastError', error));
+    },
+    async deactivateScenario({commit, state}, alias) {
+        commit('resetLastError');
+        return fetch(
+            state.BASE_URL + '/web-api/scenarios/active',
+            {
+                method: 'DELETE',
+                headers: {'Content-Type': 'application/json'},
+                body: alias
+            }
+        ).then(handleError
+        ).then(response => response.json()
+        ).then(response => commit('setActiveScenarios', response)
+        ).catch(error => commit('setLastError', error));
     },
 };

@@ -39,11 +39,11 @@
                     return this.routes;
 
                 return this.routes.filter(
-                    r => r.group.toLowerCase().includes(this.query)
-                        | r.path.toLowerCase().includes(this.query)
-                        | r.type.toLowerCase().includes(this.query)
-                        | r.method.toLowerCase().includes(this.query)
-                        | r.suffix.toLowerCase().includes(this.query)
+                    v => v.group.toLowerCase().includes(this.query)
+                        || v.path.toLowerCase().includes(this.query)
+                        || v.type.toLowerCase().includes(this.query)
+                        || v.method.toLowerCase().includes(this.query)
+                        || v.suffix.toLowerCase().includes(this.query)
                 );
             },
         },

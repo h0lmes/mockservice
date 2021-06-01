@@ -50,13 +50,13 @@ public class WebApiScenariosController {
     }
 
     @PutMapping("scenarios/active")
-    public void activateScenario(@RequestBody String alias) throws ScenarioParseException {
-        scenarioService.activateScenario(alias);
+    public Set<String> activateScenario(@RequestBody String alias) throws ScenarioParseException {
+        return scenarioService.activateScenario(alias);
     }
 
     @DeleteMapping("scenarios/active")
-    public void deactivateScenario(@RequestBody String alias) {
-        scenarioService.deactivateScenario(alias);
+    public Set<String> deactivateScenario(@RequestBody String alias) {
+        return scenarioService.deactivateScenario(alias);
     }
 
     @ExceptionHandler

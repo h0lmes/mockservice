@@ -24,7 +24,7 @@
 
         <div class="field-holder">
             <div class="field-header">ACTIVE</div>
-            <div class="field-value" :class="{ 'red' : active }">{{ active }}</div>
+            <div class="field-value" :class="{ 'color-accent-one' : active }">{{ active }}</div>
         </div>
 
         <div class="buttons-wrapper">
@@ -63,19 +63,21 @@
             groupStart: {type: Boolean}
         },
         methods: {
-            ...mapActions({
-                saveScenario: 'saveScenario',
-                deleteScenario: 'deleteScenario'
-            }),
+            ...mapActions([
+                'saveScenario',
+                'deleteScenario',
+                'activateScenario',
+                'deactivateScenario',
+            ]),
             edit() {
                 this.editingScenario = {...this.scenario};
                 this.editing = !this.editing;
             },
             activate() {
-                // TODO
+                this.activateScenario(this.scenario.alias);
             },
             deactivate() {
-                // TODO
+                this.deactivateScenario(this.scenario.alias);
             },
             cancel() {
                 this.editing = false;

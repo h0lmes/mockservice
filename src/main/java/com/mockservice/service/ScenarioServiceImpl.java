@@ -95,17 +95,19 @@ public class ScenarioServiceImpl implements ScenarioService {
     }
 
     @Override
-    public synchronized void activateScenario(String alias) throws ScenarioParseException {
+    public synchronized Set<String> activateScenario(String alias) throws ScenarioParseException {
         Scenario scenario = findByAlias(alias)
                 .orElseThrow(() -> new IllegalArgumentException("Scenario not found: " + alias));
         activeScenarios.put(scenario.getAlias(), new ActiveScenario(scenario));
+        return getActiveScenarios();
     }
 
     @Override
-    public synchronized void deactivateScenario(String alias) {
+    public synchronized Set<String> deactivateScenario(String alias) {
         Scenario scenario = findByAlias(alias)
                 .orElseThrow(() -> new IllegalArgumentException("Scenario not found: " + alias));
         activeScenarios.remove(scenario.getAlias());
+        return getActiveScenarios();
     }
 
     @Override

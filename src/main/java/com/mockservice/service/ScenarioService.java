@@ -15,7 +15,7 @@ public interface ScenarioService {
     List<Scenario> putScenario(Scenario scenario, Scenario replacement) throws IOException, ScenarioAlreadyExistsException;
     List<Scenario> deleteScenario(Scenario scenario) throws IOException;
     Set<String> getActiveScenarios();
-    void activateScenario(String alias) throws ScenarioParseException;
-    void deactivateScenario(String alias);
+    Set<String> activateScenario(String alias) throws ScenarioParseException;
+    Set<String> deactivateScenario(String alias);
     Optional<String> getRouteSuffixFromScenario(RequestMethod method, String path);
 }

@@ -64,6 +64,13 @@ routes:
   disabled: false
 scenarios:
 - group: Default
-  alias: test
+  alias: entity 400
   type: MAP
-  data: ""
+  data: GET /api/v2/entity 400
+- group: Default
+  alias: robot sequence
+  type: QUEUE
+  data: |-
+    GET /api/robot R2D2
+    GET /api/robot
+    GET /api/robot terminator
