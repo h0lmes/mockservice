@@ -39,10 +39,11 @@
 
         <div class="page-wrapper">
             <div id="page-contents">
-                <ErrorPanel></ErrorPanel>
                 <Nuxt/>
             </div>
         </div>
+
+        <ErrorPanel></ErrorPanel>
     </div>
 </template>
 <script>

@@ -24,7 +24,6 @@
 }
 
 #page {
-    overflow-x: hidden;
     width: 100%;
 }
 #page-contents {
@@ -36,6 +35,13 @@
     }
 }
 
+.page-wrapper {
+    padding: 0;
+    position: relative !important;
+    width: calc(100% - 220px);
+    margin-left: 220px;
+    transition: all 0.2s;
+}
 .navbar {
     z-index: 1000;
     width: 220px;
@@ -47,13 +53,6 @@
 }
 .navbar-mini .navbar {
     width: 70px;
-}
-.page-wrapper {
-    padding: 0;
-    position: relative !important;
-    width: calc(100% - 220px);
-    margin-left: 220px;
-    transition: all 0.2s;
 }
 .navbar-mini .page-wrapper {
     width: calc(100% - 70px);

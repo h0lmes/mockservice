@@ -1,7 +1,9 @@
 <template>
-    <div v-if="lastError" class="wrapper monospace red mb-3">
-        <p>{{ lastError }}</p>
-        <a class="btn btn-link" @click="resetLastError">Click to dismiss</a>
+    <div v-if="lastError" class="wrapper monospace" @click="resetLastError">
+        <div class="content">
+            <p class="red">{{ lastError }}</p>
+            <p>Click anywhere to dismiss</p>
+        </div>
     </div>
 </template>
 <script>
@@ -13,7 +15,7 @@
             return {}
         },
         computed: {
-            lastError () {
+            lastError() {
                 return this.$store.state.lastError
             }
         },
@@ -26,7 +28,22 @@
 </script>
 <style scoped>
     .wrapper {
-        padding: 1em 1em .5em;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 1001;
+        overflow: hidden auto;
+        background: rgba(0, 0, 0, 0.6);
+    }
+
+    .content {
+        position: relative;
+        margin: 5em auto;
+        padding: 1em;
+        width: 50%;
+        border-radius: 4px;
         background: repeating-linear-gradient(
                 -45deg,
                 var(--bg-primary),
@@ -34,5 +51,11 @@
                 var(--bg-secondary) 10px,
                 var(--bg-secondary) 20px
         );
+    }
+
+    @media screen and (max-width: 1099px) /*and (orientation: landscape)*/ {
+        .content {
+            width: 90%;
+        }
     }
 </style>
