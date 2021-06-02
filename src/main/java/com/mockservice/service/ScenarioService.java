@@ -17,5 +17,5 @@ public interface ScenarioService {
     Set<String> getActiveScenarios();
     Set<String> activateScenario(String alias) throws ScenarioParseException;
     Set<String> deactivateScenario(String alias);
-    Optional<String> getRouteSuffixFromScenario(RequestMethod method, String path);
+    Optional<String> getRouteSuffixFromActiveScenarios(RequestMethod method, String path);
 }

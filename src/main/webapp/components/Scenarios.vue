@@ -1,5 +1,6 @@
 <template>
     <div>
+        <p v-if="scenarios.length === 0">No scenarios found</p>
         <div v-for="(scenario, index) in scenarios" :key="scenario.alias">
             <Scenario :scenario="scenario"
                       :active="activeScenarios.includes(scenario.alias)"

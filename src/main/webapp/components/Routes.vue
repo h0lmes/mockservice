@@ -1,5 +1,6 @@
 <template>
     <div>
+        <p v-if="routes.length === 0">No routes found</p>
         <div v-for="(route, index) in routes" :key="route.type + route.method + route.path + route.suffix">
             <Route :route="route"
                    :groupStart="groupStart(route, index)"

@@ -1,5 +1,6 @@
 <template>
     <div class="monospace">
+
         <div class="mb-2">
             <input id="search" placeholder="search here or click on values" type="text" class="form-control noborder" @input="debounce($event.target.value)"/>
         </div>
@@ -8,21 +9,20 @@
             <a class="btn btn-link mr-4" @click="setFilter('')">Clear filter</a>
         </p>
         <div class="holder">
-            <p v-if="$fetchState.pending" class="mb-3">Loading...</p>
-            <p v-if="filtered.length === 0">No routes found</p>
-            <div v-else>
-                <Routes :routes="filtered" @filter="setFilter($event)"></Routes>
-            </div>
+            <Routes :routes="filtered" @filter="setFilter($event)"></Routes>
         </div>
+
+        <Loading v-if="$fetchState.pending"></Loading>
     </div>
 </template>
 <script>
     import {mapActions} from 'vuex';
     import Routes from "../components/Routes";
+    import Loading from "../components/Loading";
 
     export default {
         name: "index",
-        components: {Routes},
+        components: {Routes, Loading},
         data() {
             return {
                 query: '',

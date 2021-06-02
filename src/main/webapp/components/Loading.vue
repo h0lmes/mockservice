@@ -1,29 +1,16 @@
 <template>
-    <div v-if="lastError" class="wrapper monospace" @click="resetLastError">
+    <div class="wrapper monospace">
         <div class="content">
-            <p class="red">{{ lastError }}</p>
-            <p>Click anywhere to dismiss</p>
+            <p>Loading ...</p>
         </div>
     </div>
 </template>
 <script>
-    import {mapActions} from 'vuex';
-
     export default {
-        name: "ErrorPanel",
+        name: "Loading",
         data() {
             return {}
         },
-        computed: {
-            lastError() {
-                return this.$store.state.lastError
-            }
-        },
-        methods: {
-            ...mapActions({
-                resetLastError: 'resetLastError'
-            })
-        }
     }
 </script>
 <style scoped>
@@ -45,13 +32,7 @@
         transform: translate(-50%, -50%);
         padding: 1em;
         border-radius: 4px;
-        background: repeating-linear-gradient(
-                -45deg,
-                var(--bg-primary),
-                var(--bg-primary) 10px,
-                var(--bg-secondary) 10px,
-                var(--bg-secondary) 20px
-        );
+        background: var(--bg-primary);
     }
 
     @media screen and (max-width: 1099px) /*and (orientation: landscape)*/ {

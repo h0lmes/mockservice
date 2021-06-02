@@ -69,7 +69,7 @@ public class MockRestService implements MockService {
 
     private Route getRoute(RequestFacade requestFacade) {
         String suffix = requestFacade.getSuffix()
-                .or(() -> scenarioService.getRouteSuffixFromScenario(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
+                .or(() -> scenarioService.getRouteSuffixFromActiveScenarios(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
                 .orElse("");
         return new Route()
                 .setType(RouteType.REST)

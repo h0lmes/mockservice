@@ -1,9 +1,6 @@
 <template>
     <div class="monospace">
 
-        <p v-if="$fetchState.pending">Loading...</p>
-        <p v-else-if="lastError"></p>
-
         <p class="danger">Use with caution!</p>
         <p class="danger mb-5">It is easy to ruin config by editing it as plain text.</p>
         <textarea class="form-control form-control-sm v-resize" rows="16" v-model="config"></textarea>
@@ -12,10 +9,12 @@
             <div class="btn btn-sm btn-primary mr-3" @click="saveAsFile">DOWNLOAD</div>
         </div>
 
+        <Loading v-if="$fetchState.pending"></Loading>
     </div>
 </template>
 <script>
     import {mapActions} from 'vuex';
+    import Loading from "../components/Loading";
 
     async function handleError(response) {
         if (response.status === 400) {
@@ -30,6 +29,7 @@
 
     export default {
         name: "config",
+        components: {Loading},
         data() {
             return {
                 config: ''

@@ -111,16 +111,16 @@ public class ScenarioServiceImpl implements ScenarioService {
     }
 
     @Override
-    public Optional<String> getRouteSuffixFromScenario(RequestMethod method, String path) {
+    public Optional<String> getRouteSuffixFromActiveScenarios(RequestMethod method, String path) {
         Predicate<Route> condition = r -> method.equals(r.getMethod()) && path.equals(r.getPath());
-        return activeScenarios.entrySet().stream()
-                .map(e -> getSuffix(e.getValue(), condition))
+        return activeScenarios.values().stream()
+                .map(v -> getSuffixFromActiveScenario(v, condition))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .findFirst();
     }
 
-    private Optional<String> getSuffix(ActiveScenario activeScenario, Predicate<Route> condition) {
+    private Optional<String> getSuffixFromActiveScenario(ActiveScenario activeScenario, Predicate<Route> condition) {
         return activeScenario.getScenario().getType().getStrategy().apply(activeScenario.getRoutes(), condition);
     }
 }

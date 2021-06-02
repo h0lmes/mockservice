@@ -1,5 +1,6 @@
 <template>
     <div class="monospace">
+
         <div class="mb-2">
             <input id="search" placeholder="search here or click on values" type="text" class="form-control noborder" @input="debounce($event.target.value)"/>
         </div>
@@ -8,23 +9,22 @@
             <a class="btn btn-link mr-4" @click="setFilter('')">Clear filter</a>
         </p>
         <div class="holder">
-            <p v-if="$fetchState.pending" class="mb-3">Loading...</p>
-            <p v-if="filtered.length === 0">No scenarios found</p>
-            <div v-else>
-                <Scenarios :scenarios="filtered"
-                           :activeScenarios="activeScenarios"
-                           @filter="setFilter($event)"></Scenarios>
-            </div>
+            <Scenarios :scenarios="filtered"
+                       :activeScenarios="activeScenarios"
+                       @filter="setFilter($event)"></Scenarios>
         </div>
+
+        <Loading v-if="$fetchState.pending"></Loading>
     </div>
 </template>
 <script>
     import {mapActions} from 'vuex';
     import Scenarios from "../components/Scenarios";
+    import Loading from "../components/Loading";
 
     export default {
         name: "scenarios",
-        components: {Scenarios},
+        components: {Scenarios, Loading},
         data() {
             return {
                 query: '',
@@ -33,10 +33,10 @@
             }
         },
         computed: {
-            scenarios () {
+            scenarios() {
                 return this.$store.state.scenarios
             },
-            activeScenarios () {
+            activeScenarios() {
                 return this.$store.state.activeScenarios
             },
             filtered() {
