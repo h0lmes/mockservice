@@ -1,8 +1,8 @@
 <template>
     <div class="monospace">
 
-        <p class="danger">Use with caution!</p>
-        <p class="danger mb-5">It is easy to ruin config by editing it as plain text.</p>
+        <p class="red">Use with caution!</p>
+        <p class="red mb-5">It is easy to ruin config by editing it as plain text.</p>
         <textarea class="form-control form-control-sm v-resize" rows="16" v-model="config"></textarea>
         <div class="buttons mt-5">
             <div class="btn btn-sm btn-danger mr-3" @click="save">SAVE TO SERVER</div>
@@ -47,14 +47,11 @@
             }
         },
         methods: {
-            ...mapActions({
-                setLastError: 'setLastError',
-                resetLastError: 'resetLastError'
-            }),
+            ...mapActions(['setLastError', 'resetLastError', 'saveConfig']),
 
             async save() {
                 if (confirm('Ye be warned =)')) {
-                    await this.saveConfig();
+                    await this.saveConfig(this.config);
                 }
             },
 
@@ -64,19 +61,6 @@
                 ).then(handleError
                 ).then(response => response.text()
                 ).then(response => this.config = response
-                ).catch(error => this.setLastError(error));
-            },
-
-            saveConfig() {
-                return fetch(this.BASE_URL + '/web-api/config',
-                    {
-                        method: 'PUT',
-                        headers: {'Content-Type': 'text/plain'},
-                        body: this.config
-                    }
-                ).then(handleError
-                ).then(response => response.text()
-                ).then(this.resetLastError()
                 ).catch(error => this.setLastError(error));
             },
 
@@ -99,7 +83,4 @@
     }
 </script>
 <style scoped>
-    .danger {
-        color: var(--red);
-    }
 </style>

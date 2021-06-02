@@ -7,10 +7,7 @@
 </template>
 <script>
     export default {
-        name: "Loading",
-        data() {
-            return {}
-        },
+        name: "Loading"
     }
 </script>
 <style scoped>
@@ -22,7 +19,7 @@
         right: 0;
         z-index: 1001;
         overflow: hidden auto;
-        background: rgba(0, 0, 0, 0.6);
+        background: rgba(0, 0, 0, 0.1);
     }
 
     .content {

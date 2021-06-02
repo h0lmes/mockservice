@@ -44,14 +44,16 @@
         </div>
 
         <ErrorPanel></ErrorPanel>
+        <Loading v-if="working"></Loading>
     </div>
 </template>
 <script>
     import ColorModePicker from "../components/ColorModePicker";
     import ErrorPanel from "../components/ErrorPanel";
+    import Loading from "../components/Loading";
 
     export default {
-        components: {ErrorPanel, ColorModePicker},
+        components: {ErrorPanel, ColorModePicker, Loading},
         methods: {
             toggleSidebar() {
                 let page = document.querySelector('#page');
@@ -60,6 +62,11 @@
                 setTimeout(() => {
                     page.classList.toggle('navbar-maximizing');
                 }, 200);
+            }
+        },
+        computed: {
+            working() {
+                return this.$store.state.working
             }
         }
     }

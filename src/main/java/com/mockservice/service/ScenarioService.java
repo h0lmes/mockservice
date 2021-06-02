@@ -12,7 +12,7 @@ import java.util.Set;
 
 public interface ScenarioService {
     List<Scenario> getScenariosAsList();
-    List<Scenario> putScenario(Scenario scenario, Scenario replacement) throws IOException, ScenarioAlreadyExistsException;
+    List<Scenario> putScenario(Scenario scenario, Scenario replacement) throws IOException, ScenarioAlreadyExistsException, ScenarioParseException;
     List<Scenario> deleteScenario(Scenario scenario) throws IOException;
     Set<String> getActiveScenarios();
     Set<String> activateScenario(String alias) throws ScenarioParseException;

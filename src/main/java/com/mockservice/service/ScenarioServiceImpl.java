@@ -69,14 +69,23 @@ public class ScenarioServiceImpl implements ScenarioService {
     }
 
     @Override
-    public synchronized List<Scenario> putScenario(Scenario scenario, Scenario replacement) throws IOException, ScenarioAlreadyExistsException {
-        config().putScenario(scenario, replacement);
+    public synchronized List<Scenario> putScenario(Scenario scenario, Scenario replacement)
+            throws IOException, ScenarioAlreadyExistsException, ScenarioParseException {
+        boolean updated = config().putScenario(scenario, replacement);
+        if (updated && scenarioIsActive(replacement)) {
+            activateScenarioInternal(replacement);
+        }
         configRepository.trySaveConfigToFile();
         return config().getScenarios();
     }
 
+    private boolean scenarioIsActive(Scenario scenario) {
+        return activeScenarios.containsKey(scenario.getAlias());
+    }
+
     @Override
     public synchronized List<Scenario> deleteScenario(Scenario scenario) throws IOException {
+        deactivateScenarioInternal(scenario);
         boolean deleted = config().deleteScenario(scenario);
         if (deleted) {
             configRepository.trySaveConfigToFile();
@@ -98,16 +107,24 @@ public class ScenarioServiceImpl implements ScenarioService {
     public synchronized Set<String> activateScenario(String alias) throws ScenarioParseException {
         Scenario scenario = findByAlias(alias)
                 .orElseThrow(() -> new IllegalArgumentException("Scenario not found: " + alias));
-        activeScenarios.put(scenario.getAlias(), new ActiveScenario(scenario));
+        activateScenarioInternal(scenario);
         return getActiveScenarios();
+    }
+
+    private void activateScenarioInternal(Scenario scenario) throws ScenarioParseException {
+        activeScenarios.put(scenario.getAlias(), new ActiveScenario(scenario));
     }
 
     @Override
     public synchronized Set<String> deactivateScenario(String alias) {
         Scenario scenario = findByAlias(alias)
                 .orElseThrow(() -> new IllegalArgumentException("Scenario not found: " + alias));
-        activeScenarios.remove(scenario.getAlias());
+        deactivateScenarioInternal(scenario);
         return getActiveScenarios();
+    }
+
+    private void deactivateScenarioInternal(Scenario scenario) {
+        activeScenarios.remove(scenario.getAlias());
     }
 
     @Override

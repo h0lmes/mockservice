@@ -43,7 +43,6 @@
     transition: all 0.2s;
 }
 .navbar {
-    z-index: 1000;
     width: 220px;
     height: 100vh;
     position: fixed;

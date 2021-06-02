@@ -20,9 +20,7 @@
             }
         },
         methods: {
-            ...mapActions({
-                resetLastError: 'resetLastError'
-            })
+            ...mapActions(['resetLastError'])
         }
     }
 </script>
