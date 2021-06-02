@@ -89,6 +89,9 @@
                 saveRoute: 'saveRoute',
                 deleteRoute: 'deleteRoute'
             }),
+            filter(value) {
+                this.$emit('filter', value);
+            },
             edit() {
                 this.editingRoute = {...this.route};
                 this.editing = !this.editing;
@@ -107,20 +110,23 @@
                     return;
                 }
                 if (confirm('Sure?')) {
-                    this.deleteRoute(this.route);
+                    this.$nuxt.$loading.start();
+                    this.deleteRoute(this.route)
+                        .then(() => this.$nuxt.$loading.finish());
                 }
             },
             save() {
-                this.saveRoute([{...this.route, response: ''}, this.editingRoute]);
                 this.editing = false;
+                this.$nuxt.$loading.start();
+                this.saveRoute([{...this.route, response: ''}, this.editingRoute])
+                    .then(() => this.$nuxt.$loading.finish());
             },
             saveAsCopy() {
                 this.editing = false;
-                this.saveRoute([{}, this.editingRoute]);
+                this.$nuxt.$loading.start();
+                this.saveRoute([{}, this.editingRoute])
+                    .then(() => this.$nuxt.$loading.finish());
             },
-            filter(value) {
-                this.$emit('filter', value);
-            }
         }
     }
 </script>

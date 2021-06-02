@@ -54,11 +54,7 @@
             return this.fetchScenarios().then(this.fetchActiveScenarios);
         },
         methods: {
-            ...mapActions({
-                fetchScenarios: 'fetchScenarios',
-                newScenario: 'newScenario',
-                fetchActiveScenarios: 'fetchActiveScenarios',
-            }),
+            ...mapActions(['fetchScenarios', 'newScenario', 'fetchActiveScenarios']),
             debounce(value) {
                 clearTimeout(this.timeout);
                 let that = this;

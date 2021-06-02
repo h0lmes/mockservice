@@ -51,7 +51,9 @@
 
             async save() {
                 if (confirm('Ye be warned =)')) {
-                    await this.saveConfig(this.config);
+                    this.$nuxt.$loading.start();
+                    this.saveConfig(this.config)
+                        .then(() => this.$nuxt.$loading.finish());
                 }
             },
 

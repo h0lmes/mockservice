@@ -63,24 +63,26 @@
             groupStart: {type: Boolean}
         },
         methods: {
-            ...mapActions([
-                'saveScenario',
-                'deleteScenario',
-                'activateScenario',
-                'deactivateScenario',
-            ]),
+            ...mapActions(['saveScenario', 'deleteScenario', 'activateScenario', 'deactivateScenario',]),
+            filter(value) {
+                this.$emit('filter', value);
+            },
             edit() {
                 this.editingScenario = {...this.scenario};
                 this.editing = !this.editing;
             },
-            activate() {
-                this.activateScenario(this.scenario.alias);
-            },
-            deactivate() {
-                this.deactivateScenario(this.scenario.alias);
-            },
             cancel() {
                 this.editing = false;
+            },
+            activate() {
+                this.$nuxt.$loading.start();
+                this.activateScenario(this.scenario.alias)
+                    .then(() => this.$nuxt.$loading.finish());
+            },
+            deactivate() {
+                this.$nuxt.$loading.start();
+                this.deactivateScenario(this.scenario.alias)
+                    .then(() => this.$nuxt.$loading.finish());
             },
             del() {
                 if (!!this.scenario._new) {
@@ -88,20 +90,23 @@
                     return;
                 }
                 if (confirm('Sure?')) {
-                    this.deleteScenario(this.scenario);
+                    this.$nuxt.$loading.start();
+                    this.deleteScenario(this.scenario)
+                        .then(() => this.$nuxt.$loading.finish());
                 }
             },
             save() {
-                this.saveScenario([{...this.scenario, data: ''}, this.editingScenario]);
                 this.editing = false;
+                this.$nuxt.$loading.start();
+                this.saveScenario([{...this.scenario, data: ''}, this.editingScenario])
+                    .then(() => this.$nuxt.$loading.finish());
             },
             saveAsCopy() {
                 this.editing = false;
-                this.saveScenario([{}, this.editingScenario]);
+                this.$nuxt.$loading.start();
+                this.saveScenario([{}, this.editingScenario])
+                    .then(() => this.$nuxt.$loading.finish());
             },
-            filter(value) {
-                this.$emit('filter', value);
-            }
         }
     }
 </script>

@@ -25,8 +25,9 @@ export default {
         ]
     },
     loading: {
-        color: 'blue',
-        height: '5px'
+        color: '#158876',
+        height: '5px',
+        continuous: true
     },
     ssr: false
 }
