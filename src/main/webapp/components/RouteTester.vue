@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper">
         <pre class="form-control form-control-sm monospace">{{ testResult }}</pre>
-        <div class="buttons-wrapper">
+        <div class="fancy-row-block-buttons">
             <div class="btn btn-sm btn-primary mr-3" @click="test" v-cloak="inProgress">RETRY</div>
             <div class="btn btn-sm btn-default" @click="$emit('close')">CLOSE</div>
         </div>
@@ -102,7 +102,7 @@
         padding: 0 .5rem;
         width: 100%;
     }
-    .buttons-wrapper {
+    .fancy-row-block-buttons {
         cursor: default;
         display: block;
         box-sizing: border-box;

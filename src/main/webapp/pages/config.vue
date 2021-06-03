@@ -6,7 +6,7 @@
         <textarea class="form-control form-control-sm v-resize" rows="16" v-model="config"></textarea>
         <div class="buttons mt-5">
             <div class="btn btn-sm btn-danger mr-3" @click="save">SAVE TO SERVER</div>
-            <div class="btn btn-sm btn-primary mr-3" @click="saveAsFile">DOWNLOAD</div>
+            <div class="btn btn-sm btn-primary mr-3" @click="download">DOWNLOAD</div>
         </div>
 
         <Loading v-if="$fetchState.pending"></Loading>
@@ -15,17 +15,6 @@
 <script>
     import {mapActions} from 'vuex';
     import Loading from "../components/Loading";
-
-    async function handleError(response) {
-        if (response.status === 400) {
-            const errorInfo = await response.json();
-            throw Error(errorInfo.message || errorInfo);
-        }
-        if (!response.ok) {
-            throw Error(response.statusText || response);
-        }
-        return response;
-    }
 
     export default {
         name: "config",
@@ -36,19 +25,11 @@
             }
         },
         async fetch() {
-            return this.fetchConfig();
-        },
-        computed: {
-            BASE_URL() {
-                return this.$store.state.BASE_URL
-            },
-            lastError() {
-                return this.$store.state.lastError
-            }
+            return this.fetchConfig()
+                .then(response => this.config = response);
         },
         methods: {
-            ...mapActions(['setLastError', 'resetLastError', 'saveConfig']),
-
+            ...mapActions(['fetchConfig', 'saveConfig']),
             async save() {
                 if (confirm('Ye be warned =)')) {
                     this.$nuxt.$loading.start();
@@ -56,20 +37,9 @@
                         .then(() => this.$nuxt.$loading.finish());
                 }
             },
-
-            fetchConfig() {
-                this.resetLastError();
-                return fetch(this.BASE_URL + '/web-api/config'
-                ).then(handleError
-                ).then(response => response.text()
-                ).then(response => this.config = response
-                ).catch(error => this.setLastError(error));
-            },
-
-            saveAsFile() {
+            download() {
                 this.saveTextAsFile(this.config, 'config.yml')
             },
-
             saveTextAsFile(text, fileName) {
                 let blob = new Blob([text], {type: 'text/plain'});
                 let link = document.createElement("a");

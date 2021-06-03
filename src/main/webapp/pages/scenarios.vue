@@ -32,6 +32,9 @@
                 timeout: null
             }
         },
+        async fetch() {
+            return this.fetchScenarios().then(this.fetchActiveScenarios);
+        },
         computed: {
             scenarios() {
                 return this.$store.state.scenarios
@@ -49,9 +52,6 @@
                         || v.type.toLowerCase().includes(this.query)
                 );
             },
-        },
-        async fetch() {
-            return this.fetchScenarios().then(this.fetchActiveScenarios);
         },
         methods: {
             ...mapActions(['fetchScenarios', 'newScenario', 'fetchActiveScenarios']),

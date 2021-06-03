@@ -30,20 +30,20 @@ public class MockSoapService implements MockService {
     private final HttpServletRequest request;
     private final TemplateEngine templateEngine;
     private final RouteService routeService;
-    private final ScenarioService scenarioService;
+    private final ActiveScenariosService activeScenariosService;
     private final ConcurrentLruCache<Route, MockResource> resourceCache;
     private String errorBody;
 
     public MockSoapService(HttpServletRequest request,
                            TemplateEngine templateEngine,
                            RouteService routeService,
-                           ScenarioService scenarioService,
+                           ActiveScenariosService activeScenariosService,
                            @Value("${application.cache.soap-resource}") int cacheSizeLimit,
                            @Value("${application.soap-error-data-file}") String soapErrorDataFile) {
         this.request = request;
         this.templateEngine = templateEngine;
         this.routeService = routeService;
-        this.scenarioService = scenarioService;
+        this.activeScenariosService = activeScenariosService;
         resourceCache = new ConcurrentLruCache<>(cacheSizeLimit, this::loadResource);
 
         try {
@@ -80,7 +80,7 @@ public class MockSoapService implements MockService {
 
     private Route getRoute(RequestFacade requestFacade) {
         String suffix = requestFacade.getSuffix()
-                .or(() -> scenarioService.getRouteSuffixFromActiveScenarios(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
+                .or(() -> activeScenariosService.getRouteSuffix(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
                 .orElse("");
         return new Route()
                 .setType(RouteType.SOAP)

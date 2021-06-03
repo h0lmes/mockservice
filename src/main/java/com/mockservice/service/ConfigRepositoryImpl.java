@@ -3,7 +3,7 @@ package com.mockservice.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.mockservice.domain.Config;
+import com.mockservice.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +18,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -30,8 +31,10 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     private final String fileConfigPath;
     private final ObjectReader yamlReader;
     private final ObjectWriter yamlWriter;
-    private final List<ConfigChangedListener> configChangedListeners = new ArrayList<>();
     private Config config;
+    private final List<ConfigChangedListener> configChangedListeners = new ArrayList<>();
+    private final List<RoutesChangedListener> routesChangedListeners = new ArrayList<>();
+    private final List<ScenariosChangedListener> scenariosChangedListeners = new ArrayList<>();
 
 
     public ConfigRepositoryImpl(@Value("${application.config.resource}") String resourceConfigPath,
@@ -55,12 +58,12 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
     }
 
-    private File getConfigFile() {
-        return new File(fileConfigPath);
-    }
-
     private void readConfigFromFile() throws IOException {
         config = yamlReader.readValue(getConfigFile(), Config.class);
+    }
+
+    private File getConfigFile() {
+        return new File(fileConfigPath);
     }
 
     private void readConfigFromResource() throws IOException {
@@ -71,9 +74,20 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
     }
 
-    @Override
-    public Config getConfig() {
-        return config;
+    private void readConfigFromString(String yaml) throws IOException {
+        try {
+            config = yamlReader.readValue(yaml, Config.class);
+        } catch (IOException e) {
+            throw new IOException("Could not deserialize config. " + e.getMessage(), e);
+        }
+    }
+
+    private void trySaveConfigToFile() throws IOException {
+        try {
+            yamlWriter.writeValue(getConfigFile(), config);
+        } catch (IOException e) {
+            throw new IOException("Could not write config to file. " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -89,22 +103,119 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         trySaveConfigToFile();
     }
 
-    private void readConfigFromString(String yaml) throws IOException {
-        try {
-            config = yamlReader.readValue(yaml, Config.class);
-        } catch (IOException e) {
-            throw new IOException("Could not deserialize config. " + e.getMessage(), e);
-        }
+    //----------------------------------------------------------------------
+    //
+    //   Routes
+    //
+    //----------------------------------------------------------------------
+
+    @Override
+    public List<Route> findAllRoutes() {
+        return config.getRoutes();
     }
 
     @Override
-    public void trySaveConfigToFile() throws IOException {
-        try {
-            yamlWriter.writeValue(getConfigFile(), config);
-        } catch (IOException e) {
-            throw new IOException("Could not write config to file. " + e.getMessage(), e);
+    public Optional<Route> findRoute(Route route) {
+        return config.getRoutes().stream()
+                .filter(route::equals)
+                .findFirst();
+    }
+
+    @Override
+    public void putRoute(Route route, Route replacement) throws RouteAlreadyExistsException, IOException {
+        // do not allow duplicates
+        if (!route.equals(replacement)) {
+            Route maybeRoute = findRoute(replacement).orElse(null);
+            if (maybeRoute != null) {
+                throw new RouteAlreadyExistsException(replacement);
+            }
+        }
+
+        boolean updated = false;
+        Route maybeRoute = findRoute(route).orElse(null);
+        if (maybeRoute == null) {
+            config.getRoutes().add(replacement);
+        } else {
+            maybeRoute.assignFrom(replacement);
+            updated = true;
+        }
+
+        config.getRoutes().sort(Route::compareTo);
+
+        if (updated) {
+            notifyRouteDeleted(route);
+        }
+        notifyRouteCreated(replacement);
+        trySaveConfigToFile();
+    }
+
+    @Override
+    public void deleteRoute(Route route) throws IOException {
+        config.getRoutes().remove(route);
+        if (config.getRoutes().remove(route)) {
+            notifyRouteDeleted(route);
+            trySaveConfigToFile();
         }
     }
+
+    //----------------------------------------------------------------------
+    //
+    //   Scenarios
+    //
+    //----------------------------------------------------------------------
+
+    @Override
+    public List<Scenario> findAllScenarios() {
+        return config.getScenarios();
+    }
+
+    @Override
+    public Optional<Scenario> findScenario(Scenario scenario) {
+        return config.getScenarios().stream()
+                .filter(scenario::equals)
+                .findFirst();
+    }
+
+    @Override
+    public void putScenario(Scenario scenario, Scenario replacement) throws ScenarioAlreadyExistsException, IOException {
+        // do not allow duplicates
+        if (!scenario.equals(replacement)) {
+            Scenario maybeScenario = findScenario(replacement).orElse(null);
+            if (maybeScenario != null) {
+                throw new ScenarioAlreadyExistsException(replacement);
+            }
+        }
+
+        boolean updated = false;
+        Scenario maybeScenario = findScenario(scenario).orElse(null);
+        if (maybeScenario == null) {
+            config.getScenarios().add(replacement);
+        } else {
+            maybeScenario.assignFrom(replacement);
+            updated = true;
+        }
+
+        config.getScenarios().sort(Scenario::compareTo);
+
+        if (updated) {
+            notifyScenarioUpdated(replacement.getAlias());
+        }
+        trySaveConfigToFile();
+    }
+
+    @Override
+    public void deleteScenario(Scenario scenario) throws IOException {
+        if (config.getScenarios().remove(scenario)) {
+            notifyScenarioDeleted(scenario.getAlias());
+            trySaveConfigToFile();
+        }
+    }
+
+    //----------------------------------------------------------------------
+    //
+    //   Listeners
+    //
+    //----------------------------------------------------------------------
 
     private void notifyBeforeConfigChanged() {
         configChangedListeners.forEach(ConfigChangedListener::onBeforeConfigChanged);
@@ -117,5 +228,31 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     @Override
     public void registerConfigChangedListener(ConfigChangedListener listener) {
         configChangedListeners.add(listener);
+    }
+
+    private void notifyRouteCreated(Route route) {
+        routesChangedListeners.forEach(l -> l.onRouteCreated(route));
+    }
+
+    private void notifyRouteDeleted(Route route) {
+        routesChangedListeners.forEach(l -> l.onRouteDeleted(route));
+    }
+
+    @Override
+    public void registerRoutesChangedListener(RoutesChangedListener listener) {
+        routesChangedListeners.add(listener);
+    }
+
+    private void notifyScenarioUpdated(String alias) {
+        scenariosChangedListeners.forEach(l -> l.onScenarioUpdated(alias));
+    }
+
+    private void notifyScenarioDeleted(String alias) {
+        scenariosChangedListeners.forEach(l -> l.onScenarioDeleted(alias));
+    }
+
+    @Override
+    public void registerScenariosChangedListener(ScenariosChangedListener listener) {
+        scenariosChangedListeners.add(listener);
     }
 }

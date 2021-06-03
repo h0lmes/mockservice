@@ -52,8 +52,16 @@ export const actions = {
         commit('resetLastError');
     },
 
+    fetchConfig({commit, state}) {
+        commit('resetLastError');
+        return fetch(state.BASE_URL + '/web-api/config'
+        ).then(handleError
+        ).then(response => response.text()
+        ).catch(error => commit('setLastError', error));
+    },
     async saveConfig({commit, state}, config) {
-        return fetch(this.BASE_URL + '/web-api/config',
+        commit('resetLastError');
+        return fetch(state.BASE_URL + '/web-api/config',
             {
                 method: 'PUT',
                 headers: {'Content-Type': 'text/plain'},

@@ -19,6 +19,7 @@
   --bg-primary: #f3f5f4;
   --bg-secondary: #fff;
   --bg-border: #ddd;
+  --bg-shadow: rgba(0, 0, 0, 0.3);
 }
 .dark-mode {
   --blue: #005ab4;
@@ -121,4 +122,108 @@ pre {
 .page-enter,
 .page-leave-to {
     opacity: 0;
+}
+
+// --------------------------------------------------------------------------------
+
+.fancy-row {
+  display: flex;
+  flex-wrap: wrap;
+  font-size: smaller;
+  margin-bottom: 1rem;
+  padding: 0 .3rem;
+  border-radius: 5px;
+  background-color: var(--bg-secondary);
+  box-shadow: 1px 1px 3px var(--bg-shadow);
+}
+
+.fancy-row-block {
+  flex: 1;
+  min-width: 5rem;
+  box-sizing: border-box;
+  margin: 0;
+  padding: .8rem .5rem;
+  vertical-align: top;
+  text-align: center;
+
+  &.w2 {
+    flex: 2;
+  }
+
+  &.w3 {
+    flex: 3;
+  }
+}
+
+.fancy-row-block-header {
+  display: block;
+  width: max-content;
+  color: var(--color-secondary);
+  margin: 0 auto .5rem;
+  text-align: center;
+}
+
+.fancy-row-block-value {
+  cursor: default;
+  display: block;
+  width: max-content;
+  color: var(--color-primary);
+  margin: 0 auto;
+  text-align: center;
+  word-wrap: break-word;
+
+  &.link:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
+
+.fancy-row-block-memo {
+  display: block;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0 .5rem;
+  width: 100%;
+}
+
+.fancy-row-block-buttons {
+  cursor: default;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 1rem .3rem 0.9rem;
+  vertical-align: top;
+  text-align: center;
+}
+
+.fancy-row-block-edit-buttons {
+  cursor: default;
+  display: block;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.7rem 0;
+  width: 100%;
+  text-align: center;
+}
+
+@media screen and (max-width: 1599px) {
+  .fancy-row-block {
+    flex: 2;
+  }
+}
+
+@media screen and (max-width: 1099px) {
+  .fancy-row {
+    margin-bottom: 0.7rem;
+    padding: .1rem 0;
+  }
+
+  .fancy-row-block.w3 {
+    flex: 2;
+  }
+
+  .fancy-row-block-buttons {
+    display: block;
+    width: 100%;
+    padding: .2rem .3rem .6rem;
+  }
 }

@@ -30,6 +30,9 @@
                 timeout: null
             }
         },
+        async fetch() {
+            return this.fetchRoutes();
+        },
         computed: {
             routes () {
                 return this.$store.state.routes
@@ -46,9 +49,6 @@
                         || v.suffix.toLowerCase().includes(this.query)
                 );
             },
-        },
-        async fetch() {
-            return this.fetchRoutes();
         },
         methods: {
             ...mapActions({

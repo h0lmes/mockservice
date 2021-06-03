@@ -2,8 +2,10 @@ package com.mockservice.web.internal;
 
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
+import com.mockservice.service.ConfigChangedListener;
+import com.mockservice.service.ConfigRepository;
 import com.mockservice.service.MockService;
-import com.mockservice.service.RouteService;
+import com.mockservice.service.RoutesChangedListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,22 +20,22 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
-public class ConfigBasedRestController implements RouteRegisteringController {
+public class ConfigBasedRestController implements RouteRegisteringController, ConfigChangedListener, RoutesChangedListener {
 
     private static final Logger log = LoggerFactory.getLogger(ConfigBasedRestController.class);
 
     private final MockService mockService;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
-    private final RouteService routeService;
+    private final ConfigRepository configRepository;
     private Method mockMethod = null;
     private final Map<String, Integer> registeredRoutes = new ConcurrentHashMap<>();
 
     public ConfigBasedRestController(@Qualifier("rest") MockService mockService,
                                      RequestMappingHandlerMapping requestMappingHandlerMapping,
-                                     RouteService routeService) {
+                                     ConfigRepository configRepository) {
         this.mockService = mockService;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
-        this.routeService = routeService;
+        this.configRepository = configRepository;
 
         try {
             mockMethod = this.getClass().getMethod("mock");
@@ -48,16 +50,39 @@ public class ConfigBasedRestController implements RouteRegisteringController {
         }
     }
 
+    public ResponseEntity<String> mock() {
+        return mockService.mock(null);
+    }
+
     @Override
     public RouteType getType() {
         return RouteType.REST;
     }
 
     private void register() {
-        routeService.getRoutes().forEach(this::registerRoute);
+        configRepository.findAllRoutes().forEach(this::registerRoute);
+        configRepository.registerRoutesChangedListener(this);
+        configRepository.registerConfigChangedListener(this);
+    }
 
-        routeService.registerRouteCreatedListener(this::registerRoute);
-        routeService.registerRouteDeletedListener(this::unregisterRoute);
+    @Override
+    public void onBeforeConfigChanged() {
+        configRepository.findAllRoutes().forEach(this::unregisterRoute);
+    }
+
+    @Override
+    public void onAfterConfigChanged() {
+        configRepository.findAllRoutes().forEach(this::registerRoute);
+    }
+
+    @Override
+    public void onRouteCreated(Route route) {
+        registerRoute(route);
+    }
+
+    @Override
+    public void onRouteDeleted(Route route) {
+        unregisterRoute(route);
     }
 
     private void registerRoute(Route route) {
@@ -66,10 +91,6 @@ public class ConfigBasedRestController implements RouteRegisteringController {
 
     private void unregisterRoute(Route route) {
         this.unregisterRouteInt(route, registeredRoutes, requestMappingHandlerMapping, mockService, log);
-    }
-
-    public ResponseEntity<String> mock() {
-        return mockService.mock(null);
     }
 
     @ExceptionHandler

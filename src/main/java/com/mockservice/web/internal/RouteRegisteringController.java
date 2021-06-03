@@ -25,6 +25,7 @@ public interface RouteRegisteringController {
 
         if (mockMethod == null) {
             log.warn("Register route (no method): {}", route);
+            return;
         }
 
         String key = routeRegistrationKey(route);
