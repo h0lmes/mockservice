@@ -157,7 +157,7 @@ pre {
 
 .fancy-row-block-header {
   display: block;
-  width: max-content;
+  width: fit-content;
   color: var(--color-secondary);
   margin: 0 auto .5rem;
   text-align: center;
@@ -166,7 +166,7 @@ pre {
 .fancy-row-block-value {
   cursor: default;
   display: block;
-  width: max-content;
+  width: fit-content;
   color: var(--color-primary);
   margin: 0 auto;
   text-align: center;

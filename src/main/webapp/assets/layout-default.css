@@ -1,26 +1,22 @@
 :root {
     --nav-color: #b9c1c7;
     --nav-color-active: white;
+    --nav-color-accent: #18a28d;
     --nav-bg: #3a3f45;
     --nav-bg-active: #40454d;
-    --nav-bg-accent: #158876;
-    --nav-bg-accent-active: #18a28d;
 }
 .dark-mode {
     --nav-color: #6a6d76;
     --nav-color-active: #aeb3bf;
     --nav-bg: #212325;
     --nav-bg-active: #292b2d;
-    --nav-bg-accent: #22474a;
-    --nav-bg-accent-active: #275154;
 }
 .sepia-mode {
     --nav-color: #f1e7d0;
     --nav-color-active: white;
+    --nav-color-accent: #e67f65;
     --nav-bg: #433422;
     --nav-bg-active: #504231;
-    --nav-bg-accent: #4e372d;
-    --nav-bg-accent-active: #614438;
 }
 
 #page {
@@ -104,11 +100,8 @@
     border-radius: 3px;
     padding: 4px 12px;
     margin: 0;
-    background-color: var(--nav-bg-accent);
-    color: var(--nav-color);
 }
 .navbar .nav > li > a.btn-minimize-navbar:hover,
 .navbar .nav > li > a.btn-minimize-navbar:focus {
-    background-color: var(--nav-bg-accent-active);
-    color: var(--nav-color-active);
+    color: var(--nav-color-accent) !important;
 }
