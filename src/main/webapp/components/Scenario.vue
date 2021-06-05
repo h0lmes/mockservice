@@ -35,6 +35,8 @@
         </div>
 
         <div v-show="editing" class="fancy-row-block-memo">
+            <div class="btn btn-link mr-3" @click="openAddRouteToScenario(scenario.alias)">Add route</div>
+            <div class="fancy-row-block-header">ROUTES</div>
             <textarea class="form-control form-control-sm v-resize monospace" rows="10" v-model="editingScenario.data"></textarea>
         </div>
 
@@ -54,7 +56,7 @@
         data() {
             return {
                 editing: false,
-                editingScenario: {}
+                editingScenario: {},
             }
         },
         props: {
@@ -63,7 +65,7 @@
             groupStart: {type: Boolean}
         },
         methods: {
-            ...mapActions(['saveScenario', 'deleteScenario', 'activateScenario', 'deactivateScenario',]),
+            ...mapActions(['saveScenario', 'deleteScenario', 'activateScenario', 'deactivateScenario', 'openAddRouteToScenario']),
             filter(value) {
                 this.$emit('filter', value);
             },
