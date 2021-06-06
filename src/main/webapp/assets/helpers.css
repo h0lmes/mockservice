@@ -1,22 +1,3 @@
-/* font */
-
-.monospace {
-    font-family: monospace, monospace;
-}
-
-.ta-center { text-align: center; }
-
-/* position */
-
-.block { display: block; }
-.inline-block { display: inline-block; }
-.inline { display: inline; }
-
-/* sizing */
-
-.w-auto { width: auto; }
-.w100 { width: 100%; }
-
 /* margin */
 
 .ma-0 { margin: 0; }

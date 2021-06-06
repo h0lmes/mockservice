@@ -1,7 +1,6 @@
 package com.mockservice.service;
 
 import com.mockservice.domain.Route;
-import com.mockservice.domain.RouteType;
 import com.mockservice.request.RequestFacade;
 import com.mockservice.request.SoapRequestFacade;
 import com.mockservice.resource.MockResource;
@@ -18,6 +17,7 @@ import org.springframework.util.ConcurrentLruCache;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 @Service("soap")
 public class MockSoapService implements MockService {
@@ -31,6 +31,7 @@ public class MockSoapService implements MockService {
     private final TemplateEngine templateEngine;
     private final RouteService routeService;
     private final ActiveScenariosService activeScenariosService;
+    private final ConfigRepository configRepository;
     private final ConcurrentLruCache<Route, MockResource> resourceCache;
     private String errorBody;
 
@@ -38,12 +39,14 @@ public class MockSoapService implements MockService {
                            TemplateEngine templateEngine,
                            RouteService routeService,
                            ActiveScenariosService activeScenariosService,
+                           ConfigRepository configRepository,
                            @Value("${application.cache.soap-resource}") int cacheSizeLimit,
                            @Value("${application.soap-error-data-file}") String soapErrorDataFile) {
         this.request = request;
         this.templateEngine = templateEngine;
         this.routeService = routeService;
         this.activeScenariosService = activeScenariosService;
+        this.configRepository = configRepository;
         resourceCache = new ConcurrentLruCache<>(cacheSizeLimit, this::loadResource);
 
         try {
@@ -79,14 +82,23 @@ public class MockSoapService implements MockService {
     }
 
     private Route getRoute(RequestFacade requestFacade) {
-        String suffix = requestFacade.getSuffix()
-                .or(() -> activeScenariosService.getRouteSuffix(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
-                .orElse("");
-        return new Route()
-                .setType(RouteType.SOAP)
+        Route route = new Route()
                 .setMethod(requestFacade.getRequestMethod())
-                .setPath(requestFacade.getEndpoint())
-                .setSuffix(suffix);
+                .setPath(requestFacade.getEndpoint());
+
+        String suffix = requestFacade
+                .getSuffix()
+                .or(() -> getRandomSuffixFor(route))
+                .or(() -> activeScenariosService.getSuffixFor(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
+                .orElse("");
+        return route.setSuffix(suffix);
+    }
+
+    private Optional<String> getRandomSuffixFor(Route route) {
+        if (configRepository.getSettings().getRandomSuffix()) {
+            return routeService.getRandomSuffixFor(route);
+        }
+        return Optional.empty();
     }
 
     @Override

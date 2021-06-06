@@ -1,7 +1,6 @@
 :root {
     --nav-color: #b9c1c7;
     --nav-color-active: white;
-    --nav-color-accent: #18a28d;
     --nav-bg: #3a3f45;
     --nav-bg-active: #40454d;
 }
@@ -14,9 +13,8 @@
 .sepia-mode {
     --nav-color: #f1e7d0;
     --nav-color-active: white;
-    --nav-color-accent: #e67f65;
-    --nav-bg: #433422;
-    --nav-bg-active: #504231;
+    --nav-bg: #544b40;
+    --nav-bg-active: #5e5549;
 }
 
 #page {
@@ -111,5 +109,5 @@
 }
 .navbar .nav > li > a.btn-minimize-navbar:hover,
 .navbar .nav > li > a.btn-minimize-navbar:focus {
-    color: var(--nav-color-accent) !important;
+    color: var(--color-accent-one) !important;
 }

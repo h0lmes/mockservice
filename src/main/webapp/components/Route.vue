@@ -1,24 +1,24 @@
 <template>
-    <div class="fancy-row">
+    <div class="mock-row">
 
-        <div class="fancy-row-block w2">
-            <div class="fancy-row-block-header" :class="{'color-accent-one' : groupStart}">GROUP</div>
-            <div v-show="!editing" class="fancy-row-block-value link" @click="filter(route.group)">{{ route.group }}</div>
+        <div class="mock-col w2">
+            <div class="mock-col-header" :class="{'color-accent-one' : groupStart}">GROUP</div>
+            <div v-show="!editing" class="mock-col-value link" @click="filter(route.group)">{{ route.group }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.group"/>
         </div>
 
-        <div class="fancy-row-block">
-            <div class="fancy-row-block-header">TYPE</div>
-            <div v-show="!editing" class="fancy-row-block-value link" @click="filter(route.type)">{{ route.type }}</div>
+        <div class="mock-col">
+            <div class="mock-col-header">TYPE</div>
+            <div v-show="!editing" class="mock-col-value link" @click="filter(route.type)">{{ route.type }}</div>
             <select v-show="editing" class="form-control form-control-sm monospace" v-model="editingRoute.type">
                 <option>REST</option>
                 <option>SOAP</option>
             </select>
         </div>
 
-        <div class="fancy-row-block">
-            <div class="fancy-row-block-header">METHOD</div>
-            <div v-show="!editing" class="fancy-row-block-value link" @click="filter(route.method)">{{ route.method }}</div>
+        <div class="mock-col">
+            <div class="mock-col-header">METHOD</div>
+            <div v-show="!editing" class="mock-col-value link" @click="filter(route.method)">{{ route.method }}</div>
             <select v-show="editing" class="form-control form-control-sm monospace" v-model="editingRoute.method">
                 <option>GET</option>
                 <option>POST</option>
@@ -28,41 +28,43 @@
             </select>
         </div>
 
-        <div class="fancy-row-block w3">
-            <div class="fancy-row-block-header">PATH</div>
-            <div v-show="!editing" class="fancy-row-block-value link" @click="filter(route.path)">{{ route.path }}</div>
+        <div class="mock-col w3">
+            <div class="mock-col-header">PATH</div>
+            <div v-show="!editing" class="mock-col-value link" @click="filter(route.path)">{{ route.path }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.path"/>
         </div>
 
-        <div class="fancy-row-block w2">
-            <div class="fancy-row-block-header">SUFFIX</div>
-            <div v-show="!editing" class="fancy-row-block-value link color-accent-one" @click="filter(route.suffix)">{{ route.suffix }}</div>
+        <div class="mock-col w2">
+            <div class="mock-col-header">SUFFIX</div>
+            <div v-show="!editing" class="mock-col-value link color-accent-one" @click="filter(route.suffix)">{{ route.suffix }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.suffix"/>
         </div>
 
-        <div class="fancy-row-block">
-            <div class="fancy-row-block-header">DISABLED</div>
-            <div v-show="!editing" class="fancy-row-block-value" :class="{ 'red' : route.disabled }">{{ route.disabled }}</div>
+        <div class="mock-col">
+            <div class="mock-col-header">DISABLED</div>
+            <div v-show="!editing" class="mock-col-value" :class="{ 'red' : route.disabled }">{{ route.disabled }}</div>
             <input v-show="editing" type="checkbox" class="form-control form-check" v-model="editingRoute.disabled"/>
         </div>
 
-        <div class="fancy-buttons">
+        <div class="mock-col buttons">
             <a class="btn btn-link btn-default" @click="edit">edit</a>
             <a class="btn btn-link btn-default" @click="test">test</a>
             <a class="btn btn-link btn-danger" @click="del">delete</a>
         </div>
 
-        <div v-show="editing" class="fancy-row-block-memo">
+        <div v-show="editing" class="mock-col w100">
             <textarea class="form-control form-control-sm v-resize monospace" rows="10" v-model="editingRoute.response"></textarea>
         </div>
 
-        <div v-show="editing" class="fancy-buttons-centered">
+        <div v-show="editing" class="mock-col w100 buttons">
             <div class="btn btn-sm btn-primary" @click="save">SAVE</div>
             <div class="btn btn-sm btn-primary" @click="saveAsCopy">SAVE AS COPY</div>
             <div class="btn btn-sm btn-default" @click="cancel">CANCEL</div>
         </div>
 
-        <RouteTester v-if="testing" :route="route" @close="testing = false"></RouteTester>
+        <div v-if="testing" class="mock-col w100">
+            <RouteTester :route="route" @close="testing = false"></RouteTester>
+        </div>
 
     </div>
 </template>

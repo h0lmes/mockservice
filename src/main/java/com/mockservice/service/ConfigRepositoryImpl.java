@@ -110,6 +110,23 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     //----------------------------------------------------------------------
 
     @Override
+    public Settings getSettings() {
+        return config.getSettings();
+    }
+
+    @Override
+    public void setSettings(Settings settings) throws IOException {
+        config.setSettings(settings);
+        trySaveConfigToFile();
+    }
+
+    //----------------------------------------------------------------------
+    //
+    //   Routes
+    //
+    //----------------------------------------------------------------------
+
+    @Override
     public List<Route> findAllRoutes() {
         return config.getRoutes();
     }

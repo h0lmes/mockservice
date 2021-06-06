@@ -2,14 +2,15 @@ package com.mockservice.service;
 
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteAlreadyExistsException;
-import com.mockservice.domain.RouteType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 public class RouteServiceImpl implements RouteService {
@@ -22,18 +23,23 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public Optional<Route> getEnabledRoute(Route route) {
-        return getEnabledRoute(route.getType(), route.getMethod(), route.getPath(), route.getSuffix());
+        return configRepository
+                .findRoute(route)
+                .filter(r -> !r.getDisabled());
     }
 
     @Override
-    public Optional<Route> getEnabledRoute(RouteType type, RequestMethod method, String path, String suffix) {
-        return configRepository.findAllRoutes().stream()
-                .filter(route -> !route.getDisabled()
-                        && type.equals(route.getType())
-                        && method.equals(route.getMethod())
-                        && path.equals(route.getPath())
-                        && suffix.equals(route.getSuffix())
-                ).findFirst();
+    public Optional<String> getRandomSuffixFor(Route route) {
+        Predicate<Route> condition = r -> route.getMethod().equals(r.getMethod()) && route.getPath().equals(r.getPath());
+        List<String> suffixes = configRepository.findAllRoutes().stream()
+                .filter(condition)
+                .map(Route::getSuffix)
+                .collect(Collectors.toList());
+        if (suffixes.isEmpty()) {
+            return Optional.empty();
+        }
+        int index = ThreadLocalRandom.current().nextInt(0, suffixes.size());
+        return Optional.of(suffixes.get(index));
     }
 
     @Override

@@ -75,7 +75,7 @@ List of predefined variables:
 - `${random_timestamp}` - random timestamp in yyyy-MM-dd HH:mm:ss.SSS format
 - `${current_date}` - current date in yyyy-MM-dd format
 - `${current_timestamp}` - current timestamp in yyyy-MM-dd HH:mm:ss.SSS format.
-- `${of:str1:str2:...}` - a random of given arguments (may be useful to represent enum values)
+- `${enum:str1:str2:...}` - a random one of given arguments (may be useful to represent enum values)
 
 #
 ### Provided variables

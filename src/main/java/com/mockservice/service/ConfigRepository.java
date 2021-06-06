@@ -1,10 +1,7 @@
 package com.mockservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mockservice.domain.Route;
-import com.mockservice.domain.RouteAlreadyExistsException;
-import com.mockservice.domain.Scenario;
-import com.mockservice.domain.ScenarioAlreadyExistsException;
+import com.mockservice.domain.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -13,6 +10,9 @@ import java.util.Optional;
 public interface ConfigRepository {
     String getConfigData() throws JsonProcessingException;
     void writeConfigData(String data) throws IOException;
+
+    Settings getSettings();
+    void setSettings(Settings settings) throws IOException;
 
     List<Route> findAllRoutes();
     Optional<Route> findRoute(Route route);

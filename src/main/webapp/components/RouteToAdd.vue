@@ -1,16 +1,16 @@
 <template>
     <div class="row">
         <div class="item w2">
-            <div class="fancy-row-block-value link" @click="filter(route.group)">{{ route.group }}</div>
+            <div class="mock-col-value link" @click="filter(route.group)">{{ route.group }}</div>
         </div>
         <div class="item">
-            <div class="fancy-row-block-value link" @click="filter(route.method)">{{ route.method }}</div>
+            <div class="mock-col-value link" @click="filter(route.method)">{{ route.method }}</div>
         </div>
         <div class="item w3">
-            <div class="fancy-row-block-value link" @click="filter(route.path)">{{ route.path }}</div>
+            <div class="mock-col-value link" @click="filter(route.path)">{{ route.path }}</div>
         </div>
         <div class="item w2">
-            <div class="fancy-row-block-value link color-accent-one" @click="filter(route.suffix)">{{ route.suffix }}</div>
+            <div class="mock-col-value link color-accent-one" @click="filter(route.suffix)">{{ route.suffix }}</div>
         </div>
         <div class="item w2">
             <a class="btn btn-default" @click="$emit('add', route)">add</a>
@@ -41,7 +41,6 @@
     .row {
         display: flex;
         flex-wrap: wrap;
-        font-size: smaller;
         margin-bottom: 0;
         padding: 0 .3rem;
         border-radius: 5px;

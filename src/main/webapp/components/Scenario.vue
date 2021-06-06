@@ -1,42 +1,44 @@
 <template>
-    <div class="fancy-row">
+    <div class="mock-row">
 
-        <div class="fancy-row-block">
-            <div class="fancy-row-block-header" :class="{'color-accent-one' : groupStart}">GROUP</div>
-            <div v-show="!editing" class="fancy-row-block-value link" @click="filter(scenario.group)">{{ scenario.group }}</div>
+        <div class="mock-col">
+            <div class="mock-col-header" :class="{'color-accent-one' : groupStart}">GROUP</div>
+            <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.group)">{{ scenario.group }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingScenario.group"/>
         </div>
 
-        <div class="fancy-row-block">
-            <div class="fancy-row-block-header">ALIAS</div>
-            <div v-show="!editing" class="fancy-row-block-value link" @click="filter(scenario.alias)">{{ scenario.alias }}</div>
+        <div class="mock-col">
+            <div class="mock-col-header">ALIAS</div>
+            <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.alias)">{{ scenario.alias }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingScenario.alias"/>
         </div>
 
-        <div class="fancy-row-block">
-            <div class="fancy-row-block-header">TYPE</div>
-            <div v-show="!editing" class="fancy-row-block-value link" @click="filter(scenario.type)">{{ scenario.type }}</div>
+        <div class="mock-col">
+            <div class="mock-col-header">TYPE</div>
+            <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.type)">{{ scenario.type }}</div>
             <select v-show="editing" class="form-control form-control-sm monospace" v-model="editingScenario.type">
                 <option>MAP</option>
                 <option>QUEUE</option>
             </select>
         </div>
 
-        <div class="fancy-row-block">
-            <div class="fancy-row-block-header">ACTIVE</div>
-            <div class="fancy-row-block-value" :class="{ 'color-accent-one' : active }">{{ active }}</div>
+        <div class="mock-col">
+            <div class="mock-col-header">ACTIVE</div>
+            <div class="mock-col-value" :class="{ 'color-accent-one' : active }">{{ active }}</div>
         </div>
 
-        <div class="fancy-buttons">
+        <div class="mock-col buttons">
             <a class="btn btn-link btn-default" @click="edit">edit</a>
             <a class="btn btn-link btn-default" @click="activate">(re)activate</a>
             <a class="btn btn-link btn-default" @click="deactivate">deactivate</a>
             <a class="btn btn-link btn-danger" @click="del">delete</a>
         </div>
 
-        <div v-show="editing" class="fancy-row-block-memo">
+        <div v-show="editing" class="mock-col w100">
             <textarea class="form-control form-control-sm v-resize monospace" rows="7" v-model="editingScenario.data"></textarea>
-            <div v-if="addRoute" class="routes">
+        </div>
+        <div v-if="editing && addRoute" class="mock-col w100">
+            <div class="routes">
                 <RoutesToAdd
                         :routes="routes"
                         @filter="setFilter($event)"
@@ -44,7 +46,7 @@
             </div>
         </div>
 
-        <div v-show="editing" class="fancy-buttons-centered">
+        <div v-show="editing" class="mock-col w100 buttons">
             <div class="btn btn-sm btn-primary" @click="addRoute = true; $fetch()">ADD ROUTES</div>
             <div v-if="addRoute" class="btn btn-sm btn-default" @click="addRoute = false">CLOSE ROUTES</div>
             <div class="btn btn-sm btn-primary" @click="save">SAVE</div>

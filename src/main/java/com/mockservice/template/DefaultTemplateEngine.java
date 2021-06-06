@@ -26,7 +26,7 @@ public class DefaultTemplateEngine implements TemplateEngine {
         suppliers.put("random_long", () -> DefaultTemplateEngine::randomLong);
         suppliers.put("random_uuid", () -> DefaultTemplateEngine::randomUuid);
         suppliers.put("random_string", () -> DefaultTemplateEngine::randomString);
-        suppliers.put("of", () -> DefaultTemplateEngine::of);
+        suppliers.put("enum", () -> DefaultTemplateEngine::enumFn);
         suppliers.put("random_date", () -> DefaultTemplateEngine::randomDate);
         suppliers.put("random_timestamp", () -> DefaultTemplateEngine::randomTimestamp);
         suppliers.put("current_date", () -> DefaultTemplateEngine::currentDate);
@@ -40,34 +40,9 @@ public class DefaultTemplateEngine implements TemplateEngine {
         return functions;
     }
 
-    // helper function
-
-    private static int argumentInt(String[] args, int index, int def) {
-        try {
-            if (args.length > index) {
-                return Integer.parseInt(args[index]);
-            }
-        } catch (Exception e) {
-            // ignore
-        }
-        return def;
-    }
-    // helper function
-
-    private static long argumentLong(String[] args, int index, long def) {
-        try {
-            if (args.length > index) {
-                return Long.parseLong(args[index]);
-            }
-        } catch (Exception e) {
-            // ignore
-        }
-        return def;
-    }
-
     private static String randomInt(String[] args) {
-        int origin = argumentInt(args, 1, 1);
-        int bound = argumentInt(args, 2, 10_000) + 1;
+        int origin = intArgOrDefault(args, 1, 1);
+        int bound = intArgOrDefault(args, 2, 10_000) + 1;
         if (bound <= origin) {
             bound = origin + 1;
         }
@@ -75,8 +50,8 @@ public class DefaultTemplateEngine implements TemplateEngine {
     }
 
     private static String randomLong(String[] args) {
-        long origin = argumentLong(args, 1, 1);
-        long bound = argumentLong(args, 2, 1_000_000_000_000_000L) + 1;
+        long origin = longArgOrDefault(args, 1, 1);
+        long bound = longArgOrDefault(args, 2, 1_000_000_000_000_000L) + 1;
         if (bound <= origin) {
             bound = origin + 1;
         }
@@ -89,8 +64,8 @@ public class DefaultTemplateEngine implements TemplateEngine {
     }
 
     private static String randomString(String[] args) {
-        int minLen = argumentInt(args, 1, 10);
-        int maxLen = argumentInt(args, 2, 20) + 1;
+        int minLen = intArgOrDefault(args, 1, 10);
+        int maxLen = intArgOrDefault(args, 2, 20) + 1;
         if (maxLen <= minLen) {
             maxLen = minLen + 1;
         }
@@ -103,7 +78,7 @@ public class DefaultTemplateEngine implements TemplateEngine {
                 .toString();
     }
 
-    private static String of(String[] args) {
+    private static String enumFn(String[] args) {
         if (args.length > 1) {
             int index = ThreadLocalRandom.current().nextInt(1, args.length);
             return args[index];
@@ -140,5 +115,33 @@ public class DefaultTemplateEngine implements TemplateEngine {
         return ZonedDateTime
                 .now(ZoneId.systemDefault())
                 .format(DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss.SSS"));
+    }
+
+    //--------------------------------------------------------------------------
+    //
+    // helper functions
+    //
+    //--------------------------------------------------------------------------
+
+    private static int intArgOrDefault(String[] args, int index, int def) {
+        try {
+            if (args.length > index) {
+                return Integer.parseInt(args[index]);
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        return def;
+    }
+
+    private static long longArgOrDefault(String[] args, int index, long def) {
+        try {
+            if (args.length > index) {
+                return Long.parseLong(args[index]);
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        return def;
     }
 }

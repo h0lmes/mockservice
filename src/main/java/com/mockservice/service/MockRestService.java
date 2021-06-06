@@ -3,7 +3,6 @@ package com.mockservice.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.domain.Route;
-import com.mockservice.domain.RouteType;
 import com.mockservice.request.RequestFacade;
 import com.mockservice.request.RestRequestFacade;
 import com.mockservice.resource.MockResource;
@@ -19,6 +18,7 @@ import org.springframework.util.ConcurrentLruCache;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.util.Optional;
 
 @Service("rest")
 public class MockRestService implements MockService {
@@ -29,17 +29,20 @@ public class MockRestService implements MockService {
     private final TemplateEngine templateEngine;
     private final RouteService routeService;
     private final ActiveScenariosService activeScenariosService;
+    private final ConfigRepository configRepository;
     private final ConcurrentLruCache<Route, MockResource> resourceCache;
 
     public MockRestService(HttpServletRequest request,
                            TemplateEngine templateEngine,
                            RouteService routeService,
                            ActiveScenariosService activeScenariosService,
+                           ConfigRepository configRepository,
                            @Value("${application.cache.rest-resource}") int cacheSizeLimit) {
         this.request = request;
         this.templateEngine = templateEngine;
         this.routeService = routeService;
         this.activeScenariosService = activeScenariosService;
+        this.configRepository = configRepository;
         resourceCache = new ConcurrentLruCache<>(cacheSizeLimit, this::loadResource);
     }
 
@@ -68,14 +71,23 @@ public class MockRestService implements MockService {
     }
 
     private Route getRoute(RequestFacade requestFacade) {
-        String suffix = requestFacade.getSuffix()
-                .or(() -> activeScenariosService.getRouteSuffix(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
-                .orElse("");
-        return new Route()
-                .setType(RouteType.REST)
+        Route route = new Route()
                 .setMethod(requestFacade.getRequestMethod())
-                .setPath(requestFacade.getEndpoint())
-                .setSuffix(suffix);
+                .setPath(requestFacade.getEndpoint());
+
+        String suffix = requestFacade
+                .getSuffix()
+                .or(() -> getRandomSuffixFor(route))
+                .or(() -> activeScenariosService.getSuffixFor(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
+                .orElse("");
+        return route.setSuffix(suffix);
+    }
+
+    private Optional<String> getRandomSuffixFor(Route route) {
+        if (configRepository.getSettings().getRandomSuffix()) {
+            return routeService.getRandomSuffixFor(route);
+        }
+        return Optional.empty();
     }
 
     @Override

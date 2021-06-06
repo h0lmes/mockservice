@@ -1,5 +1,6 @@
 export const state = () => ({
     BASE_URL: location.protocol + '//' + location.hostname + ':8081',
+    settings: {},
     routes: [],
     scenarios: [],
     activeScenarios: [],
@@ -7,6 +8,10 @@ export const state = () => ({
 });
 
 export const mutations = {
+    setSettings(state, payload) {
+        state.settings = payload;
+    },
+
     setRoutes(state, payload) {
         state.routes = payload;
     },
@@ -30,7 +35,7 @@ export const mutations = {
     },
     resetLastError(state) {
         state.lastError = '';
-    }
+    },
 };
 
 async function handleError(response) {
@@ -45,6 +50,30 @@ async function handleError(response) {
 }
 
 export const actions = {
+    async fetchSettings({commit, state}) {
+        commit('resetLastError');
+        return fetch(
+            state.BASE_URL + '/web-api/settings'
+        ).then(handleError
+        ).then(response => response.json()
+        ).then(response => commit('setSettings', response)
+        ).catch(error => commit('setLastError', error));
+    },
+    async saveSettings({commit, state}, settings) {
+        commit('resetLastError');
+        return fetch(
+            state.BASE_URL + '/web-api/settings',
+            {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({...state.settings, ...settings})
+            }
+        ).then(handleError
+        ).then(response => response.json()
+        ).then(response => commit('setSettings', response)
+        ).catch(error => commit('setLastError', error));
+    },
+
     setLastError({commit}, text) {
         commit('setLastError', text);
     },
@@ -111,7 +140,7 @@ export const actions = {
         ).catch(error => commit('setLastError', error));
     },
     newRoute({commit}) {
-        commit('addRoute', {group: '', type: 'REST', method: 'GET', path: '/', suffix: '', _new: true});
+        commit('addRoute', {group: '', type: 'REST', method: 'GET', path: '/', suffix: '', disabled: false, _new: true});
     },
 
     async fetchScenarios({commit, state}) {

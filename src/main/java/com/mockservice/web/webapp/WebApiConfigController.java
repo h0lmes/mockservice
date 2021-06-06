@@ -12,13 +12,13 @@ import java.io.IOException;
 @RestController
 @RequestMapping("web-api")
 @CrossOrigin(origins = "*")
-public class WebApiController {
+public class WebApiConfigController {
 
-    private static final Logger log = LoggerFactory.getLogger(WebApiController.class);
+    private static final Logger log = LoggerFactory.getLogger(WebApiConfigController.class);
 
     private final ConfigRepository configRepository;
 
-    public WebApiController(ConfigRepository configRepository) {
+    public WebApiConfigController(ConfigRepository configRepository) {
         this.configRepository = configRepository;
     }
 

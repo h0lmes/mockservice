@@ -47,13 +47,13 @@ public class ActiveScenariosServiceImpl implements ActiveScenariosService, Confi
         }
     }
 
-    private boolean scenarioIsActive(String alias) {
-        return activeScenarios.containsKey(alias);
-    }
-
     @Override
     public void onScenarioDeleted(String alias) {
         deactivateScenarioInternal(alias);
+    }
+
+    private boolean scenarioIsActive(String alias) {
+        return activeScenarios.containsKey(alias);
     }
 
     @Override
@@ -106,16 +106,12 @@ public class ActiveScenariosServiceImpl implements ActiveScenariosService, Confi
     }
 
     @Override
-    public Optional<String> getRouteSuffix(RequestMethod method, String path) {
+    public Optional<String> getSuffixFor(RequestMethod method, String path) {
         Predicate<Route> condition = r -> method.equals(r.getMethod()) && path.equals(r.getPath());
         return activeScenarios.values().stream()
-                .map(v -> getSuffixFromActiveScenario(v, condition))
+                .map(activeScenario -> activeScenario.getScenario().getType().getStrategy().apply(activeScenario.getRoutes(), condition))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .findFirst();
-    }
-
-    private Optional<String> getSuffixFromActiveScenario(ActiveScenario activeScenario, Predicate<Route> condition) {
-        return activeScenario.getScenario().getType().getStrategy().apply(activeScenario.getRoutes(), condition);
     }
 }
