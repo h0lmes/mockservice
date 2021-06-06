@@ -14,10 +14,6 @@
                        @filter="setFilter($event)"></Scenarios>
         </div>
 
-        <div v-if="addRouteToScenarioAlias" class="routes" @click="closeAddRouteToScenario()">
-            routes
-        </div>
-
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
 </template>
@@ -32,7 +28,6 @@
         data() {
             return {
                 query: '',
-                queryApplied: '',
                 timeout: null
             }
         },
@@ -56,12 +51,9 @@
                         || v.type.toLowerCase().includes(this.query)
                 );
             },
-            addRouteToScenarioAlias() {
-                return this.$store.state.addRouteToScenarioAlias
-            }
         },
         methods: {
-            ...mapActions(['fetchScenarios', 'newScenario', 'fetchActiveScenarios', 'closeAddRouteToScenario']),
+            ...mapActions(['fetchScenarios', 'newScenario', 'fetchActiveScenarios']),
             debounce(value) {
                 clearTimeout(this.timeout);
                 let that = this;
@@ -79,16 +71,5 @@
 <style scoped>
     .holder {
         margin: 0 auto;
-    }
-    .routes {
-        display: block;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 1000;
-        background-color: var(--bg-primary);
-        padding: 2em;
     }
 </style>

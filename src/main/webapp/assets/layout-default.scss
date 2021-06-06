@@ -81,12 +81,20 @@
 }
 .nav > li.active > a {
     color: var(--nav-color-active);
+
+    & .nav-icon {
+        color: var(--color-accent-one);
+    }
 }
 .navbar .nav > li > a:hover,
 .navbar .nav > li > a:focus {
     background-color: var(--nav-bg-active);
     color: var(--nav-color-active);
     text-decoration: none;
+
+    & .nav-icon {
+        color: var(--color-accent-one);
+    }
 }
 .navbar-mini .nav-label,
 .navbar-maximizing .nav-label,

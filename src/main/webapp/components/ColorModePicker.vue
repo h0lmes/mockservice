@@ -67,18 +67,17 @@
         top: 0;
         margin: 0;
         padding: 4px;
-        background-color: var(--bg-secondary);
-        color: var(--color-primary);
-        border: 2px solid transparent;
+        background-color: transparent;
+        color: var(--nav-color);
         border-radius: 5px;
         transition: all 0.1s ease;
     }
     .feather.preferred {
-        border-color: var(--color-secondary);
+        color: var(--color-accent-one);
     }
-    .feather.selected {
-        color: var(--color-secondary);
-    }
+    /*.feather.selected {*/
+        /*color: var(--color-accent-one);*/
+    /*}*/
     .scheme-info {
         font-size: smaller;
         font-weight: lighter;

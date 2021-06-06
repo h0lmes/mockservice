@@ -29,6 +29,10 @@ public class ActiveScenario {
     }
 
     private void parseScenarioLine(List<Route> routes, String s) throws ScenarioParseException {
+        if (s.trim().isEmpty()) {
+            return;
+        }
+
         String[] parts = s.split("\\s+");
         if (parts.length < 2) {
             throw new ScenarioParseException("Error parsing line [" + s + "]", null);

@@ -6,6 +6,7 @@
   --form-control-border: #ced4da;
   --form-control-placeholder: #ccc;
   --form-control-bg-hilight-shadow: #57a5ff;
+  --form-control-border-radius: 0.25rem;
 }
 .dark-mode {
   --form-control-color: #909ea7;
@@ -34,7 +35,7 @@
   background-color: var(--form-control-bg);
   background-clip: padding-box;
   border: 1px solid var(--form-control-border);
-  border-radius: .25rem;
+  border-radius: var(--form-control-border-radius);
   transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
   outline: none;
   box-shadow: none;

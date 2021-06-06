@@ -27,22 +27,28 @@
             <div class="fancy-row-block-value" :class="{ 'color-accent-one' : active }">{{ active }}</div>
         </div>
 
-        <div class="fancy-row-block-buttons">
-            <a class="btn btn-link ml-2 mr-2" @click="edit">edit</a>
-            <a class="btn btn-link mr-2" @click="activate">(re)activate</a>
-            <a class="btn btn-link mr-2" @click="deactivate">deactivate</a>
-            <a class="btn btn-link btn-danger mr-2" @click="del">delete</a>
+        <div class="fancy-buttons">
+            <a class="btn btn-link btn-default" @click="edit">edit</a>
+            <a class="btn btn-link btn-default" @click="activate">(re)activate</a>
+            <a class="btn btn-link btn-default" @click="deactivate">deactivate</a>
+            <a class="btn btn-link btn-danger" @click="del">delete</a>
         </div>
 
         <div v-show="editing" class="fancy-row-block-memo">
-            <div class="btn btn-link mr-3" @click="openAddRouteToScenario(scenario.alias)">Add route</div>
-            <div class="fancy-row-block-header">ROUTES</div>
-            <textarea class="form-control form-control-sm v-resize monospace" rows="10" v-model="editingScenario.data"></textarea>
+            <textarea class="form-control form-control-sm v-resize monospace" rows="7" v-model="editingScenario.data"></textarea>
+            <div v-if="addRoute" class="routes">
+                <RoutesToAdd
+                        :routes="routes"
+                        @filter="setFilter($event)"
+                        @add="add($event)"></RoutesToAdd>
+            </div>
         </div>
 
-        <div v-show="editing" class="fancy-row-block-edit-buttons">
-            <div class="btn btn-sm btn-primary mr-3" @click="save">SAVE</div>
-            <div class="btn btn-sm btn-primary mr-3" @click="saveAsCopy">SAVE AS COPY</div>
+        <div v-show="editing" class="fancy-buttons-centered">
+            <div class="btn btn-sm btn-primary" @click="addRoute = true; $fetch()">ADD ROUTES</div>
+            <div v-if="addRoute" class="btn btn-sm btn-default" @click="addRoute = false">CLOSE ROUTES</div>
+            <div class="btn btn-sm btn-primary" @click="save">SAVE</div>
+            <div class="btn btn-sm btn-primary" @click="saveAsCopy">SAVE AS COPY</div>
             <div class="btn btn-sm btn-default" @click="cancel">CANCEL</div>
         </div>
 
@@ -50,13 +56,16 @@
 </template>
 <script>
     import {mapActions} from 'vuex';
+    import RoutesToAdd from "../components/RoutesToAdd";
 
     export default {
         name: "Scenario",
+        components: {RoutesToAdd},
         data() {
             return {
                 editing: false,
                 editingScenario: {},
+                addRoute: false
             }
         },
         props: {
@@ -64,8 +73,18 @@
             active: {type: Boolean},
             groupStart: {type: Boolean}
         },
+        async fetch() {
+            if (this.addRoute && (!this.routes || this.routes.length === 0)) {
+                this.fetchRoutes();
+            }
+        },
+        computed: {
+            routes() {
+                return this.$store.state.routes
+            },
+        },
         methods: {
-            ...mapActions(['saveScenario', 'deleteScenario', 'activateScenario', 'deactivateScenario', 'openAddRouteToScenario']),
+            ...mapActions(['saveScenario', 'deleteScenario', 'activateScenario', 'deactivateScenario', 'fetchRoutes']),
             filter(value) {
                 this.$emit('filter', value);
             },
@@ -109,8 +128,23 @@
                 this.saveScenario([{}, this.editingScenario])
                     .then(() => this.$nuxt.$loading.finish());
             },
+            add(route) {
+                this.editingScenario.data += '\n' + route.method + ' ' + route.path + ' ' + route.suffix;
+            },
         }
     }
 </script>
 <style lang="scss" scoped>
+    .routes {
+        display: block;
+        position: relative;
+        margin: 0.5rem 0 0 0;
+        width: 100%;
+        min-height: 3rem;
+        max-height: 25em;
+        background-color: var(--bg-primary);
+        border: 1px solid var(--form-control-border);
+        border-radius: var(--form-control-border-radius);
+        overflow: auto;
+    }
 </style>

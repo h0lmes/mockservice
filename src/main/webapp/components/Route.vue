@@ -46,19 +46,19 @@
             <input v-show="editing" type="checkbox" class="form-control form-check" v-model="editingRoute.disabled"/>
         </div>
 
-        <div class="fancy-row-block-buttons">
-            <a class="btn btn-link ml-2 mr-2" @click="edit">edit</a>
-            <a class="btn btn-link mr-2" @click="test">test</a>
-            <a class="btn btn-link btn-danger mr-2" @click="del">delete</a>
+        <div class="fancy-buttons">
+            <a class="btn btn-link btn-default" @click="edit">edit</a>
+            <a class="btn btn-link btn-default" @click="test">test</a>
+            <a class="btn btn-link btn-danger" @click="del">delete</a>
         </div>
 
         <div v-show="editing" class="fancy-row-block-memo">
             <textarea class="form-control form-control-sm v-resize monospace" rows="10" v-model="editingRoute.response"></textarea>
         </div>
 
-        <div v-show="editing" class="fancy-row-block-edit-buttons">
-            <div class="btn btn-sm btn-primary mr-3" @click="save">SAVE</div>
-            <div class="btn btn-sm btn-primary mr-3" @click="saveAsCopy">SAVE AS COPY</div>
+        <div v-show="editing" class="fancy-buttons-centered">
+            <div class="btn btn-sm btn-primary" @click="save">SAVE</div>
+            <div class="btn btn-sm btn-primary" @click="saveAsCopy">SAVE AS COPY</div>
             <div class="btn btn-sm btn-default" @click="cancel">CANCEL</div>
         </div>
 

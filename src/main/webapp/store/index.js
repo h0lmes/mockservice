@@ -3,7 +3,6 @@ export const state = () => ({
     routes: [],
     scenarios: [],
     activeScenarios: [],
-    addRouteToScenarioAlias: '',
     lastError: ''
 });
 
@@ -23,9 +22,6 @@ export const mutations = {
     },
     setActiveScenarios(state, payload) {
         state.activeScenarios = payload;
-    },
-    setAddRouteToScenarioAlias(state, payload) {
-        state.addRouteToScenarioAlias = payload;
     },
 
     setLastError(state, payload) {
@@ -194,11 +190,5 @@ export const actions = {
         ).then(response => response.json()
         ).then(response => commit('setActiveScenarios', response)
         ).catch(error => commit('setLastError', error));
-    },
-    openAddRouteToScenario({commit, state}, alias) {
-        commit('setAddRouteToScenarioAlias', alias);
-    },
-    closeAddRouteToScenario({commit, state}) {
-        commit('setAddRouteToScenarioAlias', '');
     },
 };

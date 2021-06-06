@@ -14,7 +14,7 @@ export default {
         '~/assets/main.scss',
         '~/assets/buttons.less',
         '~/assets/forms.scss',
-        '~/assets/layout-default.css',
+        '~/assets/layout-default.scss',
         '~/assets/helpers.css'
     ],
     head: {
