@@ -10,7 +10,7 @@ public class Route implements Comparable<Route> {
     private String path = "";
     private RequestMethod method = RequestMethod.GET;
     private RouteType type = RouteType.REST;
-    private String suffix = "";
+    private String alt = "";
     private String response = "";
     private boolean disabled = false;
 
@@ -59,12 +59,12 @@ public class Route implements Comparable<Route> {
         return this;
     }
 
-    public String getSuffix() {
-        return suffix;
+    public String getAlt() {
+        return alt;
     }
 
-    public Route setSuffix(String suffix) {
-        this.suffix = suffix == null ? "" : suffix;
+    public Route setAlt(String alt) {
+        this.alt = alt == null ? "" : alt;
         return this;
     }
 
@@ -91,14 +91,14 @@ public class Route implements Comparable<Route> {
         setPath(source.getPath());
         setMethod(source.getMethod());
         setType(source.getType());
-        setSuffix(source.getSuffix());
+        setAlt(source.getAlt());
         setResponse(source.getResponse());
         setDisabled(source.getDisabled());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(method, path, suffix);
+        return Objects.hash(method, path, alt);
     }
 
     @Override
@@ -107,12 +107,12 @@ public class Route implements Comparable<Route> {
         Route other = (Route) o;
         return method.equals(other.getMethod())
                 && path.equals(other.getPath())
-                && suffix.equals(other.getSuffix());
+                && alt.equals(other.getAlt());
     }
 
     @Override
     public String toString() {
-        return String.format("(group=%s, type=%s, method=%s, path=%s, suffix=%s, disabled=%s)", group, type, method, path, suffix, disabled);
+        return String.format("(group=%s, type=%s, method=%s, path=%s, alt=%s, disabled=%s)", group, type, method, path, alt, disabled);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class Route implements Comparable<Route> {
         if (c != 0) return c;
         c = this.path.compareTo(o.getPath());
         if (c != 0) return c;
-        c = this.suffix.compareTo(o.getSuffix());
+        c = this.alt.compareTo(o.getAlt());
         return c;
     }
 }

@@ -2,15 +2,15 @@ package com.mockservice.domain;
 
 public class Settings {
 
-    private boolean randomSuffix = false;
+    private boolean randomAlt = false;
     private boolean quantum = false;
 
     public Settings() {
         // default
     }
 
-    public boolean getRandomSuffix() {
-        return randomSuffix;
+    public boolean getRandomAlt() {
+        return randomAlt;
     }
 
     public boolean getQuantum() {

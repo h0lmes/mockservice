@@ -140,7 +140,7 @@ export const actions = {
         ).catch(error => commit('setLastError', error));
     },
     newRoute({commit}) {
-        commit('addRoute', {group: '', type: 'REST', method: 'GET', path: '/', suffix: '', disabled: false, _new: true});
+        commit('addRoute', {group: '', type: 'REST', method: 'GET', path: '/', alt: '', disabled: false, _new: true});
     },
 
     async fetchScenarios({commit, state}) {

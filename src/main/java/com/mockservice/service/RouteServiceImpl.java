@@ -29,17 +29,17 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
-    public Optional<String> getRandomSuffixFor(Route route) {
+    public Optional<String> getRandomAltFor(Route route) {
         Predicate<Route> condition = r -> route.getMethod().equals(r.getMethod()) && route.getPath().equals(r.getPath());
-        List<String> suffixes = configRepository.findAllRoutes().stream()
+        List<String> alts = configRepository.findAllRoutes().stream()
                 .filter(condition)
-                .map(Route::getSuffix)
+                .map(Route::getAlt)
                 .collect(Collectors.toList());
-        if (suffixes.isEmpty()) {
+        if (alts.isEmpty()) {
             return Optional.empty();
         }
-        int index = ThreadLocalRandom.current().nextInt(0, suffixes.size());
-        return Optional.of(suffixes.get(index));
+        int index = ThreadLocalRandom.current().nextInt(0, alts.size());
+        return Optional.of(alts.get(index));
     }
 
     @Override

@@ -1,7 +1,7 @@
 <template>
     <div class="table">
         <p v-if="routes.length === 0">No routes found</p>
-        <div class="row" v-for="(route, index) in routes" :key="route.type + route.method + route.path + route.suffix">
+        <div class="row" v-for="(route, index) in routes" :key="route.type + route.method + route.path + route.alt">
             <RouteToAdd :route="route"
                         :groupStart="groupStart(route, index)"
                         @filter="$emit('filter', $event)"

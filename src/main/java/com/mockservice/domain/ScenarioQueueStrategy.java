@@ -8,20 +8,20 @@ public class ScenarioQueueStrategy implements ScenarioStrategy {
 
     public Optional<String> apply(List<Route> routes, Predicate<Route> condition) {
         int i = 0;
-        Optional<String> suffix = Optional.empty();
-        while (i < routes.size() && suffix.isEmpty()) {
+        Optional<String> alt = Optional.empty();
+        while (i < routes.size() && alt.isEmpty()) {
             Route route = routes.get(i);
             if (condition.test(route)) {
-                suffix = Optional.of(route.getSuffix());
+                alt = Optional.of(route.getAlt());
             } else {
                 i++;
             }
         }
 
-        if (suffix.isPresent()) {
+        if (alt.isPresent()) {
             routes.remove(i);
         }
 
-        return suffix;
+        return alt;
     }
 }

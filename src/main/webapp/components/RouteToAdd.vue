@@ -10,7 +10,7 @@
             <div class="mock-col-value link" @click="filter(route.path)">{{ route.path }}</div>
         </div>
         <div class="item w2">
-            <div class="mock-col-value link color-accent-one" @click="filter(route.suffix)">{{ route.suffix }}</div>
+            <div class="mock-col-value link color-accent-one" @click="filter(route.alt)">{{ route.alt }}</div>
         </div>
         <div class="item w2">
             <a class="btn btn-default" @click="$emit('add', route)">add</a>

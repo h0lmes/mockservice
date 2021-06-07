@@ -10,5 +10,5 @@ public interface ActiveScenariosService {
     Set<String> getActiveScenarios();
     Set<String> activateScenario(String alias) throws ScenarioParseException;
     Set<String> deactivateScenario(String alias);
-    Optional<String> getSuffixFor(RequestMethod method, String path);
+    Optional<String> getAltFor(RequestMethod method, String path);
 }

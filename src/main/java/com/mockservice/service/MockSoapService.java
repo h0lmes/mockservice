@@ -86,17 +86,17 @@ public class MockSoapService implements MockService {
                 .setMethod(requestFacade.getRequestMethod())
                 .setPath(requestFacade.getEndpoint());
 
-        String suffix = requestFacade
-                .getSuffix()
-                .or(() -> getRandomSuffixFor(route))
-                .or(() -> activeScenariosService.getSuffixFor(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
+        String alt = requestFacade
+                .getAlt()
+                .or(() -> getRandomAltFor(route))
+                .or(() -> activeScenariosService.getAltFor(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
                 .orElse("");
-        return route.setSuffix(suffix);
+        return route.setAlt(alt);
     }
 
-    private Optional<String> getRandomSuffixFor(Route route) {
-        if (configRepository.getSettings().getRandomSuffix()) {
-            return routeService.getRandomSuffixFor(route);
+    private Optional<String> getRandomAltFor(Route route) {
+        if (configRepository.getSettings().getRandomAlt()) {
+            return routeService.getRandomAltFor(route);
         }
         return Optional.empty();
     }

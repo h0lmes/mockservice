@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface RouteService {
     Optional<Route> getEnabledRoute(Route route);
-    Optional<String> getRandomSuffixFor(Route route);
+    Optional<String> getRandomAltFor(Route route);
     List<Route> getRoutesAsList();
     List<Route> putRoute(Route route, Route replacement) throws IOException, RouteAlreadyExistsException;
     List<Route> deleteRoute(Route route) throws IOException;

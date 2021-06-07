@@ -106,7 +106,7 @@ public class ActiveScenariosServiceImpl implements ActiveScenariosService, Confi
     }
 
     @Override
-    public Optional<String> getSuffixFor(RequestMethod method, String path) {
+    public Optional<String> getAltFor(RequestMethod method, String path) {
         Predicate<Route> condition = r -> method.equals(r.getMethod()) && path.equals(r.getPath());
         return activeScenarios.values().stream()
                 .map(activeScenario -> activeScenario.getScenario().getType().getStrategy().apply(activeScenario.getRoutes(), condition))

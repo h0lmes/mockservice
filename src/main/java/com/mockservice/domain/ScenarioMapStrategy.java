@@ -7,6 +7,6 @@ import java.util.function.Predicate;
 public class ScenarioMapStrategy implements ScenarioStrategy {
 
     public Optional<String> apply(List<Route> routes, Predicate<Route> condition) {
-        return routes.stream().filter(condition).map(Route::getSuffix).findFirst();
+        return routes.stream().filter(condition).map(Route::getAlt).findFirst();
     }
 }

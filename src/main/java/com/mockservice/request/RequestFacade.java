@@ -9,6 +9,6 @@ import java.util.Optional;
 public interface RequestFacade {
     RequestMethod getRequestMethod();
     String getEndpoint();
-    Optional<String> getSuffix();
+    Optional<String> getAlt();
     Map<String, String> getVariables(@Nullable Map<String, String> variables);
 }

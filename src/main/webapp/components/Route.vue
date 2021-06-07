@@ -35,9 +35,9 @@
         </div>
 
         <div class="mock-col w2">
-            <div class="mock-col-header">SUFFIX</div>
-            <div v-show="!editing" class="mock-col-value link" @click="filter(route.suffix)">{{ route.suffix }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.suffix"/>
+            <div class="mock-col-header">ALT</div>
+            <div v-show="!editing" class="mock-col-value link" @click="filter(route.alt)">{{ route.alt }}</div>
+            <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.alt"/>
         </div>
 
         <div class="mock-col center">

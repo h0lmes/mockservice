@@ -41,10 +41,10 @@
                 return 'application/json';
             },
             testHeaders() {
-                if (this.route.suffix) {
+                if (this.route.alt) {
                     return {
                         'Content-Type': this.contentType,
-                        'Mock-Suffix': this.encodedPath + '/' + this.route.suffix
+                        'Mock-Alt': this.encodedPath + '/' + this.route.alt
                     }
                 } else {
                     return {

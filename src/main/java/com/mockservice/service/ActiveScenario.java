@@ -38,13 +38,13 @@ public class ActiveScenario {
             throw new ScenarioParseException("Error parsing line [" + s + "]", null);
         }
 
-        String suffix = "";
+        String alt = "";
         int i = 2;
         while (i < parts.length) {
-            suffix += parts[i++];
+            alt += parts[i++];
         }
 
-        routes.add(new Route(parts[0], parts[1]).setSuffix(suffix));
+        routes.add(new Route(parts[0], parts[1]).setAlt(alt));
     }
 
     public Scenario getScenario() {

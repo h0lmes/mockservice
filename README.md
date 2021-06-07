@@ -36,24 +36,24 @@ or
     Custom-Header: header value
 
 #
-### Route Suffix
+### Route Alt (Alternative)
 
-Suffixes allow you to create multiple responses for a single path.
+Alt allow you to create alternative responses for a single path.
 
-To select a particular response send `Mock-Suffix` header in HTTP request.
-Multiple `Mock-Suffix` headers supported per HTTP request.
-Each header should define exactly one suffix.
+To select a particular response send `Mock-Alt` header in HTTP request.
+Multiple `Mock-Alt` headers supported per HTTP request.
+Each header should define exactly one alternative.
 
 Header format:
 
-    request-mapping/suffix
+    request-mapping/alt
     
 Example:
 
-    Mock-Suffix: api-v1-item-{id}/invalid_format
+    Mock-Alt: api-v1-item-{id}/invalid_format
 
 In the example above if you call an endpoint `/api/v1/item/{id}`
-then the Route with the `invalid_format` suffix would match.
+then the Route with the `invalid_format` Alt would match.
 
 #
 ### Predefined variables

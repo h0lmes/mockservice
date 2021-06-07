@@ -1,8 +1,8 @@
 <template>
     <div class="monospace">
         <p>
-            <ToggleSwitch :id="'randomSuffix'"
-                          v-model="randomSuffix">Random Suffix (return random of existing Suffixes for requested Route)
+            <ToggleSwitch :id="'randomAlt'"
+                          v-model="randomAlt">Random Alt (return random of existing alternatives for requested Route)
             </ToggleSwitch>
         </p>
         <p class="mt-2">
@@ -26,7 +26,7 @@
         components: {Loading, ToggleSwitch},
         data() {
             return {
-                randomSuffix: false,
+                randomAlt: false,
                 quantum: false
             }
         },
@@ -41,7 +41,7 @@
         },
         watch: {
             settings() {
-                this.randomSuffix = this.settings.randomSuffix;
+                this.randomAlt = this.settings.randomAlt;
                 this.quantum = this.settings.quantum;
             },
         },
@@ -51,7 +51,7 @@
                 this.$nuxt.$loading.start();
                 await this.saveSettings(
                     {
-                        randomSuffix: this.randomSuffix,
+                        randomAlt: this.randomAlt,
                         quantum: this.quantum
                     }
                 ).then(() => this.$nuxt.$loading.finish());

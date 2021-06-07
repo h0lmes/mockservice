@@ -1,65 +1,68 @@
+settings:
+  randomAlt: true
+  quantum: false
 routes:
 - group: -robot-
   path: /api/robot
   method: GET
   type: REST
-  suffix: ""
+  alt: ""
   response: "{\"name\": \"Johnny 5\"}"
   disabled: false
 - group: -robot-
   path: /api/robot
   method: GET
   type: REST
-  suffix: R2D2
+  alt: R2D2
   response: "{\"name\": \"R2D2\"}"
   disabled: false
 - group: -robot-
   path: /api/robot
   method: GET
   type: REST
-  suffix: terminator
+  alt: terminator
   response: "{\"name\": \"terminator\"}"
   disabled: false
 - group: Example Rest Service
   path: /api/v2/entity
   method: GET
   type: REST
-  suffix: ""
+  alt: ""
   response: "[\n  {\"id\": ${sequence}, \"name\": \"${random_string}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"}\n]"
   disabled: false
 - group: Example Rest Service
   path: /api/v2/entity
   method: GET
   type: REST
-  suffix: 400
+  alt: 400
   response: "HTTP/1.1 400\n\n[]"
   disabled: false
 - group: Example Rest Service
   path: /api/v2/entity/filter
   method: GET
   type: REST
-  suffix: ""
+  alt: ""
   response: "[\n  {\"id\": 2, \"name\": \"${a:default a}\"},\n  {\"id\": 3, \"name\": \"${b:${enum:default B1:default B2:default B3}}\"}\n]"
   disabled: false
 - group: Example Rest Service
   path: "/api/v2/entity/{id}"
   method: GET
   type: REST
-  suffix: ""
+  alt: ""
   response: "{\"id\": ${id}, \"name\": \"entity name\"}"
   disabled: false
 - group: Example Rest Service
   path: /api/v2/entity
   method: POST
   type: REST
-  suffix: ""
+  alt: ""
   response: "HTTP/1.1 201\nCustom-Header: entity-created\n\n{\"id\": ${random_int}, \"name\": \"${name:default name}\"}"
   disabled: false
 - group: Example Soap Service
   path: /mockNumberConversion
   method: POST
   type: SOAP
-  suffix: ""
+  alt: ""
   response: "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:web=\"http://www.dataaccess.com/webservicesserver/\">\n  <soapenv:Header/>\n  <soapenv:Body>\n    <web:NumberToDollarsResponse>\n      <web:NumberToDollarsResult>${enum:TEST1:TEST2}</web:NumberToDollarsResult>\n    </web:NumberToDollarsResponse>\n  </soapenv:Body>\n</soapenv:Envelope>"
   disabled: false
 scenarios:

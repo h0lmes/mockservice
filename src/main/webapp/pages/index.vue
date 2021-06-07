@@ -47,7 +47,7 @@
                         || v.path.toLowerCase().includes(this.query)
                         || v.type.toLowerCase().includes(this.query)
                         || v.method.toLowerCase().includes(this.query)
-                        || v.suffix.toLowerCase().includes(this.query)
+                        || v.alt.toLowerCase().includes(this.query)
                 );
             },
         },
