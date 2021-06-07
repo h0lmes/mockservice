@@ -5,8 +5,8 @@
             <input id="search" placeholder="search here or click on values" type="text" class="form-control noborder" @input="debounce($event.target.value)"/>
         </div>
         <p class="mb-2">
-            <a class="btn btn-link mr-4" @click="newScenario">Add scenario</a>
-            <a class="btn btn-link mr-4" @click="setFilter('')">Clear filter</a>
+            <a class="btn btn-link mr-3" @click="newScenario">Add scenario</a>
+            <a class="btn btn-link mr-3" @click="setFilter('')">Clear filter</a>
         </p>
         <div class="holder">
             <Scenarios :scenarios="filtered"
@@ -34,6 +34,7 @@
         async fetch() {
             return this.fetchScenarios().then(this.fetchActiveScenarios);
         },
+        fetchDelay: 0,
         computed: {
             scenarios() {
                 return this.$store.state.scenarios

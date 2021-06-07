@@ -36,27 +36,30 @@
 
         <div class="mock-col w2">
             <div class="mock-col-header">SUFFIX</div>
-            <div v-show="!editing" class="mock-col-value link color-accent-one" @click="filter(route.suffix)">{{ route.suffix }}</div>
+            <div v-show="!editing" class="mock-col-value link" @click="filter(route.suffix)">{{ route.suffix }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.suffix"/>
         </div>
 
-        <div class="mock-col">
+        <div class="mock-col center">
             <div class="mock-col-header">DISABLED</div>
             <div v-show="!editing" class="mock-col-value" :class="{ 'red' : route.disabled }">{{ route.disabled }}</div>
-            <input v-show="editing" type="checkbox" class="form-control form-check" v-model="editingRoute.disabled"/>
+            <!--<input v-show="editing" type="checkbox" class="form-control form-check" v-model="editingRoute.disabled"/>-->
+            <ToggleSwitch v-show="editing"
+                          :id="'disabled' + index"
+                          v-model="editingRoute.disabled"></ToggleSwitch>
         </div>
 
-        <div class="mock-col buttons">
-            <a class="btn btn-link btn-default" @click="edit">edit</a>
-            <a class="btn btn-link btn-default" @click="test">test</a>
-            <a class="btn btn-link btn-danger" @click="del">delete</a>
+        <div class="mock-col w-auto">
+            <a class="btn btn-sm btn-default" @click="edit">edit</a>
+            <a class="btn btn-sm btn-default" @click="test">test</a>
+            <a class="btn btn-sm btn-danger" @click="del">delete</a>
         </div>
 
         <div v-show="editing" class="mock-col w100">
             <textarea class="form-control form-control-sm v-resize monospace" rows="10" v-model="editingRoute.response"></textarea>
         </div>
 
-        <div v-show="editing" class="mock-col w100 buttons">
+        <div v-show="editing" class="mock-col w100">
             <div class="btn btn-sm btn-primary" @click="save">SAVE</div>
             <div class="btn btn-sm btn-primary" @click="saveAsCopy">SAVE AS COPY</div>
             <div class="btn btn-sm btn-default" @click="cancel">CANCEL</div>
@@ -71,10 +74,11 @@
 <script>
     import {mapActions} from 'vuex';
     import RouteTester from "./RouteTester";
+    import ToggleSwitch from "./ToggleSwitch";
 
     export default {
         name: "Route",
-        components: {RouteTester},
+        components: {RouteTester, ToggleSwitch},
         data() {
             return {
                 editing: false,
@@ -84,6 +88,7 @@
         },
         props: {
             route: {type: Object},
+            index: {type: Number},
             groupStart: {type: Boolean}
         },
         methods: {

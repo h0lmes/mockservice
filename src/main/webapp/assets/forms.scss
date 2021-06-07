@@ -5,7 +5,7 @@
   --form-control-bg-disabled: #e9ecef;
   --form-control-border: #ced4da;
   --form-control-placeholder: #ccc;
-  --form-control-bg-hilight-shadow: #57a5ff;
+  --form-control-bg-hilight-shadow: rgba(0,0,0,.3);
   --form-control-border-radius: 0.25rem;
 }
 .dark-mode {
@@ -14,6 +14,7 @@
   --form-control-bg-disabled: #787979;
   --form-control-border: #4e4f4f;
   --form-control-placeholder: #4a4f54;
+  --form-control-bg-hilight-shadow: rgba(255, 200, 73, 0.5);
 }
 .sepia-mode {
   --form-control-color: #433422;

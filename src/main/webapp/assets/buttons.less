@@ -1,21 +1,29 @@
 :root {
-  --btn-color: #ddd;
-  --btn-color-hilight: #fff;
-  --btn-bg: #8d8e8d;
+  --btn-color-default: #ddd;
+  --btn-color-hilight-default: #fff;
+  /**/
+  --btn-bg-default: #8d8e8d;
+  --btn-bg-primary: var(--color-accent-one);
+  --btn-bg-warning: #cc7533;
+  --btn-bg-danger: #b33642;
+  /**/
   --btn-color-link: var(--color-primary);
 }
 .dark-mode {
-  --btn-color: #aaa;
-  --btn-color-hilight: #ddd;
-  --btn-bg: #4d4e4d;
+  --btn-color-default: #aaa;
+  --btn-color-hilight-default: #ddd;
+  /**/
+  --btn-bg-default: #303030;
+  --btn-bg-primary: #162a30;
+  --btn-bg-warning: #303030;
+  --btn-bg-danger: #301c1f;
 }
 .sepia-mode {
-  --btn-bg: #9a846d;
 }
 
 .btn {
   display: inline-block;
-  margin-bottom: 0;
+  margin: 0;
   font-weight: 400;
   text-align: center;
   white-space: nowrap;
@@ -28,8 +36,9 @@
   font-size: 14px;
   line-height: 1.42857143;
   user-select: none;
-  background-color: var(--btn-bg);
-  color: var(--btn-color);
+  background-color: var(--btn-bg-default);
+  color: var(--btn-color-default);
+  box-shadow: 0 1px 4px -1px rgba(0, 0, 0, .6);
 
   &,
   &:active,
@@ -43,7 +52,7 @@
   &:hover,
   &:focus,
   &.focus {
-    color: var(--btn-color-hilight);
+    color: var(--btn-color-hilight-default);
     text-decoration: none;
   }
 
@@ -101,7 +110,7 @@
   fieldset[disabled] & {
     &:hover,
     &:focus {
-      color: var(--btn-color);
+      color: var(--btn-color-default);
       text-decoration: none;
     }
   }
@@ -114,23 +123,23 @@
 }
 
 .btn-primary {
-  background-color: var(--blue);
+  background-color: var(--btn-bg-primary);
   &.btn-link {
     background: transparent;
-    color: var(--blue);
+    color: var(--btn-bg-primary);
   }
 }
 .btn-warning {
-  background-color: var(--orange);
+  background-color: var(--btn-bg-warning);
   &.btn-link {
     background: transparent;
-    color: var(--orange);
+    color: var(--btn-bg-warning);
   }
 }
 .btn-danger {
-  background-color: var(--red);
+  background-color: var(--btn-bg-danger);
   &.btn-link {
     background: transparent;
-    color: var(--red);
+    color: var(--btn-bg-danger);
   }
 }

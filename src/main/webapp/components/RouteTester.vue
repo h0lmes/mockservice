@@ -1,8 +1,10 @@
 <template>
     <div>
-        <pre class="form-control form-control-sm monospace">{{ testResult }}</pre>
-        <div class="mock-col w100 buttons">
-            <div class="btn btn-sm btn-primary mr-3" @click="test" v-cloak="inProgress">RETRY</div>
+        <div class="wrapper">
+            <pre class="form-control form-control-sm monospace">{{ testResult }}</pre>
+        </div>
+        <div class="buttons">
+            <div class="btn btn-sm btn-primary" @click="test" v-cloak="inProgress">RETRY</div>
             <div class="btn btn-sm btn-default" @click="$emit('close')">CLOSE</div>
         </div>
     </div>
@@ -94,5 +96,13 @@
         }
     }
 </script>
-<style scoped>
+<style lang="scss" scoped>
+    .wrapper {
+        padding: 0 0 0.7rem;
+        text-align: initial;
+    }
+    .buttons {
+        padding: 0;
+        text-align: center;
+    }
 </style>

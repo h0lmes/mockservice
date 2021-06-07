@@ -10,9 +10,9 @@
                           v-model="quantum">Go Quantum (Routes are now quantum objects, so don't expect anything deterministic)
             </ToggleSwitch>
         </p>
-        <p class="mt-4">
-            <a class="btn btn-sm btn-default" @click="save">SAVE</a>
-        </p>
+        <div class="mt-4 pl-1">
+            <div class="btn btn-sm btn-primary" @click="save">SAVE</div>
+        </div>
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
 </template>
@@ -33,6 +33,7 @@
         async fetch() {
             return this.fetchSettings();
         },
+        fetchDelay: 0,
         computed: {
             settings() {
                 return this.$store.state.settings
@@ -47,10 +48,13 @@
         methods: {
             ...mapActions(['fetchSettings', 'saveSettings']),
             async save() {
-                await this.saveSettings({
-                    randomSuffix: this.randomSuffix,
-                    quantum: this.quantum
-                });
+                this.$nuxt.$loading.start();
+                await this.saveSettings(
+                    {
+                        randomSuffix: this.randomSuffix,
+                        quantum: this.quantum
+                    }
+                ).then(() => this.$nuxt.$loading.finish());
             },
         }
     }

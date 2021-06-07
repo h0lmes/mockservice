@@ -5,8 +5,8 @@
             <input id="search" placeholder="search here or click on values" type="text" class="form-control noborder" @input="debounce($event.target.value)"/>
         </div>
         <p class="mb-2">
-            <a class="btn btn-link mr-4" @click="newRoute">Add route</a>
-            <a class="btn btn-link mr-4" @click="setFilter('')">Clear filter</a>
+            <a class="btn btn-link mr-3" @click="newRoute">Add route</a>
+            <a class="btn btn-link mr-3" @click="setFilter('')">Clear filter</a>
         </p>
         <div class="holder">
             <Routes :routes="filtered" @filter="setFilter($event)"></Routes>
@@ -33,6 +33,7 @@
         async fetch() {
             return this.fetchRoutes();
         },
+        fetchDelay: 0,
         computed: {
             routes () {
                 return this.$store.state.routes

@@ -27,16 +27,24 @@
             <div class="mock-col-value" :class="{ 'color-accent-one' : active }">{{ active }}</div>
         </div>
 
-        <div class="mock-col buttons">
-            <a class="btn btn-link btn-default" @click="edit">edit</a>
-            <a class="btn btn-link btn-default" @click="activate">(re)activate</a>
-            <a class="btn btn-link btn-default" @click="deactivate">deactivate</a>
-            <a class="btn btn-link btn-danger" @click="del">delete</a>
+        <div class="mock-col w-auto">
+            <a class="btn btn-sm btn-primary" @click="edit">edit</a>
+            <a class="btn btn-sm btn-default" @click="activate">(re)activate</a>
+            <a class="btn btn-sm btn-default" @click="deactivate">deactivate</a>
+            <a class="btn btn-sm btn-danger" @click="del">delete</a>
         </div>
 
         <div v-show="editing" class="mock-col w100">
             <textarea class="form-control form-control-sm v-resize monospace" rows="7" v-model="editingScenario.data"></textarea>
         </div>
+
+        <div v-show="editing" class="mock-col w100">
+            <div class="btn btn-sm btn-default" @click="toggleRoutes">TOGGLE ROUTES</div>
+            <div class="btn btn-sm btn-primary" @click="save">SAVE</div>
+            <div class="btn btn-sm btn-primary" @click="saveAsCopy">SAVE AS COPY</div>
+            <div class="btn btn-sm btn-default" @click="cancel">CANCEL</div>
+        </div>
+
         <div v-if="editing && addRoute" class="mock-col w100">
             <div class="routes">
                 <RoutesToAdd
@@ -44,14 +52,6 @@
                         @filter="setFilter($event)"
                         @add="add($event)"></RoutesToAdd>
             </div>
-        </div>
-
-        <div v-show="editing" class="mock-col w100 buttons">
-            <div class="btn btn-sm btn-primary" @click="addRoute = true; $fetch()">ADD ROUTES</div>
-            <div v-if="addRoute" class="btn btn-sm btn-default" @click="addRoute = false">CLOSE ROUTES</div>
-            <div class="btn btn-sm btn-primary" @click="save">SAVE</div>
-            <div class="btn btn-sm btn-primary" @click="saveAsCopy">SAVE AS COPY</div>
-            <div class="btn btn-sm btn-default" @click="cancel">CANCEL</div>
         </div>
 
     </div>
@@ -133,6 +133,10 @@
             add(route) {
                 this.editingScenario.data += '\n' + route.method + ' ' + route.path + ' ' + route.suffix;
             },
+            toggleRoutes() {
+                this.addRoute = !this.addRoute;
+                if (this.addRoute) this.$fetch();
+            },
         }
     }
 </script>
@@ -140,7 +144,7 @@
     .routes {
         display: block;
         position: relative;
-        margin: 0.5rem 0 0 0;
+        margin: 0;
         width: 100%;
         min-height: 3rem;
         max-height: 25em;

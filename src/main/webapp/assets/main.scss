@@ -1,5 +1,6 @@
 :root {
   --grey: #6e6e6e;
+  --gray: #6e6e6e;
   --blue: #0077ff;
   --indigo: #5f1ce6;
   --purple: #7143bf;
@@ -9,12 +10,12 @@
   --orange-yellow: #e68c17;
   --yellow: #ffb700;
   --green: #29a649;
-  --teal: #1dc48d;
+  --teal: #1dc288;
   --cyan: #1aaaba;
   /**/
   --color-primary: #243746;
-  --color-secondary: #6bb3a5;
-  --color-accent-one: var(--orange-yellow);
+  --color-secondary: #bfb3ad;
+  --color-accent-one: var(--cyan);
   --color-link: #0056b3;
   --color-link-hover: #007bff;
   --bg-primary: #f3f5f4;
@@ -133,14 +134,15 @@ pre {
 // --------------------------------------------------------------------------------
 
 .mock-row {
-  font-size: smaller;
   display: flex;
   flex-wrap: wrap;
   margin-bottom: 1rem;
-  padding: 0 0.3rem 0.6rem;
+  padding: 0.7rem 0.3rem 0;
+  font-size: smaller;
   border-radius: 5px;
   background-color: var(--bg-secondary);
-  box-shadow: 0 1px 2px var(--bg-shadow);
+  /*box-shadow: 0 1px 2px var(--bg-shadow);*/
+  box-shadow: 0 2px 1px -1px rgb(0 0 0 / 20%), 0 1px 1px 0 rgb(0 0 0 / 14%), 0 1px 3px 0 rgb(0 0 0 / 12%);
 }
 
 .mock-col {
@@ -149,7 +151,16 @@ pre {
   box-sizing: border-box;
   min-width: 5rem;
   margin: 0;
-  padding: 0.6rem .5rem 0;
+  padding: 0 .5rem 0.7rem;
+
+  &.center {
+    text-align: center;
+  }
+
+  &.w-auto {
+    flex: 0 0 auto;
+    align-self: center;
+  }
 
   &.w1 {
     flex: 1 2 0;
@@ -165,38 +176,7 @@ pre {
 
   &.w100 {
     flex: 0 0 100%;
-    padding-top: .8rem;
-
-    &.buttons {
-      cursor: default;
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0.5rem 0 0;
-      width: 100%;
-      text-align: center;
-
-      & > .btn {
-        margin: 0.2rem 0.5rem 0;
-      }
-
-      & > .btn:last-child {
-        margin-right: 0;
-      }
-    }
-  }
-
-  &.buttons {
-    flex: 0 0 auto;
-    cursor: default;
-    padding: .8rem .3rem 0;
-
-    & > .btn:first-child {
-      margin-left: 0.5rem;
-    }
-
-    & > .btn {
-      margin-right: 0.5rem;
-    }
+    text-align: center;
   }
 }
 

@@ -2,11 +2,11 @@
     <div class="monospace">
 
         <p class="red">Use with caution!</p>
-        <p class="red mb-5">It is easy to ruin config by editing it as plain text.</p>
+        <p class="red mb-4">It is easy to ruin config by editing it as plain text.</p>
         <textarea class="form-control form-control-sm v-resize" rows="16" v-model="config"></textarea>
-        <div class="buttons mt-5">
-            <div class="btn btn-sm btn-danger mr-3" @click="save">SAVE TO SERVER</div>
-            <div class="btn btn-sm btn-primary mr-3" @click="download">DOWNLOAD</div>
+        <div class="mt-4 pl-1">
+            <div class="btn btn-sm btn-primary mr-3" @click="save">SAVE AND APPLY</div>
+            <div class="btn btn-sm btn-default mr-3" @click="download">DOWNLOAD</div>
         </div>
 
         <Loading v-if="$fetchState.pending"></Loading>
@@ -28,6 +28,7 @@
             return this.fetchConfig()
                 .then(response => this.config = response);
         },
+        fetchDelay: 0,
         methods: {
             ...mapActions(['fetchConfig', 'saveConfig']),
             async save() {
