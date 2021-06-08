@@ -5,8 +5,8 @@
         <p class="red mb-4">It is easy to ruin config by editing it as plain text.</p>
         <textarea class="form-control form-control-sm v-resize" rows="16" v-model="config"></textarea>
         <div class="mt-4 pl-1">
-            <div class="btn btn-sm btn-primary mr-3" @click="save">SAVE AND APPLY</div>
-            <div class="btn btn-sm btn-default mr-3" @click="download">DOWNLOAD</div>
+            <button type="button" class="btn btn-sm btn-primary mr-3" @click="save">SAVE AND APPLY</button>
+            <button type="button" class="btn btn-sm btn-default mr-3" @click="download">DOWNLOAD</button>
         </div>
 
         <Loading v-if="$fetchState.pending"></Loading>

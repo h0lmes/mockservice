@@ -4,8 +4,8 @@
             <pre class="form-control form-control-sm monospace">{{ testResult }}</pre>
         </div>
         <div class="buttons">
-            <div class="btn btn-sm btn-primary" @click="test" v-cloak="inProgress">RETRY</div>
-            <div class="btn btn-sm btn-default" @click="$emit('close')">CLOSE</div>
+            <button type="button" class="btn btn-sm btn-primary" @click="test" v-cloak="inProgress">RETRY</button>
+            <button type="button" class="btn btn-sm btn-default" @click="$emit('close')">CLOSE</button>
         </div>
     </div>
 </template>

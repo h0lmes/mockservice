@@ -5,8 +5,8 @@
             <input id="search" placeholder="search here or click on values" type="text" class="form-control noborder" @input="debounce($event.target.value)"/>
         </div>
         <p class="mb-2">
-            <a class="btn btn-link mr-3" @click="newRoute">Add route</a>
-            <a class="btn btn-link mr-3" @click="setFilter('')">Clear filter</a>
+            <button type="button" class="btn btn-link mr-3" @click="newRoute">Add route</button>
+            <button type="button" class="btn btn-link mr-3" @click="setFilter('')">Clear filter</button>
         </p>
         <div class="holder">
             <Routes :routes="filtered" @filter="setFilter($event)"></Routes>

@@ -31,8 +31,8 @@
 
         <div class="mock-col w-auto">
             <div class="buttons-spacer">
-                <a class="btn btn-sm btn-default" @click="edit">edit</a>
-                <a class="btn btn-sm btn-danger" @click="del">delete</a>
+                <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
+                <button type="button" class="btn btn-sm btn-danger" @click="del">delete</button>
             </div>
         </div>
 
@@ -41,10 +41,10 @@
         </div>
 
         <div v-show="editing" class="mock-col w100">
-            <div class="btn btn-sm btn-default" @click="toggleRoutes">TOGGLE ROUTES</div>
-            <div class="btn btn-sm btn-primary" @click="save">SAVE</div>
-            <div class="btn btn-sm btn-primary" @click="saveAsCopy">SAVE AS COPY</div>
-            <div class="btn btn-sm btn-default" @click="cancel">CANCEL</div>
+            <button type="button" class="btn btn-sm btn-default" @click="toggleRoutes">TOGGLE ROUTES</button>
+            <button type="button" class="btn btn-sm btn-primary" @click="save">SAVE</button>
+            <button type="button" class="btn btn-sm btn-primary" @click="saveAsCopy">SAVE AS COPY</button>
+            <button type="button" class="btn btn-sm btn-default" @click="cancel">CANCEL</button>
         </div>
 
         <div v-if="editing && addRoute" class="mock-col w100">
