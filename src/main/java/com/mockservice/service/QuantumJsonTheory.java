@@ -26,6 +26,10 @@ public class QuantumJsonTheory implements QuantumTheory {
 
     @Override
     public String apply(String data) {
+        if (chanceIs(40)) {
+            return data;
+        }
+
         Pattern pattern = Pattern.compile(REGEX_JSON_STRING_VALUE);
         Matcher matcher = pattern.matcher(data);
         if (matcher.find()) {
@@ -49,17 +53,22 @@ public class QuantumJsonTheory implements QuantumTheory {
 
     private String stringReplacer(MatchResult matchResult) {
         String name = matchResult.groupCount() > 0 ? matchResult.group(1) : randomString();
-        return "\"" + name + "\": \"" + randomString() + "\"";
+        return "\"" + name + "\": " + randomString();
     }
 
     private static String randomString() {
+        if (chanceIs(10)) {
+            return "null";
+        }
+
         int len = ThreadLocalRandom.current().nextInt(1, 31);
-        return ThreadLocalRandom.current()
+        String str = ThreadLocalRandom.current()
                 .ints(0, chars.length)
                 .limit(len)
                 .map(i -> chars[i])
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
+        return "\"" + str + "\"";
     }
 
     private String numberReplacer(MatchResult matchResult) {
@@ -68,6 +77,10 @@ public class QuantumJsonTheory implements QuantumTheory {
     }
 
     private static String randomNumber() {
+        if (chanceIs(10)) {
+            return "null";
+        }
+
         int len = ThreadLocalRandom.current().nextInt(1, 11);
         String number = ThreadLocalRandom.current()
                 .ints(0, 10)
@@ -75,9 +88,15 @@ public class QuantumJsonTheory implements QuantumTheory {
                 .boxed()
                 .map(String::valueOf)
                 .collect(Collectors.joining());
-        if (ThreadLocalRandom.current().nextInt(0, 2) == 1) {
-            int index = ThreadLocalRandom.current().nextInt(1, 10);
-            number = number.substring(0, index) + "." + number.substring(index + 1);
+        number = maybeFloatify(number);
+        return number;
+    }
+
+    private static String maybeFloatify(String number) {
+        boolean canFloatify = number.length() >= 3;
+        if (canFloatify && chanceIs(50)) {
+            int pointPosition = ThreadLocalRandom.current().nextInt(1, number.length() - 1);
+            number = number.substring(0, pointPosition) + "." + number.substring(pointPosition + 1);
         }
         return number;
     }
@@ -88,8 +107,7 @@ public class QuantumJsonTheory implements QuantumTheory {
     }
 
     private static String randomBoolean() {
-        int index = ThreadLocalRandom.current().nextInt(0, 2);
-        return booleans[index];
+        return booleans[rnd(2)];
     }
 
     @Override
@@ -99,5 +117,13 @@ public class QuantumJsonTheory implements QuantumTheory {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    private static int rnd(int numberOfAlternatives) {
+        return ThreadLocalRandom.current().nextInt(0, numberOfAlternatives);
+    }
+
+    private static boolean chanceIs(int percent) {
+        return rnd(100) < percent;
     }
 }
