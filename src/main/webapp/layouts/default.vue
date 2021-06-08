@@ -3,7 +3,7 @@
         <div class="navbar" role="navigation">
             <ul class="nav">
                 <li class="nav-header mb-2">
-                    <a class="btn-minimize-navbar" v-on:click="toggleSidebar">
+                    <a class="btn-minimize-navbar" @click="toggleSidebar">
                         <FontAwesomeIcon icon="bars"/>
                     </a>
                 </li>
@@ -60,6 +60,14 @@
 
     export default {
         components: {ErrorPanel, ColorModePicker, Loading},
+        data() {
+            return {}
+        },
+        computed: {
+            working() {
+                return this.$store.state.working
+            }
+        },
         methods: {
             toggleSidebar() {
                 let page = document.querySelector('#page');
@@ -68,12 +76,7 @@
                 setTimeout(() => {
                     page.classList.toggle('navbar-maximizing');
                 }, 200);
-            }
-        },
-        computed: {
-            working() {
-                return this.$store.state.working
-            }
+            },
         }
     }
 </script>

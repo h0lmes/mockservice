@@ -5,7 +5,7 @@
                           v-model="randomAlt">Random Alt (return random of existing alternatives for requested Route)
             </ToggleSwitch>
         </p>
-        <p class="mt-2">
+        <p class="mt-3">
             <ToggleSwitch :id="'quantum'"
                           v-model="quantum">Go Quantum (Routes are now quantum objects, so don't expect anything deterministic)
             </ToggleSwitch>

@@ -3,6 +3,7 @@
         <p v-if="scenarios.length === 0">No scenarios found</p>
         <div v-for="(scenario, index) in scenarios" :key="scenario.alias">
             <Scenario :scenario="scenario"
+                      :index="index"
                       :active="activeScenarios.includes(scenario.alias)"
                       :groupStart="groupStart(scenario, index)"
                       @filter="$emit('filter', $event)"></Scenario>

@@ -96,7 +96,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     @Override
-    public void writeConfigData(String data) throws IOException {
+    public synchronized void writeConfigData(String data) throws IOException {
         notifyBeforeConfigChanged();
         readConfigFromString(data);
         notifyAfterConfigChanged();
@@ -105,7 +105,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     //----------------------------------------------------------------------
     //
-    //   Routes
+    //   Settings
     //
     //----------------------------------------------------------------------
 
@@ -115,7 +115,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     @Override
-    public void setSettings(Settings settings) throws IOException {
+    public synchronized void setSettings(Settings settings) throws IOException {
         config.setSettings(settings);
         trySaveConfigToFile();
     }

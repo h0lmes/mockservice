@@ -22,16 +22,18 @@
             </select>
         </div>
 
-        <div class="mock-col">
-            <div class="mock-col-header">ACTIVE</div>
-            <div class="mock-col-value" :class="{ 'color-accent-one' : active }">{{ active }}</div>
+        <div class="mock-col v-center text-center">
+            <ToggleSwitch :id="'disabled' + index"
+                          v-model="activeSwitch"
+                          @toggle="activeToggled()">Active
+            </ToggleSwitch>
         </div>
 
         <div class="mock-col w-auto">
-            <a class="btn btn-sm btn-primary" @click="edit">edit</a>
-            <a class="btn btn-sm btn-default" @click="activate">(re)activate</a>
-            <a class="btn btn-sm btn-default" @click="deactivate">deactivate</a>
-            <a class="btn btn-sm btn-danger" @click="del">delete</a>
+            <div class="buttons-spacer">
+                <a class="btn btn-sm btn-default" @click="edit">edit</a>
+                <a class="btn btn-sm btn-danger" @click="del">delete</a>
+            </div>
         </div>
 
         <div v-show="editing" class="mock-col w100">
@@ -59,36 +61,61 @@
 <script>
     import {mapActions} from 'vuex';
     import RoutesToAdd from "../components/RoutesToAdd";
+    import ToggleSwitch from "./ToggleSwitch";
 
     export default {
         name: "Scenario",
-        components: {RoutesToAdd},
+        components: {RoutesToAdd, ToggleSwitch},
         data() {
             return {
                 editing: false,
                 editingScenario: {},
-                addRoute: false
+                addRoute: false,
+                activeSwitch: false
             }
         },
         props: {
+            index: {type: Number},
             scenario: {type: Object},
             active: {type: Boolean},
             groupStart: {type: Boolean}
         },
-        async fetch() {
-            if (this.addRoute && (!this.routes || this.routes.length === 0)) {
-                this.fetchRoutes();
-            }
-        },
         computed: {
             routes() {
-                return this.$store.state.routes
+                return this.$store.state.routes;
             },
+        },
+        created() {
+            this.activeSwitch = this.active;
+        },
+        watch: {
+            active() {
+                this.activeSwitch = this.active;
+            }
         },
         methods: {
             ...mapActions(['saveScenario', 'deleteScenario', 'activateScenario', 'deactivateScenario', 'fetchRoutes']),
             filter(value) {
                 this.$emit('filter', value);
+            },
+            activeToggled() {
+                if (this.activeSwitch) this.activate(); else this.deactivate();
+            },
+            activate() {
+                this.$nuxt.$loading.start();
+                this.activateScenario(this.scenario.alias)
+                    .then(() => {
+                        this.$nuxt.$loading.finish();
+                        this.activeSwitch = this.active;
+                    });
+            },
+            deactivate() {
+                this.$nuxt.$loading.start();
+                this.deactivateScenario(this.scenario.alias)
+                    .then(() => {
+                        this.$nuxt.$loading.finish();
+                        this.activeSwitch = this.active;
+                    });
             },
             edit() {
                 this.editingScenario = {...this.scenario};
@@ -96,16 +123,6 @@
             },
             cancel() {
                 this.editing = false;
-            },
-            activate() {
-                this.$nuxt.$loading.start();
-                this.activateScenario(this.scenario.alias)
-                    .then(() => this.$nuxt.$loading.finish());
-            },
-            deactivate() {
-                this.$nuxt.$loading.start();
-                this.deactivateScenario(this.scenario.alias)
-                    .then(() => this.$nuxt.$loading.finish());
             },
             del() {
                 if (!!this.scenario._new) {
@@ -135,7 +152,11 @@
             },
             toggleRoutes() {
                 this.addRoute = !this.addRoute;
-                if (this.addRoute) this.$fetch();
+                if (this.addRoute && (!this.routes || this.routes.length === 0)) {
+                    this.$nuxt.$loading.start();
+                    this.fetchRoutes()
+                        .then(() => this.$nuxt.$loading.finish());
+                }
             },
         }
     }

@@ -21,7 +21,6 @@
   --bg-primary: #f3f5f4;
   --bg-secondary: #fff;
   --bg-border: #ddd;
-  --bg-shadow: rgba(0, 0, 0, 0.2);
 }
 .dark-mode {
   --blue: #005ab4;
@@ -42,7 +41,6 @@
   --bg-primary: #191b1d;
   --bg-secondary: #212325;
   --bg-border: #212325;
-  --bg-shadow: rgba(0, 0, 0, 0.3);
 }
 .sepia-mode {
   --color-primary: #433422;
@@ -51,7 +49,6 @@
   --bg-primary: #f1e7d0;
   --bg-secondary: #eae0c9;
   --bg-border: #ded0bf;
-  --bg-shadow: rgba(0, 0, 0, 0.3);
 }
 
 .color-primary { color: var(--color-secondary)!important; }
@@ -136,30 +133,33 @@ pre {
 .mock-row {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   margin-bottom: 1rem;
   padding: 0.7rem 0.3rem 0;
   font-size: smaller;
   border-radius: 5px;
   background-color: var(--bg-secondary);
-  /*box-shadow: 0 1px 2px var(--bg-shadow);*/
-  box-shadow: 0 2px 1px -1px rgb(0 0 0 / 20%), 0 1px 1px 0 rgb(0 0 0 / 14%), 0 1px 3px 0 rgb(0 0 0 / 12%);
+  box-shadow: 0 1px 1px 0 rgb(0 0 0 / 14%), 0 1px 3px 0 rgb(0 0 0 / 12%);
 }
 
 .mock-col {
   flex: 1 2 0;
   position: relative;
   box-sizing: border-box;
-  min-width: 5rem;
+  min-width: 6rem;
   margin: 0;
   padding: 0 .5rem 0.7rem;
 
-  &.center {
+  &.text-center {
     text-align: center;
   }
 
-  &.w-auto {
-    flex: 0 0 auto;
+  &.v-center {
     align-self: center;
+  }
+
+  &.w-auto {
+    flex: 0 1 auto;
   }
 
   &.w1 {
@@ -177,6 +177,10 @@ pre {
   &.w100 {
     flex: 0 0 100%;
     text-align: center;
+  }
+
+  & .buttons-spacer {
+    padding-top: .5rem;
   }
 }
 
@@ -207,9 +211,13 @@ pre {
   .mock-col.w3 {
     flex: 2 1 0;
   }
+}
 
-  .mock-col.buttons {
-    flex: 0 0 100%;
+@media screen and (max-width: 599px) {
+  .mock-col {
+    &, &.w1, &.w2, &.w3 {
+      flex: 0 0 100%;
+    }
   }
 }
 

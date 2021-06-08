@@ -40,7 +40,7 @@
             <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.alt"/>
         </div>
 
-        <div class="mock-col center">
+        <div class="mock-col text-center">
             <div class="mock-col-header">DISABLED</div>
             <div v-show="!editing" class="mock-col-value" :class="{ 'red' : route.disabled }">{{ route.disabled }}</div>
             <!--<input v-show="editing" type="checkbox" class="form-control form-check" v-model="editingRoute.disabled"/>-->
@@ -50,9 +50,11 @@
         </div>
 
         <div class="mock-col w-auto">
-            <a class="btn btn-sm btn-default" @click="edit">edit</a>
-            <a class="btn btn-sm btn-default" @click="test">test</a>
-            <a class="btn btn-sm btn-danger" @click="del">delete</a>
+            <div class="buttons-spacer">
+                <a class="btn btn-sm btn-default" @click="edit">edit</a>
+                <a class="btn btn-sm btn-default" @click="test">test</a>
+                <a class="btn btn-sm btn-danger" @click="del">delete</a>
+            </div>
         </div>
 
         <div v-show="editing" class="mock-col w100">
@@ -87,8 +89,8 @@
             }
         },
         props: {
-            route: {type: Object},
             index: {type: Number},
+            route: {type: Object},
             groupStart: {type: Boolean}
         },
         methods: {
@@ -138,5 +140,4 @@
     }
 </script>
 <style lang="scss" scoped>
-
 </style>

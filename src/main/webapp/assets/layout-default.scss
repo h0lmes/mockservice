@@ -84,6 +84,13 @@
         color: var(--color-accent-one);
     }
 }
+.nav > li > a.nuxt-link-exact-active {
+    color: var(--nav-color-active);
+
+    & .nav-icon {
+        color: var(--color-accent-one);
+    }
+}
 .navbar .nav > li > a:hover,
 .navbar .nav > li > a:focus {
     background-color: var(--nav-bg-active);

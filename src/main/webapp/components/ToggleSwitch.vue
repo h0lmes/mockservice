@@ -1,7 +1,7 @@
 <template>
-    <div class="toggle-switch" tabindex="0">
-        <input type="checkbox" :id="id" :checked="value" @input="e => $emit('input', e.target.checked)">
-        <label :for="id">
+    <div class="toggle-switch" tabindex="0" :class="{small : !!small}">
+        <input type="checkbox" :id="id" :checked="value" @input="e => input(e)">
+        <label :for="id" :class="{gap : hasTitle}">
             <div class="area" aria-hidden="true">
                 <div class="background">
                     <div class="handle"></div>
@@ -21,15 +21,32 @@
         props: {
             id: {type: String},
             value: {type: Boolean},
+            small: {type: Boolean},
+        },
+        computed: {
+            hasTitle() {
+                return !!this.$slots.default;
+            }
+        },
+        methods: {
+            input(e) {
+                this.$emit('input', e.target.checked);
+                this.$emit('toggle', e.target.checked);
+            }
         },
     }
 </script>
-<style scoped>
+<style lang="scss" scoped>
     .toggle-switch {
         --width: 2.5rem;
         --height: 1.75rem;
         --padding: 2px;
         --handle-size: calc(var(--height) - var(--padding) * 2);
+
+        &.small {
+            --width: 2rem;
+            --height: 1.25rem;
+        }
 
         display: inline-block;
         outline-width: 0;
@@ -48,8 +65,12 @@
     label {
         display: inline-grid;
         grid-template-columns: auto auto;
-        column-gap: 1rem;
+        column-gap: 0;
         line-height: var(--height);
+
+        &.gap {
+            column-gap: 1rem;
+        }
     }
 
     .area {
