@@ -95,7 +95,7 @@ public class MockSoapService implements MockService {
     }
 
     private Optional<String> getRandomAltFor(Route route) {
-        if (configRepository.getSettings().getRandomAlt()) {
+        if (configRepository.getSettings().getRandomAlt() || configRepository.getSettings().getQuantum()) {
             return routeService.getRandomAltFor(route);
         }
         return Optional.empty();

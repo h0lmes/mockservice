@@ -30,19 +30,22 @@ public class MockRestService implements MockService {
     private final RouteService routeService;
     private final ActiveScenariosService activeScenariosService;
     private final ConfigRepository configRepository;
+    private final QuantumTheory quantumTheory;
     private final ConcurrentLruCache<Route, MockResource> resourceCache;
 
-    public MockRestService(HttpServletRequest request,
+    public MockRestService(@Value("${application.cache.rest-resource}") int cacheSizeLimit,
+                           HttpServletRequest request,
                            TemplateEngine templateEngine,
                            RouteService routeService,
                            ActiveScenariosService activeScenariosService,
                            ConfigRepository configRepository,
-                           @Value("${application.cache.rest-resource}") int cacheSizeLimit) {
+                           QuantumTheory quantumTheory) {
         this.request = request;
         this.templateEngine = templateEngine;
         this.routeService = routeService;
         this.activeScenariosService = activeScenariosService;
         this.configRepository = configRepository;
+        this.quantumTheory = quantumTheory;
         resourceCache = new ConcurrentLruCache<>(cacheSizeLimit, this::loadResource);
     }
 
@@ -64,10 +67,15 @@ public class MockRestService implements MockService {
         log.info("Route requested: {}", route);
         MockResource resource = resourceCache.get(route);
         Map<String, String> requestVariables = requestFacade.getVariables(variables);
+        String body = resource.getBody(requestVariables);
+        if (configRepository.getSettings().getQuantum()) {
+            body = quantumTheory.apply(body);
+            quantumTheory.delay();
+        }
         return ResponseEntity
                 .status(resource.getCode())
                 .headers(resource.getHeaders())
-                .body(resource.getBody(requestVariables));
+                .body(body);
     }
 
     private Route getRoute(RequestFacade requestFacade) {
@@ -84,7 +92,7 @@ public class MockRestService implements MockService {
     }
 
     private Optional<String> getRandomAltFor(Route route) {
-        if (configRepository.getSettings().getRandomAlt()) {
+        if (configRepository.getSettings().getRandomAlt() || configRepository.getSettings().getQuantum()) {
             return routeService.getRandomAltFor(route);
         }
         return Optional.empty();

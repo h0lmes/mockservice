@@ -38,6 +38,9 @@ public class RouteServiceImpl implements RouteService {
         if (alts.isEmpty()) {
             return Optional.empty();
         }
+        if (alts.size() == 1) {
+            return Optional.of(alts.get(0));
+        }
         int index = ThreadLocalRandom.current().nextInt(0, alts.size());
         return Optional.of(alts.get(index));
     }
