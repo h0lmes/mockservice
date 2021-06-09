@@ -33,18 +33,13 @@ public class ActiveScenario {
             return;
         }
 
-        String[] parts = s.split("\\s+");
+        String[] parts = s.split(";");
         if (parts.length < 2) {
             throw new ScenarioParseException("Error parsing line [" + s + "]", null);
         }
 
-        String alt = "";
-        int i = 2;
-        while (i < parts.length) {
-            alt += parts[i++];
-        }
-
-        routes.add(new Route(parts[0], parts[1]).setAlt(alt));
+        routes.add(new Route(parts[0], parts[1])
+                .setAlt(parts.length > 2 ? parts[2] : ""));
     }
 
     public Scenario getScenario() {

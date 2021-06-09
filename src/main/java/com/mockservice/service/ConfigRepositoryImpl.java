@@ -7,27 +7,19 @@ import com.mockservice.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
 public class ConfigRepositoryImpl implements ConfigRepository {
 
     private static final Logger log = LoggerFactory.getLogger(ConfigRepositoryImpl.class);
 
-    private final String resourceConfigPath;
     private final String fileConfigPath;
     private final ObjectReader yamlReader;
     private final ObjectWriter yamlWriter;
@@ -37,10 +29,8 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     private final List<ScenariosChangedListener> scenariosChangedListeners = new ArrayList<>();
 
 
-    public ConfigRepositoryImpl(@Value("${application.config.resource}") String resourceConfigPath,
-                                @Value("${application.config.file}") String fileConfigPath,
+    public ConfigRepositoryImpl(@Value("${application.config}") String fileConfigPath,
                                 YamlMapperService yamlMapperService) {
-        this.resourceConfigPath = resourceConfigPath;
         this.fileConfigPath = fileConfigPath;
         this.yamlReader = yamlMapperService.reader();
         this.yamlWriter = yamlMapperService.writer();
@@ -48,13 +38,8 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         try {
             readConfigFromFile();
         } catch (IOException e) {
-            log.warn("Could not read config from file {}. Falling back to resource.", this.fileConfigPath);
-            try {
-                readConfigFromResource();
-            } catch (IOException ex) {
-                log.error("Could not read config from resource {}. Using empty config.", this.resourceConfigPath);
-                config = new Config();
-            }
+            log.warn("Could not read config file {}. Using empty config.", this.fileConfigPath);
+            config = new Config();
         }
     }
 
@@ -64,14 +49,6 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     private File getConfigFile() {
         return new File(fileConfigPath);
-    }
-
-    private void readConfigFromResource() throws IOException {
-        ResourceLoader resourceLoader = new DefaultResourceLoader();
-        Resource resource = resourceLoader.getResource(resourceConfigPath);
-        try (Reader reader = new InputStreamReader(resource.getInputStream(), UTF_8)) {
-            config = yamlReader.readValue(reader, Config.class);
-        }
     }
 
     private void readConfigFromString(String yaml) throws IOException {
@@ -89,6 +66,12 @@ public class ConfigRepositoryImpl implements ConfigRepository {
             throw new IOException("Could not write config to file. " + e.getMessage(), e);
         }
     }
+
+    //----------------------------------------------------------------------
+    //
+    //   Config
+    //
+    //----------------------------------------------------------------------
 
     @Override
     public String getConfigData() throws JsonProcessingException {

@@ -59,7 +59,7 @@
                 this.testResult = '';
                 this.println(this.route.method.toUpperCase() + ' ' + this.host + this.route.path);
                 this.println(JSON.stringify(this.testHeaders));
-                this.println('query running ...');
+                this.println('fetching ...');
                 this.$nextTick();
 
                 try {
@@ -70,10 +70,8 @@
                     });
                     const body = await response.text();
                     const elapsed = new Date() - startTime;
-                    this.println('');
                     this.println('--- response in ' + elapsed + ' ms with status ' + response.status + ' ---');
                     this.println(body);
-                    this.println('');
                     this.println('--- headers ---');
                     for (let header of response.headers) {
                         this.println(this.headerToString(header));

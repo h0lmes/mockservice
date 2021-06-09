@@ -16,9 +16,7 @@ spring:
     suffix: .html
 
 application:
-  config:
-    resource: classpath:defaultConfig.yml
-    file: .\config.yml
+  config: .\config.yml
   soap-error-data-file: soapFault.xml
   cache:
     rest-resource: 256

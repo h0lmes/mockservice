@@ -1,64 +1,71 @@
 settings:
-  randomAlt: true
-  quantum: false
+  randomAlt: false
+  quantum: true
 routes:
-- group: -robot-
+- group: a robot service
   path: /api/robot
   method: GET
   type: REST
   alt: ""
   response: "{\"name\": \"Johnny 5\"}"
   disabled: false
-- group: -robot-
+- group: a robot service
   path: /api/robot
   method: GET
   type: REST
   alt: R2D2
   response: "{\"name\": \"R2D2\"}"
   disabled: false
-- group: -robot-
+- group: a robot service
   path: /api/robot
   method: GET
   type: REST
   alt: terminator
   response: "{\"name\": \"terminator\"}"
   disabled: false
-- group: Example Rest Service
+- group: a test
+  path: /api with spaces
+  method: GET
+  type: REST
+  alt: ""
+  response: "[\n  {\n    \"_id\": \"56af331efbeca6240c61b2ca\",\n    \"index\": 120000,\n    \"percent\": -0.12,\n    \"exp_number\": 1.123244e12,\n    \"guid\": \"bedb2018-c017-429E-b520-696ea3666692\",\n    \"isValid\": true,\n    \"comment\": null,\n    \"isActive\": false,\n    \"balance\": \"$2,202,350\",\n    \"object\": {\n        \"name\": \"am\",\n        \"lastname\": \"lang\"\n    }\n  }\n]"
+  disabled: false
+- group: entity service
   path: /api/v2/entity
   method: GET
   type: REST
   alt: ""
   response: "[\n  {\"id\": ${sequence}, \"name\": \"${random_string}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"}\n]"
   disabled: false
-- group: Example Rest Service
+- group: entity service
   path: /api/v2/entity
   method: GET
   type: REST
   alt: 400
   response: "HTTP/1.1 400\n\n[]"
   disabled: false
-- group: Example Rest Service
+- group: entity service
   path: /api/v2/entity/filter
   method: GET
   type: REST
   alt: ""
   response: "[\n  {\"id\": 2, \"name\": \"${a:default a}\"},\n  {\"id\": 3, \"name\": \"${b:${enum:default B1:default B2:default B3}}\"}\n]"
   disabled: false
-- group: Example Rest Service
+- group: entity service
   path: "/api/v2/entity/{id}"
   method: GET
   type: REST
   alt: ""
   response: "{\"id\": ${id}, \"name\": \"entity name\"}"
   disabled: false
-- group: Example Rest Service
+- group: entity service
   path: /api/v2/entity
   method: POST
   type: REST
   alt: ""
   response: "HTTP/1.1 201\nCustom-Header: entity-created\n\n{\"id\": ${random_int}, \"name\": \"${name:default name}\"}"
   disabled: false
-- group: Example Soap Service
+- group: number conversion service
   path: /mockNumberConversion
   method: POST
   type: SOAP
@@ -69,11 +76,11 @@ scenarios:
 - group: Default
   alias: entity 400
   type: MAP
-  data: GET /api/v2/entity 400
+  data: GET;/api/v2/entity;400
 - group: Default
   alias: robot sequence
   type: QUEUE
   data: |-
-    GET /api/robot R2D2
-    GET /api/robot
-    GET /api/robot terminator
+    GET;/api/robot;R2D2
+    GET;/api/robot;
+    GET;/api/robot;terminator

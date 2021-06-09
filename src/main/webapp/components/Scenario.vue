@@ -148,7 +148,7 @@
                     .then(() => this.$nuxt.$loading.finish());
             },
             add(route) {
-                this.editingScenario.data += '\n' + route.method + ' ' + route.path + ' ' + route.alt;
+                this.editingScenario.data += '\n' + route.method + ';' + route.path + ';' + route.alt;
             },
             toggleRoutes() {
                 this.addRoute = !this.addRoute;

@@ -3,6 +3,7 @@ package com.mockservice.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.domain.Route;
+import com.mockservice.quantum.QuantumTheory;
 import com.mockservice.request.RequestFacade;
 import com.mockservice.request.RestRequestFacade;
 import com.mockservice.resource.MockResource;
@@ -68,9 +69,10 @@ public class MockRestService implements MockService {
         MockResource resource = resourceCache.get(route);
         Map<String, String> requestVariables = requestFacade.getVariables(variables);
         String body = resource.getBody(requestVariables);
+
         if (configRepository.getSettings().getQuantum()) {
             body = quantumTheory.apply(body);
-            quantumTheory.delay();
+            delay();
         }
         return ResponseEntity
                 .status(resource.getCode())
