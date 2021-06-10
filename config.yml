@@ -78,6 +78,12 @@ scenarios:
   type: MAP
   data: GET;/api/v2/entity;400
 - group: Default
+  alias: entity alt 400
+  type: CIRCULAR_QUEUE
+  data: |-
+    GET;/api/v2/entity;400
+    GET;/api/v2/entity
+- group: Default
   alias: robot sequence
   type: QUEUE
   data: |-

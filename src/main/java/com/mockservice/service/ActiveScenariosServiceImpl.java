@@ -41,10 +41,11 @@ public class ActiveScenariosServiceImpl implements ActiveScenariosService, Confi
     }
 
     @Override
-    public void onScenarioUpdated(String alias) {
-        if (scenarioIsActive(alias)) {
-            activateScenarioSilent(alias);
+    public void onScenarioUpdated(String oldAlias, String newAlias) {
+        if (scenarioIsActive(oldAlias)) {
+            deactivateScenarioInternal(oldAlias);
         }
+        activateScenarioSilent(newAlias);
     }
 
     @Override

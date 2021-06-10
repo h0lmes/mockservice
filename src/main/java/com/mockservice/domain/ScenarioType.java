@@ -2,8 +2,9 @@ package com.mockservice.domain;
 
 public enum ScenarioType {
 
-    MAP(new ScenarioMapStrategy()),
-    QUEUE(new ScenarioQueueStrategy());
+    MAP(new MapScenarioStrategy()),
+    QUEUE(new QueueScenarioStrategy()),
+    CIRCULAR_QUEUE(new CircularQueueScenarioStrategy());
 
     private final ScenarioStrategy strategy;
 

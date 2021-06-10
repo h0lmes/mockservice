@@ -3,7 +3,7 @@ package com.mockservice.quantum;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-public class StringGenerator {
+public class ValueGenerator {
 
     private static final String QUERTY = "ABCDEF GHIJKLMN OPQRST UVWXYZ abcdef ghijklmn opqrst uvwxyz ,.!-";
     private static final char[] chars = QUERTY.toCharArray();
@@ -29,13 +29,13 @@ public class StringGenerator {
         if (RandomUtil.withChance(20)) {
             return randomChars();
         }
-        return randomString(stringLengths[RandomUtil.rnd(stringLengths.length)]);
+        return randomWords(stringLengths[RandomUtil.rnd(stringLengths.length)]);
     }
 
-    public static String randomString(int len) {
+    public static String randomWords(int numberOfWords) {
         return ThreadLocalRandom.current()
                 .ints(0, vocabulary.length)
-                .limit(len)
+                .limit(numberOfWords)
                 .boxed()
                 .map(i -> vocabulary[i])
                 .collect(Collectors.joining(" "));

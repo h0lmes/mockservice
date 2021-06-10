@@ -1,11 +1,11 @@
 <template>
     <div>
-        <div class="wrapper">
-            <pre class="form-control form-control-sm monospace">{{ testResult }}</pre>
-        </div>
         <div class="buttons">
             <button type="button" class="btn btn-sm btn-primary" @click="test" v-cloak="inProgress">RETRY</button>
             <button type="button" class="btn btn-sm btn-default" @click="$emit('close')">CLOSE</button>
+        </div>
+        <div class="wrapper">
+            <pre class="form-control form-control-sm monospace">{{ testResult }}</pre>
         </div>
     </div>
 </template>
@@ -44,11 +44,13 @@
                 if (this.route.alt) {
                     return {
                         'Content-Type': this.contentType,
+                        'Cache-Control': 'no-cache',
                         'Mock-Alt': this.encodedPath + '/' + this.route.alt
                     }
                 } else {
                     return {
-                        'Content-Type': this.contentType
+                        'Content-Type': this.contentType,
+                        'Cache-Control': 'no-cache'
                     }
                 }
             },
@@ -96,11 +98,11 @@
 </script>
 <style lang="scss" scoped>
     .wrapper {
-        padding: 0 0 0.7rem;
+        padding: 0;
         text-align: initial;
     }
     .buttons {
-        padding: 0;
+        padding: 0.3rem 0 0.7rem;
         text-align: center;
     }
 </style>

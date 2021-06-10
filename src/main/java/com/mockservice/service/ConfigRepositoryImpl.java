@@ -198,7 +198,9 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         config.getScenarios().sort(Scenario::compareTo);
 
         if (updated) {
-            notifyScenarioUpdated(replacement.getAlias());
+            notifyScenarioUpdated(scenario.getAlias(), replacement.getAlias());
+        } else {
+            notifyScenarioUpdated("", replacement.getAlias());
         }
         trySaveConfigToFile();
     }
@@ -243,8 +245,8 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         routesChangedListeners.add(listener);
     }
 
-    private void notifyScenarioUpdated(String alias) {
-        scenariosChangedListeners.forEach(l -> l.onScenarioUpdated(alias));
+    private void notifyScenarioUpdated(String oldAlias, String newAlias) {
+        scenariosChangedListeners.forEach(l -> l.onScenarioUpdated(oldAlias, newAlias));
     }
 
     private void notifyScenarioDeleted(String alias) {

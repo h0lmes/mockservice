@@ -19,6 +19,7 @@
             <select v-show="editing" class="form-control form-control-sm monospace" v-model="editingScenario.type">
                 <option>MAP</option>
                 <option>QUEUE</option>
+                <option>CIRCULAR_QUEUE</option>
             </select>
         </div>
 
