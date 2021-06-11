@@ -20,7 +20,7 @@ public class ValueGenerator {
 
     static {
         vocabulary = article
-                .replaceAll("[,—!:@#\\^\\*\\.\\-\\?]", "")
+                .replaceAll("[^A-Za-z\\-\\s]", "")
                 .toLowerCase()
                 .split("\\s+");
     }
@@ -52,14 +52,14 @@ public class ValueGenerator {
     }
 
     public static String randomNumberString() {
-        int len = ThreadLocalRandom.current().nextInt(1, 11);
+        int len = RandomUtil.rnd(10) + 1;
         String number = ThreadLocalRandom.current()
                 .ints(0, 10)
                 .limit(len)
                 .boxed()
                 .map(String::valueOf)
                 .collect(Collectors.joining());
-        return maybeFloatify(number);
+        return maybeFloatify(number.replaceFirst("^0+(?!$)", ""));
     }
 
     private static String maybeFloatify(String number) {

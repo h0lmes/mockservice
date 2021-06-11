@@ -11,8 +11,6 @@ import java.util.regex.Pattern;
 @Service
 public class JsonQuantumTheory implements QuantumTheory {
 
-    private static final Logger log = LoggerFactory.getLogger(JsonQuantumTheory.class);
-
     private static final String REGEX_JSON_STRING_VALUE = "\"(\\w+)\"\\s*:\\s*\"((\\\\\"|[^\"])*)\"";
     private static final String REGEX_JSON_NUMERIC_VALUE = "\"(\\w+)\"\\s*:\\s*(-?[\\d\\.e]+)";
     private static final String REGEX_JSON_BOOLEAN_VALUE = "\"(\\w+)\"\\s*:\\s*(false|true)";
@@ -23,21 +21,17 @@ public class JsonQuantumTheory implements QuantumTheory {
 
     @Override
     public String apply(String data) {
+        if (RandomUtil.withChance(20)) {
+            return randomJson();
+        }
         if (RandomUtil.withChance(10)) {
-            log.info("qt - empty");
             return "";
         }
         if (RandomUtil.withChance(40)) {
-            log.info("qt - untouched");
             return data;
         }
-        if (RandomUtil.withChance(30)) {
-            log.info("qt - randomJson");
-            return randomJson();
-        }
 
-        log.info("qt - randomizeJsonValues");
-        return randomizeJsonValues(data);
+        return randomizeJsonValues(data); // 43,2% chance
     }
 
     private String randomJson() {

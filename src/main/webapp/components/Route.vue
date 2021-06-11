@@ -22,9 +22,9 @@
             <select v-show="editing" class="form-control form-control-sm monospace" v-model="editingRoute.method">
                 <option>GET</option>
                 <option>POST</option>
-                <option>PATCH</option>
                 <option>PUT</option>
                 <option>DELETE</option>
+                <option>PATCH</option>
             </select>
         </div>
 

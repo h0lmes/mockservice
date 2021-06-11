@@ -2,6 +2,7 @@ package com.mockservice.quantum;
 
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class JsonGenerator {
 
@@ -12,15 +13,23 @@ public class JsonGenerator {
     }
 
     private static final JsonValueType[] rootValueTypes = {
+            JsonValueType.OBJECT,
+            JsonValueType.OBJECT,
+            JsonValueType.OBJECT,
+            JsonValueType.OBJECT,
             JsonValueType.ARRAY,
-            JsonValueType.OBJECT
     };
     private static final JsonValueType[] valueTypes = {
             JsonValueType.NUMBER,
+            JsonValueType.NUMBER,
+            JsonValueType.STRING,
             JsonValueType.STRING,
             JsonValueType.BOOLEAN,
+            JsonValueType.BOOLEAN,
             JsonValueType.ARRAY,
-            JsonValueType.OBJECT
+            JsonValueType.OBJECT,
+            JsonValueType.OBJECT,
+            JsonValueType.OBJECT,
     };
 
     public static String generate() {
@@ -65,11 +74,24 @@ public class JsonGenerator {
 
         int numberOfElements = RandomUtil.rnd(MAX_NUMBER_OF_ELEMENTS + 1);
         JsonValueType elementType = valueTypes[RandomUtil.rnd(valueTypes.length)];
+
+        if (JsonValueType.OBJECT.equals(elementType) || JsonValueType.ARRAY.equals(elementType)) {
+            String content = IntStream.range(0, numberOfElements)
+                    .boxed()
+                    .map(i -> makeArrayElement(elementType, level + 1))
+                    .collect(Collectors.joining(",\n"));
+            return "[\n" + content + "\n" + offset(level) + "]";
+        }
+
         String content = IntStream.range(0, numberOfElements)
                 .boxed()
-                .map(i -> offset(level + 1) + generateValue(elementType, level + 1))
-                .collect(Collectors.joining(", \n"));
-        return "[\n" + content + "\n" + offset(level) + "]";
+                .map(i -> makeArrayElement(elementType, 0))
+                .collect(Collectors.joining(", "));
+        return "[" + content + "]";
+    }
+
+    private static String makeArrayElement(JsonValueType elementType, int level) {
+        return offset(level) + generateValue(elementType, level);
     }
 
     private static String generateObjectValue(int level) {
@@ -79,19 +101,24 @@ public class JsonGenerator {
         }
 
         int numberOfElements = RandomUtil.rnd(MAX_NUMBER_OF_ELEMENTS + 1);
-        String content = IntStream.range(0, numberOfElements)
-                .boxed()
-                .map(i -> offset(level + 1) + makeKey(generateValue(valueTypes[RandomUtil.rnd(valueTypes.length)], level + 1)))
-                .collect(Collectors.joining(", \n"));
+        String content = Stream
+                .generate(() -> ValueGenerator.randomWords(1))
+                .distinct()
+                .limit(numberOfElements)
+                .map(keyName -> makeObjectElement(keyName, level + 1))
+                .collect(Collectors.joining(",\n"));
+        if (content.isEmpty()) {
+            return "{}";
+        }
         return "{\n" + content + "\n" + offset(level) + "}";
     }
 
-    private static String makeKey(String value) {
-        return "\"" + generateKeyName() + "\": " + value;
+    private static String makeObjectElement(String name, int level) {
+        return offset(level) + makeKey(name, generateValue(valueTypes[RandomUtil.rnd(valueTypes.length)], level));
     }
 
-    private static String generateKeyName() {
-        return ValueGenerator.randomWords(1).replaceAll("\\W", "");
+    private static String makeKey(String name, String value) {
+        return "\"" + name + "\": " + value;
     }
 
     private static String offset(int level) {

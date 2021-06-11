@@ -91,19 +91,13 @@ public class MockRestService implements MockService {
                 .setMethod(requestFacade.getRequestMethod())
                 .setPath(requestFacade.getEndpoint());
 
+        boolean random = configRepository.getSettings().getRandomAlt() || configRepository.getSettings().getQuantum();
         String alt = requestFacade
                 .getAlt()
-                .or(() -> getRandomAltFor(route))
+                .or(() -> random ? routeService.getRandomAltFor(route) : Optional.empty())
                 .or(() -> activeScenariosService.getAltFor(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
                 .orElse("");
         return route.setAlt(alt);
-    }
-
-    private Optional<String> getRandomAltFor(Route route) {
-        if (configRepository.getSettings().getRandomAlt() || configRepository.getSettings().getQuantum()) {
-            return routeService.getRandomAltFor(route);
-        }
-        return Optional.empty();
     }
 
     @Override
