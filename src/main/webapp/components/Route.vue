@@ -49,7 +49,7 @@
                           v-model="editingRoute.disabled"></ToggleSwitch>
         </div>
 
-        <div class="mock-col w-auto">
+        <div class="mock-col w-fixed-auto">
             <div class="buttons-spacer">
                 <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
                 <button type="button" class="btn btn-sm btn-default" @click="test">test</button>

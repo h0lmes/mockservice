@@ -135,23 +135,29 @@ pre {
 
 .mock-row {
   display: flex;
+  gap: 0.7rem 1rem;
   flex-wrap: wrap;
   justify-content: center;
+  align-content: space-around;
   margin-bottom: .5rem;
-  padding: 0.7rem 0.3rem 0;
+  padding: 0.7rem 1rem;
   font-size: smaller;
   border-radius: 5px;
   background-color: var(--bg-secondary);
   box-shadow: 0 1px 1px 0 rgb(0 0 0 / 14%), 0 1px 3px 0 rgb(0 0 0 / 12%);
 }
 
+@media screen and (max-width: 1099px) {
+  .mock-row {
+    column-gap: 0.5rem;
+  }
+}
+
 .mock-col {
-  flex: 1 2 0;
+  flex: 1 1 0;
   position: relative;
   box-sizing: border-box;
-  min-width: 8rem;
-  margin: 0;
-  padding: 0 .5rem 0.7rem;
+  min-width: 7rem;
 
   &.text-center {
     text-align: center;
@@ -161,12 +167,13 @@ pre {
     align-self: center;
   }
 
-  &.w-auto {
-    flex: 0 1 auto;
+  &.w-fixed-auto {
+    flex: 0 0 auto;
+    min-width: initial;
   }
 
   &.w1 {
-    flex: 1 2 0;
+    flex: 1 1 0;
   }
 
   &.w2 {
@@ -184,14 +191,6 @@ pre {
 
   & .buttons-spacer {
     padding-top: .5rem;
-  }
-}
-
-@media screen and (max-width: 1099px) {
-  .mock-col {
-    &, &.w1, &.w2, &.w3 {
-      flex: 0 0 33%;
-    }
   }
 }
 
@@ -215,6 +214,7 @@ pre {
   cursor: default;
   display: block;
   width: fit-content;
+  max-width: 100%;
   color: var(--color-primary);
   margin: 0 auto;
   text-align: center;
