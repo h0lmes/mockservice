@@ -1,22 +1,19 @@
 package com.mockservice.service;
 
 import com.mockservice.domain.Route;
+import com.mockservice.request.RequestFacade;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 public interface MockService {
-    int MIN_DELAY = 10;
-    int MAX_DELAY = 3000;
-
     void cacheRemove(Route route);
-    ResponseEntity<String> mock(Map<String, String> variables);
+    ResponseEntity<String> mock(RequestFacade request);
     String mockError(Throwable t);
 
     default void delay() {
         try {
-            Thread.sleep(ThreadLocalRandom.current().nextInt(MIN_DELAY, MAX_DELAY));
+            Thread.sleep(ThreadLocalRandom.current().nextInt(10, 3000));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

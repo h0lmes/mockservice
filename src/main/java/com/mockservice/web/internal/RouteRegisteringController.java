@@ -54,6 +54,8 @@ public interface RouteRegisteringController {
             return;
         }
 
+        mockService.cacheRemove(route);
+
         String key = routeRegistrationKey(route);
         int regCount = Math.max(0, registeredRoutes.getOrDefault(key, 0));
         if (regCount <= 0) {
@@ -72,8 +74,6 @@ public interface RouteRegisteringController {
                 .methods(route.getMethod())
                 .build();
         requestMappingHandlerMapping.unregisterMapping(mappingInfo);
-
-        mockService.cacheRemove(route);
 
         log.info("Unregister route (success): {}", route);
     }

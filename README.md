@@ -15,33 +15,70 @@ Refer to README in `src/main/webapp` for instructions on how to build web applic
 #
 ### Route Response
 
-Response can contain any JSON or XML (any textual data actually).
+Response can contain:
+- HTTP 1.1 response in textual format with or without HTTP head
+(JSON or XML body)
+- HTTP 1.1 request in textual format **with** HTTP head
+(JSON or XML body)
 
-You can specify HTTP status code and headers for REST endpoints
-(not possible to specify headers only).
-Parser looks for `HTTP/1.1` to start reading status code and headers.
-Put empty line before body if headers go first.
+> See HTTP request and response formats here
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages
 
-Examples:
+**RESPONSE**: Parser looks for `HTTP/1.1` at the beginning of a line
+to start reading response.
+Then an empty line should go indicating head ended
+(head is optional for response part).
+Then goes the body if not blank.
 
-    HTTP/1.1 201
-    Custom-Header: header value
-    
-    {"some_key": "some value"}
-    
-or
+Anything that goes before head start (`HTTP/1.1`)
+is considered a response body.
 
-    {"message": "Internal error"}
+**REQUEST** (optional): Parser looks for `HTTP/1.1` at the end of a line
+to start reading request.
+Then headers may go.
+Then an empty line should go indicating head ended
+(head is mandatory for request part).
+Then goes the body if not blank.
+
+If request is present it would be executed asynchronously
+after the response was sent.
+
+Simple response (only body):
+
+    {"id": 1, name": "Johnny 5"}
+
+Response with head:
+
     HTTP/1.1 400
-    Custom-Header: header value
+    Cache-Control: no-cache
+        
+    {"code": "E000394", "message": "Internal error"}
+
+Response with head + request:
+
+    HTTP/1.1 202
+    
+    {
+        "status": "PROCESSING",
+        "id": "${item_id}"
+    }
+    POST /store/cart/item/${item_id} HTTP/1.1
+    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5...
+    
+    {
+        "status": "PROCESSED",
+        "id": "${item_id}"
+    }
 
 #
 ### Route Alt (Alternative)
 
-Alt allow you to create alternative responses for a single path.
+Alt allow you to create alternative responses for the same path.
 
-To select a particular response send `Mock-Alt` header in HTTP request.
-Multiple `Mock-Alt` headers supported per HTTP request.
+To select a particular alt send **Mock-Alt** header in HTTP request
+or you may enable **Random Alt** in **Settings** (or even **Go Quantum** ;).
+
+Multiple **Mock-Alt** headers supported per HTTP request.
 Each header should define exactly one alternative.
 
 Header format:
@@ -89,12 +126,12 @@ Format:
 
 Variables are collected from the following sources:
 
-1. Path variables (example `api/v1/account/{id}`).
-2. Request parameters (example `api/v1/account?id=1`).
+1. Path variables (`/api/v1/account/{id}`).
+2. Request parameters (`/api/v1/account?id=1`).
 3. Request payload (if it is in JSON).
 All fields of the JSON would be collected and made available as variables
 (preserving hierarchy, see example below).
-4. `Mock-Variable` header (see section below).
+4. **Mock-Variable** header (see section below).
 
 Example of request payload:
 
@@ -113,7 +150,7 @@ The following variables would be available:
 #
 ### Mock-Variable header
 
-Multiple `Mock-Variable` headers supported per HTTP request.
+Multiple **Mock-Variable** headers supported per HTTP request.
 Each header defines exactly one variable.
 
 Header format:

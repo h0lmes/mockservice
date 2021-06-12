@@ -6,14 +6,16 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class FileReaderWriterUtil {
+public class IOUtil {
 
     private static final String CLASSPATH = "classpath:";
 
-    private FileReaderWriterUtil() {
+    private IOUtil() {
         // private
     }
 
@@ -44,6 +46,14 @@ public class FileReaderWriterUtil {
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
             byte[] strToBytes = data.getBytes();
             outputStream.write(strToBytes);
+        }
+    }
+
+    public static List<String> toList(String resource) {
+        try (BufferedReader reader = new BufferedReader(new StringReader(resource))) {
+            return reader.lines().collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 }

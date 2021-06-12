@@ -2,6 +2,8 @@ package com.mockservice.web.internal;
 
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
+import com.mockservice.request.RequestFacade;
+import com.mockservice.request.SoapRequestFacade;
 import com.mockservice.service.ConfigChangedListener;
 import com.mockservice.service.ConfigRepository;
 import com.mockservice.service.MockService;
@@ -15,8 +17,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
@@ -24,15 +28,18 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
 
     private static final Logger log = LoggerFactory.getLogger(ConfigBasedSoapController.class);
 
+    private final HttpServletRequest request;
     private final MockService mockService;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
     private final ConfigRepository configRepository;
     private Method mockMethod = null;
     private final Map<String, Integer> registeredRoutes = new ConcurrentHashMap<>();
 
-    public ConfigBasedSoapController(@Qualifier("soap") MockService mockService,
+    public ConfigBasedSoapController(HttpServletRequest request,
+                                     @Qualifier("soap") MockService mockService,
                                      RequestMappingHandlerMapping requestMappingHandlerMapping,
                                      ConfigRepository configRepository) {
+        this.request = request;
         this.mockService = mockService;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
         this.configRepository = configRepository;
@@ -50,8 +57,9 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
         }
     }
 
-    public ResponseEntity<String> mock() {
-        return mockService.mock(null);
+    public CompletableFuture<ResponseEntity<String>> mock() {
+        RequestFacade facade = new SoapRequestFacade(request);
+        return CompletableFuture.supplyAsync(() -> mockService.mock(facade));
     }
 
     @Override

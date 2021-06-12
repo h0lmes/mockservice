@@ -1,13 +1,13 @@
 settings:
   randomAlt: false
-  quantum: true
+  quantum: false
 routes:
 - group: a robot service
   path: /api/robot
   method: GET
   type: REST
   alt: ""
-  response: "{\"name\": \"Johnny 5\"}"
+  response: "HTTP/1.1 202\n\n{\"name\": \"Johnny 5\"}\n\nGET /api/robot HTTP/1.1\nMock-Alt: api-robot/R2D2\n\n{}"
   disabled: false
 - group: a robot service
   path: /api/robot

@@ -2,6 +2,7 @@ package com.mockservice.web.internal;
 
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
+import com.mockservice.request.RestRequestFacade;
 import com.mockservice.service.ConfigChangedListener;
 import com.mockservice.service.ConfigRepository;
 import com.mockservice.service.MockService;
@@ -15,27 +16,37 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
 
 @RestController
 public class ConfigBasedRestController implements RouteRegisteringController, ConfigChangedListener, RoutesChangedListener {
 
     private static final Logger log = LoggerFactory.getLogger(ConfigBasedRestController.class);
 
+    private final HttpServletRequest request;
     private final MockService mockService;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
     private final ConfigRepository configRepository;
     private Method mockMethod = null;
     private final Map<String, Integer> registeredRoutes = new ConcurrentHashMap<>();
 
-    public ConfigBasedRestController(@Qualifier("rest") MockService mockService,
+    public ConfigBasedRestController(HttpServletRequest request,
+                                     @Qualifier("rest") MockService mockService,
                                      RequestMappingHandlerMapping requestMappingHandlerMapping,
                                      ConfigRepository configRepository) {
+        this.request = request;
         this.mockService = mockService;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
         this.configRepository = configRepository;
+
+        log.info("ForkJoinPool parallelism = {}, poolSize = {}",
+                ForkJoinPool.commonPool().getParallelism(),
+                ForkJoinPool.commonPool().getPoolSize());
 
         try {
             mockMethod = this.getClass().getMethod("mock");
@@ -50,8 +61,9 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
         }
     }
 
-    public ResponseEntity<String> mock() {
-        return mockService.mock(null);
+    public CompletableFuture<ResponseEntity<String>> mock() {
+        RestRequestFacade facade = new RestRequestFacade(request);
+        return CompletableFuture.supplyAsync(() -> mockService.mock(facade));
     }
 
     @Override

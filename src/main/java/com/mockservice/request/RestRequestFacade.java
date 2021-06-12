@@ -2,7 +2,8 @@ package com.mockservice.request;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mockservice.util.MapUtils;
-import org.springframework.lang.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -10,20 +11,19 @@ import java.util.Map;
 
 public class RestRequestFacade extends AbstractRequestFacade {
 
+    private static final Logger log = LoggerFactory.getLogger(RestRequestFacade.class);
+
     public RestRequestFacade(HttpServletRequest request) {
         super(request);
     }
 
     @Override
-    public Map<String, String> getVariables(@Nullable Map<String, String> variables) {
+    public Map<String, String> getVariables() {
         Map<String, String> vars = new HashMap<>();
         vars.putAll(getBodyAsVariables());
         vars.putAll(getPathVariables());
         vars.putAll(getRequestParams());
         vars.putAll(getHeaderVariables());
-        if (variables != null) {
-            vars.putAll(variables);
-        }
         return vars;
     }
 
@@ -33,7 +33,7 @@ public class RestRequestFacade extends AbstractRequestFacade {
             try {
                 return MapUtils.flattenMap(MapUtils.jsonToMap(body));
             } catch (JsonProcessingException e) {
-                // Not a valid JSON. Ignore.
+                log.warn("Not a valid JSON:\n{}", body);
             }
         }
         return new HashMap<>();

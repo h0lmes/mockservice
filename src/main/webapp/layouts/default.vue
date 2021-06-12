@@ -20,15 +20,15 @@
                     </NuxtLink>
                 </li>
                 <li>
-                    <NuxtLink to="/config">
-                        <FontAwesomeIcon icon="code" class="nav-icon"/>
-                        <span class="nav-label">Config</span>
-                    </NuxtLink>
-                </li>
-                <li>
                     <NuxtLink to="/settings">
                         <FontAwesomeIcon icon="cogs" class="nav-icon"/>
                         <span class="nav-label">Settings</span>
+                    </NuxtLink>
+                </li>
+                <li>
+                    <NuxtLink to="/config">
+                        <FontAwesomeIcon icon="code" class="nav-icon"/>
+                        <span class="nav-label">Config</span>
                     </NuxtLink>
                 </li>
                 <li>

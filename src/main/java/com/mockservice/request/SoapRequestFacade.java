@@ -1,7 +1,5 @@
 package com.mockservice.request;
 
-import org.springframework.lang.Nullable;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,12 +11,9 @@ public class SoapRequestFacade extends AbstractRequestFacade {
     }
 
     @Override
-    public Map<String, String> getVariables(@Nullable Map<String, String> variables) {
+    public Map<String, String> getVariables() {
         Map<String, String> vars = new HashMap<>();
         vars.putAll(getHeaderVariables());
-        if (variables != null) {
-            vars.putAll(variables);
-        }
         return vars;
     }
 }

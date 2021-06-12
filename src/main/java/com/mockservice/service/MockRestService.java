@@ -6,9 +6,8 @@ import com.mockservice.domain.Route;
 import com.mockservice.quantum.QuantumTheory;
 import com.mockservice.quantum.RandomUtil;
 import com.mockservice.request.RequestFacade;
-import com.mockservice.request.RestRequestFacade;
-import com.mockservice.resource.MockResource;
-import com.mockservice.resource.RestMockResource;
+import com.mockservice.response.MockResponse;
+import com.mockservice.response.RestMockResponse;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.web.webapp.ErrorInfo;
 import org.slf4j.Logger;
@@ -18,31 +17,28 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @Service("rest")
 public class MockRestService implements MockService {
 
     private static final Logger log = LoggerFactory.getLogger(MockRestService.class);
 
-    private final HttpServletRequest request;
     private final TemplateEngine templateEngine;
     private final RouteService routeService;
     private final ActiveScenariosService activeScenariosService;
     private final ConfigRepository configRepository;
     private final QuantumTheory quantumTheory;
-    private final ConcurrentLruCache<Route, MockResource> resourceCache;
+    private final ConcurrentLruCache<Route, MockResponse> resourceCache;
+    private final LinkedBlockingQueue<MockResponse> requestQueue = new LinkedBlockingQueue<>();
 
     public MockRestService(@Value("${application.cache.rest-resource}") int cacheSizeLimit,
-                           HttpServletRequest request,
                            TemplateEngine templateEngine,
                            RouteService routeService,
                            ActiveScenariosService activeScenariosService,
                            ConfigRepository configRepository,
                            QuantumTheory quantumTheory) {
-        this.request = request;
         this.templateEngine = templateEngine;
         this.routeService = routeService;
         this.activeScenariosService = activeScenariosService;
@@ -51,26 +47,27 @@ public class MockRestService implements MockService {
         resourceCache = new ConcurrentLruCache<>(cacheSizeLimit, this::loadResource);
     }
 
-    private MockResource loadResource(Route route) {
+    private MockResponse loadResource(Route route) {
         return routeService.getEnabledRoute(route)
-                .map(r -> new RestMockResource(templateEngine, r.getResponse()))
+                .map(r -> new RestMockResponse(templateEngine, r.getResponse()))
                 .orElse(null);
     }
 
     @Override
     public void cacheRemove(Route route) {
-        resourceCache.remove(route);
+        if (resourceCache.remove(route)) {
+            log.info("Route evicted: {}", route);
+        }
     }
 
     @Override
-    public ResponseEntity<String> mock(Map<String, String> variables) {
-        RequestFacade requestFacade = new RestRequestFacade(request);
-        Route route = getRoute(requestFacade);
+    public ResponseEntity<String> mock(RequestFacade request) {
+        Route route = getRoute(request);
         log.info("Route requested: {}", route);
-        MockResource resource = resourceCache.get(route);
-        Map<String, String> requestVariables = requestFacade.getVariables(variables);
-        String body = resource.getBody(requestVariables);
-        int statusCode = resource.getCode();
+        MockResponse resource = resourceCache.get(route);
+        resource.setVariables(request.getVariables()).setHost(request.getBasePath());
+        String body = resource.getResponseBody();
+        int statusCode = resource.getResponseCode();
 
         if (configRepository.getSettings().getQuantum()) {
             body = quantumTheory.apply(body);
@@ -80,9 +77,17 @@ public class MockRestService implements MockService {
             }
         }
 
+//        try {
+//            if (resource.hasRequest()) {
+//                requestQueue.put(resource);
+//            }
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//        }
+
         return ResponseEntity
                 .status(statusCode)
-                .headers(resource.getHeaders())
+                .headers(resource.getResponseHeaders())
                 .body(body);
     }
 
