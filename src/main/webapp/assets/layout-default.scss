@@ -42,7 +42,7 @@
     position: fixed;
     display: block;
     background-color: var(--nav-bg);
-    transition: all 0.2s;
+    transition: width 0.2s;
 }
 .navbar-mini .navbar {
     width: 70px;

@@ -37,7 +37,7 @@
   /**/
   --color-primary: #a7b1c2;
   --color-secondary: #6a6d76;
-  --color-accent-one: var(--yellow);
+  --color-accent-one: var(--cyan);
   --bg-primary: #191b1d;
   --bg-secondary: #212325;
   --bg-border: #212325;
@@ -138,12 +138,12 @@ pre {
   flex-wrap: wrap;
   justify-content: center;
   align-content: space-around;
-  margin-bottom: .5rem;
+  margin-bottom: 0.9rem;
   padding: 0.7rem 1rem;
   font-size: smaller;
   border-radius: 5px;
   background-color: var(--bg-secondary);
-  box-shadow: 0 1px 1px 0 rgb(0 0 0 / 14%), 0 1px 3px 0 rgb(0 0 0 / 12%);
+  box-shadow: 0 1px 1px 0 rgb(0 0 0 / 8%), 0 1px 3px 0 rgb(0 0 0 / 10%);
 }
 
 @media screen and (max-width: 1099px) {
