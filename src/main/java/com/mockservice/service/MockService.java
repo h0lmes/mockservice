@@ -9,7 +9,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public interface MockService {
     void cacheRemove(Route route);
     ResponseEntity<String> mock(RequestFacade request);
-    String mockError(Throwable t);
 
     default void delay() {
         try {

@@ -67,15 +67,8 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     private String getBasePathInternal(HttpServletRequest request) {
         String scheme = getScheme(request);
         String domain = getRemoteHost(request);
-        int port = request.getRemotePort();
-        StringBuilder builder = new StringBuilder();
-        builder.append(scheme);
-        builder.append("://");
-        builder.append(domain);
-        if (("http".equalsIgnoreCase(scheme) && 80 != port) || ("https".equalsIgnoreCase(scheme) && port != 443)) {
-            builder.append(":").append(String.valueOf(port));
-        }
-        return builder.toString();
+        int port = "http".equalsIgnoreCase(scheme) ? 8080 : 8443;
+        return scheme + "://" + domain + ":" + port;
     }
 
     private String getScheme(HttpServletRequest request) {

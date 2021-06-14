@@ -62,6 +62,7 @@
         padding-bottom: 20px;
     }
     .feather {
+        box-sizing: content-box;
         cursor: pointer;
         position: relative;
         top: 0;

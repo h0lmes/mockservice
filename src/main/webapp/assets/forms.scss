@@ -76,6 +76,7 @@ select.form-control {
 
 textarea.v-resize { resize: vertical; }
 
+
 // sizing
 
 .form-control-sm {
@@ -89,6 +90,19 @@ select.form-control-sm {
   &:not([size]):not([multiple]) {
     height: calc(1.8125rem + 2px);
   }
+}
+
+
+// disable input autofill highlighting
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active
+{
+  -webkit-box-shadow: 0 0 0 30px var(--form-control-bg) inset !important;
+  -webkit-text-fill-color: var(--form-control-color) !important;
+  background-clip: content-box !important;
 }
 
 

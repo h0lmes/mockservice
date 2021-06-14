@@ -72,14 +72,14 @@
                     });
                     const body = await response.text();
                     const elapsed = new Date() - startTime;
-                    this.println('--- response in ' + elapsed + ' ms with status ' + response.status + ' ---');
+                    this.println('----- response in ' + elapsed + ' ms with status ' + response.status + ' -----');
                     this.println(body);
-                    this.println('--- headers ---');
+                    this.println('----- headers -----');
                     for (let header of response.headers) {
                         this.println(this.headerToString(header));
                     }
                 } catch (err) {
-                    this.println('------');
+                    this.println('----------');
                     this.println(err);
                 }
             },

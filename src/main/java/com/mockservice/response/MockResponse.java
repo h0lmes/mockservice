@@ -1,8 +1,8 @@
 package com.mockservice.response;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.Map;
 
@@ -13,7 +13,7 @@ public interface MockResponse {
     int getResponseCode();
     HttpHeaders getResponseHeaders();
     boolean hasRequest();
-    RequestMethod getRequestMethod();
+    HttpMethod getRequestMethod();
     String getRequestRelativeReference();
     HttpHeaders getRequestHeaders();
     String getRequestBody();

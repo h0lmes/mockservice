@@ -8,9 +8,10 @@ import com.mockservice.service.ConfigChangedListener;
 import com.mockservice.service.ConfigRepository;
 import com.mockservice.service.MockService;
 import com.mockservice.service.RoutesChangedListener;
+import com.mockservice.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -28,15 +30,20 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
 
     private static final Logger log = LoggerFactory.getLogger(ConfigBasedSoapController.class);
 
+    private static final String FAULT_CODE_PLACEHOLDER = "${code}";
+    private static final String FAULT_MESSAGE_PLACEHOLDER = "${message}";
+
     private final HttpServletRequest request;
     private final MockService mockService;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
     private final ConfigRepository configRepository;
     private Method mockMethod = null;
     private final Map<String, Integer> registeredRoutes = new ConcurrentHashMap<>();
+    private String errorBody;
 
-    public ConfigBasedSoapController(HttpServletRequest request,
-                                     @Qualifier("soap") MockService mockService,
+    public ConfigBasedSoapController(@Value("${application.soap-error-data-file}") String soapErrorDataFile,
+                                     HttpServletRequest request,
+                                     MockService mockService,
                                      RequestMappingHandlerMapping requestMappingHandlerMapping,
                                      ConfigRepository configRepository) {
         this.request = request;
@@ -48,6 +55,13 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
             mockMethod = this.getClass().getMethod("mock");
         } catch (NoSuchMethodException e) {
             log.error("", e);
+        }
+
+        try {
+            errorBody = IOUtil.asString(soapErrorDataFile);
+        } catch (IOException e) {
+            log.error("Error loading SOAP error data file, using fallback.", e);
+            errorBody = "<code>" + FAULT_CODE_PLACEHOLDER + "</code>\n<message>" + FAULT_MESSAGE_PLACEHOLDER + "</message>";
         }
 
         try {
@@ -106,6 +120,12 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
         log.error("", t);
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(mockService.mockError(t));
+                .body(mockError(t));
+    }
+
+    private String mockError(Throwable t) {
+        return errorBody
+                .replace(FAULT_CODE_PLACEHOLDER, t.getClass().getSimpleName())
+                .replace(FAULT_MESSAGE_PLACEHOLDER, t.getMessage());
     }
 }

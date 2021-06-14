@@ -3,7 +3,8 @@ server:
 
 logging:
   level:
-    ROOT: ${LOGGING_LEVEL:INFO}
+    ROOT: ${ROOT_LOGGING_LEVEL:INFO}
+    com.mockservice: ${LOGGING_LEVEL:INFO}
 
 spring:
   application:
@@ -16,8 +17,7 @@ spring:
     suffix: .html
 
 application:
-  config: .\config.yml
+  config: ${CONFIG_FILE:.\config.yml}
   soap-error-data-file: soapFault.xml
   cache:
-    rest-resource: 256
-    soap-resource: 256
+    response: 256

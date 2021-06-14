@@ -50,6 +50,7 @@
 
         display: inline-block;
         outline-width: 0;
+        box-sizing: content-box;
     }
 
     .toggle-switch > input {

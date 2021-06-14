@@ -3,8 +3,8 @@ package com.mockservice.response;
 import com.mockservice.template.StringTemplate;
 import com.mockservice.template.TemplateEngine;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.Map;
 
@@ -54,7 +54,7 @@ public class SoapMockResponse implements MockResponse {
     }
 
     @Override
-    public RequestMethod getRequestMethod() {
+    public HttpMethod getRequestMethod() {
         return null;
     }
 

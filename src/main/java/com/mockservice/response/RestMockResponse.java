@@ -6,8 +6,8 @@ import com.mockservice.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ public class RestMockResponse implements MockResponse {
     private final HttpHeaders responseHeaders = new HttpHeaders();
     private final StringTemplate responseBody;
     private boolean containsRequest = false;
-    private RequestMethod requestMethod = RequestMethod.GET;
+    private HttpMethod requestMethod = HttpMethod.GET;
     private String requestRelativeReference = "";
     private final HttpHeaders requestHeaders = new HttpHeaders();
     private final StringTemplate requestBody;
@@ -95,7 +95,7 @@ public class RestMockResponse implements MockResponse {
             String methodAndRef = line.substring(0, line.indexOf(HTTP_1_1));
             String methodStr = methodAndRef.substring(0, methodAndRef.indexOf(' '));
             requestRelativeReference = methodAndRef.substring(methodAndRef.indexOf(' ')).trim();
-            requestMethod = RequestMethod.valueOf(methodStr);
+            requestMethod = HttpMethod.valueOf(methodStr);
             containsRequest = true;
         } catch (Exception e) {
             log.warn("Invalid request starting line: {}", line);
@@ -149,15 +149,12 @@ public class RestMockResponse implements MockResponse {
     }
 
     @Override
-    public RequestMethod getRequestMethod() {
+    public HttpMethod getRequestMethod() {
         return requestMethod;
     }
 
     @Override
     public String getRequestRelativeReference() {
-        if (requestRelativeReference.startsWith("/")) {
-            return host + requestRelativeReference;
-        }
         return requestRelativeReference;
     }
 

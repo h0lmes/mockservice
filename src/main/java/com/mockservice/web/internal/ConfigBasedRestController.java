@@ -1,5 +1,7 @@
 package com.mockservice.web.internal;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
 import com.mockservice.request.RestRequestFacade;
@@ -7,9 +9,9 @@ import com.mockservice.service.ConfigChangedListener;
 import com.mockservice.service.ConfigRepository;
 import com.mockservice.service.MockService;
 import com.mockservice.service.RoutesChangedListener;
+import com.mockservice.web.webapp.ErrorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -36,7 +38,7 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
     private final Map<String, Integer> registeredRoutes = new ConcurrentHashMap<>();
 
     public ConfigBasedRestController(HttpServletRequest request,
-                                     @Qualifier("rest") MockService mockService,
+                                     MockService mockService,
                                      RequestMappingHandlerMapping requestMappingHandlerMapping,
                                      ConfigRepository configRepository) {
         this.request = request;
@@ -111,6 +113,14 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
         return ResponseEntity
                 .badRequest()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(mockService.mockError(t));
+                .body(mockError(t));
+    }
+
+    private String mockError(Throwable t) {
+        try {
+            return new ObjectMapper().writeValueAsString(new ErrorInfo(t));
+        } catch (JsonProcessingException e) {
+            return "";
+        }
     }
 }
