@@ -49,13 +49,15 @@ public class MockServiceImpl implements MockService {
 
     private MockResponse getResponse(Route route) {
         return routeService.getEnabledRoute(route)
-                .map(r -> {
-                    if (RouteType.REST.equals(r.getType())) {
-                        return new RestMockResponse(templateEngine, r.getResponse());
-                    }
-                    return new SoapMockResponse(templateEngine, r.getResponse());
-                })
+                .map(this::routeToMockResponse)
                 .orElse(null);
+    }
+
+    private MockResponse routeToMockResponse(Route route) {
+        if (RouteType.REST.equals(route.getType())) {
+            return new RestMockResponse(templateEngine, route.getResponse());
+        }
+        return new SoapMockResponse(templateEngine, route.getResponse());
     }
 
     @Override

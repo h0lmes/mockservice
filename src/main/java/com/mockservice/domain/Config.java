@@ -6,9 +6,9 @@ import java.util.List;
 public class Config {
 
     private Settings settings = new Settings();
-
     private List<Route> routes = new ArrayList<>();
     private List<Scenario> scenarios = new ArrayList<>();
+
     public Config() {
         // default
     }

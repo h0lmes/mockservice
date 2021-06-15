@@ -63,9 +63,13 @@ public class RestMockResponse implements MockResponse {
             } else if (readingRequest && readingHead) {
                 addRequestHeader(line);
             } else if (!readingRequest) {
-                responsePayload.add(line);
+                if (!line.isEmpty()) {
+                    responsePayload.add(line);
+                }
             } else {
-                requestPayload.add(line);
+                if (!line.isEmpty()) {
+                    requestPayload.add(line);
+                }
             }
         }
 
