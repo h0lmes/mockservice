@@ -33,7 +33,6 @@
         },
         mounted() {
             this.oneRowHeight = document.getElementById('hta2').clientHeight - document.getElementById('hta1').clientHeight;
-            this.textareaOffsetTop = document.getElementById('ta-config-el').offsetTop;
             window.addEventListener("resize", this.onResize);
             this.$nextTick(function () {
                 this.onResize();
@@ -75,7 +74,7 @@
                 this.resizeTimeoutId = setTimeout(() => {
                     this.rows = (
                         window.innerHeight
-                        - this.textareaOffsetTop
+                        - document.getElementById('ta-config-el').offsetTop
                         - 90 /*(document.getElementById('config-page-el').clientHeight
                             - this.textareaOffsetTop
                             - document.getElementById('ta-config-el').offsetHeight)*/
