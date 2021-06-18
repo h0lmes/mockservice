@@ -102,6 +102,14 @@ export const actions = {
         ).catch(error => commit('setLastError', error));
     },
 
+    fetchLog({commit, state}) {
+        commit('resetLastError');
+        return fetch(state.BASE_URL + '/web-api/log'
+        ).then(handleError
+        ).then(response => response.text()
+        ).catch(error => commit('setLastError', error));
+    },
+
     async fetchRoutes({commit, state}) {
         commit('resetLastError');
         return fetch(

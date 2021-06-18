@@ -5,10 +5,14 @@ logging:
   level:
     ROOT: ${ROOT_LOGGING_LEVEL:INFO}
     com.mockservice: ${LOGGING_LEVEL:INFO}
+    org.springframework.boot.SpringApplication: INFO
 
 spring:
   application:
     name: MockService
+
+  main:
+    banner-mode: LOG
 
   thymeleaf:
     cache: false

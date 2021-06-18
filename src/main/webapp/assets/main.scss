@@ -88,6 +88,9 @@ button {
 .smaller {
   font-size: smaller;
 }
+.larger {
+  font-size: larger;
+}
 h1, h2, h3, h4, h5 {
     font-weight: 500;
     margin: 0 0 1.5rem;
@@ -260,8 +263,4 @@ pre {
   border-radius: 5px;
   background-color: var(--bg-secondary);
   box-shadow: 0 1px 2px var(--bg-shadow);
-
-  &.header {
-
-  }
 }

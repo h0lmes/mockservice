@@ -32,6 +32,12 @@
                     </NuxtLink>
                 </li>
                 <li>
+                    <NuxtLink to="/log">
+                        <FontAwesomeIcon icon="file-alt" class="nav-icon larger icon-log"/>
+                        <span class="nav-label">Log</span>
+                    </NuxtLink>
+                </li>
+                <li>
                     <NuxtLink to="/about">
                         <FontAwesomeIcon icon="question-circle" class="nav-icon"/>
                         <span class="nav-label">About</span>
@@ -88,5 +94,9 @@
     .container {
         width: 100%;
         text-align: center;
+    }
+
+    .icon-log {
+        width: 1.2rem;
     }
 </style>
