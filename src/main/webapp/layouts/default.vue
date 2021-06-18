@@ -20,6 +20,12 @@
                     </NuxtLink>
                 </li>
                 <li>
+                    <NuxtLink to="/request">
+                        <FontAwesomeIcon icon="at" class="nav-icon"/>
+                        <span class="nav-label">Request</span>
+                    </NuxtLink>
+                </li>
+                <li>
                     <NuxtLink to="/settings">
                         <FontAwesomeIcon icon="cogs" class="nav-icon"/>
                         <span class="nav-label">Settings</span>

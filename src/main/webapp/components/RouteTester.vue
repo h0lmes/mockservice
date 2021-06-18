@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="buttons">
-            <button type="button" class="btn btn-sm btn-primary" @click="test" v-cloak="inProgress">RETRY</button>
+            <button type="button" class="btn btn-sm btn-primary" @click="test">RETRY</button>
             <button type="button" class="btn btn-sm btn-default" @click="$emit('close')">CLOSE</button>
         </div>
         <div class="wrapper">
@@ -15,7 +15,6 @@
         data() {
             return {
                 testResult: '',
-                inProgress: false
             }
         },
         props: {
@@ -24,7 +23,7 @@
                 default: {}
             }
         },
-        mounted: function() {
+        mounted() {
             this.test();
         },
         computed: {
@@ -57,7 +56,6 @@
         },
         methods: {
             async test() {
-                this.inProgress = true;
                 this.testResult = '';
                 this.println(this.route.method.toUpperCase() + ' ' + this.host + this.route.path);
                 this.println(JSON.stringify(this.testHeaders));
