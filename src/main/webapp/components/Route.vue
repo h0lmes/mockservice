@@ -1,5 +1,5 @@
 <template>
-    <div class="mock-row">
+    <div class="mock-row" :class="{'open' : open}">
 
         <div class="mock-col w2">
             <div class="mock-col-header" :class="{'color-accent-one' : groupStart}">GROUP</div>
@@ -43,10 +43,7 @@
         <div class="mock-col text-center">
             <div class="mock-col-header">DISABLED</div>
             <div v-show="!editing" class="mock-col-value" :class="{ 'red' : route.disabled }">{{ route.disabled }}</div>
-            <!--<input v-show="editing" type="checkbox" class="form-control form-check" v-model="editingRoute.disabled"/>-->
-            <ToggleSwitch v-show="editing"
-                          :id="'disabled' + index"
-                          v-model="editingRoute.disabled"></ToggleSwitch>
+            <ToggleSwitch v-show="editing" v-model="editingRoute.disabled"></ToggleSwitch>
         </div>
 
         <div class="mock-col w-fixed-auto">
@@ -92,6 +89,11 @@
             index: {type: Number},
             route: {type: Object},
             groupStart: {type: Boolean}
+        },
+        computed: {
+            open() {
+                return this.editing || this.testing;
+            },
         },
         methods: {
             ...mapActions({

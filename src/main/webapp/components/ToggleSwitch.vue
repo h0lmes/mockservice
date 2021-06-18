@@ -11,15 +11,17 @@
         </label>
     </div>
 </template>
-
 <script>
+    import uuidv4 from './uuidv4';
+
     export default {
         name: "ToggleSwitch",
         data() {
-            return {}
+            return {
+                id: uuidv4()
+            }
         },
         props: {
-            id: {type: String},
             value: {type: Boolean},
             small: {type: Boolean},
         },

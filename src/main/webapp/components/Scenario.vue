@@ -1,5 +1,5 @@
 <template>
-    <div class="mock-row">
+    <div class="mock-row" :class="{'open' : open}">
 
         <div class="mock-col">
             <div class="mock-col-header" :class="{'color-accent-one' : groupStart}">GROUP</div>
@@ -24,10 +24,7 @@
         </div>
 
         <div class="mock-col v-center text-center">
-            <ToggleSwitch :id="'disabled' + index"
-                          v-model="activeSwitch"
-                          @toggle="activeToggled()">Active
-            </ToggleSwitch>
+            <ToggleSwitch v-model="activeSwitch" @toggle="activeToggled()">Active</ToggleSwitch>
         </div>
 
         <div class="mock-col w-fixed-auto">
@@ -84,6 +81,9 @@
         computed: {
             routes() {
                 return this.$store.state.routes;
+            },
+            open() {
+                return this.editing || this.testing;
             },
         },
         created() {

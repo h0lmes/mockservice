@@ -40,6 +40,9 @@
                 <li class="container hidden-when-mini mt-3">
                     <ColorModePicker></ColorModePicker>
                 </li>
+                <li class="container hidden-when-mini smaller">
+                    <ViewSelector></ViewSelector>
+                </li>
             </ul>
         </div>
 
@@ -57,9 +60,10 @@
     import ColorModePicker from "../components/ColorModePicker";
     import ErrorPanel from "../components/ErrorPanel";
     import Loading from "../components/Loading";
+    import ViewSelector from "../components/ViewSelector";
 
     export default {
-        components: {ErrorPanel, ColorModePicker, Loading},
+        components: {ViewSelector, ErrorPanel, ColorModePicker, Loading},
         data() {
             return {}
         },
@@ -84,6 +88,5 @@
     .container {
         width: 100%;
         text-align: center;
-        padding: 5px;
     }
 </style>

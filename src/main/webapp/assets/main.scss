@@ -85,6 +85,9 @@ button {
 .monospace {
     font-family: monospace, monospace;
 }
+.smaller {
+  font-size: smaller;
+}
 h1, h2, h3, h4, h5 {
     font-weight: 500;
     margin: 0 0 1.5rem;
@@ -133,17 +136,30 @@ pre {
 // --------------------------------------------------------------------------------
 
 .mock-row {
+  --padding: 0.7rem 1rem;
+  --margin-bottom: 0.9rem;
+  --align-items: start;
   display: flex;
   gap: 0.7rem 1rem;
   flex-wrap: wrap;
   justify-content: center;
   align-content: space-around;
-  margin-bottom: 0.9rem;
-  padding: 0.7rem 1rem;
+  align-items: var(--align-items);
+  margin-bottom: var(--margin-bottom);
+  padding: var(--padding);
   font-size: smaller;
   border-radius: 5px;
   background-color: var(--bg-secondary);
   box-shadow: 0 1px 1px 0 rgb(0 0 0 / 8%), 0 1px 3px 0 rgb(0 0 0 / 10%);
+}
+
+.compact-view .mock-row {
+  --margin-bottom: 1px;
+}
+
+.compact-view .mock-row:not(.open) {
+  --padding: 0.4rem 0.4rem;
+  --align-items: center;
 }
 
 @media screen and (max-width: 1099px) {
@@ -189,8 +205,13 @@ pre {
   }
 
   & .buttons-spacer {
-    padding-top: .5rem;
+    --padding-top: .5rem;
+    padding-top: var(--padding-top);
   }
+}
+
+.compact-view .mock-row:not(.open) .mock-col .buttons-spacer {
+  --padding-top: 0;
 }
 
 @media screen and (max-width: 719px) {
@@ -202,11 +223,16 @@ pre {
 }
 
 .mock-col-header {
-  display: block;
+  --display: block;
+  display: var(--display);
   width: fit-content;
   color: var(--color-secondary);
   margin: 0 auto .5rem;
   text-align: center;
+}
+
+.compact-view .mock-row:not(.open) .mock-col-header {
+  --display: none;
 }
 
 .mock-col-value {
