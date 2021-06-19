@@ -22,6 +22,7 @@ spring:
 
 application:
   config: ${CONFIG_FILE:.\config.yml}
+  config-backup: ${CONFIG_BACKUP_FILE:.\config-backup.yml}
   soap-error-data-file: soapFault.xml
   cache:
     response: 256

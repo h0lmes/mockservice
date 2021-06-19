@@ -86,10 +86,10 @@ button {
     font-family: monospace, monospace;
 }
 .smaller {
-  font-size: smaller;
+  font-size: smaller !important;
 }
 .larger {
-  font-size: larger;
+  font-size: larger !important;
 }
 h1, h2, h3, h4, h5 {
     font-weight: 500;

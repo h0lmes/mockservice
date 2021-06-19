@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("web-api")
+@RequestMapping("web-api/config")
 @CrossOrigin(origins = "*")
 public class WebApiConfigController {
 
@@ -22,14 +22,24 @@ public class WebApiConfigController {
         this.configRepository = configRepository;
     }
 
-    @GetMapping("config")
+    @GetMapping
     public String getConfig() throws JsonProcessingException {
         return configRepository.getConfigData();
     }
 
-    @PutMapping("config")
+    @PutMapping
     public void putConfig(@RequestBody String data) throws IOException {
         configRepository.writeConfigData(data);
+    }
+
+    @GetMapping("backup")
+    public void backup() throws IOException {
+        configRepository.backup();
+    }
+
+    @GetMapping("restore")
+    public void restore() throws IOException {
+        configRepository.restore();
     }
 
     @ExceptionHandler

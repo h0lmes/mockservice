@@ -21,6 +21,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     private static final Logger log = LoggerFactory.getLogger(ConfigRepositoryImpl.class);
 
     private final String fileConfigPath;
+    private final String fileConfigBackupPath;
     private final ObjectReader yamlReader;
     private final ObjectWriter yamlWriter;
     private Config config;
@@ -30,8 +31,10 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
 
     public ConfigRepositoryImpl(@Value("${application.config}") String fileConfigPath,
+                                @Value("${application.config-backup}") String fileConfigBackupPath,
                                 YamlMapperService yamlMapperService) {
         this.fileConfigPath = fileConfigPath;
+        this.fileConfigBackupPath = fileConfigBackupPath;
         this.yamlReader = yamlMapperService.reader();
         this.yamlWriter = yamlMapperService.writer();
 
@@ -44,11 +47,11 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     private void readConfigFromFile() throws IOException {
-        config = yamlReader.readValue(getConfigFile(), Config.class);
+        readConfigFromFile(getConfigFile());
     }
 
-    private File getConfigFile() {
-        return new File(fileConfigPath);
+    private void readConfigFromFile(File file) throws IOException {
+        config = yamlReader.readValue(file, Config.class);
     }
 
     private void readConfigFromString(String yaml) throws IOException {
@@ -60,11 +63,23 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     private void trySaveConfigToFile() throws IOException {
+        trySaveConfigToFile(getConfigFile());
+    }
+
+    private void trySaveConfigToFile(File file) throws IOException {
         try {
-            yamlWriter.writeValue(getConfigFile(), config);
+            yamlWriter.writeValue(file, config);
         } catch (IOException e) {
             throw new IOException("Could not write config to file. " + e.getMessage(), e);
         }
+    }
+
+    private File getConfigFile() {
+        return new File(fileConfigPath);
+    }
+
+    private File getConfigBackupFile() {
+        return new File(fileConfigBackupPath);
     }
 
     //----------------------------------------------------------------------
@@ -82,6 +97,19 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     public synchronized void writeConfigData(String data) throws IOException {
         notifyBeforeConfigChanged();
         readConfigFromString(data);
+        notifyAfterConfigChanged();
+        trySaveConfigToFile();
+    }
+
+    @Override
+    public void backup() throws IOException {
+        trySaveConfigToFile(getConfigBackupFile());
+    }
+
+    @Override
+    public void restore() throws IOException {
+        notifyBeforeConfigChanged();
+        readConfigFromFile(getConfigBackupFile());
         notifyAfterConfigChanged();
         trySaveConfigToFile();
     }

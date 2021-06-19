@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface ConfigRepository {
     String getConfigData() throws JsonProcessingException;
     void writeConfigData(String data) throws IOException;
+    void backup() throws IOException;
+    void restore() throws IOException;
 
     Settings getSettings();
     void setSettings(Settings settings) throws IOException;

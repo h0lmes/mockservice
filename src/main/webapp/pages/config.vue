@@ -6,7 +6,9 @@
         <textarea id="ta-config-el" class="form-control form-control-sm v-resize" :rows="rows" v-model="config"></textarea>
         <div id="buttons-el" class="mt-4 pl-1">
             <button type="button" class="btn btn-sm btn-primary mr-3" @click="save">SAVE AND APPLY</button>
-            <button type="button" class="btn btn-sm btn-default mr-3" @click="download">DOWNLOAD</button>
+            <button type="button" class="btn btn-sm btn-default mr-3" @click="download">DOWNLOAD AS FILE</button>
+            <button type="button" class="btn btn-sm btn-default mr-3" @click="backup">BACKUP ON SERVER</button>
+            <button type="button" class="btn btn-sm btn-danger mr-3" @click="restore">RESTORE FROM BACKUP</button>
         </div>
 
         <textarea id="hta1" class="form-control form-control-sm invisible" :rows="1"></textarea>
@@ -26,7 +28,6 @@
             return {
                 config: '',
                 oneRowHeight: 16,
-                textareaOffsetTop: 0,
                 resizeTimeoutId: null,
                 rows: 16
             }
@@ -47,12 +48,27 @@
         },
         fetchDelay: 0,
         methods: {
-            ...mapActions(['fetchConfig', 'saveConfig']),
+            ...mapActions(['fetchConfig', 'saveConfig', 'backupConfig', 'restoreConfig']),
             async save() {
                 if (confirm('Ye be warned =)')) {
                     this.$nuxt.$loading.start();
                     this.saveConfig(this.config)
                         .then(() => this.$nuxt.$loading.finish());
+                }
+            },
+            async backup() {
+                this.$nuxt.$loading.start();
+                this.backupConfig()
+                    .then(() => this.$nuxt.$loading.finish());
+            },
+            async restore() {
+                if (confirm('Confirm restore ?')) {
+                    this.$nuxt.$loading.start();
+                    this.restoreConfig()
+                        .then(() => {
+                            this.$nuxt.$loading.finish();
+                            this.$fetch();
+                        });
                 }
             },
             download() {

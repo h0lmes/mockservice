@@ -1,7 +1,9 @@
 <template>
     <div class="monospace">
 
-        <textarea class="form-control form-control-sm v-resize"
+        <textarea id="request-text-el"
+                  class="form-control form-control-sm v-resize"
+                  :placeholder="requestPlaceholder"
                   :rows="10"
                   @keydown.ctrl.enter.exact="$fetch()"
                   @keydown.116.exact.prevent="storeRequest"
@@ -40,6 +42,7 @@
         components: {Loading},
         data() {
             return {
+                requestPlaceholder: 'POST http://localhost:8081/api/v2/entity\n\n{"name": "Johnny 5"}',
                 requestValue: '',
                 responseValue: '',
             }
@@ -50,7 +53,13 @@
         async fetch() {
             if (!this.requestValue) return;
 
-            const lines = this.requestValue.split('\n');
+            const requestEl = document.getElementById('request-text-el');
+            let lines;
+            if (requestEl.selectionStart === requestEl.selectionEnd) {
+                lines = this.requestValue.split('\n');
+            } else {
+                lines = this.requestValue.substring(requestEl.selectionStart, requestEl.selectionEnd).split('\n');
+            }
             const len = lines.length;
             const spaceIndex = lines[0].indexOf(' ');
             const method = spaceIndex > -1 ? lines[0].substring(0, spaceIndex).toUpperCase() : 'GET';

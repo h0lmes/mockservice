@@ -1,13 +1,13 @@
 <template>
     <div id="log-page-el" class="monospace">
 
-        <textarea id="log-text-area-el" class="form-control form-control-sm v-resize" :rows="rows" v-model="value"></textarea>
+        <textarea id="log-text-area-el" class="form-control form-control-sm v-resize smaller" :rows="rows" v-model="value"></textarea>
         <div id="log-buttons-el" class="mt-4 pl-1">
             <button type="button" class="btn btn-sm btn-default mr-3" @click="download">DOWNLOAD</button>
         </div>
 
-        <textarea id="hta1" class="form-control form-control-sm invisible" :rows="1"></textarea>
-        <textarea id="hta2" class="form-control form-control-sm invisible" :rows="2"></textarea>
+        <textarea id="hta1" class="form-control form-control-sm smaller invisible" :rows="1"></textarea>
+        <textarea id="hta2" class="form-control form-control-sm smaller invisible" :rows="2"></textarea>
 
         <Loading v-if="$fetchState.pending"></Loading>
     </div>

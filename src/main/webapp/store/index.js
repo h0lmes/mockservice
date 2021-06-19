@@ -101,6 +101,20 @@ export const actions = {
         ).then(commit('resetLastError')
         ).catch(error => commit('setLastError', error));
     },
+    backupConfig({commit, state}) {
+        commit('resetLastError');
+        return fetch(state.BASE_URL + '/web-api/config/backup'
+        ).then(handleError
+        ).then(response => response.text()
+        ).catch(error => commit('setLastError', error));
+    },
+    restoreConfig({commit, state}) {
+        commit('resetLastError');
+        return fetch(state.BASE_URL + '/web-api/config/restore'
+        ).then(handleError
+        ).then(response => response.text()
+        ).catch(error => commit('setLastError', error));
+    },
 
     fetchLog({commit, state}) {
         commit('resetLastError');
