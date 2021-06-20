@@ -6,8 +6,8 @@
         </div>
 
         <div class="toolbar mb-3">
-            <button type="button" class="btn btn-link" @click="newScenario">Add scenario</button>
-            <button type="button" class="btn btn-link" @click="setFilter('')">Clear filter</button>
+            <button type="button" class="btn" @click="newScenario">Add scenario</button>
+            <button type="button" class="btn" @click="setFilter('')">Clear filter</button>
             <ViewSelector></ViewSelector>
         </div>
 

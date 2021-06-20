@@ -1,25 +1,24 @@
 <template>
     <div class="monospace">
 
+        <div class="toolbar mb-3">
+            <button type="button" class="btn btn-sm btn-primary" @click="$fetch()">FETCH (CTRL + ENTER)</button>
+            <button type="button" class="btn btn-sm btn-default" @click="storeRequest">REQUEST TO STORAGE (F5)</button>
+            <button type="button" class="btn btn-sm btn-default" @click="restoreRequest">REQUEST FROM STORAGE (F9)</button>
+            <button type="button" class="btn btn-sm btn-default" @click="forgetRequest">FORGET REQUEST</button>
+            <button type="button" class="btn btn-sm btn-default" @click="saveRequest">REQUEST TO FILE</button>
+            <button type="button" class="btn btn-sm btn-default" @click="saveResponse">RESPONSE TO FILE</button>
+        </div>
         <textarea id="request-text-el"
-                  class="form-control form-control-sm v-resize"
+                  class="form-control form-control-sm v-resize mb-4"
                   :placeholder="requestPlaceholder"
                   :rows="10"
                   @keydown.ctrl.enter.exact="$fetch()"
                   @keydown.116.exact.prevent="storeRequest"
                   @keydown.120.exact.prevent="restoreRequest"
-                  v-model="requestValue"></textarea>
-        <div class="buttons pl-1">
-            <button type="button" class="btn btn-sm btn-primary mr-3 mt-3" @click="$fetch()">FETCH (CTRL + ENTER)</button>
-            <button type="button" class="btn btn-sm btn-default mr-3 mt-3" @click="storeRequest">REQUEST TO STORAGE (F5)</button>
-            <button type="button" class="btn btn-sm btn-default mr-3 mt-3" @click="restoreRequest">REQUEST FROM STORAGE (F9)</button>
-            <button type="button" class="btn btn-sm btn-default mr-3 mt-3" @click="forgetRequest">FORGET REQUEST</button>
-            <button type="button" class="btn btn-sm btn-default mr-3 mt-3" @click="saveRequest">REQUEST TO FILE</button>
-            <button type="button" class="btn btn-sm btn-default mr-3 mt-3" @click="saveResponse">RESPONSE TO FILE</button>
-        </div>
-        <div class="wrapper mt-3">
-            <pre class="form-control form-control-sm monospace">{{ responseValue }}</pre>
-        </div>
+                  v-model="requestValue"
+        ></textarea>
+        <pre class="form-control form-control-sm monospace min-height">{{ responseValue }}</pre>
 
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
@@ -129,10 +128,7 @@
     }
 </script>
 <style scoped>
-    .wrapper pre {
+    .min-height {
         min-height: 2rem;
-    }
-    .buttons {
-        text-align: center;
     }
 </style>

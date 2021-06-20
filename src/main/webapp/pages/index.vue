@@ -5,8 +5,8 @@
         </div>
 
         <div class="toolbar mb-3">
-            <button type="button" class="btn btn-link" @click="newRoute">Add route</button>
-            <button type="button" class="btn btn-link" @click="setFilter('')">Clear filter</button>
+            <button type="button" class="btn" @click="newRoute">Add route</button>
+            <button type="button" class="btn" @click="setFilter('')">Clear filter</button>
             <ViewSelector></ViewSelector>
         </div>
 

@@ -30,6 +30,15 @@
 </script>
 <style lang="scss" scoped>
     .table {
+        margin: 0;
+        width: 100%;
+        min-height: 3rem;
+        max-height: 25em;
+        background-color: var(--bg-primary);
+        border: 1px solid var(--form-control-border);
+        border-radius: var(--form-control-border-radius);
+        overflow: auto;
+
         & > .row:nth-child(2n+1) {
             background-color: var(--bg-secondary);
         }

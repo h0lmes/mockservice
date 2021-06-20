@@ -35,7 +35,8 @@
         </div>
 
         <div v-show="editing" class="mock-col w100">
-            <textarea class="form-control form-control-sm v-resize monospace" rows="7" v-model="editingScenario.data"></textarea>
+            <div class="mock-col-header">SCENARIO (ROUTES)</div>
+            <AutoSizeTextArea v-model="editingScenario.data"></AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-col w100">
@@ -46,12 +47,7 @@
         </div>
 
         <div v-if="editing && addRoute" class="mock-col w100">
-            <div class="routes">
-                <RoutesToAdd
-                        :routes="routes"
-                        @filter="setFilter($event)"
-                        @add="add($event)"></RoutesToAdd>
-            </div>
+            <RoutesToAdd :routes="routes" @filter="setFilter($event)" @add="add($event)"></RoutesToAdd>
         </div>
 
     </div>
@@ -60,10 +56,11 @@
     import {mapActions} from 'vuex';
     import RoutesToAdd from "../components/RoutesToAdd";
     import ToggleSwitch from "./ToggleSwitch";
+    import AutoSizeTextArea from "./AutoSizeTextArea";
 
     export default {
         name: "Scenario",
-        components: {RoutesToAdd, ToggleSwitch},
+        components: {AutoSizeTextArea, RoutesToAdd, ToggleSwitch},
         data() {
             return {
                 editing: false,
@@ -124,6 +121,7 @@
             },
             cancel() {
                 this.editing = false;
+                this.editingScenario = {};
             },
             del() {
                 if (!!this.scenario._new) {
@@ -162,17 +160,5 @@
         }
     }
 </script>
-<style lang="scss" scoped>
-    .routes {
-        display: block;
-        position: relative;
-        margin: 0;
-        width: 100%;
-        min-height: 3rem;
-        max-height: 25em;
-        background-color: var(--bg-primary);
-        border: 1px solid var(--form-control-border);
-        border-radius: var(--form-control-border-radius);
-        overflow: auto;
-    }
+<style scoped>
 </style>

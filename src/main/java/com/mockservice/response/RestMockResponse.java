@@ -82,7 +82,7 @@ public class RestMockResponse implements MockResponse {
     }
 
     private boolean isRequestStart(String line) {
-        return line.endsWith(HTTP_1_1);
+        return line.trim().endsWith(HTTP_1_1);
     }
 
     private void setResponse(String line) {
@@ -96,7 +96,7 @@ public class RestMockResponse implements MockResponse {
 
     private void setRequest(String line) {
         try {
-            String methodAndRef = line.substring(0, line.indexOf(HTTP_1_1));
+            String methodAndRef = line.substring(0, line.indexOf(HTTP_1_1)).trim();
             String methodStr = methodAndRef.substring(0, methodAndRef.indexOf(' '));
             requestRelativeReference = methodAndRef.substring(methodAndRef.indexOf(' ')).trim();
             requestMethod = HttpMethod.valueOf(methodStr);

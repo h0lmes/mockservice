@@ -1,30 +1,55 @@
 :root {
-  --btn-color-default: #ddd;
-  --btn-color-hilight-default: #fff;
-  /**/
-  --btn-bg-default: #8d8e8d;
-  --btn-bg-primary: var(--color-accent-one);
-  --btn-bg-warning: #cc7533;
-  --btn-bg-danger: #b33642;
-  /**/
-  --btn-bg-default-focus: #8d8e8d;
-  --btn-bg-primary-focus: var(--color-accent-one);
-  --btn-bg-warning-focus: #cc7533;
-  --btn-bg-danger-focus: #b33642;
-  /**/
   --btn-color-link: var(--color-primary);
+  --btn-color: #505050;
+  --btn-color-focus: black;
+  --btn-bg: #bfbfbf;
+  --btn-bg-focus: #8d8e8d;
+
+  & .btn-primary {
+    --btn-color: #ccc;
+    --btn-color-focus: #fff;
+    --btn-bg: var(--color-accent-one);
+    --btn-bg-focus: var(--color-accent-one);
+  }
+
+  & .btn-warning {
+    --btn-bg: #cc7533;
+    --btn-bg-focus: #995626;
+  }
+
+  & .btn-danger {
+    --btn-color: #ccc;
+    --btn-color-focus: #fff;
+    --btn-bg: #b33642;
+    --btn-bg-focus: #8a2b34;
+  }
 }
+
 .dark-mode {
-  --btn-color-default: #aaa;
-  --btn-color-hilight-default: #ddd;
-  /**/
-  --btn-bg-default: #303030;
-  --btn-bg-primary: #162a30;
-  --btn-bg-warning: #303030;
-  --btn-bg-danger: #301c1f;
+  --btn-color: #aaa;
+  --btn-color-focus: #ddd;
+  --btn-bg: #292929;
+  --btn-bg-focus: #333333;
+
+  & .btn-primary {
+    --btn-bg: #162a30;
+    --btn-bg-focus: #19363b;
+  }
+
+  & .btn-warning {
+    --btn-bg: #4d321f;
+    --btn-bg-focus: #66422a;
+  }
+
+  & .btn-danger {
+    --btn-bg: #301c1f;
+    --btn-bg-focus: #3d1e25;
+  }
 }
+
 .sepia-mode {
-  --btn-bg-default: #a19a8a;
+  --btn-bg: #bfb195;
+  --btn-bg-focus: #9e927d;
 }
 
 .btn {
@@ -41,29 +66,19 @@
   padding: .4rem .8rem;
   line-height: 1.42857143;
   user-select: none;
-  background-color: var(--btn-bg-default);
-  color: var(--btn-color-default);
+  background-color: var(--btn-bg);
+  color: var(--btn-color);
   box-shadow: 0 1px 4px -1px rgba(0, 0, 0, .6);
   outline: none;
 
-  &,
-  &:active,
-  &.active {
-    &:focus,
-    &.focus {
-      outline-offset: -2px;
-    }
-  }
-
   &:hover,
-  &:focus,
-  &.focus {
-    color: var(--btn-color-hilight-default);
+  &:focus {
+    color: var(--btn-color-focus);
     text-decoration: none;
   }
 
   &:focus {
-    box-shadow: 0 1px 4px -1px rgba(0, 0, 0, .6), 0 0 5px var(--btn-bg-default-focus);
+    background-color: var(--btn-bg-focus);
   }
 
   &:active,
@@ -74,16 +89,14 @@
   }
 
   &.disabled,
-  &[disabled],
-  fieldset[disabled] & {
+  &[disabled] {
     cursor: none;
     opacity: .65;
     box-shadow: none;
   }
 
   a& {
-    &.disabled,
-    fieldset[disabled] & {
+    &.disabled {
       pointer-events: none;
     }
   }
@@ -92,72 +105,43 @@
 .btn-link {
   font-weight: 400;
   color: var(--btn-color-link);
+  background: transparent;
   padding: .4rem .3rem;
   border-color: transparent;
 
   &,
   &:active,
   &.active,
-  &[disabled],
-  fieldset[disabled] & {
+  &[disabled] {
     background-color: transparent;
     box-shadow: none;
   }
+
   &,
   &:hover,
   &:focus,
   &:active {
     border-color: transparent;
   }
+
   &:hover,
   &:focus {
     color: var(--btn-color-link);
     text-decoration: underline;
     background-color: transparent;
   }
-  &[disabled],
-  fieldset[disabled] & {
+
+  &[disabled] {
     &:hover,
     &:focus {
-      color: var(--btn-color-default);
+      color: var(--btn-color);
       text-decoration: none;
     }
   }
 }
 
 .btn-sm {
-  padding: .3rem .5rem;
+  padding: .3rem .7rem;
   font-size: smaller;
   line-height: 1.2;
-}
-
-.btn-primary {
-  background-color: var(--btn-bg-primary);
-  &:focus {
-    box-shadow: 0 1px 4px -1px rgba(0, 0, 0, .6), 0 0 5px var(--btn-bg-primary-focus);
-  }
-  &.btn-link {
-    background: transparent;
-    color: var(--btn-bg-primary);
-  }
-}
-.btn-warning {
-  background-color: var(--btn-bg-warning);
-  &:focus {
-    box-shadow: 0 1px 4px -1px rgba(0, 0, 0, .6), 0 0 5px var(--btn-bg-warning-focus);
-  }
-  &.btn-link {
-    background: transparent;
-    color: var(--btn-bg-warning);
-  }
-}
-.btn-danger {
-  background-color: var(--btn-bg-danger);
-  &:focus {
-    box-shadow: 0 1px 4px -1px rgba(0, 0, 0, .6), 0 0 5px var(--btn-bg-danger-focus);
-  }
-  &.btn-link {
-    background: transparent;
-    color: var(--btn-bg-danger);
-  }
 }

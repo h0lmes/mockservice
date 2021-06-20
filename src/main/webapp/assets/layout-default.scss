@@ -20,11 +20,11 @@
 #page {
     width: 100%;
 }
-#page-contents {
+.page-contents {
     padding: 2rem;
 }
 @media screen and (max-width: 1099px) /*and (orientation: landscape)*/ {
-    #page-contents {
+    .page-contents {
         padding: 1rem .5rem;
     }
 }

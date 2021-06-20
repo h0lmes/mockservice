@@ -55,7 +55,8 @@
         </div>
 
         <div v-show="editing" class="mock-col w100">
-            <textarea class="form-control form-control-sm v-resize monospace" rows="10" v-model="editingRoute.response"></textarea>
+            <div class="mock-col-header">RESPONSE (BODY)</div>
+            <AutoSizeTextArea v-model="editingRoute.response"></AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-col w100">
@@ -74,15 +75,16 @@
     import {mapActions} from 'vuex';
     import RouteTester from "./RouteTester";
     import ToggleSwitch from "./ToggleSwitch";
+    import AutoSizeTextArea from "./AutoSizeTextArea";
 
     export default {
         name: "Route",
-        components: {RouteTester, ToggleSwitch},
+        components: {AutoSizeTextArea, RouteTester, ToggleSwitch},
         data() {
             return {
                 editing: false,
                 editingRoute: {},
-                testing: false
+                testing: false,
             }
         },
         props: {
@@ -109,11 +111,12 @@
                 this.testing = false;
             },
             test() {
-                this.editing = false;
+                this.cancel();
                 this.testing = !this.testing;
             },
             cancel() {
                 this.editing = false;
+                this.editingRoute = {};
             },
             del() {
                 if (!!this.route._new) {
@@ -141,5 +144,5 @@
         }
     }
 </script>
-<style lang="scss" scoped>
+<style scoped>
 </style>

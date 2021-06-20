@@ -1,15 +1,15 @@
 <template>
-    <div id="config-page-el" class="monospace">
+    <div class="config-page monospace">
 
         <p class="red">Use with caution!</p>
         <p class="red mb-4">It is easy to ruin config by editing it as plain text.</p>
-        <textarea id="ta-config-el" class="form-control form-control-sm v-resize" :rows="rows" v-model="config"></textarea>
-        <div id="buttons-el" class="mt-4 pl-1">
-            <button type="button" class="btn btn-sm btn-primary mr-3" @click="save">SAVE AND APPLY</button>
-            <button type="button" class="btn btn-sm btn-default mr-3" @click="download">DOWNLOAD AS FILE</button>
-            <button type="button" class="btn btn-sm btn-default mr-3" @click="backup">BACKUP ON SERVER</button>
-            <button type="button" class="btn btn-sm btn-danger mr-3" @click="restore">RESTORE FROM BACKUP</button>
+        <div class="toolbar mb-3">
+            <button type="button" class="btn btn-sm btn-primary" @click="save">SAVE AND APPLY</button>
+            <button type="button" class="btn btn-sm btn-default" @click="download">DOWNLOAD AS FILE</button>
+            <button type="button" class="btn btn-sm btn-default" @click="backup">BACKUP ON SERVER</button>
+            <button type="button" class="btn btn-sm btn-danger" @click="restore">RESTORE FROM BACKUP</button>
         </div>
+        <textarea id="textarea" class="form-control form-control-sm v-resize monospace" :rows="rows" v-model="config"></textarea>
 
         <textarea id="hta1" class="form-control form-control-sm invisible" :rows="1"></textarea>
         <textarea id="hta2" class="form-control form-control-sm invisible" :rows="2"></textarea>
@@ -20,10 +20,11 @@
 <script>
     import {mapActions} from 'vuex';
     import Loading from "../components/Loading";
+    import AutoSizeTextArea from "../components/AutoSizeTextArea";
 
     export default {
         name: "config",
-        components: {Loading},
+        components: {AutoSizeTextArea, Loading},
         data() {
             return {
                 config: '',
@@ -90,10 +91,8 @@
                 this.resizeTimeoutId = setTimeout(() => {
                     this.rows = (
                         window.innerHeight
-                        - document.getElementById('ta-config-el').offsetTop
-                        - 90 /*(document.getElementById('config-page-el').clientHeight
-                            - this.textareaOffsetTop
-                            - document.getElementById('ta-config-el').offsetHeight)*/
+                        - document.getElementById('textarea').offsetTop
+                        - 50
                     ) / this.oneRowHeight;
                 }, 500);
             },
@@ -102,8 +101,7 @@
 </script>
 <style scoped>
     .invisible {
-        position: fixed;
-        top: -10rem;
-        width: 10rem;
+        position: absolute;
+        top: -20rem;
     }
 </style>

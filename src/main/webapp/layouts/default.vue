@@ -56,7 +56,7 @@
         </div>
 
         <div class="page-wrapper">
-            <div id="page-contents">
+            <div class="page-contents">
                 <Nuxt/>
             </div>
         </div>
