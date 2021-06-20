@@ -7,7 +7,7 @@ routes:
   method: GET
   type: REST
   alt: ""
-  response: "HTTP/1.1 202\n\n{\"name\": \"Johnny 5\"}\nGET /api/robot HTTP/1.1\nHost: localhost:8081\nMock-Alt: api-robot/R2D2\n\n{}"
+  response: "HTTP/1.1 202\n\n{\"name\": \"Johnny 5\"}\nGET localhost:8081/api/robot HTTP/1.1 \nMock-Alt: api-robot/R2D2\n\n{}"
   disabled: false
 - group: a robot service
   path: /api/robot

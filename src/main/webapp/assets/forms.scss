@@ -12,9 +12,9 @@
   --form-control-color: #909ea7;
   --form-control-color-disabled: #6c757d;
   --form-control-bg-disabled: #787979;
-  --form-control-border: #4e4f4f;
+  --form-control-border: #323434;
   --form-control-placeholder: #4a4f54;
-  --form-control-bg-hilight-shadow: rgba(255, 200, 73, 0.5);
+  --form-control-bg-hilight-shadow: var(--color-accent-one);
 }
 .sepia-mode {
   --form-control-color: #433422;

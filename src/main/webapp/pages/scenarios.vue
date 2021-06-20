@@ -1,18 +1,19 @@
 <template>
     <div class="monospace">
 
-        <div class="mb-2">
+        <div class="mb-3">
             <input id="search" placeholder="search here or click on values" type="text" class="form-control noborder" @input="debounce($event.target.value)"/>
         </div>
-        <p class="mb-2">
-            <button type="button" class="btn btn-link mr-3" @click="newScenario">Add scenario</button>
-            <button type="button" class="btn btn-link mr-3" @click="setFilter('')">Clear filter</button>
-        </p>
-        <div class="holder">
-            <Scenarios :scenarios="filtered"
-                       :activeScenarios="activeScenarios"
-                       @filter="setFilter($event)"></Scenarios>
+
+        <div class="toolbar mb-3">
+            <button type="button" class="btn btn-link" @click="newScenario">Add scenario</button>
+            <button type="button" class="btn btn-link" @click="setFilter('')">Clear filter</button>
+            <ViewSelector></ViewSelector>
         </div>
+
+        <Scenarios :scenarios="filtered"
+                   :activeScenarios="activeScenarios"
+                   @filter="setFilter($event)"></Scenarios>
 
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
@@ -21,10 +22,11 @@
     import {mapActions} from 'vuex';
     import Scenarios from "../components/Scenarios";
     import Loading from "../components/Loading";
+    import ViewSelector from "../components/ViewSelector";
 
     export default {
         name: "scenarios",
-        components: {Scenarios, Loading},
+        components: {Scenarios, Loading, ViewSelector},
         data() {
             return {
                 query: '',
@@ -70,7 +72,4 @@
     }
 </script>
 <style scoped>
-    .holder {
-        margin: 0 auto;
-    }
 </style>

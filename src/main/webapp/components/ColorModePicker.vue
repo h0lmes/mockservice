@@ -1,8 +1,10 @@
 <template>
     <div>
         <ul>
-            <li v-for="color of colors" :key="color">
-                <component :is="`icon-${color}`" @click="$colorMode.preference = color" :class="getClasses(color)" />
+            <li v-for="color of colors" :key="color" tabindex="0" @keydown.enter.exact="$colorMode.preference = color">
+                <component :is="`icon-${color}`"
+                           @click="$colorMode.preference = color"
+                           :class="getClasses(color)" />
             </li>
         </ul>
         <p class="scheme-info">
@@ -55,6 +57,10 @@
     ul li {
         display: inline-block;
         padding: 5px;
+        outline: 0;
+    }
+    ul li:focus {
+        background-color: var(--nav-bg-active);
     }
     p {
         margin: 0;

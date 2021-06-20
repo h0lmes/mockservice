@@ -7,6 +7,11 @@
   --btn-bg-warning: #cc7533;
   --btn-bg-danger: #b33642;
   /**/
+  --btn-bg-default-focus: #8d8e8d;
+  --btn-bg-primary-focus: var(--color-accent-one);
+  --btn-bg-warning-focus: #cc7533;
+  --btn-bg-danger-focus: #b33642;
+  /**/
   --btn-color-link: var(--color-primary);
 }
 .dark-mode {
@@ -57,6 +62,10 @@
     text-decoration: none;
   }
 
+  &:focus {
+    box-shadow: 0 1px 4px -1px rgba(0, 0, 0, .6), 0 0 5px var(--btn-bg-default-focus);
+  }
+
   &:active,
   &.active {
     background-image: none;
@@ -84,7 +93,6 @@
   font-weight: 400;
   color: var(--btn-color-link);
   padding: .4rem .3rem;
-  border-radius: 0;
   border-color: transparent;
 
   &,
@@ -125,6 +133,9 @@
 
 .btn-primary {
   background-color: var(--btn-bg-primary);
+  &:focus {
+    box-shadow: 0 1px 4px -1px rgba(0, 0, 0, .6), 0 0 5px var(--btn-bg-primary-focus);
+  }
   &.btn-link {
     background: transparent;
     color: var(--btn-bg-primary);
@@ -132,6 +143,9 @@
 }
 .btn-warning {
   background-color: var(--btn-bg-warning);
+  &:focus {
+    box-shadow: 0 1px 4px -1px rgba(0, 0, 0, .6), 0 0 5px var(--btn-bg-warning-focus);
+  }
   &.btn-link {
     background: transparent;
     color: var(--btn-bg-warning);
@@ -139,6 +153,9 @@
 }
 .btn-danger {
   background-color: var(--btn-bg-danger);
+  &:focus {
+    box-shadow: 0 1px 4px -1px rgba(0, 0, 0, .6), 0 0 5px var(--btn-bg-danger-focus);
+  }
   &.btn-link {
     background: transparent;
     color: var(--btn-bg-danger);

@@ -1,6 +1,6 @@
 <template>
-    <div class="toggle-switch" tabindex="0" :class="{small : !!small}">
-        <input type="checkbox" :id="id" :checked="value" @input="e => input(e)">
+    <div class="toggle-switch" tabindex="0" :class="{small : !!small}" @keydown.space.exact="$refs.input.click()">
+        <input type="checkbox" tabindex="-1" ref="input" :id="id" :checked="value" @input="e => input(e)">
         <label :for="id" :class="{gap : hasTitle}">
             <div class="area" aria-hidden="true">
                 <div class="background">
@@ -12,13 +12,11 @@
     </div>
 </template>
 <script>
-    import uuidv4 from './uuidv4';
-
     export default {
         name: "ToggleSwitch",
         data() {
             return {
-                id: uuidv4()
+                id: null
             }
         },
         props: {
@@ -30,10 +28,19 @@
                 return !!this.$slots.default;
             }
         },
+        created() {
+            this.id = this.uuid();
+        },
         methods: {
             input(e) {
                 this.$emit('input', e.target.checked);
                 this.$emit('toggle', e.target.checked);
+            },
+            uuid() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    let r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
             }
         },
     }
@@ -44,6 +51,11 @@
         --height: 1.75rem;
         --padding: 2px;
         --handle-size: calc(var(--height) - var(--padding) * 2);
+
+        --toggle-switch-bg-unchecked: darkgray;
+        --toggle-switch-bg-unchecked-focus: gray;
+        --toggle-switch-bg-checked: var(--color-accent-one);
+        --toggle-switch-bg-handle: white;
 
         &.small {
             --width: 2rem;
@@ -65,7 +77,7 @@
         overflow: hidden;
     }
 
-    label {
+    .toggle-switch > label {
         display: inline-grid;
         grid-template-columns: auto auto;
         column-gap: 0;
@@ -76,7 +88,7 @@
         }
     }
 
-    .area {
+    .toggle-switch .area {
         padding: 4px;
         margin: -4px;
     }
@@ -85,12 +97,12 @@
         outline-width: 0;
     }
 
-    .background,
-    .handle {
+    .toggle-switch .background,
+    .toggle-switch .handle {
         transition: all 0.1s ease;
     }
 
-    .background {
+    .toggle-switch .background {
         display: inline-flex;
         flex-direction: row;
         align-items: center;
@@ -100,14 +112,14 @@
         padding: 0 var(--padding);
         vertical-align: text-bottom;
         user-select: none;
-        background-color: darkgray;
+        background-color: var(--toggle-switch-bg-unchecked);
         box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
         overflow: hidden;
         transition: background-color .15s ease;
     }
 
-    .toggle-switch:focus .area {
-        outline: 1px dotted gray;
+    .toggle-switch:focus .area .background {
+        box-shadow: 0 0 5px var(--toggle-switch-bg-checked);
     }
 
     .toggle-switch:active .area {
@@ -115,30 +127,30 @@
     }
 
     .toggle-switch:focus .background,
-    .area:hover .background {
-        background-color: gray;
+    .toggle-switch .area:hover .background {
+        background-color: var(--toggle-switch-bg-unchecked-focus);
     }
 
-    .handle {
+    .toggle-switch .handle {
         width: var(--handle-size);
         height: var(--handle-size);
-        background-color: white;
+        background-color: var(--toggle-switch-bg-handle);
         border-radius: 50%;
         box-shadow:
                 0 2px 4px rgba(0, 0, 0, 0.5),
                 inset 0 2px 4px rgba(0, 0, 0, 0.15);
     }
 
-    .handle:hover {
-        background-color: white;
+    .toggle-switch .handle:hover {
+        background-color: var(--toggle-switch-bg-handle);
     }
 
-    input:checked + label .area .background {
-        background-color: var(--color-accent-one);
+    .toggle-switch > input:checked + label .area .background {
+        background-color: var(--toggle-switch-bg-checked);
     }
 
-    input:checked + label .area .handle {
-        background-color: white;
+    .toggle-switch > input:checked + label .area .handle {
+        background-color: var(--toggle-switch-bg-handle);
         transform: translateX(calc(var(--width) - var(--handle-size)));
     }
 </style>

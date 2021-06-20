@@ -1,16 +1,16 @@
 <template>
     <div class="monospace">
-
-        <div class="mb-2">
+        <div class="mb-3">
             <input id="search" placeholder="search here or click on values" type="text" class="form-control noborder" @input="debounce($event.target.value)"/>
         </div>
-        <p class="mb-2">
-            <button type="button" class="btn btn-link mr-3" @click="newRoute">Add route</button>
-            <button type="button" class="btn btn-link mr-3" @click="setFilter('')">Clear filter</button>
-        </p>
-        <div class="holder">
-            <Routes :routes="filtered" @filter="setFilter($event)"></Routes>
+
+        <div class="toolbar mb-3">
+            <button type="button" class="btn btn-link" @click="newRoute">Add route</button>
+            <button type="button" class="btn btn-link" @click="setFilter('')">Clear filter</button>
+            <ViewSelector></ViewSelector>
         </div>
+
+        <Routes :routes="filtered" @filter="setFilter($event)"></Routes>
 
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
@@ -19,10 +19,11 @@
     import {mapActions} from 'vuex';
     import Routes from "../components/Routes";
     import Loading from "../components/Loading";
+    import ViewSelector from "../components/ViewSelector";
 
     export default {
         name: "index",
-        components: {Routes, Loading},
+        components: {Routes, Loading, ViewSelector},
         data() {
             return {
                 query: '',
@@ -71,7 +72,4 @@
     }
 </script>
 <style scoped>
-    .holder {
-        margin: 0 auto;
-    }
 </style>

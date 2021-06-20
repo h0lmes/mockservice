@@ -2,8 +2,8 @@
     <div id="page">
         <div class="navbar" role="navigation">
             <ul class="nav">
-                <li class="nav-header mb-2">
-                    <a class="btn-minimize-navbar" @click="toggleSidebar">
+                <li class="nav-header mb-2" @keydown.enter.exact="toggleSidebar">
+                    <a type="button" class="btn-minimize-navbar" tabindex="0" @click="toggleSidebar">
                         <FontAwesomeIcon icon="bars"/>
                     </a>
                 </li>
@@ -15,13 +15,13 @@
                 </li>
                 <li>
                     <NuxtLink to="/scenarios">
-                        <FontAwesomeIcon icon="play" class="nav-icon"/>
+                        <FontAwesomeIcon icon="play" class="nav-icon icon-width-fix"/>
                         <span class="nav-label">Scenarios</span>
                     </NuxtLink>
                 </li>
                 <li>
                     <NuxtLink to="/request">
-                        <FontAwesomeIcon icon="at" class="nav-icon"/>
+                        <FontAwesomeIcon icon="at" class="nav-icon icon-width-fix"/>
                         <span class="nav-label">Request</span>
                     </NuxtLink>
                 </li>
@@ -39,21 +39,18 @@
                 </li>
                 <li>
                     <NuxtLink to="/log">
-                        <FontAwesomeIcon icon="file-alt" class="nav-icon larger icon-log"/>
+                        <FontAwesomeIcon icon="file-alt" class="nav-icon larger icon-width-fix"/>
                         <span class="nav-label">Log</span>
                     </NuxtLink>
                 </li>
                 <li>
                     <NuxtLink to="/about">
-                        <FontAwesomeIcon icon="question-circle" class="nav-icon"/>
+                        <FontAwesomeIcon icon="question-circle" class="nav-icon icon-width-fix"/>
                         <span class="nav-label">About</span>
                     </NuxtLink>
                 </li>
                 <li class="container hidden-when-mini mt-3">
                     <ColorModePicker></ColorModePicker>
-                </li>
-                <li class="container hidden-when-mini smaller">
-                    <ViewSelector></ViewSelector>
                 </li>
             </ul>
         </div>
@@ -72,10 +69,9 @@
     import ColorModePicker from "../components/ColorModePicker";
     import ErrorPanel from "../components/ErrorPanel";
     import Loading from "../components/Loading";
-    import ViewSelector from "../components/ViewSelector";
 
     export default {
-        components: {ViewSelector, ErrorPanel, ColorModePicker, Loading},
+        components: {ErrorPanel, ColorModePicker, Loading},
         data() {
             return {}
         },
@@ -102,7 +98,7 @@
         text-align: center;
     }
 
-    .icon-log {
+    .icon-width-fix {
         width: 1.2rem;
     }
 </style>
