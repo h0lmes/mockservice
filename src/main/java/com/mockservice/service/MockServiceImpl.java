@@ -54,6 +54,7 @@ public class MockServiceImpl implements MockService {
     }
 
     private MockResponse routeToMockResponse(Route route) {
+        log.info("Route requested: {}", route);
         if (RouteType.REST.equals(route.getType())) {
             return new RestMockResponse(templateEngine, route.getResponse());
         }
@@ -70,7 +71,6 @@ public class MockServiceImpl implements MockService {
     @Override
     public ResponseEntity<String> mock(RequestFacade request) {
         Route route = getRoute(request);
-        log.info("Route requested: {}", route);
         MockResponse response = responseCache.get(route);
         response.setVariables(request.getVariables()).setHost(request.getBasePath());
         String body = response.getResponseBody();

@@ -3,21 +3,19 @@
 
         <div class="toolbar mb-3">
             <button type="button" class="btn btn-sm btn-primary" @click="$fetch()">FETCH (CTRL + ENTER)</button>
-            <button type="button" class="btn btn-sm btn-default" @click="storeRequest">REQUEST TO STORAGE (F5)</button>
-            <button type="button" class="btn btn-sm btn-default" @click="restoreRequest">REQUEST FROM STORAGE (F9)</button>
+            <button type="button" class="btn btn-sm btn-default" @click="storeRequest">SAVE REQUEST (F5)</button>
             <button type="button" class="btn btn-sm btn-default" @click="forgetRequest">FORGET REQUEST</button>
-            <button type="button" class="btn btn-sm btn-default" @click="saveRequest">REQUEST TO FILE</button>
-            <button type="button" class="btn btn-sm btn-default" @click="saveResponse">RESPONSE TO FILE</button>
         </div>
-        <textarea id="request-text-el"
-                  class="form-control form-control-sm v-resize mb-4"
-                  :placeholder="requestPlaceholder"
-                  :rows="10"
-                  @keydown.ctrl.enter.exact="$fetch()"
-                  @keydown.116.exact.prevent="storeRequest"
-                  @keydown.120.exact.prevent="restoreRequest"
-                  v-model="requestValue"
-        ></textarea>
+        <AutoSizeTextArea class="mb-4"
+                          ref="requestText"
+                          :placeholder="requestPlaceholder"
+                          @keydown.ctrl.enter.exact="$fetch()"
+                          @keydown.116.exact.prevent="storeRequest"
+                          v-model="requestValue"
+        ></AutoSizeTextArea>
+        <div class="toolbar mb-3">
+            <button type="button" class="btn btn-sm btn-default" @click="saveResponse">SAVE TO FILE</button>
+        </div>
         <pre class="form-control form-control-sm monospace min-height">{{ responseValue }}</pre>
 
         <Loading v-if="$fetchState.pending"></Loading>
@@ -25,6 +23,7 @@
 </template>
 <script>
     import Loading from "../components/Loading";
+    import AutoSizeTextArea from "../components/AutoSizeTextArea";
 
     const storageKey = 'MockServiceRequest';
 
@@ -38,7 +37,7 @@
 
     export default {
         name: "request",
-        components: {Loading},
+        components: {AutoSizeTextArea, Loading},
         data() {
             return {
                 requestPlaceholder: 'POST http://localhost:8081/api/v2/entity\n\n{"name": "Johnny 5"}',
@@ -52,12 +51,13 @@
         async fetch() {
             if (!this.requestValue) return;
 
-            const requestEl = document.getElementById('request-text-el');
+            const selStart = this.$refs.requestText.selectionStart();
+            const selEnd = this.$refs.requestText.selectionEnd();
             let lines;
-            if (requestEl.selectionStart === requestEl.selectionEnd) {
+            if (selStart === selEnd) {
                 lines = this.requestValue.split('\n');
             } else {
-                lines = this.requestValue.substring(requestEl.selectionStart, requestEl.selectionEnd).split('\n');
+                lines = this.requestValue.substring(selStart, selEnd).split('\n');
             }
             const len = lines.length;
             const spaceIndex = lines[0].indexOf(' ');
@@ -106,9 +106,6 @@
                 if (window.localStorage) {
                     window.localStorage.removeItem(storageKey);
                 }
-            },
-            saveRequest() {
-                this.saveTextAsFile(this.requestValue, 'request.http')
             },
             saveResponse() {
                 this.saveTextAsFile(this.responseValue, 'response.http')

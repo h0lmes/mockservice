@@ -2,18 +2,21 @@
     --nav-color: #b9c1c7;
     --nav-color-active: white;
     --nav-bg: #3a3f45;
+    --nav-bg2: #30353a;
     --nav-bg-active: #40454d;
 }
 .dark-mode {
     --nav-color: #6a6d76;
     --nav-color-active: #aeb3bf;
     --nav-bg: #212325;
-    --nav-bg-active: #292b2d;
+    --nav-bg2: #1e1f21;
+    --nav-bg-active: #262729;
 }
 .sepia-mode {
     --nav-color: #f1e7d0;
     --nav-color-active: white;
     --nav-bg: #544b40;
+    --nav-bg2: #4c4339;
     --nav-bg-active: #5e5549;
 }
 
@@ -41,7 +44,7 @@
     height: 100vh;
     position: fixed;
     display: block;
-    background-color: var(--nav-bg);
+    background: linear-gradient(90deg, var(--nav-bg), var(--nav-bg2));
     transition: width 0.2s;
 }
 .navbar-mini .navbar {
@@ -118,4 +121,20 @@
 .navbar .nav > li > a.btn-minimize-navbar:hover,
 .navbar .nav > li > a.btn-minimize-navbar:focus {
     color: var(--color-accent-one) !important;
+}
+
+.nav-group-start {
+    --height: 1.4rem;
+    height: var(--height);
+
+    &::before {
+        --thickness: 3px;
+        content: "";
+        position: absolute;
+        margin: calc(var(--height) / 2 - var(--thickness) / 2) 15px;
+        width: calc(100% - 30px);
+        height: var(--thickness);
+        border-radius: var(--thickness);
+        background: linear-gradient(90deg, var(--color-accent-two), var(--color-accent-one) 77%);
+    }
 }

@@ -4,7 +4,7 @@
             <button type="button" class="btn btn-sm btn-primary" @click="test">RETRY</button>
             <button type="button" class="btn btn-sm btn-default" @click="$emit('close')">CLOSE</button>
         </div>
-        <div class="wrapper">
+        <div class="modal-backdrop">
             <pre class="form-control form-control-sm monospace">{{ testResult }}</pre>
         </div>
     </div>
@@ -95,7 +95,7 @@
     }
 </script>
 <style lang="scss" scoped>
-    .wrapper {
+    .modal-backdrop {
         padding: 0;
         text-align: initial;
     }

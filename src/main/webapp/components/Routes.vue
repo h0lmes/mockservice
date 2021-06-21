@@ -1,9 +1,8 @@
 <template>
     <div>
         <p v-if="routes.length === 0">No routes found</p>
-        <div v-for="(route, index) in routes" :key="route.type + route.method + route.path + route.alt">
+        <div v-for="(route, index) in routes" :key="route.method + route.path + route.alt">
             <Route :route="route"
-                   :index="index"
                    :groupStart="groupStart(route, index)"
                    @filter="$emit('filter', $event)"></Route>
         </div>

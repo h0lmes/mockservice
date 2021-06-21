@@ -2,11 +2,12 @@
     <div id="page">
         <div class="navbar" role="navigation">
             <ul class="nav">
-                <li class="nav-header mb-2" @keydown.enter.exact="toggleSidebar">
+                <li class="nav-header" @keydown.enter.exact="toggleSidebar">
                     <a type="button" class="btn-minimize-navbar" tabindex="0" @click="toggleSidebar">
                         <FontAwesomeIcon icon="bars"/>
                     </a>
                 </li>
+                <li class="nav-group-start"></li>
                 <li>
                     <NuxtLink to="/">
                         <FontAwesomeIcon icon="route" class="nav-icon"/>
@@ -49,7 +50,8 @@
                         <span class="nav-label">About</span>
                     </NuxtLink>
                 </li>
-                <li class="container hidden-when-mini mt-3">
+                <li class="nav-group-start"></li>
+                <li class="container hidden-when-mini">
                     <ColorModePicker></ColorModePicker>
                 </li>
             </ul>

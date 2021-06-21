@@ -9,10 +9,7 @@
             <button type="button" class="btn btn-sm btn-default" @click="backup">BACKUP ON SERVER</button>
             <button type="button" class="btn btn-sm btn-danger" @click="restore">RESTORE FROM BACKUP</button>
         </div>
-        <textarea id="textarea" class="form-control form-control-sm v-resize monospace" :rows="rows" v-model="config"></textarea>
-
-        <textarea id="hta1" class="form-control form-control-sm invisible" :rows="1"></textarea>
-        <textarea id="hta2" class="form-control form-control-sm invisible" :rows="2"></textarea>
+        <AutoSizeTextArea v-model="config"></AutoSizeTextArea>
 
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
@@ -28,20 +25,7 @@
         data() {
             return {
                 config: '',
-                oneRowHeight: 16,
-                resizeTimeoutId: null,
-                rows: 16
             }
-        },
-        mounted() {
-            this.oneRowHeight = document.getElementById('hta2').clientHeight - document.getElementById('hta1').clientHeight;
-            window.addEventListener("resize", this.onResize);
-            this.$nextTick(function () {
-                this.onResize();
-            });
-        },
-        beforeDestroy() {
-            window.removeEventListener("resize", this.onResize);
         },
         async fetch() {
             return this.fetchConfig()
@@ -85,16 +69,6 @@
                 document.body.appendChild(link);
                 link.click();
                 link.remove();
-            },
-            onResize() {
-                clearTimeout(this.resizeTimeoutId);
-                this.resizeTimeoutId = setTimeout(() => {
-                    this.rows = (
-                        window.innerHeight
-                        - document.getElementById('textarea').offsetTop
-                        - 50
-                    ) / this.oneRowHeight;
-                }, 500);
             },
         }
     }

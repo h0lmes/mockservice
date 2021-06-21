@@ -70,7 +70,6 @@
             }
         },
         props: {
-            index: {type: Number},
             scenario: {type: Object},
             active: {type: Boolean},
             groupStart: {type: Boolean}

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.github.underscore.lodash.U;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -25,6 +26,24 @@ public class MapUtils {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
         return mapper.readValue(json, Map.class);
+    }
+
+    public static Map<String, Object> xmlToMap(String body) {
+        Map<String, Object> map = U.fromXmlWithoutNamespaces(body);
+        map = getXmlToJsonMapKeyAsMap(map, "envelope");
+        return getXmlToJsonMapKeyAsMap(map, "body");
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> getXmlToJsonMapKeyAsMap(Map<String, Object> map, String key) {
+        if (map != null) {
+            for (String k : map.keySet()) {
+                if (k.equalsIgnoreCase(key) && (map.get(k) instanceof Map)) {
+                    return (Map<String, Object>) map.get(k);
+                }
+            }
+        }
+        return new HashMap<>();
     }
 
     public static Map<String, String> flattenMap(Map<String, Object> map) {

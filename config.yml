@@ -50,14 +50,14 @@ routes:
   type: REST
   alt: ""
   response: "[\n  {\"id\": 2, \"name\": \"${a:default a}\"},\n  {\"id\": 3, \"name\": \"${b:${enum:default B1:default B2:default B3}}\"}\n]"
-  disabled: false
+  disabled: true
 - group: entity service
   path: "/api/v2/entity/{id}"
   method: GET
   type: REST
   alt: ""
   response: "{\"id\": ${id}, \"name\": \"entity name\"}"
-  disabled: false
+  disabled: true
 - group: entity service
   path: /api/v2/entity
   method: POST
@@ -70,7 +70,7 @@ routes:
   method: POST
   type: SOAP
   alt: ""
-  response: "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:web=\"http://www.dataaccess.com/webservicesserver/\">\n  <soapenv:Header/>\n  <soapenv:Body>\n    <web:NumberToDollarsResponse>\n      <web:NumberToDollarsResult>${enum:TEST1:TEST2}</web:NumberToDollarsResult>\n    </web:NumberToDollarsResponse>\n  </soapenv:Body>\n</soapenv:Envelope>"
+  response: "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:web=\"http://www.dataaccess.com/webservicesserver/\">\n  <soapenv:Header/>\n  <soapenv:Body>\n    <web:NumberToDollarsResponse>\n      <web:NumberToDollarsResult>${enum:TEST1:TEST2}</web:NumberToDollarsResult>\n      <web:Result>${NumberToDollarsRequest.Value:DEFAULT_VALUE}</web:Result>\n    </web:NumberToDollarsResponse>\n  </soapenv:Body>\n</soapenv:Envelope>"
   disabled: false
 scenarios:
 - group: Default

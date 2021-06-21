@@ -1,5 +1,5 @@
 <template>
-    <div class="mock-row" :class="{'open' : open}">
+    <div class="mock-row" :class="{'open' : open, 'disabled' : route.disabled}">
 
         <div class="mock-col w2">
             <div class="mock-col-header" :class="{'color-accent-one' : groupStart}">GROUP</div>
@@ -40,10 +40,9 @@
             <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.alt"/>
         </div>
 
-        <div class="mock-col text-center">
+        <div v-show="editing" class="mock-col text-center">
             <div class="mock-col-header">DISABLED</div>
-            <div v-show="!editing" class="mock-col-value" :class="{ 'red' : route.disabled }">{{ route.disabled }}</div>
-            <ToggleSwitch v-show="editing" v-model="editingRoute.disabled"></ToggleSwitch>
+            <ToggleSwitch class="mock-col-value" v-model="editingRoute.disabled"></ToggleSwitch>
         </div>
 
         <div class="mock-col w-fixed-auto">
@@ -88,7 +87,6 @@
             }
         },
         props: {
-            index: {type: Number},
             route: {type: Object},
             groupStart: {type: Boolean}
         },
@@ -106,9 +104,9 @@
                 this.$emit('filter', value);
             },
             edit() {
+                this.testing = false;
                 this.editingRoute = {...this.route};
                 this.editing = !this.editing;
-                this.testing = false;
             },
             test() {
                 this.cancel();
