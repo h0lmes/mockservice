@@ -128,12 +128,14 @@ Variables are collected from the following sources:
 
 1. Path variables (`/api/v1/account/{id}`).
 2. Request parameters (`/api/v1/account?id=1`).
-3. Request payload (if it is in JSON).
-All fields of the JSON would be collected and made available as variables
-(preserving hierarchy, see example below).
-4. **Mock-Variable** header (see section below).
+3. Request payload (JSON). All fields of the JSON would be collected
+as variables (preserving hierarchy).
+4. Request payload (SOAP). All fields of the SOAP envelope Body tag
+would be collected as variables
+(without namespace, preserving hierarchy).
+5. **Mock-Variable** header (see section below).
 
-Example of request payload:
+Example of request payload (JSON):
 
     {
         "key1": "value 1",
@@ -146,6 +148,21 @@ The following variables would be available:
 
     ${key1}
     ${key2.key1}
+
+Example of request payload (SOAP):
+
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://www.dataaccess.com/webservicesserver/">
+        <soapenv:Header/>
+        <soapenv:Body>
+            <web:NumberToDollarsRequest>
+                <web:Value>$74,383.56</web:Value>
+            </web:NumberToDollarsRequest>
+        </soapenv:Body>
+    </soapenv:Envelope>
+
+The following variables would be available:
+
+    ${NumberToDollarsRequest.Value}
 
 #
 ### Mock-Variable header
