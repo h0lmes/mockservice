@@ -1,10 +1,10 @@
 <template>
     <div>
-        <div class="buttons">
+        <div class="route-tester-buttons">
             <button type="button" class="btn btn-sm btn-primary" @click="test">RETRY</button>
             <button type="button" class="btn btn-sm btn-default" @click="$emit('close')">CLOSE</button>
         </div>
-        <div class="modal-backdrop">
+        <div class="route-tester-result">
             <pre class="form-control form-control-sm monospace">{{ testResult }}</pre>
         </div>
     </div>
@@ -95,11 +95,11 @@
     }
 </script>
 <style lang="scss" scoped>
-    .modal-backdrop {
+    .route-tester-result {
         padding: 0;
         text-align: initial;
     }
-    .buttons {
+    .route-tester-buttons {
         padding: 0.3rem 0 0.7rem;
         text-align: center;
     }

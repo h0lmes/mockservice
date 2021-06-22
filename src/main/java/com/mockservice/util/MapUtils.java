@@ -30,12 +30,12 @@ public class MapUtils {
 
     public static Map<String, Object> xmlToMap(String body) {
         Map<String, Object> map = U.fromXmlWithoutNamespaces(body);
-        map = getXmlToJsonMapKeyAsMap(map, "envelope");
-        return getXmlToJsonMapKeyAsMap(map, "body");
+        map = getXmlMapKeyAsMap(map, "envelope");
+        return getXmlMapKeyAsMap(map, "body");
     }
 
     @SuppressWarnings("unchecked")
-    private static Map<String, Object> getXmlToJsonMapKeyAsMap(Map<String, Object> map, String key) {
+    private static Map<String, Object> getXmlMapKeyAsMap(Map<String, Object> map, String key) {
         if (map != null) {
             for (String k : map.keySet()) {
                 if (k.equalsIgnoreCase(key) && (map.get(k) instanceof Map)) {
