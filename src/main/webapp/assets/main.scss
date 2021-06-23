@@ -16,6 +16,7 @@
   /**/
   --color-primary: #243746;
   --color-secondary: #bfb3ad;
+  --color-disabled: #bfbfbf;
   --color-accent-one: var(--cyan);
   --color-accent-two: var(--teal);
   --color-link: #0056b3;
@@ -25,12 +26,23 @@
   --bg-border: #ddd;
 }
 
+.sepia-mode {
+  --color-primary: #433422;
+  --color-secondary: #b3887d;
+  --color-disabled: #bfb8a6;
+  --color-accent-one: var(--teal);
+  --color-accent-two: var(--green);
+  --bg-primary: #e3d9c5;
+  --bg-secondary: #f5ebd3;
+  --bg-border: #ded0bf;
+}
+
 .dark-mode {
   --blue: #005ab4;
   --indigo: #5624b3;
   --purple: #673eb3;
-  --pink: #99295d;
-  --red: #992f3a;
+  --pink: #8a305b;
+  --red: #8c3843;
   --orange: #b3580e;
   --orange-yellow: #b36b0e;
   --yellow: #b38a12;
@@ -40,74 +52,51 @@
   /**/
   --color-primary: #a7b1c2;
   --color-secondary: #6a6d76;
-  --color-accent-one: var(--cyan);
-  --color-accent-two: var(--teal);
+  --color-disabled: #44464e;
+  --color-accent-one: #295a8a;
+  --color-accent-two: var(--cyan);
   --bg-primary: #191b1d;
   --bg-secondary: #212325;
   --bg-border: #212325;
 }
 
-.sepia-mode {
-  --color-primary: #433422;
-  --color-secondary: #b3887d;
-  --color-accent-one: var(--teal);
-  --color-accent-two: var(--green);
-  --bg-primary: #e3d9c5;
-  --bg-secondary: #f5ebd3;
-  --bg-border: #ded0bf;
+.aws-mode {
+  --blue: #005ab4;
+  --indigo: #5624b3;
+  --purple: #673eb3;
+  --pink: #8a305b;
+  --red: #8c3843;
+  --orange: #b3580e;
+  --orange-yellow: #b36b0e;
+  --yellow: #b38a12;
+  --green: #388c49;
+  --teal: #1d8c69;
+  --cyan: #1d7f8c;
+  /**/
+  --color-primary: #dae1ec;
+  --color-secondary: #667898;
+  --color-disabled: #445573;
+  --color-accent-one: #3998d2;
+  --color-accent-two: #faa23d;
+  --bg-primary: #1b222e;
+  --bg-secondary: #252e3f;
+  --bg-border: #252e3f;
 }
 
-.color-primary {
-  color: var(--color-secondary) !important;
-}
+.color-primary {color: var(--color-secondary) !important;}
+.color-secondary {color: var(--color-secondary) !important;}
+.color-accent-one {color: var(--color-accent-one) !important;}
 
-.color-secondary {
-  color: var(--color-secondary) !important;
-}
-
-.color-accent-one {
-  color: var(--color-accent-one) !important;
-}
-
-.red {
-  color: var(--red) !important;
-}
-
-.orange {
-  color: var(--orange) !important;
-}
-
-.yellow {
-  color: var(--yellow) !important;
-}
-
-.green {
-  color: var(--green) !important;
-}
-
-.teal {
-  color: var(--teal) !important;
-}
-
-.cyan {
-  color: var(--cyan) !important;
-}
-
-.blue {
-  color: var(--blue) !important;
-}
-
-.indigo {
-  color: var(--indigo) !important;
-}
-
-.purple {
-  color: var(--purple) !important;
-}
-
-.pink {
-  color: var(--pink) !important;
-}
+.red {color: var(--red) !important;}
+.orange {color: var(--orange) !important;}
+.yellow {color: var(--yellow) !important;}
+.green {color: var(--green) !important;}
+.teal {color: var(--teal) !important;}
+.cyan {color: var(--cyan) !important;}
+.blue {color: var(--blue) !important;}
+.indigo {color: var(--indigo) !important;}
+.purple {color: var(--purple) !important;}
+.pink {color: var(--pink) !important;}
 
 * {
   line-height: 1.2;
@@ -198,6 +187,21 @@ pre {
   column-gap: 1.5rem;
   row-gap: 0.7rem;
   align-items: center;
+  background-color: var(--bg-secondary);
+  border-radius: 5px;
+  padding: 0.7rem 1rem;
+
+  .w100 {
+    flex: 0 0 100%;
+  }
+}
+
+.card {
+  font-size: smaller;
+  margin-bottom: 1rem;
+  padding: 1rem 2rem;
+  border-radius: 5px;
+  background-color: var(--bg-secondary);
 }
 
 .mock-row {
@@ -216,7 +220,8 @@ pre {
   font-size: smaller;
   border-radius: 5px;
   background-color: var(--bg-secondary);
-  box-shadow: 0 1px 1px 0 rgb(0 0 0 / 10%), 0 1px 5px 0 rgb(0 0 0 / 12%);
+  //box-shadow: 0 1px 1px 0 rgb(0 0 0 / 10%), 0 1px 5px 0 rgb(0 0 0 / 12%);
+  transition: margin-bottom 0.15s ease;
 }
 
 .compact-view .mock-row {
@@ -317,17 +322,6 @@ pre {
   }
 
   .mock-row.disabled & {
-    color: var(--red);
+    color: var(--color-disabled);
   }
-}
-
-// --------------------------------------------------------------------------------
-
-.card {
-  font-size: smaller;
-  margin-bottom: 1rem;
-  padding: 1rem 2rem;
-  border-radius: 5px;
-  background-color: var(--bg-secondary);
-  box-shadow: 0 1px 10px var(--bg-shadow);
 }

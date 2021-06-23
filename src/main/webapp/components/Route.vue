@@ -60,7 +60,7 @@
 
         <div v-show="editing" class="mock-col w100">
             <button type="button" class="btn btn-sm btn-primary" @click="save">SAVE</button>
-            <button type="button" class="btn btn-sm btn-primary" @click="saveAsCopy">SAVE AS COPY</button>
+            <button type="button" class="btn btn-sm btn-default" @click="saveAsCopy">SAVE AS COPY</button>
             <button type="button" class="btn btn-sm btn-default" @click="cancel">CANCEL</button>
         </div>
 

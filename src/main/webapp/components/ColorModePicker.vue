@@ -20,6 +20,7 @@
     import IconLight from '@/assets/icons/light.svg?inline';
     import IconDark from '@/assets/icons/dark.svg?inline';
     import IconSepia from '@/assets/icons/sepia.svg?inline';
+    import IconAws from '@/assets/icons/aws.svg?inline';
 
     export default {
         name: "ColorModePicker",
@@ -27,11 +28,12 @@
             IconSystem,
             IconLight,
             IconDark,
-            IconSepia
+            IconSepia,
+            IconAws
         },
         data() {
             return {
-                colors: ['system', 'light', 'dark', 'sepia']
+                colors: ['system', 'light', 'sepia', 'dark', 'aws']
             }
         },
         methods: {

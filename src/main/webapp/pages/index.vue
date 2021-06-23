@@ -1,11 +1,12 @@
 <template>
-    <div class="monospace">
+    <div ref="routes" class="monospace">
         <div class="mb-3">
-            <input id="search" placeholder="search here or click on values" type="text" class="form-control noborder" @input="debounce($event.target.value)"/>
+            <input id="search" placeholder="search here or click on values" type="text" class="form-control no-border"
+                   @input="debounce($event.target.value)"/>
         </div>
 
         <div class="toolbar mb-3">
-            <button type="button" class="btn" @click="newRoute">Add route</button>
+            <button type="button" class="btn" @click="addRoute">Add route</button>
             <button type="button" class="btn" @click="setFilter('')">Clear filter</button>
             <ViewSelector></ViewSelector>
         </div>
@@ -36,7 +37,7 @@
         },
         fetchDelay: 0,
         computed: {
-            routes () {
+            routes() {
                 return this.$store.state.routes
             },
             filtered() {
@@ -53,10 +54,11 @@
             },
         },
         methods: {
-            ...mapActions({
-                fetchRoutes: 'fetchRoutes',
-                newRoute: 'newRoute'
-            }),
+            ...mapActions(['fetchRoutes', 'newRoute']),
+            addRoute() {
+                this.newRoute();
+                this.$refs.routes.scrollTop = 0;
+            },
             debounce(value) {
                 clearTimeout(this.timeout);
                 let that = this;

@@ -5,13 +5,6 @@
     --nav-bg2: #30353a;
     --nav-bg-active: #40454d;
 }
-.dark-mode {
-    --nav-color: #6a6d76;
-    --nav-color-active: #aeb3bf;
-    --nav-bg: #212325;
-    --nav-bg2: #1e1f21;
-    --nav-bg-active: #262729;
-}
 .sepia-mode {
     --nav-color: #f1e7d0;
     --nav-color-active: white;
@@ -19,17 +12,23 @@
     --nav-bg2: #4c4339;
     --nav-bg-active: #5e5549;
 }
+.dark-mode {
+    --nav-color: #6a6d76;
+    --nav-color-active: #aeb3bf;
+    --nav-bg: #212325;
+    --nav-bg2: #1e1f21;
+    --nav-bg-active: #262729;
+}
+.aws-mode {
+    --nav-color: #dae1ec;
+    --nav-color-active: #fff;
+    --nav-bg: #252e3f;
+    --nav-bg2: #212938;
+    --nav-bg-active: #2a3447;
+}
 
 #page {
     width: 100%;
-}
-.page-contents {
-    padding: 2rem;
-}
-@media screen and (max-width: 1099px) /*and (orientation: landscape)*/ {
-    .page-contents {
-        padding: 1rem .5rem;
-    }
 }
 
 .page-wrapper {
@@ -38,7 +37,18 @@
     width: calc(100% - 220px);
     margin-left: 220px;
     transition: all 0.2s;
+    min-height: 100vh;
 }
+
+.page-contents {
+    padding: 2rem;
+}
+@media screen and (max-width: 1099px) {
+    .page-contents {
+        padding: .5rem;
+    }
+}
+
 .navbar {
     width: 220px;
     height: 100vh;
@@ -126,15 +136,4 @@
 .nav-group-start {
     --height: 1.4rem;
     height: var(--height);
-
-    &::before {
-        --thickness: 3px;
-        content: "";
-        position: absolute;
-        margin: calc(var(--height) / 2 - var(--thickness) / 2) 15px;
-        width: calc(100% - 30px);
-        height: var(--thickness);
-        border-radius: var(--thickness);
-        background: linear-gradient(90deg, var(--color-accent-two), var(--color-accent-one) 77%);
-    }
 }

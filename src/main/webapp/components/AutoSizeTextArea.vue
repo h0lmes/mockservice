@@ -1,6 +1,7 @@
 <template>
     <div class="grow-wrap" ref="textWrap">
         <textarea class="form-control form-control-sm v-resize monospace"
+                  :class="{'no-border' : !border}"
                   ref="textArea"
                   :value="value"
                   :placeholder="placeholder"
@@ -20,6 +21,7 @@
         props: {
             value: {type: String},
             placeholder: {type: String},
+            border: {type: Boolean, default: true},
         },
         mounted() {
             this.resize();
@@ -50,11 +52,13 @@
     .grow-wrap::after {
         content: attr(data-replicated-value) " ";
         white-space: pre-wrap;
+        word-wrap: break-word;
         visibility: hidden;
     }
     .grow-wrap > textarea {
         resize: none;
-        overflow: hidden;
+        overflow-y: hidden;
+        word-wrap: break-word;
     }
     .grow-wrap > textarea,
     .grow-wrap::after {

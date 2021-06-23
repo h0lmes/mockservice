@@ -8,15 +8,17 @@
         </div>
         <AutoSizeTextArea class="mb-4"
                           ref="requestText"
+                          :border="false"
                           :placeholder="requestPlaceholder"
                           @keydown.ctrl.enter.exact="$fetch()"
                           @keydown.116.exact.prevent="storeRequest"
                           v-model="requestValue"
         ></AutoSizeTextArea>
-        <div class="toolbar mb-3">
+
+        <div v-show="responseValue" class="toolbar mb-3">
             <button type="button" class="btn btn-sm btn-default" @click="saveResponse">SAVE TO FILE</button>
         </div>
-        <pre class="form-control form-control-sm monospace min-height">{{ responseValue }}</pre>
+        <pre v-show="responseValue" class="form-control form-control-sm no-border monospace min-height">{{ responseValue }}</pre>
 
         <Loading v-if="$fetchState.pending"></Loading>
     </div>

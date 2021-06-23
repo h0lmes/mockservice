@@ -8,6 +8,13 @@
   --form-control-bg-hilight-shadow: rgba(0,0,0,.3);
   --form-control-border-radius: 0.25rem;
 }
+.sepia-mode {
+  --form-control-color: #433422;
+  --form-control-bg-disabled: #bbbec1;
+  --form-control-border: #c4af91;
+  --form-control-placeholder: #bfb1a3;
+  --form-control-bg-hilight-shadow: #b0795d;
+}
 .dark-mode {
   --form-control-color: #909ea7;
   --form-control-color-disabled: #6c757d;
@@ -16,12 +23,13 @@
   --form-control-placeholder: #4a4f54;
   --form-control-bg-hilight-shadow: var(--color-accent-one);
 }
-.sepia-mode {
-  --form-control-color: #433422;
-  --form-control-bg-disabled: #bbbec1;
-  --form-control-border: #b4a185;
-  --form-control-placeholder: #bfb1a3;
-  --form-control-bg-hilight-shadow: #b0795d;
+.aws-mode {
+  --form-control-color: #909ea7;
+  --form-control-color-disabled: #6c757d;
+  --form-control-bg-disabled: #787979;
+  --form-control-border: #354159;
+  --form-control-placeholder: #455573;
+  --form-control-bg-hilight-shadow: var(--color-accent-one);
 }
 
 .form-control {
@@ -57,7 +65,7 @@
     opacity: 1;
   }
 
-  &.noborder {
+  &.no-border {
     border: 1px solid var(--form-control-bg);
   }
 }

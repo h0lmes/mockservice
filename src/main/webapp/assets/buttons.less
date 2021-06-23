@@ -2,54 +2,65 @@
   --btn-color-link: var(--color-primary);
   --btn-color: #505050;
   --btn-color-focus: black;
-  --btn-bg: #bfbfbf;
-  --btn-bg-focus: #8d8e8d;
+  --btn-bg: #ccc;
+  --btn-bg-focus: #ababab;
 
   & .btn-primary {
-    --btn-color: #ccc;
+    --btn-color: #ddd;
     --btn-color-focus: #fff;
     --btn-bg: var(--color-accent-one);
     --btn-bg-focus: var(--color-accent-one);
   }
 
-  & .btn-warning {
-    --btn-bg: #cc7533;
-    --btn-bg-focus: #995626;
-  }
-
   & .btn-danger {
-    --btn-color: #ccc;
-    --btn-color-focus: #fff;
-    --btn-bg: #b33642;
-    --btn-bg-focus: #8a2b34;
-  }
-}
-
-.dark-mode {
-  --btn-color: #aaa;
-  --btn-color-focus: #ddd;
-  --btn-bg: #292929;
-  --btn-bg-focus: #333333;
-
-  & .btn-primary {
-    --btn-bg: #162a30;
-    --btn-bg-focus: #19363b;
-  }
-
-  & .btn-warning {
-    --btn-bg: #4d321f;
-    --btn-bg-focus: #66422a;
-  }
-
-  & .btn-danger {
-    --btn-bg: #352427;
-    --btn-bg-focus: #3d2b2e;
+    --btn-color: #fff;
+    --btn-color-focus: #ccc;
+    --btn-bg: #bf3b4b;
+    --btn-bg-focus: #99313b;
   }
 }
 
 .sepia-mode {
-  --btn-bg: #bfb195;
+  --btn-bg: #ccbda1;
   --btn-bg-focus: #9e927d;
+}
+
+.dark-mode {
+  --btn-color: #999;
+  --btn-color-focus: #ddd;
+  --btn-bg: #2e2e2e;
+  --btn-bg-focus: #3b3b3b;
+
+  & .btn-primary {
+    --btn-color: #999;
+    --btn-color-focus: #ddd;
+    --btn-bg: #294766;
+    --btn-bg-focus: #2e5073;
+  }
+
+  & .btn-danger {
+    --btn-color: #999;
+    --btn-color-focus: #ddd;
+    --btn-bg: #3b262a;
+    --btn-bg-focus: #472b31;
+  }
+}
+
+.aws-mode {
+  --btn-color: #aaa;
+  --btn-color-focus: #ddd;
+  --btn-bg: #2d384d;
+  --btn-bg-focus: #3a4761;
+
+  & .btn-primary {
+    --btn-bg: #245e80;
+    --btn-bg-focus: #2e7aa6;
+  }
+
+  & .btn-danger {
+    --btn-bg: #803820;
+    --btn-bg-focus: #a64929;
+  }
 }
 
 .btn {
@@ -68,7 +79,7 @@
   user-select: none;
   background-color: var(--btn-bg);
   color: var(--btn-color);
-  box-shadow: 0 1px 4px -1px rgba(0, 0, 0, .6);
+
   outline: none;
 
   &:hover,
@@ -85,7 +96,7 @@
   &.active {
     background-image: none;
     outline: 0;
-    box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, .18);
   }
 
   &.disabled,

@@ -4,7 +4,7 @@
         <div class="toolbar mb-3">
             <button type="button" class="btn btn-sm btn-default mr-3" @click="download">DOWNLOAD</button>
         </div>
-        <pre class="form-control form-control-sm smaller">{{ value }}</pre>
+        <pre class="form-control form-control-sm no-border smaller">{{ value }}</pre>
 
         <Loading v-if="$fetchState.pending"></Loading>
     </div>

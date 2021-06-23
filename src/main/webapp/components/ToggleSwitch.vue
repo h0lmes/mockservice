@@ -55,7 +55,7 @@
         --toggle-switch-bg-unchecked: darkgray;
         --toggle-switch-bg-unchecked-focus: gray;
         --toggle-switch-bg-checked: var(--color-accent-one);
-        --toggle-switch-bg-handle: white;
+        --toggle-switch-bg-handle: var(--bg-secondary);
 
         &.small {
             --width: 2rem;
