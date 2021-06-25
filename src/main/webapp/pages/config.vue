@@ -2,7 +2,7 @@
     <div class="config-page monospace">
 
         <p class="red mb-3">Use with caution! It is easy to ruin config by editing it as plain text.</p>
-        <div class="toolbar mb-3">
+        <div class="component component-toolbar mb-3">
             <button type="button" class="btn btn-sm btn-primary" @click="save">SAVE AND APPLY</button>
             <button type="button" class="btn btn-sm btn-default" @click="download">DOWNLOAD AS FILE</button>
             <button type="button" class="btn btn-sm btn-default" @click="backup">BACKUP ON SERVER</button>

@@ -34,17 +34,17 @@
         width: 100%;
         min-height: 3rem;
         max-height: 25em;
-        background-color: var(--bg-primary);
+        background-color: var(--bg-page);
         border: 1px solid var(--form-control-border);
         border-radius: var(--form-control-border-radius);
         overflow: auto;
 
         & > .row:nth-child(2n+1) {
-            background-color: var(--bg-secondary);
+            background-color: var(--bg-component);
         }
 
         & > .row:nth-child(2n) {
-            background-color: var(--bg-primary);
+            background-color: var(--bg-page);
         }
     }
 </style>

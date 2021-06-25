@@ -1,7 +1,7 @@
 :root {
-  --form-control-color: #495057;
-  --form-control-color-disabled: #6c757d;
-  --form-control-bg: var(--bg-secondary);
+  --form-control-color: var(--color-primary);
+  --form-control-color-disabled: var(--color-disabled);
+  --form-control-bg: var(--bg-component);
   --form-control-bg-disabled: #e9ecef;
   --form-control-border: #ced4da;
   --form-control-placeholder: #ccc;
@@ -9,23 +9,18 @@
   --form-control-border-radius: 0.25rem;
 }
 .sepia-mode {
-  --form-control-color: #433422;
   --form-control-bg-disabled: #bbbec1;
   --form-control-border: #c4af91;
   --form-control-placeholder: #bfb1a3;
   --form-control-bg-hilight-shadow: #b0795d;
 }
 .dark-mode {
-  --form-control-color: #909ea7;
-  --form-control-color-disabled: #6c757d;
   --form-control-bg-disabled: #787979;
   --form-control-border: #323434;
   --form-control-placeholder: #4a4f54;
   --form-control-bg-hilight-shadow: var(--color-accent-one);
 }
 .aws-mode {
-  --form-control-color: #909ea7;
-  --form-control-color-disabled: #6c757d;
   --form-control-bg-disabled: #787979;
   --form-control-border: #354159;
   --form-control-placeholder: #455573;
@@ -43,11 +38,15 @@
   color: var(--form-control-color);
   background-color: var(--form-control-bg);
   background-clip: padding-box;
-  border: 1px solid var(--form-control-border);
   border-radius: var(--form-control-border-radius);
   transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
   outline: none;
   box-shadow: none;
+  border: 1px solid var(--form-control-bg);
+
+  .component & {
+    border: 1px solid var(--form-control-border);
+  }
 
   &:focus {
     box-shadow: 0 0 5px var(--form-control-bg-hilight-shadow);

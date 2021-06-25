@@ -1,7 +1,7 @@
 <template>
     <div class="monospace">
 
-        <div class="toolbar mb-3">
+        <div class="component component-toolbar mb-3">
             <button type="button" class="btn btn-sm btn-primary" @click="$fetch()">FETCH (CTRL + ENTER)</button>
             <button type="button" class="btn btn-sm btn-default" @click="storeRequest">SAVE REQUEST (F5)</button>
             <button type="button" class="btn btn-sm btn-default" @click="forgetRequest">FORGET REQUEST</button>
@@ -15,10 +15,10 @@
                           v-model="requestValue"
         ></AutoSizeTextArea>
 
-        <div v-show="responseValue" class="toolbar mb-3">
+        <div v-show="responseValue" class="component component-toolbar mb-3">
             <button type="button" class="btn btn-sm btn-default" @click="saveResponse">SAVE TO FILE</button>
         </div>
-        <pre v-show="responseValue" class="form-control form-control-sm no-border monospace min-height">{{ responseValue }}</pre>
+        <pre v-show="responseValue" class="form-control form-control-sm monospace min-height">{{ responseValue }}</pre>
 
         <Loading v-if="$fetchState.pending"></Loading>
     </div>

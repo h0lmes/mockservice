@@ -1,11 +1,11 @@
 <template>
     <div ref="routes" class="monospace">
         <div class="mb-3">
-            <input id="search" placeholder="search here or click on values" type="text" class="form-control no-border"
+            <input ref="search" placeholder="search here or click on values" type="text" class="form-control"
                    @input="debounce($event.target.value)"/>
         </div>
 
-        <div class="toolbar mb-3">
+        <div class="component component-toolbar mb-3">
             <button type="button" class="btn" @click="addRoute">Add route</button>
             <button type="button" class="btn" @click="setFilter('')">Clear filter</button>
             <ViewSelector></ViewSelector>
@@ -67,7 +67,7 @@
                 }, 500);
             },
             setFilter(value) {
-                document.querySelector('#search').value = value;
+                this.$refs.search.value = value;
                 this.query = value.toLowerCase();
             },
         }

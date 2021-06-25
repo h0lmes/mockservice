@@ -1,6 +1,6 @@
 <template>
     <div class="monospace">
-        <div class="card">
+        <div class="component component-card">
             <p>
                 <ToggleSwitch :id="'randomAlt'"
                               v-model="randomAlt">Random Alt (return random of existing alternatives for requested Route)

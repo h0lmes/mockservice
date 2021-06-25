@@ -49,18 +49,18 @@
     .toggle-switch {
         --width: 2.5rem;
         --height: 1.75rem;
+        &.small {
+            --width: 2rem;
+            --height: 1.25rem;
+        }
+
         --padding: 2px;
         --handle-size: calc(var(--height) - var(--padding) * 2);
 
         --toggle-switch-bg-unchecked: darkgray;
         --toggle-switch-bg-unchecked-focus: gray;
         --toggle-switch-bg-checked: var(--color-accent-one);
-        --toggle-switch-bg-handle: var(--bg-secondary);
-
-        &.small {
-            --width: 2rem;
-            --height: 1.25rem;
-        }
+        --toggle-switch-bg-handle: var(--bg-component);
 
         display: inline-block;
         outline-width: 0;

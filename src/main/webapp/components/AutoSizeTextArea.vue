@@ -1,7 +1,6 @@
 <template>
     <div class="grow-wrap" ref="textWrap">
         <textarea class="form-control form-control-sm v-resize monospace"
-                  :class="{'no-border' : !border}"
                   ref="textArea"
                   :value="value"
                   :placeholder="placeholder"
@@ -21,7 +20,6 @@
         props: {
             value: {type: String},
             placeholder: {type: String},
-            border: {type: Boolean, default: true},
         },
         mounted() {
             this.resize();

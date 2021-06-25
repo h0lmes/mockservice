@@ -1,5 +1,5 @@
 <template>
-    <div class="mock-row" :class="{'open' : open, 'disabled' : route.disabled}">
+    <div class="component component-row" :class="{'open' : open, 'disabled' : route.disabled}">
 
         <div class="mock-col w2">
             <div class="mock-col-header" :class="{'color-accent-one' : groupStart}">GROUP</div>
@@ -46,7 +46,7 @@
         </div>
 
         <div class="mock-col w-fixed-auto">
-            <div class="buttons-spacer">
+            <div>
                 <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
                 <button type="button" class="btn btn-sm btn-default" @click="test">test</button>
                 <button type="button" class="btn btn-sm btn-danger" @click="del">delete</button>

@@ -1,5 +1,5 @@
 <template>
-    <div class="mock-row" :class="{'open' : open}">
+    <div class="component component-row" :class="{'open' : open}">
 
         <div class="mock-col">
             <div class="mock-col-header" :class="{'color-accent-one' : groupStart}">GROUP</div>
@@ -23,12 +23,12 @@
             </select>
         </div>
 
-        <div class="mock-col v-center text-center">
+        <div class="mock-col text-center">
             <ToggleSwitch v-model="activeSwitch" @toggle="activeToggled()">Active</ToggleSwitch>
         </div>
 
         <div class="mock-col w-fixed-auto">
-            <div class="buttons-spacer">
+            <div>
                 <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
                 <button type="button" class="btn btn-sm btn-danger" @click="del">delete</button>
             </div>
@@ -42,7 +42,7 @@
         <div v-show="editing" class="mock-col w100">
             <button type="button" class="btn btn-sm btn-default" @click="toggleRoutes">TOGGLE ROUTES</button>
             <button type="button" class="btn btn-sm btn-primary" @click="save">SAVE</button>
-            <button type="button" class="btn btn-sm btn-primary" @click="saveAsCopy">SAVE AS COPY</button>
+            <button type="button" class="btn btn-sm btn-default" @click="saveAsCopy">SAVE AS COPY</button>
             <button type="button" class="btn btn-sm btn-default" @click="cancel">CANCEL</button>
         </div>
 
@@ -91,7 +91,13 @@
             }
         },
         methods: {
-            ...mapActions(['saveScenario', 'deleteScenario', 'activateScenario', 'deactivateScenario', 'fetchRoutes']),
+            ...mapActions({
+                saveScenario: 'scenarios/saveScenario',
+                deleteScenario: 'scenarios/deleteScenario',
+                activateScenario: 'scenarios/activateScenario',
+                deactivateScenario: 'scenarios/deactivateScenario',
+                fetchRoutes: 'fetchRoutes',
+            }),
             filter(value) {
                 this.$emit('filter', value);
             },
