@@ -2,16 +2,8 @@
     <div class="bg monospace">
         <div style="height: 150px; overflow: hidden; position: absolute; width: 100%">
             <svg viewBox="0 0 500 150" preserveAspectRatio="none" style="height: 100%; width: 100%;">
-                <path d="M0,150 C150,150 272,-50 500,50 V0 H0 Z" style="stroke: none; fill: rgba(255,255,255,0.04);"></path>
+                <path d="M0,150 C150,150 272,-50 500,50 V0 H0 Z" style="stroke: none; fill: var(--bg-component);"></path>
             </svg>
-        </div>
-        <div class="animation">
-            <div class="hex hex1"></div>
-            <div class="hex hex2"></div>
-            <div class="hex hex1"></div>
-            <div class="hex hex2"></div>
-            <div class="hex hex1"></div>
-            <div class="hex hex2"></div>
         </div>
         <div class="about">
             <h1>Mock Service</h1>
@@ -53,14 +45,5 @@
         transform: translateY(-50%);
         background: transparent;
         text-align: center;
-    }
-
-    .animation {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
     }
 </style>

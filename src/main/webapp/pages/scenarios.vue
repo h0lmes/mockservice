@@ -1,14 +1,14 @@
 <template>
     <div class="monospace">
 
-        <div class="mb-3">
-            <input ref="search" placeholder="search here or click on values" type="text" class="form-control"
+        <div class="component component-toolbar mb-5">
+            <input ref="search"
+                   type="search"
+                   placeholder="search here or click on values"
+                   class="form-control"
                    @input="debounce($event.target.value)"/>
-        </div>
-
-        <div class="component component-toolbar mb-3">
-            <button type="button" class="btn" @click="add">Add scenario</button>
             <button type="button" class="btn" @click="setFilter('')">Clear filter</button>
+            <button type="button" class="btn" @click="add">Add scenario</button>
             <ViewSelector></ViewSelector>
         </div>
 

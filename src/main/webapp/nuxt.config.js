@@ -13,7 +13,6 @@ export default {
     css: [
         '~/assets/main.scss',
         '~/assets/helpers.css',
-        '~/assets/animation.scss',
         '~/assets/buttons.less',
         '~/assets/forms.scss',
         '~/assets/modals.scss',

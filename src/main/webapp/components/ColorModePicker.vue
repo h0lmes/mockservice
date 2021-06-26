@@ -33,7 +33,7 @@
         },
         data() {
             return {
-                colors: ['system', 'light', 'sepia', 'dark', 'aws']
+                colors: [/*'system',*/ 'light', 'sepia', 'dark', 'aws']
             }
         },
         methods: {

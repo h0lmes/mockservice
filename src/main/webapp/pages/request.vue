@@ -50,6 +50,18 @@
         mounted() {
             this.restoreRequest();
         },
+        beforeRouteLeave(to, from , next) {
+            if (window.localStorage) {
+                const storedValue = window.localStorage.getItem(storageKey) || '';
+                if (this.requestValue !== storedValue) {
+                    if (!window.confirm('You have unsaved request.\nLeave page anyway?')) {
+                        next(false);
+                        return;
+                    }
+                }
+            }
+            next();
+        },
         async fetch() {
             if (!this.requestValue) return;
 

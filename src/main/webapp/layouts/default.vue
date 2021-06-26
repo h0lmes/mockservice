@@ -7,7 +7,7 @@
                         <FontAwesomeIcon icon="bars"/>
                     </a>
                 </li>
-                <li class="nav-group-start"></li>
+                <li class="nav-group-start">MOCKS</li>
                 <li>
                     <NuxtLink to="/">
                         <FontAwesomeIcon icon="route" class="nav-icon"/>
@@ -20,12 +20,14 @@
                         <span class="nav-label">Scenarios</span>
                     </NuxtLink>
                 </li>
+                <li class="nav-group-start">TOOLS</li>
                 <li>
                     <NuxtLink to="/request">
                         <FontAwesomeIcon icon="at" class="nav-icon icon-width-fix"/>
                         <span class="nav-label">Request</span>
                     </NuxtLink>
                 </li>
+                <li class="nav-group-start">SERVICE</li>
                 <li>
                     <NuxtLink to="/settings">
                         <FontAwesomeIcon icon="cogs" class="nav-icon"/>
@@ -50,7 +52,7 @@
                         <span class="nav-label">About</span>
                     </NuxtLink>
                 </li>
-                <li class="nav-group-start"></li>
+                <li class="nav-group-start">COLOR</li>
                 <li class="container hidden-when-mini">
                     <ColorModePicker></ColorModePicker>
                 </li>
