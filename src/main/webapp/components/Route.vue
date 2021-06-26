@@ -97,8 +97,8 @@
         },
         methods: {
             ...mapActions({
-                saveRoute: 'saveRoute',
-                deleteRoute: 'deleteRoute'
+                saveRoute: 'routes/save',
+                deleteRoute: 'routes/delete'
             }),
             filter(value) {
                 this.$emit('filter', value);

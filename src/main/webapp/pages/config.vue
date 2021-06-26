@@ -32,7 +32,12 @@
         },
         fetchDelay: 0,
         methods: {
-            ...mapActions(['fetchConfig', 'saveConfig', 'backupConfig', 'restoreConfig']),
+            ...mapActions({
+                fetchConfig: 'config/fetch',
+                saveConfig: 'config/save',
+                backupConfig: 'config/backup',
+                restoreConfig: 'config/restore'
+            }),
             async save() {
                 if (confirm('Ye be warned =)')) {
                     this.$nuxt.$loading.start();

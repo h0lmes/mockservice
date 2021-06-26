@@ -38,7 +38,7 @@
         fetchDelay: 0,
         computed: {
             settings() {
-                return this.$store.state.settings
+                return this.$store.state.settings.settings
             },
         },
         watch: {
@@ -48,7 +48,10 @@
             },
         },
         methods: {
-            ...mapActions(['fetchSettings', 'saveSettings']),
+            ...mapActions({
+                fetchSettings: 'settings/fetch',
+                saveSettings: 'settings/save'
+            }),
             async save() {
                 this.$nuxt.$loading.start();
                 await this.saveSettings(

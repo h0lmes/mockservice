@@ -38,7 +38,7 @@
         fetchDelay: 0,
         computed: {
             routes() {
-                return this.$store.state.routes
+                return this.$store.state.routes.routes
             },
             filtered() {
                 if (!this.query.trim())
@@ -54,7 +54,10 @@
             },
         },
         methods: {
-            ...mapActions(['fetchRoutes', 'newRoute']),
+            ...mapActions({
+                fetchRoutes: 'routes/fetch',
+                newRoute: 'routes/add'
+            }),
             addRoute() {
                 this.newRoute();
                 this.$refs.routes.scrollTop = 0;

@@ -7,7 +7,7 @@
         </div>
 
         <div class="component component-toolbar mb-3">
-            <button type="button" class="btn" @click="newScenario">Add scenario</button>
+            <button type="button" class="btn" @click="add">Add scenario</button>
             <button type="button" class="btn" @click="setFilter('')">Clear filter</button>
             <ViewSelector></ViewSelector>
         </div>
@@ -58,9 +58,9 @@
         },
         methods: {
             ...mapActions({
-                fetchScenarios: 'scenarios/fetchScenarios',
-                newScenario: 'scenarios/newScenario',
-                fetchActiveScenarios: 'scenarios/fetchActiveScenarios',
+                fetchScenarios: 'scenarios/fetch',
+                add: 'scenarios/add',
+                fetchActiveScenarios: 'scenarios/fetchActive',
             }),
             debounce(value) {
                 clearTimeout(this.timeout);

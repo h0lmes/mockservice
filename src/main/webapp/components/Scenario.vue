@@ -76,7 +76,7 @@
         },
         computed: {
             routes() {
-                return this.$store.state.routes;
+                return this.$store.state.routes.routes;
             },
             open() {
                 return this.editing || this.testing;
@@ -92,11 +92,11 @@
         },
         methods: {
             ...mapActions({
-                saveScenario: 'scenarios/saveScenario',
-                deleteScenario: 'scenarios/deleteScenario',
-                activateScenario: 'scenarios/activateScenario',
-                deactivateScenario: 'scenarios/deactivateScenario',
-                fetchRoutes: 'fetchRoutes',
+                saveScenario: 'scenarios/save',
+                deleteScenario: 'scenarios/delete',
+                activateScenario: 'scenarios/activate',
+                deactivateScenario: 'scenarios/deactivate',
+                fetchRoutes: 'routes/fetch',
             }),
             filter(value) {
                 this.$emit('filter', value);

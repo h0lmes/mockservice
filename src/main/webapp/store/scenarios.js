@@ -4,42 +4,30 @@ export const state = () => ({
 });
 
 export const mutations = {
-    setScenarios(state, payload) {
+    store(state, payload) {
         state.scenarios = payload;
     },
-    addScenario(state, payload) {
+    add(state, payload) {
         state.scenarios.unshift(payload);
     },
-    setActiveScenarios(state, payload) {
+    active(state, payload) {
         state.activeScenarios = payload;
     },
 };
 
-async function handleError(response) {
-    if (response.status === 400) {
-        const errorInfo = await response.json();
-        throw Error(errorInfo.message || errorInfo);
-    }
-    if (!response.ok) {
-        throw Error(response.statusText || response);
-    }
-}
-
 export const actions = {
-    async fetchScenarios({commit, dispatch, rootState}) {
-        dispatch('resetLastError', {}, {root: true});
+    async fetch({commit, dispatch, rootState}) {
         try {
             const url = rootState.BASE_URL + '/web-api/scenarios';
             const res = await fetch(url);
-            handleError(res);
+            dispatch('handleError', res, {root: true});
             const data = await res.json();
-            commit('setScenarios', data);
+            commit('store', data);
         } catch (err) {
-            dispatch('setLastError', err, {root: true});
+            commit('setLastError', err, {root: true});
         }
     },
-    async saveScenario({commit, dispatch, rootState}, scenarios) {
-        dispatch('resetLastError', {}, {root: true});
+    async save({commit, dispatch, rootState}, scenarios) {
         try {
             const url = rootState.BASE_URL + '/web-api/scenarios';
             const params = {
@@ -48,15 +36,14 @@ export const actions = {
                 body: JSON.stringify(scenarios)
             };
             const res = await fetch(url, params);
-            handleError(res);
+            dispatch('handleError', res, {root: true});
             const data = await res.json();
-            commit('setScenarios', data);
+            commit('store', data);
         } catch (err) {
-            dispatch('setLastError', err, {root: true});
+            commit('setLastError', err, {root: true});
         }
     },
-    async deleteScenario({commit, dispatch, rootState}, scenario) {
-        dispatch('resetLastError', {}, {root: true});
+    async delete({commit, dispatch, rootState}, scenario) {
         try {
             const url = rootState.BASE_URL + '/web-api/scenarios';
             const params = {
@@ -65,60 +52,49 @@ export const actions = {
                 body: JSON.stringify(scenario)
             };
             const res = await fetch(url, params);
-            handleError(res);
+            dispatch('handleError', res, {root: true});
             const data = await res.json();
-            commit('setScenarios', data);
+            commit('store', data);
         } catch (err) {
-            dispatch('setLastError', err, {root: true});
+            commit('setLastError', err, {root: true});
         }
     },
-    newScenario({commit}) {
-        commit('addScenario', {group: 'Default', alias: 'New Alias', type: 'MAP', _new: true});
+    add({commit}) {
+        commit('add', {group: 'Default', alias: 'New Alias', type: 'MAP', _new: true});
     },
-    async fetchActiveScenarios({commit, dispatch, rootState}) {
-        dispatch('resetLastError', {}, {root: true});
+    async fetchActive({commit, dispatch, rootState}) {
         try {
             const url = rootState.BASE_URL + '/web-api/scenarios/active';
             const res = await fetch(url);
-            handleError(res);
+            dispatch('handleError', res, {root: true});
             const data = await res.json();
-            commit('setActiveScenarios', data);
+            commit('active', data);
         } catch (err) {
-            dispatch('setLastError', err, {root: true});
+            commit('setLastError', err, {root: true});
         }
     },
-    async activateScenario({commit, dispatch, rootState}, alias) {
-        dispatch('resetLastError', {}, {root: true});
+    async activate({commit, dispatch, rootState}, alias) {
         try {
             const url = rootState.BASE_URL + '/web-api/scenarios/active';
-            const params = {
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
-                body: alias
-            };
+            const params = {method: 'PUT', body: alias};
             const res = await fetch(url, params);
-            handleError(res);
+            dispatch('handleError', res, {root: true});
             const data = await res.json();
-            commit('setActiveScenarios', data);
+            commit('active', data);
         } catch (err) {
-            dispatch('setLastError', err, {root: true});
+            commit('setLastError', err, {root: true});
         }
     },
-    async deactivateScenario({commit, dispatch, rootState}, alias) {
-        dispatch('resetLastError', {}, {root: true});
+    async deactivate({commit, dispatch, rootState}, alias) {
         try {
             const url = rootState.BASE_URL + '/web-api/scenarios/active';
-            const params = {
-                method: 'DELETE',
-                headers: {'Content-Type': 'application/json'},
-                body: alias
-            };
+            const params = {method: 'DELETE', body: alias};
             const res = await fetch(url, params);
-            handleError(res);
+            dispatch('handleError', res, {root: true});
             const data = await res.json();
-            commit('setActiveScenarios', data);
+            commit('active', data);
         } catch (err) {
-            dispatch('setLastError', err, {root: true});
+            commit('setLastError', err, {root: true});
         }
     },
 };

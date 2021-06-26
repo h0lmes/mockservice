@@ -26,7 +26,7 @@
         },
         fetchDelay: 0,
         methods: {
-            ...mapActions(['fetchLog']),
+            ...mapActions({fetchLog: 'log/fetch'}),
             download() {
                 this.saveTextAsFile(this.value, 'mockservice.log')
             },
