@@ -16,6 +16,10 @@
         ></AutoSizeTextArea>
 
         <div v-show="responseValue" class="component-toolbar mb-4">
+            <button type="button" class="btn btn-default" @click="copyToClipboard(responseValue)">
+                TO CLIPBOARD
+                <span v-show="copied">&#9989;</span>
+            </button>
             <button type="button" class="btn btn-default" @click="saveResponse">SAVE RESPONSE TO FILE</button>
         </div>
         <pre v-show="responseValue" class="form-control form-control-sm monospace min-height">{{ responseValue }}</pre>
@@ -26,6 +30,7 @@
 <script>
     import Loading from "../components/Loading";
     import AutoSizeTextArea from "../components/AutoSizeTextArea";
+    import copy from "../assets/clipboard";
 
     const storageKey = 'MockServiceRequest';
 
@@ -45,6 +50,7 @@
                 requestPlaceholder: 'POST http://localhost:8081/api/v2/entity\n\n{"name": "Johnny 5"}',
                 requestValue: '',
                 responseValue: '',
+                copied: false,
             }
         },
         mounted() {
@@ -63,6 +69,8 @@
             next();
         },
         async fetch() {
+            this.copied = false;
+
             if (!this.requestValue) return;
 
             const selStart = this.$refs.requestText.selectionStart();
@@ -134,6 +142,13 @@
                 document.body.appendChild(link);
                 link.click();
                 link.remove();
+            },
+            copyToClipboard(text) {
+                copy(text).then(
+                    () => this.copied = true
+                ).catch(
+                    console.error
+                );
             },
         }
     }

@@ -16,5 +16,5 @@ To build web app for deployment:
 This will copy web app distro into Thymeleaf template folder `src/main/resources/webapp`. 
 
 Then you may build/run Spring Boot application.
-It is set to run on 8081, so you may run it on the same machine
-along with your application under test.
+It is set to run on port 8081, so you can run it along
+with your application under test (which usually uses port 8080).

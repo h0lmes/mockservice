@@ -3,7 +3,10 @@
 
         <div class="component-toolbar mb-5">
             <button type="button" class="btn btn-default" @click="$fetch()">GENERATE</button>
-            <button type="button" class="btn btn-default" @click="copyToClipboard(value)">TO CLIPBOARD</button>
+            <button type="button" class="btn btn-default" @click="copyToClipboard(value)">
+                TO CLIPBOARD
+                <span v-show="copied">&#9989;</span>
+            </button>
             <button type="button" class="btn btn-default" @click="download">DOWNLOAD</button>
         </div>
         <pre class="smaller">{{ value }}</pre>
@@ -14,12 +17,15 @@
 <script>
     import {mapActions} from 'vuex';
     import Loading from "../components/Loading";
+    import copy from "../assets/clipboard";
 
     export default {
         name: "generate",
         components: {Loading},
         data() {
-            return {}
+            return {
+                copied: false,
+            }
         },
         computed: {
             value() {
@@ -27,6 +33,7 @@
             }
         },
         async fetch() {
+            this.copied = false;
             return this.generateJson();
         },
         fetchDelay: 0,
@@ -46,38 +53,13 @@
                 link.click();
                 link.remove();
             },
-            fallbackCopyToClipboard(text) {
-                var textArea = document.createElement("textarea");
-                textArea.value = text;
-
-                textArea.style.top = "0";
-                textArea.style.left = "0";
-                textArea.style.position = "fixed";
-
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-
-                try {
-                    const successful = document.execCommand('copy');
-                    if (!successful) {
-                        console.log('Fallback copy to clipboard failed');
-                    }
-                } catch (err) {
-                    console.error('Fallback copy to clipboard failed');
-                }
-
-                document.body.removeChild(textArea);
-            },
             copyToClipboard(text) {
-                if (!navigator.clipboard) {
-                    this.fallbackCopyToClipboard(text);
-                    return;
-                }
-                navigator.clipboard.writeText(text).catch(
-                    () => console.error('Async copy to clipboard failed')
+                copy(text).then(
+                    () => this.copied = true
+                ).catch(
+                    console.error
                 );
-            }
+            },
         }
     }
 </script>

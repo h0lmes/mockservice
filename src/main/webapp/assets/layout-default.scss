@@ -4,6 +4,7 @@
   --nav-color-group: #8e9599;
   --nav-bg: #3a3f45;
   --nav-bg-active: #40454d;
+  --nav-bg-border: var(--nav-bg);
 }
 
 .sepia-mode {
@@ -18,8 +19,9 @@
   --nav-color: #6a6d76;
   --nav-color-active: #aeb3bf;
   --nav-color-group: #4c4e54;
-  --nav-bg: var(--bg-component);
-  --nav-bg-active: var(--bg-component-active);
+  --nav-bg: var(--bg-page);
+  --nav-bg-active: var(--bg-page);
+  --nav-bg-border: var(--bg-page);
 }
 
 .aws-mode {
@@ -59,6 +61,7 @@
   position: fixed;
   display: block;
   background: var(--nav-bg);
+  border-right: 1px solid var(--nav-bg-border);
   transition: width 0.2s;
 }
 

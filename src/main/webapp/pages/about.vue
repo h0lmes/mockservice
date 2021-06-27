@@ -1,10 +1,5 @@
 <template>
     <div class="bg monospace">
-        <div style="height: 150px; overflow: hidden; position: absolute; width: 100%">
-            <svg viewBox="0 0 500 150" preserveAspectRatio="none" style="height: 100%; width: 100%;">
-                <path d="M0,150 C150,150 272,-50 500,50 V0 H0 Z" style="stroke: none; fill: var(--bg-component);"></path>
-            </svg>
-        </div>
         <div class="about">
             <h1>Mock Service</h1>
             <p></p>
