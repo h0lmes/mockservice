@@ -8,7 +8,7 @@ public class JsonGenerator {
 
     private static final int MAX_NUMBER_OF_ELEMENTS = 10;
 
-    enum JsonValueType {
+    public enum JsonValueType {
         NUMBER, STRING, BOOLEAN, ARRAY, OBJECT
     }
 
@@ -33,7 +33,10 @@ public class JsonGenerator {
     };
 
     public static String generate() {
-        JsonValueType rootElementType = rootValueTypes[RandomUtil.rnd(rootValueTypes.length)];
+        return generate(rootValueTypes[RandomUtil.rnd(rootValueTypes.length)]);
+    }
+
+    public static String generate(JsonValueType rootElementType) {
         return generateValue(rootElementType, 0);
     }
 

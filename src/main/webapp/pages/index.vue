@@ -1,15 +1,16 @@
 <template>
     <div ref="routes" class="monospace">
-        <div class="component component-toolbar mb-5">
-            <input ref="search"
-                   type="search"
-                   class="form-control"
-                   placeholder="search here or click on values"
-                   @input="debounce($event.target.value)"/>
-                <button type="button" class="btn" @click="setFilter('')">Clear filter</button>
-            <button type="button" class="btn" @click="addRoute">Add route</button>
-
-            <ViewSelector></ViewSelector>
+        <div class="component-toolbar mb-5">
+            <div class="toolbar-item">
+                <input ref="search"
+                       type="search"
+                       class="form-control"
+                       placeholder="search here or click on values"
+                       @input="debounce($event.target.value)"/>
+            </div>
+            <button type="button" class="toolbar-item-fixed btn" @click="setFilter('')">Clear filter</button>
+            <button type="button" class="toolbar-item-fixed btn" @click="addRoute">Add route</button>
+            <ViewSelector class="toolbar-item-fixed"></ViewSelector>
         </div>
 
         <Routes :routes="filtered" @filter="setFilter($event)"></Routes>

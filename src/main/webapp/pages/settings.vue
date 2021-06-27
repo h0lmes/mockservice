@@ -1,21 +1,19 @@
 <template>
     <div class="monospace">
-        <div class="component component-card">
-            <p>
-                <ToggleSwitch :id="'randomAlt'"
-                              v-model="randomAlt">Random Alt (return random of existing alternatives for requested Route)
-                </ToggleSwitch>
-            </p>
-            <p class="mt-3">
-                <ToggleSwitch :id="'quantum'"
-                              v-model="quantum">Go Quantum (Routes are now quantum objects, so don't expect anything deterministic)
-                </ToggleSwitch>
-            </p>
-            <div class="mt-4 pl-1">
-                <button type="button" class="btn btn-primary" @click="save">SAVE</button>
-            </div>
-            <Loading v-if="$fetchState.pending"></Loading>
+        <p class="mb-4">
+            <ToggleSwitch :id="'randomAlt'"
+                          v-model="randomAlt">Random Alt (return random of existing alternatives for requested Route)
+            </ToggleSwitch>
+        </p>
+        <p class="mb-4">
+            <ToggleSwitch :id="'quantum'"
+                          v-model="quantum">Go Quantum (Routes are now quantum objects, so don't expect anything deterministic)
+            </ToggleSwitch>
+        </p>
+        <div class="mt-5 pl-1">
+            <button type="button" class="btn btn-primary" @click="save">SAVE</button>
         </div>
+        <Loading v-if="$fetchState.pending"></Loading>
     </div>
 </template>
 <script>

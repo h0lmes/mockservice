@@ -1,10 +1,10 @@
 <template>
     <div class="monospace">
 
-        <div class="component component-toolbar mb-3">
-            <button type="button" class="btn btn-sm btn-primary" @click="$fetch()">FETCH (CTRL + ENTER)</button>
-            <button type="button" class="btn btn-sm btn-default" @click="storeRequest">SAVE REQUEST (F5)</button>
-            <button type="button" class="btn btn-sm btn-default" @click="forgetRequest">FORGET REQUEST</button>
+        <div class="component-toolbar mb-4">
+            <button type="button" class="btn btn-primary" @click="$fetch()">FETCH (CTRL + ENTER)</button>
+            <button type="button" class="btn btn-default" @click="storeRequest">SAVE REQUEST (F5)</button>
+            <button type="button" class="btn btn-default" @click="forgetRequest">FORGET REQUEST</button>
         </div>
         <AutoSizeTextArea class="mb-4"
                           ref="requestText"
@@ -15,8 +15,8 @@
                           v-model="requestValue"
         ></AutoSizeTextArea>
 
-        <div v-show="responseValue" class="component component-toolbar mb-3">
-            <button type="button" class="btn btn-sm btn-default" @click="saveResponse">SAVE TO FILE</button>
+        <div v-show="responseValue" class="component-toolbar mb-4">
+            <button type="button" class="btn btn-default" @click="saveResponse">SAVE RESPONSE TO FILE</button>
         </div>
         <pre v-show="responseValue" class="form-control form-control-sm monospace min-height">{{ responseValue }}</pre>
 

@@ -7,12 +7,12 @@
                            :class="getClasses(color)" />
             </li>
         </ul>
-        <p class="scheme-info">
-            <ColorScheme placeholder="..." tag="span">
-                Color mode: <b>{{ $colorMode.preference }}</b>
-                <span v-if="$colorMode.preference === 'system'">(<i>{{ $colorMode.value }}</i>)</span>
-            </ColorScheme>
-        </p>
+        <!--<p class="scheme-info">-->
+            <!--<ColorScheme placeholder="..." tag="span">-->
+                <!--Color mode: <b>{{ $colorMode.preference }}</b>-->
+                <!--<span v-if="$colorMode.preference === 'system'">(<i>{{ $colorMode.value }}</i>)</span>-->
+            <!--</ColorScheme>-->
+        <!--</p>-->
     </div>
 </template>
 <script>

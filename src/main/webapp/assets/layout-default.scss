@@ -103,16 +103,10 @@
   margin-right: 6px;
 }
 
-.nav > li.active > a {
-  color: var(--nav-color-active);
-
-  & .nav-icon {
-    color: var(--color-accent-one);
-  }
-}
-
+.nav > li.active > a,
 .nav > li > a.nuxt-link-exact-active {
   color: var(--nav-color-active);
+  //background-color: var(--nav-bg-active);
 
   & .nav-icon {
     color: var(--color-accent-one);
@@ -121,8 +115,8 @@
 
 .navbar .nav > li > a:hover,
 .navbar .nav > li > a:focus {
-  background-color: var(--nav-bg-active);
   color: var(--nav-color-active);
+  background-color: var(--nav-bg-active);
   text-decoration: none;
 
   & .nav-icon {

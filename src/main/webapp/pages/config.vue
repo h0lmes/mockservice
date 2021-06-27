@@ -1,15 +1,12 @@
 <template>
     <div class="config-page monospace">
-
-        <p class="red mb-3">Use with caution! It is easy to ruin config by editing it as plain text.</p>
-        <div class="component component-toolbar mb-3">
-            <button type="button" class="btn btn-sm btn-primary" @click="save">SAVE AND APPLY</button>
-            <button type="button" class="btn btn-sm btn-default" @click="download">DOWNLOAD AS FILE</button>
-            <button type="button" class="btn btn-sm btn-default" @click="backup">BACKUP ON SERVER</button>
-            <button type="button" class="btn btn-sm btn-danger" @click="restore">RESTORE FROM BACKUP</button>
+        <div class="component-toolbar mb-5">
+            <button type="button" class="btn btn-danger" @click="save">SAVE AND APPLY</button>
+            <button type="button" class="btn btn-default" @click="download">DOWNLOAD AS FILE</button>
+            <button type="button" class="btn btn-default" @click="backup">BACKUP ON SERVER</button>
+            <button type="button" class="btn btn-default" @click="restore">RESTORE FROM BACKUP</button>
         </div>
         <AutoSizeTextArea v-model="config" :border="false"></AutoSizeTextArea>
-
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
 </template>

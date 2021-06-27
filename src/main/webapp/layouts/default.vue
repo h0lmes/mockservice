@@ -16,15 +16,21 @@
                 </li>
                 <li>
                     <NuxtLink to="/scenarios">
-                        <FontAwesomeIcon icon="play" class="nav-icon icon-width-fix"/>
+                        <FontAwesomeIcon icon="receipt" class="nav-icon icon-width-fix"/>
                         <span class="nav-label">Scenarios</span>
                     </NuxtLink>
                 </li>
                 <li class="nav-group-start">TOOLS</li>
                 <li>
                     <NuxtLink to="/request">
-                        <FontAwesomeIcon icon="at" class="nav-icon icon-width-fix"/>
+                        <FontAwesomeIcon icon="play" class="nav-icon icon-width-fix"/>
                         <span class="nav-label">Request</span>
+                    </NuxtLink>
+                </li>
+                <li>
+                    <NuxtLink to="/generate">
+                        <FontAwesomeIcon icon="hammer" class="nav-icon icon-width-fix"/>
+                        <span class="nav-label">Generate</span>
                     </NuxtLink>
                 </li>
                 <li class="nav-group-start">SERVICE</li>

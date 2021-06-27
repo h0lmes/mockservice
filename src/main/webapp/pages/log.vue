@@ -1,10 +1,10 @@
 <template>
     <div class="monospace">
 
-        <div class="component component-toolbar mb-3">
-            <button type="button" class="btn btn-sm btn-default mr-3" @click="download">DOWNLOAD</button>
+        <div class="component-toolbar mb-5">
+            <button type="button" class="btn btn-default" @click="download">DOWNLOAD</button>
         </div>
-        <pre class="form-control form-control-sm smaller">{{ value }}</pre>
+        <pre class="smaller">{{ value }}</pre>
 
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
