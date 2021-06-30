@@ -26,7 +26,7 @@ public interface ConfigRepository {
     void putScenario(Scenario scenario, Scenario replacement) throws ScenarioAlreadyExistsException, IOException;
     void deleteScenario(Scenario scenario) throws IOException;
 
-    void registerConfigChangedListener(NotifiableConfigChanged listener);
-    void registerRoutesChangedListener(NotifiableRoutesChanged listener);
-    void registerScenariosChangedListener(NotifiableScenariosChanged listener);
+    void registerConfigChangedListener(ConfigChangedListener listener);
+    void registerRoutesChangedListener(RoutesChangedListener listener);
+    void registerScenariosChangedListener(ScenariosChangedListener listener);
 }

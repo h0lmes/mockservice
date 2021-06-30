@@ -26,9 +26,9 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     private final ObjectReader yamlReader;
     private final ObjectWriter yamlWriter;
     private Config config;
-    private final List<NotifiableConfigChanged> configChangedListeners = new ArrayList<>();
-    private final List<NotifiableRoutesChanged> routesChangedListeners = new ArrayList<>();
-    private final List<NotifiableScenariosChanged> scenariosChangedListeners = new ArrayList<>();
+    private final List<ConfigChangedListener> configChangedListeners = new ArrayList<>();
+    private final List<RoutesChangedListener> routesChangedListeners = new ArrayList<>();
+    private final List<ScenariosChangedListener> scenariosChangedListeners = new ArrayList<>();
 
 
     public ConfigRepositoryImpl(@Value("${application.config-filename}") String fileConfigPath,
@@ -90,7 +90,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     //----------------------------------------------------------------------
 
     @Override
-    public String getConfigData() throws JsonProcessingException {
+    public synchronized String getConfigData() throws JsonProcessingException {
         return yamlWriter.writeValueAsString(config);
     }
 
@@ -122,7 +122,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     //----------------------------------------------------------------------
 
     @Override
-    public synchronized Settings getSettings() {
+    public Settings getSettings() {
         return config.getSettings();
     }
 
@@ -248,15 +248,15 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     //----------------------------------------------------------------------
 
     private void notifyBeforeConfigChanged() {
-        configChangedListeners.forEach(NotifiableConfigChanged::onBeforeConfigChanged);
+        configChangedListeners.forEach(ConfigChangedListener::onBeforeConfigChanged);
     }
 
     private void notifyAfterConfigChanged() {
-        configChangedListeners.forEach(NotifiableConfigChanged::onAfterConfigChanged);
+        configChangedListeners.forEach(ConfigChangedListener::onAfterConfigChanged);
     }
 
     @Override
-    public void registerConfigChangedListener(NotifiableConfigChanged listener) {
+    public void registerConfigChangedListener(ConfigChangedListener listener) {
         configChangedListeners.add(listener);
     }
 
@@ -269,7 +269,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     @Override
-    public void registerRoutesChangedListener(NotifiableRoutesChanged listener) {
+    public void registerRoutesChangedListener(RoutesChangedListener listener) {
         routesChangedListeners.add(listener);
     }
 
@@ -282,7 +282,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     @Override
-    public void registerScenariosChangedListener(NotifiableScenariosChanged listener) {
+    public void registerScenariosChangedListener(ScenariosChangedListener listener) {
         scenariosChangedListeners.add(listener);
     }
 }

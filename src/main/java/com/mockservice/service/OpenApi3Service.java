@@ -63,7 +63,7 @@ public class OpenApi3Service implements OpenApiService {
         if (tags instanceof List) {
             String separator = "";
             for (Object tag : (List) tags) {
-                group += separator + tag.toString(); // not using builder as in most cases there will be 0 or 1 tag
+                group += separator + tag.toString(); // not using builder since in most cases there will be 0 or 1 tag
                 separator = ", ";
             }
         }
