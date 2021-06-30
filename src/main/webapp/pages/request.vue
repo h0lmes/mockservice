@@ -8,7 +8,6 @@
         </div>
         <AutoSizeTextArea class="mb-4"
                           ref="requestText"
-                          :border="false"
                           :placeholder="requestPlaceholder"
                           @keydown.ctrl.enter.exact="$fetch()"
                           @keydown.116.exact.prevent="storeRequest"
@@ -95,7 +94,7 @@
 
             let body = '';
             while (++i < len) {
-                body += lines[i];
+                body += lines[i] + '\n';
             }
 
             let params = {method, headers};

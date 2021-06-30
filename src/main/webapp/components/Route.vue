@@ -1,5 +1,6 @@
 <template>
-    <div class="component component-row" :class="{'open' : open, 'disabled' : route.disabled}">
+    <div class="component component-row"
+         :class="{'open' : open, 'disabled' : route.disabled}">
 
         <div class="mock-col w2">
             <div class="mock-col-header" :class="{'color-accent-one' : groupStart}">GROUP</div>

@@ -4,10 +4,10 @@ import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
 import com.mockservice.request.RequestFacade;
 import com.mockservice.request.SoapRequestFacade;
-import com.mockservice.service.ConfigChangedListener;
-import com.mockservice.service.ConfigRepository;
+import com.mockservice.repository.NotifiableConfigChanged;
+import com.mockservice.repository.ConfigRepository;
 import com.mockservice.service.MockService;
-import com.mockservice.service.RoutesChangedListener;
+import com.mockservice.repository.NotifiableRoutesChanged;
 import com.mockservice.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
-public class ConfigBasedSoapController implements RouteRegisteringController, ConfigChangedListener, RoutesChangedListener {
+public class ConfigBasedSoapController implements RouteRegisteringController, NotifiableConfigChanged, NotifiableRoutesChanged {
 
     private static final Logger log = LoggerFactory.getLogger(ConfigBasedSoapController.class);
 

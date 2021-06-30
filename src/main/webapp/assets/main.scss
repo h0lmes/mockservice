@@ -22,7 +22,6 @@
   --color-link: #0056b3;
   --color-link-hover: #007bff;
   --bg-page: #ededed;
-  --bg-page-active: var(--bg-page);
   --bg-component: #fff;
   --bg-component-active: #dbe0e5;
   --bg-border: #fff;
@@ -30,6 +29,9 @@
 }
 
 .sepia-mode {
+  --teal: #50c199;
+  --cyan: #1a91a1;
+  /**/
   --color-primary: #433422;
   --color-secondary: #b3887d;
   --color-disabled: #bfb8a6;
@@ -61,7 +63,6 @@
   --color-accent-one: #b4a27a;
   --color-accent-two: var(--cyan);
   --bg-page: #191b1d;
-  --bg-page-active: #1f2124;
   --bg-component: #212325;
   --bg-component-active: #27292b;
   --bg-border: var(--bg-component);

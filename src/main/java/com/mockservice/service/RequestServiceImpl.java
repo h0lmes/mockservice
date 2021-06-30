@@ -29,7 +29,7 @@ public class RequestServiceImpl implements RequestService {
         }
     }
 
-    @Scheduled(fixedDelay = 1000)
+    @Scheduled(initialDelayString = "${application.request-service.initial-delay}", fixedDelayString = "${application.request-service.fixed-delay}")
     public void scheduleFixedDelay() {
         try {
             MockResponse response = requestQueue.poll(10, TimeUnit.MILLISECONDS);

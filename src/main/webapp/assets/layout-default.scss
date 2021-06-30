@@ -8,11 +8,11 @@
 }
 
 .sepia-mode {
-  --nav-color: #f1e7d0;
-  --nav-color-active: white;
-  --nav-color-group: #bfb7a6;
-  --nav-bg: #544b40;
-  --nav-bg-active: #5e5549;
+  --nav-color: #8c7b6b;
+  --nav-color-active: #594f46;
+  --nav-color-group: #969188;
+  --nav-bg: var(--bg-page);
+  --nav-bg-active: var(--bg-page);
 }
 
 .dark-mode {
@@ -21,7 +21,6 @@
   --nav-color-group: #4c4e54;
   --nav-bg: var(--bg-page);
   --nav-bg-active: var(--bg-page);
-  --nav-bg-border: var(--bg-page);
 }
 
 .aws-mode {
@@ -61,8 +60,7 @@
   position: fixed;
   display: block;
   background: var(--nav-bg);
-  border-right: 1px solid var(--nav-bg-border);
-  transition: width 0.2s;
+  transition: width 0.15s;
 }
 
 .navbar-mini .navbar {
@@ -109,7 +107,6 @@
 .nav > li.active > a,
 .nav > li > a.nuxt-link-exact-active {
   color: var(--nav-color-active);
-  //background-color: var(--nav-bg-active);
 
   & .nav-icon {
     color: var(--color-accent-one);
@@ -125,6 +122,18 @@
   & .nav-icon {
     color: var(--color-accent-one);
   }
+}
+
+.nav-group {
+  padding: 1.5rem 20px 0.5rem 25px;
+  font-size: smaller;
+  font-family: monospace, monospace;
+  color: var(--nav-color-group) !important;
+}
+
+.navbar-mini .nav-group,
+.navbar-maximizing .nav-group {
+  display: none;
 }
 
 .navbar-mini .nav-label,
@@ -144,16 +153,4 @@
 .navbar .nav > li > a.btn-minimize-navbar:hover,
 .navbar .nav > li > a.btn-minimize-navbar:focus {
   color: var(--color-accent-one) !important;
-}
-
-.nav-group-start {
-  padding: 1.5rem 20px 0.5rem 25px;
-  font-size: smaller;
-  font-family: monospace, monospace;
-  color: var(--nav-color-group) !important;
-}
-
-.navbar-mini .nav-group-start,
-.navbar-maximizing .nav-group-start {
-  display: none;
 }

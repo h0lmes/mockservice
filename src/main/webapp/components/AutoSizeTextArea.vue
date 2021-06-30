@@ -1,38 +1,40 @@
 <template>
-    <div class="grow-wrap" ref="textWrap">
-        <textarea class="form-control form-control-sm v-resize monospace"
-                  ref="textArea"
-                  :value="value"
-                  :placeholder="placeholder"
-                  @input="e => input(e)"
-                  @keydown="e => $emit('keydown', e)"
-        ></textarea>
-    </div>
+    <textarea class="form-control form-control-sm v-resize monospace"
+              ref="textArea"
+              :value="value"
+              :placeholder="placeholder"
+              :rows="rows"
+              @input="e => input(e)"
+              @keydown="e => $emit('keydown', e)"
+    ></textarea>
 </template>
 <script>
     export default {
         name: "AutoSizeTextArea",
         data() {
-            return {
-                height: 2,
-            }
+            return {}
         },
         props: {
             value: {type: String},
             placeholder: {type: String},
+            minRows: {type: Number, default: 3},
+            maxRows: {type: Number, default: 20},
         },
-        mounted() {
-            this.resize();
-        },
-        updated() {
-            this.resize();
+        computed: {
+            rows() {
+                let size = this.minRows;
+                if (!!this.value) {
+                    const lines = this.value.split('\n');
+                    if (lines.length > size) {
+                        size = Math.min(lines.length, this.maxRows);
+                    }
+                }
+                return size;
+            },
         },
         methods: {
             input(e) {
                 this.$emit('input', e.target.value);
-            },
-            resize() {
-                this.$refs.textWrap.dataset.replicatedValue = this.value;
             },
             selectionStart() {
                 return this.$refs.textArea.selectionStart;
@@ -44,30 +46,4 @@
     }
 </script>
 <style scoped>
-    .grow-wrap {
-        display: grid;
-    }
-    .grow-wrap::after {
-        content: attr(data-replicated-value) " ";
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        visibility: hidden;
-    }
-    .grow-wrap > textarea {
-        resize: none;
-        overflow-y: hidden;
-        word-wrap: break-word;
-    }
-    .grow-wrap > textarea,
-    .grow-wrap::after {
-        grid-area: 1 / 1 / 2 / 2;
-        box-sizing: border-box;
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-        line-height: 1.5;
-        border-radius: 0.2rem;
-    }
-    .grow-wrap::after {
-        border: 1px solid transparent;
-    }
 </style>

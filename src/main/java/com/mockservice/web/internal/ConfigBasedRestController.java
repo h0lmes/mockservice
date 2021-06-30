@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
 import com.mockservice.request.RestRequestFacade;
-import com.mockservice.service.ConfigChangedListener;
-import com.mockservice.service.ConfigRepository;
+import com.mockservice.repository.NotifiableConfigChanged;
+import com.mockservice.repository.ConfigRepository;
 import com.mockservice.service.MockService;
-import com.mockservice.service.RoutesChangedListener;
+import com.mockservice.repository.NotifiableRoutesChanged;
 import com.mockservice.web.webapp.ErrorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 
 @RestController
-public class ConfigBasedRestController implements RouteRegisteringController, ConfigChangedListener, RoutesChangedListener {
+public class ConfigBasedRestController implements RouteRegisteringController, NotifiableConfigChanged, NotifiableRoutesChanged {
 
     private static final Logger log = LoggerFactory.getLogger(ConfigBasedRestController.class);
 

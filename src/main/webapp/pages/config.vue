@@ -6,7 +6,7 @@
             <button type="button" class="btn btn-default" @click="backup">BACKUP ON SERVER</button>
             <button type="button" class="btn btn-default" @click="restore">RESTORE FROM BACKUP</button>
         </div>
-        <AutoSizeTextArea v-model="config" :border="false"></AutoSizeTextArea>
+        <AutoSizeTextArea v-model="config" :max-rows="30"></AutoSizeTextArea>
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
 </template>

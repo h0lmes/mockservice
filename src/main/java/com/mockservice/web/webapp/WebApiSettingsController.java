@@ -1,7 +1,7 @@
 package com.mockservice.web.webapp;
 
 import com.mockservice.domain.Settings;
-import com.mockservice.service.ConfigRepository;
+import com.mockservice.repository.ConfigRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;

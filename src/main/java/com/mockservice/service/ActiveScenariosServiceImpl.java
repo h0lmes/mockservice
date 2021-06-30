@@ -3,6 +3,9 @@ package com.mockservice.service;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.Scenario;
 import com.mockservice.domain.ScenarioParseException;
+import com.mockservice.repository.NotifiableConfigChanged;
+import com.mockservice.repository.ConfigRepository;
+import com.mockservice.repository.NotifiableScenariosChanged;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 @Service
-public class ActiveScenariosServiceImpl implements ActiveScenariosService, ConfigChangedListener, ScenariosChangedListener {
+public class ActiveScenariosServiceImpl implements ActiveScenariosService, NotifiableConfigChanged, NotifiableScenariosChanged {
 
     private static final Logger log = LoggerFactory.getLogger(ActiveScenariosServiceImpl.class);
     private final ConfigRepository configRepository;

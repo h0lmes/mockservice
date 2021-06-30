@@ -21,8 +21,11 @@ spring:
     suffix: .html
 
 application:
-  config: ${CONFIG_FILE:.\config.yml}
-  config-backup: ${CONFIG_BACKUP_FILE:.\config-backup.yml}
+  config-filename: ${CONFIG_FILENAME:.\config.yml}
+  config-backup-filename: ${CONFIG_BACKUP_FILENAME:.\config-backup.yml}
   soap-error-data-file: soapFault.xml
   cache:
     response: 256
+  request-service:
+    initial-delay: 10000
+    fixed-delay: 5000

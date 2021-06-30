@@ -2,6 +2,7 @@ package com.mockservice.service;
 
 import com.mockservice.domain.Scenario;
 import com.mockservice.domain.ScenarioAlreadyExistsException;
+import com.mockservice.repository.ConfigRepository;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
