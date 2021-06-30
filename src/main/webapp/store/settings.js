@@ -8,19 +8,21 @@ export const mutations = {
     },
 };
 
+import {handleError} from "../js/common";
+
 export const actions = {
-    async fetch({commit, dispatch, rootState}) {
+    async fetch({commit, rootState}) {
         try {
             const url = rootState.BASE_URL + '/web-api/settings';
             const res = await fetch(url);
-            dispatch('handleError', res, {root: true});
+            await handleError(res);
             const data = await res.json();
             commit('store', data);
         } catch (err) {
             commit('setLastError', err, {root: true});
         }
     },
-    async save({commit, dispatch, state, rootState}, settings) {
+    async save({commit, state, rootState}, settings) {
         try {
             const url = rootState.BASE_URL + '/web-api/settings';
             const params = {
@@ -29,7 +31,7 @@ export const actions = {
                 body: JSON.stringify({...state.settings, ...settings})
             };
             const res = await fetch(url, params);
-            dispatch('handleError', res, {root: true});
+            await handleError(res);
             const data = await res.json();
             commit('store', data);
         } catch (err) {

@@ -4,18 +4,20 @@ export const state = () => ({
 export const mutations = {
 };
 
+import {handleError} from "../js/common";
+
 export const actions = {
-    async fetch({commit, dispatch, rootState}) {
+    async fetch({commit, rootState}) {
         try {
             const url = rootState.BASE_URL + '/web-api/config';
             const res = await fetch(url);
-            dispatch('handleError', res, {root: true});
+            await handleError(res);
             return await res.text();
         } catch (err) {
             commit('setLastError', err, {root: true});
         }
     },
-    async save({commit, dispatch, rootState}, config) {
+    async save({commit, rootState}, config) {
         try {
             const url = rootState.BASE_URL + '/web-api/config';
             const params = {
@@ -24,27 +26,27 @@ export const actions = {
                 body: config
             };
             const res = await fetch(url, params);
-            dispatch('handleError', res, {root: true});
+            await handleError(res);
             return await res.text();
         } catch (err) {
             commit('setLastError', err, {root: true});
         }
     },
-    async backup({commit, dispatch, rootState}) {
+    async backup({commit, rootState}) {
         try {
             const url = rootState.BASE_URL + '/web-api/config/backup';
             const res = await fetch(url);
-            dispatch('handleError', res, {root: true});
+            await handleError(res);
             return await res.text();
         } catch (err) {
             commit('setLastError', err, {root: true});
         }
     },
-    async restore({commit, dispatch, rootState}) {
+    async restore({commit, rootState}) {
         try {
             const url = rootState.BASE_URL + '/web-api/config/restore';
             const res = await fetch(url);
-            dispatch('handleError', res, {root: true});
+            await handleError(res);
             return await res.text();
         } catch (err) {
             commit('setLastError', err, {root: true});

@@ -1,25 +1,23 @@
 <template>
     <div class="row">
         <div class="item w2">
-            <div class="mock-col-value link" @click="filter(route.group)">{{ route.group }}</div>
+            <div class="mock-col-value">{{ route.group }}</div>
         </div>
         <div class="item">
-            <div class="mock-col-value link" @click="filter(route.method)">{{ route.method }}</div>
+            <div class="mock-col-value">{{ route.method }}</div>
         </div>
         <div class="item w3">
-            <div class="mock-col-value link" @click="filter(route.path)">{{ route.path }}</div>
+            <div class="mock-col-value">{{ route.path }}</div>
         </div>
         <div class="item w2">
-            <div class="mock-col-value link color-accent-one" @click="filter(route.alt)">{{ route.alt }}</div>
+            <div class="mock-col-value">{{ route.alt }}</div>
         </div>
         <div class="item w2">
-            <button type="button" class="btn btn-default" @click="$emit('add', route)">add</button>
+            <button type="button" class="btn btn-sm btn-default" @click="$emit('add', route)">ADD</button>
         </div>
     </div>
 </template>
 <script>
-    import {mapActions} from 'vuex';
-
     export default {
         name: "RouteToAdd",
         data() {
@@ -29,12 +27,6 @@
             route: {type: Object},
             groupStart: {type: Boolean}
         },
-        methods: {
-            ...mapActions(['saveRoute']),
-            filter(value) {
-                this.$emit('filter', value);
-            },
-        }
     }
 </script>
 <style lang="scss" scoped>
@@ -54,10 +46,6 @@
         vertical-align: top;
         text-align: center;
 
-        &.w1 {
-            flex: 1;
-        }
-
         &.w2 {
             flex: 2;
         }
@@ -67,7 +55,6 @@
         }
 
         & .btn {
-            padding: 0 0.3rem;
             margin: -0.3rem 0;
         }
     }

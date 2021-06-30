@@ -6,18 +6,20 @@ export const mutations = {
     store(state, payload) {
         state.routes = payload;
     },
-    add(state, payload) {
-        state.routes.unshift(payload);
-    },
 };
 
 import {handleError} from "../js/common";
 
 export const actions = {
-    async fetch({commit, rootState}) {
+    async openapi3({commit, dispatch, rootState}, param) {
         try {
-            const url = rootState.BASE_URL + '/web-api/routes';
-            const res = await fetch(url);
+            const url = rootState.BASE_URL + '/web-api/import/openapi3';
+            const params = {
+                method: 'PUT',
+                headers: {'Content-Type': 'text/plain'},
+                body: param
+            };
+            const res = await fetch(url, params);
             await handleError(res);
             const data = await res.json();
             commit('store', data);
@@ -25,7 +27,7 @@ export const actions = {
             commit('setLastError', err, {root: true});
         }
     },
-    async save({commit, rootState}, routes) {
+    async save({commit, dispatch, rootState}, routes) {
         try {
             const url = rootState.BASE_URL + '/web-api/routes';
             const params = {
@@ -40,24 +42,5 @@ export const actions = {
         } catch (err) {
             commit('setLastError', err, {root: true});
         }
-    },
-    async delete({commit, rootState}, route) {
-        try {
-            const url = rootState.BASE_URL + '/web-api/routes';
-            const params = {
-                method: 'DELETE',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(route)
-            };
-            const res = await fetch(url, params);
-            await handleError(res);
-            const data = await res.json();
-            commit('store', data);
-        } catch (err) {
-            commit('setLastError', err, {root: true});
-        }
-    },
-    add({commit}) {
-        commit('add', {group: 'Default', type: 'REST', method: 'GET', path: '/', alt: '', disabled: false, _new: true});
     },
 };

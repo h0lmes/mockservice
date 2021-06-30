@@ -47,7 +47,7 @@
         </div>
 
         <div v-if="editing && addRoute" class="mock-col w100">
-            <RoutesToAdd :routes="routes" @filter="setFilter($event)" @add="add($event)"></RoutesToAdd>
+            <RoutesToAdd :routes="routes" @add="add($event)"></RoutesToAdd>
         </div>
 
     </div>

@@ -7,7 +7,7 @@ export default {
     ],
     fontawesome: {
         icons: {
-            solid: ['faBars', 'faRoute', 'faPlay', 'faCode', 'faFileAlt', 'faCogs', 'faQuestionCircle', 'faHammer', 'faReceipt']
+            solid: ['faBars', 'faRoute', 'faPlay', 'faCode', 'faFileAlt', 'faCogs', 'faQuestionCircle', 'faHammer', 'faReceipt', 'faFileImport']
         }
     },
     css: [

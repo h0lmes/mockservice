@@ -8,12 +8,14 @@ export const mutations = {
     },
 };
 
+import {handleError} from "../js/common";
+
 export const actions = {
-    async json({commit, dispatch, rootState}) {
+    async json({commit, rootState}) {
         try {
             const url = rootState.BASE_URL + '/web-api/generate/json';
             const res = await fetch(url);
-            dispatch('handleError', res, {root: true});
+            await handleError(res);
             const data = await res.text();
             commit('store', data);
         } catch (err) {

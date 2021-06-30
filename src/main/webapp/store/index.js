@@ -20,16 +20,4 @@ export const actions = {
     resetLastError({commit}) {
         commit('resetLastError');
     },
-    async handleError({commit}, response) {
-        commit('resetLastError');
-        if (response.status === 400) {
-            const errorInfo = await response.json();
-            const err = errorInfo.message || errorInfo;
-            commit('setLastError', err);
-        }
-        else if (!response.ok) {
-            const err = response.statusText || response;
-            commit('setLastError', err);
-        }
-    },
 };

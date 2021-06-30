@@ -24,6 +24,9 @@ public class OpenApi3Service implements OpenApiService {
 
     @Override
     public List<Route> routesFromYaml(String yaml) throws IOException {
+        if (yaml == null || yaml.isEmpty()) {
+            return new ArrayList<>();
+        }
         Map<String, Object> map = yamlReader.readValue(yaml, Map.class);
         return routesFromOpenApiMap(map);
     }

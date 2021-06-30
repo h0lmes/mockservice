@@ -1,11 +1,11 @@
 <template>
     <div class="table">
-        <p v-if="routes.length === 0">No routes found</p>
+        <p v-if="routes.length === 0">No routes</p>
         <div class="row" v-for="(route, index) in routes" :key="route.type + route.method + route.path + route.alt">
             <RouteToAdd :route="route"
                         :groupStart="groupStart(route, index)"
-                        @filter="$emit('filter', $event)"
-                        @add="$emit('add', $event)"></RouteToAdd>
+                        @add="$emit('add', $event)"
+            ></RouteToAdd>
         </div>
     </div>
 </template>
