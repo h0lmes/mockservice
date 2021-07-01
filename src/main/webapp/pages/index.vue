@@ -10,6 +10,7 @@
             </div>
             <button type="button" class="toolbar-item-fixed btn" @click="setFilter('')">Clear filter</button>
             <button type="button" class="toolbar-item-fixed btn" @click="addRoute">Add route</button>
+            <button type="button" class="toolbar-item-fixed btn" @click="deleteVisibleRoutes">Delete visible routes</button>
             <ViewSelector class="toolbar-item-fixed"></ViewSelector>
         </div>
 
@@ -58,11 +59,20 @@
         methods: {
             ...mapActions({
                 fetchRoutes: 'routes/fetch',
-                newRoute: 'routes/add'
+                newRoute: 'routes/add',
+                deleteRoutes: 'routes/delete',
             }),
             addRoute() {
                 this.newRoute();
                 this.$refs.routes.scrollTop = 0;
+            },
+            deleteVisibleRoutes() {
+                if (confirm('Are you sure you want to delete all visible routes?\n'
+                    + 'Note: if filtered you only delete those you see on screen.')) {
+                    this.$nuxt.$loading.start();
+                    this.deleteRoutes(this.filtered)
+                        .then(() => this.$nuxt.$loading.finish());
+                }
             },
             debounce(value) {
                 clearTimeout(this.timeout);

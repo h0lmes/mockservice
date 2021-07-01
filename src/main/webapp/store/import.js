@@ -27,20 +27,4 @@ export const actions = {
             commit('setLastError', err, {root: true});
         }
     },
-    async save({commit, dispatch, rootState}, routes) {
-        try {
-            const url = rootState.BASE_URL + '/web-api/routes';
-            const params = {
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(routes)
-            };
-            const res = await fetch(url, params);
-            await handleError(res);
-            const data = await res.json();
-            commit('store', data);
-        } catch (err) {
-            commit('setLastError', err, {root: true});
-        }
-    },
 };

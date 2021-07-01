@@ -19,7 +19,8 @@ public interface ConfigRepository {
     List<Route> findAllRoutes();
     Optional<Route> findRoute(Route route);
     void putRoute(Route route, Route replacement) throws RouteAlreadyExistsException, IOException;
-    void deleteRoute(Route route) throws IOException;
+    void putRoutes(List<Route> routes) throws RouteAlreadyExistsException, IOException;
+    void deleteRoutes(List<Route> routes) throws IOException;
 
     List<Scenario> findAllScenarios();
     Optional<Scenario> findScenario(Scenario scenario);

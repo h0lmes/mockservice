@@ -37,9 +37,14 @@ public class WebApiRoutesController {
         return routeService.putRoute(routes.get(0), routes.get(1));
     }
 
+    @PostMapping
+    public List<Route> postRoutes(@RequestBody List<Route> routes) throws IOException, RouteAlreadyExistsException {
+        return routeService.putRoutes(routes);
+    }
+
     @DeleteMapping
-    public List<Route> deleteRoute(@RequestBody Route route) throws IOException {
-        return routeService.deleteRoute(route);
+    public List<Route> deleteRoutes(@RequestBody List<Route> routes) throws IOException {
+        return routeService.deleteRoutes(routes);
     }
 
     @ExceptionHandler

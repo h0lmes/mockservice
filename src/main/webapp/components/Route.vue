@@ -4,7 +4,8 @@
 
         <div class="mock-col w2">
             <div class="mock-col-header" :class="{'color-accent-one' : groupStart}">GROUP</div>
-            <div v-show="!editing" class="mock-col-value link" @click="filter(route.group)">{{ route.group }}</div>
+            <div v-show="!editing" class="mock-col-value link" :class="{'color-accent-one' : groupStart}"
+                 @click="filter(route.group)">{{ route.group }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.group"/>
         </div>
 
@@ -99,7 +100,7 @@
         methods: {
             ...mapActions({
                 saveRoute: 'routes/save',
-                deleteRoute: 'routes/delete'
+                deleteRoutes: 'routes/delete',
             }),
             filter(value) {
                 this.$emit('filter', value);
@@ -119,12 +120,12 @@
             },
             del() {
                 if (!!this.route._new) {
-                    this.deleteRoute(this.route);
+                    this.deleteRoutes([this.route]);
                     return;
                 }
                 if (confirm('Sure?')) {
                     this.$nuxt.$loading.start();
-                    this.deleteRoute(this.route)
+                    this.deleteRoutes([this.route])
                         .then(() => this.$nuxt.$loading.finish());
                 }
             },

@@ -179,9 +179,34 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     @Override
-    public void deleteRoute(Route route) throws IOException {
-        if (config.getRoutes().remove(route)) {
-            notifyRouteDeleted(route);
+    public void putRoutes(List<Route> routes) throws RouteAlreadyExistsException, IOException {
+        // do not allow duplicates
+        for (Route route : routes) {
+            Route maybeRoute = findRoute(route).orElse(null);
+            if (maybeRoute != null) {
+                throw new RouteAlreadyExistsException(route);
+            }
+        }
+
+        for (Route route : routes) {
+            config.getRoutes().add(route);
+            notifyRouteCreated(route);
+        }
+        config.getRoutes().sort(Route::compareTo);
+
+        trySaveConfigToFile();
+    }
+
+    @Override
+    public void deleteRoutes(List<Route> routes) throws IOException {
+        boolean deleted = false;
+        for (Route route : routes) {
+            if (config.getRoutes().remove(route)) {
+                deleted = true;
+                notifyRouteDeleted(route);
+            }
+        }
+        if (deleted) {
             trySaveConfigToFile();
         }
     }

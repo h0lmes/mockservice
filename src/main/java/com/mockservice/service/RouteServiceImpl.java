@@ -58,8 +58,14 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
-    public synchronized List<Route> deleteRoute(Route route) throws IOException {
-        configRepository.deleteRoute(route);
+    public synchronized List<Route> putRoutes(List<Route> routes) throws IOException, RouteAlreadyExistsException {
+        configRepository.putRoutes(routes);
+        return getRoutesAsList();
+    }
+
+    @Override
+    public synchronized List<Route> deleteRoutes(List<Route> routes) throws IOException {
+        configRepository.deleteRoutes(routes);
         return getRoutesAsList();
     }
 }

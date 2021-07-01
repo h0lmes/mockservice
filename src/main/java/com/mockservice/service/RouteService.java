@@ -12,5 +12,6 @@ public interface RouteService {
     Optional<String> getRandomAltFor(Route route);
     List<Route> getRoutesAsList();
     List<Route> putRoute(Route route, Route replacement) throws IOException, RouteAlreadyExistsException;
-    List<Route> deleteRoute(Route route) throws IOException;
+    List<Route> putRoutes(List<Route> routes) throws IOException, RouteAlreadyExistsException;
+    List<Route> deleteRoutes(List<Route> routes) throws IOException;
 }

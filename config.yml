@@ -23,7 +23,7 @@ routes:
   alt: terminator
   response: "{\"name\": \"terminator\"}"
   disabled: false
-- group: a test
+- group: a test service
   path: /api with spaces
   method: GET
   type: REST

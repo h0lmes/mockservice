@@ -41,13 +41,29 @@ export const actions = {
             commit('setLastError', err, {root: true});
         }
     },
-    async delete({commit, rootState}, route) {
+    async saveAllNew({commit, rootState}, routes) {
+        try {
+            const url = rootState.BASE_URL + '/web-api/routes';
+            const params = {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(routes)
+            };
+            const res = await fetch(url, params);
+            await handleError(res);
+            const data = await res.json();
+            commit('store', data);
+        } catch (err) {
+            commit('setLastError', err, {root: true});
+        }
+    },
+    async delete({commit, rootState}, routes) {
         try {
             const url = rootState.BASE_URL + '/web-api/routes';
             const params = {
                 method: 'DELETE',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(route)
+                body: JSON.stringify(routes)
             };
             const res = await fetch(url, params);
             await handleError(res);
