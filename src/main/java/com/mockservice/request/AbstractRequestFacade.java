@@ -134,6 +134,12 @@ public abstract class AbstractRequestFacade implements RequestFacade {
         return body;
     }
 
+    Map<String, String> getBaseVariables() {
+        Map<String, String> vars = new HashMap<>();
+        vars.put("REQUEST_BASE_PATH", getBasePath());
+        return vars;
+    }
+
     Map<String, String> getPathVariables() {
         return pathVariables;
     }

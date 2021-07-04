@@ -8,13 +8,12 @@ import java.util.Map;
 
 public interface MockResponse {
     MockResponse setVariables(@Nullable Map<String, String> variables);
-    MockResponse setHost(String host);
     String getResponseBody();
     int getResponseCode();
     HttpHeaders getResponseHeaders();
     boolean hasRequest();
     HttpMethod getRequestMethod();
-    String getRequestRelativeReference();
+    String getRequestUrl();
     HttpHeaders getRequestHeaders();
     String getRequestBody();
 }

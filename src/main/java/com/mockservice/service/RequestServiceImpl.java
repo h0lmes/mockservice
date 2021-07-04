@@ -45,7 +45,7 @@ public class RequestServiceImpl implements RequestService {
 
     private void sendRequest(MockResponse mockResponse) {
         try {
-            String url = mockResponse.getRequestRelativeReference();
+            String url = mockResponse.getRequestUrl();
             InetSocketAddress host = mockResponse.getRequestHeaders().getHost();
             if (host != null && url.startsWith("/")) {
                 url = host.toString() + url;

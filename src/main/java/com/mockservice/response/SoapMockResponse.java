@@ -11,7 +11,6 @@ import java.util.Map;
 public class SoapMockResponse implements MockResponse {
 
     private Map<String, String> variables;
-    private String host = "";
     private final HttpHeaders headers = new HttpHeaders();
     private final StringTemplate body;
 
@@ -24,12 +23,6 @@ public class SoapMockResponse implements MockResponse {
     @Override
     public MockResponse setVariables(@Nullable Map<String, String> variables) {
         this.variables = variables;
-        return this;
-    }
-
-    @Override
-    public MockResponse setHost(String host) {
-        this.host = host;
         return this;
     }
 
@@ -59,7 +52,7 @@ public class SoapMockResponse implements MockResponse {
     }
 
     @Override
-    public String getRequestRelativeReference() {
+    public String getRequestUrl() {
         return null;
     }
 

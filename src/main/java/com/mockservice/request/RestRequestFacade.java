@@ -19,7 +19,7 @@ public class RestRequestFacade extends AbstractRequestFacade {
 
     @Override
     public Map<String, String> getVariables() {
-        Map<String, String> vars = new HashMap<>();
+        Map<String, String> vars = getBaseVariables();
         vars.putAll(getBodyAsVariables());
         vars.putAll(getPathVariables());
         vars.putAll(getRequestParams());

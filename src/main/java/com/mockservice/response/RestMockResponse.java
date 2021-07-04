@@ -9,7 +9,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,19 +21,19 @@ public class RestMockResponse implements MockResponse {
     private static final int HTTP_HEADER_DELIMITER_LEN = HTTP_HEADER_DELIMITER.length();
 
     private Map<String, String> variables;
-    private String host = "";
     private int responseCode = 200;
     private final HttpHeaders responseHeaders = new HttpHeaders();
     private final StringTemplate responseBody;
     private boolean containsRequest = false;
     private HttpMethod requestMethod = HttpMethod.GET;
-    private String requestRelativeReference = "";
+    private final StringTemplate requestUrl;
     private final HttpHeaders requestHeaders = new HttpHeaders();
     private final StringTemplate requestBody;
 
     public RestMockResponse(TemplateEngine engine, String resource) {
         responseBody = new StringTemplate(engine);
         requestBody = new StringTemplate(engine);
+        requestUrl = new StringTemplate(engine);
         responseHeaders.add(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8");
         requestHeaders.add(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8");
         read(resource);
@@ -42,8 +41,6 @@ public class RestMockResponse implements MockResponse {
 
     private void read(String resource) {
         List<String> lines = IOUtil.toList(resource);
-        List<String> responsePayload = new ArrayList<>();
-        List<String> requestPayload = new ArrayList<>();
         boolean readingRequest = false;
         boolean readingHead = false;
 
@@ -59,22 +56,17 @@ public class RestMockResponse implements MockResponse {
             } else if (readingHead && line.trim().isEmpty()) {
                 readingHead = false;
             } else if (!readingRequest && readingHead) {
-                addResponseHeader(line);
+                addHeader(line, responseHeaders);
             } else if (readingRequest && readingHead) {
-                addRequestHeader(line);
-            } else if (!readingRequest) {
-                if (!line.isEmpty()) {
-                    responsePayload.add(line);
-                }
-            } else {
-                if (!line.isEmpty()) {
-                    requestPayload.add(line);
+                addHeader(line, requestHeaders);
+            } else if (!line.isEmpty()) {
+                if (readingRequest) {
+                    requestBody.add(line);
+                } else {
+                    responseBody.add(line);
                 }
             }
         }
-
-        responsePayload.forEach(responseBody::add);
-        requestPayload.forEach(requestBody::add);
     }
 
     private boolean isResponseStart(String line) {
@@ -96,39 +88,26 @@ public class RestMockResponse implements MockResponse {
 
     private void setRequest(String line) {
         try {
-            String methodAndRef = line.substring(0, line.indexOf(HTTP_1_1)).trim();
-            String methodStr = methodAndRef.substring(0, methodAndRef.indexOf(' '));
-            requestRelativeReference = methodAndRef.substring(methodAndRef.indexOf(' ')).trim();
+            String methodAndUrl = line.substring(0, line.indexOf(HTTP_1_1)).trim();
+            String methodStr = methodAndUrl.substring(0, methodAndUrl.indexOf(' '));
+            requestUrl.add(methodAndUrl.substring(methodAndUrl.indexOf(' ')).trim());
             requestMethod = HttpMethod.valueOf(methodStr);
             containsRequest = true;
         } catch (Exception e) {
-            log.warn("Invalid request starting line: {}", line);
+            log.warn("Invalid request first line: {}", line);
         }
     }
 
-    private void addResponseHeader(String line) {
+    private void addHeader(String line, HttpHeaders toHeaders) {
         int delimiter = line.indexOf(HTTP_HEADER_DELIMITER);
         String key = line.substring(0, delimiter);
         String value = line.substring(delimiter + HTTP_HEADER_DELIMITER_LEN).trim();
-        responseHeaders.add(key, value);
-    }
-
-    private void addRequestHeader(String line) {
-        int delimiter = line.indexOf(HTTP_HEADER_DELIMITER);
-        String key = line.substring(0, delimiter);
-        String value = line.substring(delimiter + HTTP_HEADER_DELIMITER_LEN).trim();
-        requestHeaders.add(key, value);
+        toHeaders.add(key, value);
     }
 
     @Override
     public MockResponse setVariables(@Nullable Map<String, String> variables) {
         this.variables = variables;
-        return this;
-    }
-
-    @Override
-    public MockResponse setHost(String host) {
-        this.host = host;
         return this;
     }
 
@@ -158,8 +137,8 @@ public class RestMockResponse implements MockResponse {
     }
 
     @Override
-    public String getRequestRelativeReference() {
-        return requestRelativeReference;
+    public String getRequestUrl() {
+        return requestUrl.toString(variables);
     }
 
     @Override

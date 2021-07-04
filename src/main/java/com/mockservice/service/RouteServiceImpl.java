@@ -31,7 +31,9 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public Optional<String> getRandomAltFor(Route route) {
-        Predicate<Route> condition = r -> route.getMethod().equals(r.getMethod()) && route.getPath().equals(r.getPath());
+        Predicate<Route> condition = r -> route.getMethod().equals(r.getMethod())
+                && route.getPath().equals(r.getPath())
+                && !r.getDisabled();
         List<String> alts = configRepository.findAllRoutes().stream()
                 .filter(condition)
                 .map(Route::getAlt)

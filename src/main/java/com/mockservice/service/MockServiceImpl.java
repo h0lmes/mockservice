@@ -73,7 +73,7 @@ public class MockServiceImpl implements MockService {
     public ResponseEntity<String> mock(RequestFacade request) {
         Route route = getRoute(request);
         MockResponse response = responseCache.get(route);
-        response.setVariables(request.getVariables()).setHost(request.getBasePath());
+        response.setVariables(request.getVariables());
         String body = response.getResponseBody();
         int statusCode = response.getResponseCode();
 
@@ -104,8 +104,7 @@ public class MockServiceImpl implements MockService {
                 .setPath(requestFacade.getEndpoint());
 
         boolean random = configRepository.getSettings().getRandomAlt() || configRepository.getSettings().getQuantum();
-        String alt = requestFacade
-                .getAlt()
+        String alt = requestFacade.getAlt()
                 .or(() -> random ? routeService.getRandomAltFor(route) : Optional.empty())
                 .or(() -> activeScenariosService.getAltFor(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
                 .orElse("");

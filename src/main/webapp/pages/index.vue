@@ -10,7 +10,7 @@
             </div>
             <button type="button" class="toolbar-item-fixed btn" @click="setFilter('')">Clear filter</button>
             <button type="button" class="toolbar-item-fixed btn" @click="addRoute">Add route</button>
-            <button type="button" class="toolbar-item-fixed btn" @click="deleteVisibleRoutes">Delete visible routes</button>
+            <button type="button" class="toolbar-item-fixed btn btn-danger" @click="deleteVisibleRoutes">Delete visible routes</button>
             <ViewSelector class="toolbar-item-fixed"></ViewSelector>
         </div>
 
