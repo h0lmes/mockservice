@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.Objects;
 
-public class Route implements Comparable<Route> {
+public class Route implements Comparable<Route>, Cloneable {
 
     private String group = "";
     private String path = "";
@@ -86,7 +86,7 @@ public class Route implements Comparable<Route> {
         return this;
     }
 
-    public void assignFrom(Route source) {
+    public Route assignFrom(Route source) {
         setGroup(source.getGroup());
         setPath(source.getPath());
         setMethod(source.getMethod());
@@ -94,6 +94,7 @@ public class Route implements Comparable<Route> {
         setAlt(source.getAlt());
         setResponse(source.getResponse());
         setDisabled(source.getDisabled());
+        return this;
     }
 
     @Override
@@ -128,5 +129,10 @@ public class Route implements Comparable<Route> {
         if (c != 0) return c;
         c = this.alt.compareTo(o.getAlt());
         return c;
+    }
+
+    @Override
+    public Route clone() {
+        return new Route().assignFrom(this);
     }
 }
