@@ -1,10 +1,11 @@
 ### Mock Service
 
-An easy to use service to mock REST and SOAP services.
-Suitable for integration testing and similar purposes.
+An easy to use service to mock REST and SOAP endpoints.
+Suitable for integration/e2e testing.
+Supports importing routes from OpenAPI3/Swagger2 YAML files.
 
-> Important: SOAP support is very simplistic and limited.
-It requires you to provide valid SOAP envelope as a response.
+> Note: SOAP support is very simplistic and limited.
+It requires you to provide a valid SOAP envelope as a response.
 There is NO support for WSDL/XSD.
 
 #
@@ -24,16 +25,21 @@ Response can contain:
 > See HTTP request and response formats here
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages
 
-**RESPONSE**: Parser looks for `HTTP/1.1` at the beginning of a line
+**RESPONSE**
+
+Parser looks for `HTTP/1.1` at the beginning of a line
 to start reading response.
+  
 Then an empty line should go indicating head ended
 (head is optional for response part).
-Then goes the body if not blank.
+Then goes the body if any.
+> Anything that goes before head start
+(before `HTTP/1.1`, or if head is not there at all)
+is considered a response body as well.
 
-Anything that goes before head start (`HTTP/1.1`)
-is considered a response body.
+**REQUEST** (optional)
 
-**REQUEST** (optional): Parser looks for `HTTP/1.1` at the end of a line
+Parser looks for `HTTP/1.1` at the end of a line
 to start reading request.
 Then headers may go.
 Then an empty line should go indicating head ended
@@ -43,18 +49,18 @@ Then goes the body if not blank.
 If request is present it would be executed asynchronously
 after the response was sent.
 
-Simple response (only body):
+**RESPONSE EXAMPLE** (body only)
 
     {"id": 1, name": "Johnny 5"}
 
-Response with head:
+**RESPONSE EXAMPLE** (with head)
 
     HTTP/1.1 400
     Cache-Control: no-cache
         
     {"code": "E000394", "message": "Internal error"}
 
-Response with head + request:
+**RESPONSE EXAMPLE** (head + body + request head + request body)
 
     HTTP/1.1 202
     
@@ -62,6 +68,7 @@ Response with head + request:
         "status": "PROCESSING",
         "id": "${item_id}"
     }
+    
     POST /store/cart/item/${item_id} HTTP/1.1
     Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5...
     
@@ -75,8 +82,11 @@ Response with head + request:
 
 Alt allow you to create alternative responses for the same path.
 
-To select a particular alt send **Mock-Alt** header in HTTP request
-or you may enable **Random Alt** in **Settings** (or even **Go Quantum** ;).
+To select an Alt:
+- send **Mock-Alt** header in HTTP request
+- enable **Random Alt** in **Settings**
+- or even **Go Quantum** 😄
+- or use **Scenarios**.
 
 Multiple **Mock-Alt** headers supported per HTTP request.
 Each header should define exactly one alternative.
