@@ -1,61 +1,69 @@
 package com.mockservice.service;
 
-import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
 import com.mockservice.util.JsonUtil;
-import org.springframework.context.annotation.Primary;
+import io.swagger.parser.OpenAPIParser;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.parser.core.models.ParseOptions;
+import io.swagger.v3.parser.core.models.SwaggerParseResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @SuppressWarnings("unchecked")
 @Service
-@Primary
 public class OpenApiServiceImpl implements OpenApiService {
 
+    private static final Logger log = LoggerFactory.getLogger(OpenApiServiceImpl.class);
+
     private static final String URL_PARTS_REGEX = "(https?:\\/\\/)?(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\b(\\/.*)";
-    private final ObjectReader yamlReader;
+    private final ObjectWriter jsonWriter;
 
     public OpenApiServiceImpl(YamlMapperService yamlMapperService) {
-        this.yamlReader = yamlMapperService.reader();
+        jsonWriter = yamlMapperService.jsonWriter();
     }
 
     @Override
-    public List<Route> routesFromYaml(String yaml) throws IOException {
+    public List<Route> routesFromYaml(String yaml) {
         if (yaml == null || yaml.isEmpty()) {
             return new ArrayList<>();
         }
-        Map<String, Object> map = yamlReader.readValue(yaml, Map.class);
 
-        Set<String> paths;
-        if (isOpenApi3Map(map)) {
-            paths = serversFromMap(map);
-        } else if (isSwagger2Map(map)) {
-            paths = basePathFromMap(map);
-        } else {
-            throw new UnsupportedOperationException("Unsupported input format. Expected OpenAPI 3 or Swagger 2.");
+        ParseOptions parseOptions = new ParseOptions();
+        parseOptions.setResolve(true);
+        parseOptions.setResolveFully(true);
+        SwaggerParseResult result = new OpenAPIParser().readContents(yaml, null, parseOptions);
+        if (result.getMessages() != null) {
+            result.getMessages().forEach(log::warn);
+        }
+        OpenAPI openApi = result.getOpenAPI();
+        if (openApi == null) {
+            return new ArrayList<>();
         }
 
-        List<Route> routes = routesFromMap(map);
+        List<Route> routes = routesFromOpenApi(openApi);
+        Set<String> paths = serversFromOpenApi(openApi);
         if (paths.isEmpty()) {
             return routes;
         }
         return multiply(routes, paths);
-    }
-
-    private boolean isOpenApi3Map(Map<String, Object> map) {
-        Object o = map.get("openapi");
-        return (o instanceof String) && o.toString().startsWith("3");
-    }
-
-    private boolean isSwagger2Map(Map<String, Object> map) {
-        Object o = map.get("swagger");
-        return (o instanceof String) && o.toString().startsWith("2");
     }
 
     private List<Route> multiply(List<Route> routes, Set<String> paths) {
@@ -69,13 +77,13 @@ public class OpenApiServiceImpl implements OpenApiService {
         return result;
     }
 
-    private Set<String> serversFromMap(Map<String, Object> map) {
+    private Set<String> serversFromOpenApi(OpenAPI openApi) {
         Set<String> paths = new HashSet<>();
-        Object servers = map.get("servers");
-        if (servers instanceof List) {
+        List<Server> servers = openApi.getServers();
+        if (servers != null) {
             Pattern pattern = Pattern.compile(URL_PARTS_REGEX, Pattern.CASE_INSENSITIVE + Pattern.UNICODE_CASE);
-            for (Map<String, String> server : (List<Map<String, String>>) servers) {
-                Matcher matcher = pattern.matcher(server.get("url"));
+            for (Server server : servers) {
+                Matcher matcher = pattern.matcher(server.getUrl());
                 if (matcher.find() && matcher.groupCount() >= 3) {
                     paths.add(matcher.group(3));
                 }
@@ -84,50 +92,39 @@ public class OpenApiServiceImpl implements OpenApiService {
         return paths;
     }
 
-    private Set<String> basePathFromMap(Map<String, Object> map) {
-        Set<String> paths = new HashSet<>();
-        Object basePath = map.get("basePath");
-        if (basePath instanceof String) {
-            paths.add(basePath.toString());
-        }
-        return paths;
-    }
-
-    private List<Route> routesFromMap(Map<String, Object> map) {
-        Object paths = map.get("paths");
-
+    private List<Route> routesFromOpenApi(OpenAPI openApi) {
         List<Route> routes = new ArrayList<>();
-        if (paths instanceof Map) {
-            for (Map.Entry<String, Object> e : ((Map<String, Object>) paths).entrySet()) {
-                routesFromPath(routes, e.getKey(), e.getValue(), map);
+        Paths paths = openApi.getPaths();
+        if (paths != null) {
+            for (Map.Entry<String, PathItem> e : paths.entrySet()) {
+                routesFromPath(routes, e.getKey(), e.getValue(), openApi);
             }
         }
         return routes;
     }
 
-    private void routesFromPath(List<Route> routes, String path, Object methods, Map<String, Object> map) {
-        if (methods instanceof Map) {
-            for (Map.Entry<String, Object> e : ((Map<String, Object>) methods).entrySet()) {
-                String method = e.getKey();
-                routesFromMethod(routes, path, method, e.getValue(), map);
-            }
+    private void routesFromPath(List<Route> routes, String path, PathItem pathItem, OpenAPI openApi) {
+        routesFromOperation(routes, path, "GET", pathItem.getGet(), openApi);
+        routesFromOperation(routes, path, "POST", pathItem.getPost(), openApi);
+        routesFromOperation(routes, path, "PUT", pathItem.getPut(), openApi);
+        routesFromOperation(routes, path, "DELETE", pathItem.getDelete(), openApi);
+        routesFromOperation(routes, path, "PATCH", pathItem.getPatch(), openApi);
+    }
+
+    private void routesFromOperation(List<Route> routes, String path, String method, Operation operation, OpenAPI openApi) {
+        if (operation != null) {
+            String group = tagsFromOperation(operation);
+            routesFromResponses(routes, group, path, method, operation, openApi);
         }
     }
 
-    private void routesFromMethod(List<Route> routes, String path, String method, Object methodDefinition, Map<String, Object> map) {
-        if (methodDefinition instanceof Map) {
-            String group = tagsFromMethodDefinition((Map<String, Object>) methodDefinition);
-            routesFromResponses(routes, group, path, method, (Map<String, Object>) methodDefinition, map);
-        }
-    }
-
-    private String tagsFromMethodDefinition(Map<String, Object> methodDefinition) {
+    private String tagsFromOperation(Operation operation) {
         String group = "";
-        Object tags = methodDefinition.get("tags");
-        if (tags instanceof List) {
+        List<String> tags = operation.getTags();
+        if (tags != null) {
             String separator = "";
-            for (Object tag : (List) tags) {
-                group += separator + tag.toString(); // not using builder since in most cases there will be 0 or 1 tag
+            for (String tag : tags) {
+                group += separator + tag; // not using builder since in most cases there will be 0 or 1 tag
                 separator = ", ";
             }
         }
@@ -138,21 +135,20 @@ public class OpenApiServiceImpl implements OpenApiService {
                                      String group,
                                      String path,
                                      String method,
-                                     Map<String, Object> methodDefinition,
-                                     Map<String, Object> map) {
-        Object responses = methodDefinition.get("responses");
-        if (responses instanceof Map) {
-            for (Map.Entry<String, Object> e : ((Map<String, Object>) responses).entrySet()) {
+                                     Operation operation,
+                                     OpenAPI openApi) {
+        ApiResponses responses = operation.getResponses();
+        if (responses != null) {
+            for (Map.Entry<String, ApiResponse> e : responses.entrySet()) {
                 String responseCode = e.getKey();
                 if ("200".equals(responseCode) || "default".equals(responseCode)) {
                     responseCode = "";
                 }
 
+                Content content = e.getValue().getContent();
                 String example = "";
-                Object response = e.getValue();
-                if (response instanceof Map) {
-                    Object schema = ((Map<String, Object>) response).get("schema");
-                    example = exampleFromSchema(schema, map);
+                if (content != null) {
+                    example = exampleFromSchema(content);
                 }
 
                 routes.add(new Route()
@@ -168,11 +164,24 @@ public class OpenApiServiceImpl implements OpenApiService {
         }
     }
 
-    private String exampleFromSchema(Object schema, Map<String, Object> map) {
-        if (schema instanceof Map) {
-            Object example = ((Map<String, Object>) schema).get("example");
-            if (example != null) {
-                return JsonUtil.unescape(example.toString());
+    private String exampleFromSchema(Content content) {
+        if (content != null && !content.isEmpty()) {
+            MediaType mediaType = content.get("application/json");
+            if (mediaType == null) {
+                mediaType = content.get(content.keySet().iterator().next());
+            }
+            if (mediaType != null) {
+                Object example = mediaType.getExample();
+                if (example != null) {
+                    return JsonUtil.unescape(example.toString());
+                } else {
+                    Schema schema = mediaType.getSchema();
+                    try {
+                        return jsonWriter.writeValueAsString(schema);
+                    } catch (JsonProcessingException e) {
+                        return "";
+                    }
+                }
             }
         }
         return "";

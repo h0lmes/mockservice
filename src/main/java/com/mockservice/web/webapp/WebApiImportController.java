@@ -23,7 +23,7 @@ public class WebApiImportController {
         this.openApiService = openApiService;
     }
 
-    @PutMapping("/openapi3")
+    @PutMapping()
     public List<Route> routesFromOpenApiYaml(@RequestBody(required = false) String yaml) throws IOException {
         return openApiService.routesFromYaml(yaml);
     }

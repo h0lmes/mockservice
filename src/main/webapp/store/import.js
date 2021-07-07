@@ -11,9 +11,9 @@ export const mutations = {
 import {handleError} from "../js/common";
 
 export const actions = {
-    async openapi3({commit, dispatch, rootState}, param) {
+    async import({commit, dispatch, rootState}, param) {
         try {
-            const url = rootState.BASE_URL + '/web-api/import/openapi3';
+            const url = rootState.BASE_URL + '/web-api/import';
             const params = {
                 method: 'PUT',
                 headers: {'Content-Type': 'text/plain'},

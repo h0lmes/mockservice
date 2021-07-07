@@ -17,4 +17,6 @@ This will copy web app distro into Thymeleaf template folder `src/main/resources
 
 Then you may build/run Spring Boot application.
 It is set to run on port 8081, so you can run it along
-with your application under test (which usually uses port 8080).
+with your application under test which usually runs on 8080.
+
+If you wish you can use Nuxt application separately, not leveraging Thymeleaf.

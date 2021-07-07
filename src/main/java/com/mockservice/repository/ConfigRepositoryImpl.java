@@ -36,8 +36,8 @@ public class ConfigRepositoryImpl implements ConfigRepository {
                                 YamlMapperService yamlMapperService) {
         this.fileConfigPath = fileConfigPath;
         this.fileConfigBackupPath = fileConfigBackupPath;
-        this.yamlReader = yamlMapperService.reader();
-        this.yamlWriter = yamlMapperService.writer();
+        this.yamlReader = yamlMapperService.yamlReader();
+        this.yamlWriter = yamlMapperService.yamlWriter();
 
         try {
             readConfigFromFile();
