@@ -1,7 +1,6 @@
 package com.mockservice.web.webapp;
 
 import com.mockservice.domain.Route;
-import com.mockservice.domain.RouteAlreadyExistsException;
 import com.mockservice.service.RouteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,30 +28,24 @@ public class WebApiRoutesController {
         return routeService.getRoutesAsList();
     }
 
+    @PatchMapping
+    public List<Route> patchRoute(@RequestBody Route route) throws IOException {
+        return routeService.putRoute(route);
+    }
+
     @PutMapping
-    public List<Route> putRoute(@RequestBody List<Route> routes) throws IOException, RouteAlreadyExistsException {
-        if (routes.size() != 2) {
-            throw new IllegalArgumentException("There must be exactly 2 routes, the old and the new one.");
-        }
-        return routeService.putRoute(routes.get(0), routes.get(1));
+    public List<Route> putRoutes(@RequestBody List<Route> routes) throws IOException {
+        return routeService.putRoutes(routes, true);
     }
 
     @PostMapping
-    public List<Route> postRoutes(@RequestBody List<Route> routes) throws IOException, RouteAlreadyExistsException {
-        return routeService.putRoutes(routes);
+    public List<Route> postRoutes(@RequestBody List<Route> routes) throws IOException {
+        return routeService.putRoutes(routes, false);
     }
 
     @DeleteMapping
     public List<Route> deleteRoutes(@RequestBody List<Route> routes) throws IOException {
         return routeService.deleteRoutes(routes);
-    }
-
-    @ExceptionHandler
-    protected ResponseEntity<ErrorInfo> handleRouteAlreadyExistsException(RouteAlreadyExistsException e) {
-        log.warn(e.getMessage());
-        return ResponseEntity
-                .badRequest()
-                .body(new ErrorInfo(e));
     }
 
     @ExceptionHandler

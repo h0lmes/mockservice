@@ -25,13 +25,13 @@ export const actions = {
             commit('setLastError', err, {root: true});
         }
     },
-    async save({commit, rootState}, routes) {
+    async save({commit, rootState}, route) {
         try {
             const url = rootState.BASE_URL + '/web-api/routes';
             const params = {
-                method: 'PUT',
+                method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(routes)
+                body: JSON.stringify(route)
             };
             const res = await fetch(url, params);
             await handleError(res);
@@ -41,11 +41,12 @@ export const actions = {
             commit('setLastError', err, {root: true});
         }
     },
-    async saveAllNew({commit, rootState}, routes) {
+    async saveAll({commit, rootState}, routes, overwrite) {
         try {
             const url = rootState.BASE_URL + '/web-api/routes';
+            const method = overwrite ? 'PUT' : 'POST';
             const params = {
-                method: 'POST',
+                method,
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(routes)
             };

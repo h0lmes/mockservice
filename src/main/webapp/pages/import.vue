@@ -2,10 +2,14 @@
     <div class="monospace">
         <input type="file" ref="file_file" id="file_file" @change="openFile()"/>
         <div class="component-toolbar mb-4">
-            <button type="button" class="btn btn-default" @click="$refs.file_file.click()">IMPORT OPENAPI FILE</button>
-            <button type="button" class="btn btn-default" @click="saveNewRoutes(routes)">ADD ALL ROUTES</button>
+            <button type="button" class="btn btn-primary" @click="$refs.file_file.click()">IMPORT OPENAPI FILE</button>
+            <button type="button" class="btn btn-default" @click="addAll()">ADD ALL ROUTES</button>
         </div>
-        <ImportedRoutes class="smaller" :routes="routes" @add="add($event)"></ImportedRoutes>
+        <ImportedRoutes class="smaller"
+                        :imported-routes="importedRoutes"
+                        :existing-routes="existingRoutes"
+                        @add="add($event)"
+        ></ImportedRoutes>
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
 </template>
@@ -24,8 +28,11 @@
             }
         },
         computed: {
-            routes() {
+            importedRoutes() {
                 return this.$store.state.import.routes;
+            },
+            existingRoutes() {
+                return this.$store.state.routes.routes;
             },
         },
         async fetch() {
@@ -38,12 +45,17 @@
         methods: {
             ...mapActions({
                 import: 'import/import',
+                fetchRoutes: 'routes/fetch',
                 saveRoute: 'routes/save',
-                saveNewRoutes: 'routes/saveAllNew',
+                saveAllRoutes: 'routes/saveAll',
             }),
             add(route) {
                 this.$nuxt.$loading.start();
-                this.saveRoute([{}, route]).then(() => this.$nuxt.$loading.finish());
+                this.saveRoute(route).then(() => this.$nuxt.$loading.finish());
+            },
+            addAll() {
+                this.$nuxt.$loading.start();
+                this.saveAllRoutes(routes, true).then(() => this.$nuxt.$loading.finish());
             },
             openFile() {
                 const files = this.$refs.file_file.files;
@@ -63,10 +75,6 @@
     }
 </script>
 <style scoped>
-    .min-height {
-        min-height: 2rem;
-    }
-
     input[type=file] {
         width: 0.1px;
         height: 0.1px;

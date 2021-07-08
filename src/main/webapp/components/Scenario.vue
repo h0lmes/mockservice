@@ -156,11 +156,6 @@
             },
             toggleRoutes() {
                 this.addRoute = !this.addRoute;
-                if (this.addRoute && (!this.routes || this.routes.length === 0)) {
-                    this.$nuxt.$loading.start();
-                    this.fetchRoutes()
-                        .then(() => this.$nuxt.$loading.finish());
-                }
             },
         }
     }

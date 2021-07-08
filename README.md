@@ -17,9 +17,9 @@ Refer to README in `src/main/webapp` for instructions on how to build web applic
 ### Route Response
 
 Response can contain:
-- HTTP 1.1 response in textual format with or without HTTP head
+- response in textual format with or without HTTP head
 (JSON or XML body)
-- HTTP 1.1 request in textual format **with** HTTP head
+- request in textual format **with** HTTP head
 (JSON or XML body)
 
 > See HTTP request and response formats here
@@ -82,6 +82,10 @@ after the response was sent.
 
 Alt allow you to create alternative responses for the same path.
 
+If an Alt is a numeric HTTP status code (e.g. 400)
+and no response status code specified in RESPONSE BODY
+then Alt would be used as a response status code.
+
 To select an Alt:
 - send **Mock-Alt** header in HTTP request
 - enable **Random Alt** in **Settings**
@@ -90,6 +94,7 @@ To select an Alt:
 
 Multiple **Mock-Alt** headers supported per HTTP request.
 Each header should define exactly one alternative.
+The first header whose path equals route path would be used.
 
 Header format:
 

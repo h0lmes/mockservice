@@ -1,7 +1,6 @@
 package com.mockservice.service;
 
 import com.mockservice.domain.Route;
-import com.mockservice.domain.RouteAlreadyExistsException;
 
 import java.io.IOException;
 import java.util.List;
@@ -11,7 +10,7 @@ public interface RouteService {
     Optional<Route> getEnabledRoute(Route route);
     Optional<String> getRandomAltFor(Route route);
     List<Route> getRoutesAsList();
-    List<Route> putRoute(Route route, Route replacement) throws IOException, RouteAlreadyExistsException;
-    List<Route> putRoutes(List<Route> routes) throws IOException, RouteAlreadyExistsException;
+    List<Route> putRoute(Route route) throws IOException;
+    List<Route> putRoutes(List<Route> routes, boolean overwrite) throws IOException;
     List<Route> deleteRoutes(List<Route> routes) throws IOException;
 }

@@ -68,7 +68,7 @@
             },
             deleteVisibleRoutes() {
                 if (confirm('Are you sure you want to delete all visible routes?\n'
-                    + 'Note: if filtered you only delete those you see on screen.')) {
+                    + 'Note: if filtered you only delete those you see on the screen.')) {
                     this.$nuxt.$loading.start();
                     this.deleteRoutes(this.filtered)
                         .then(() => this.$nuxt.$loading.finish());

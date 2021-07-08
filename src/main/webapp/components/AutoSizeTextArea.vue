@@ -17,7 +17,7 @@
         props: {
             value: {type: String},
             placeholder: {type: String},
-            minRows: {type: Number, default: 3},
+            minRows: {type: Number, default: 2},
             maxRows: {type: Number, default: 20},
         },
         computed: {

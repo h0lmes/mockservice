@@ -123,7 +123,7 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     @Override
     public Optional<String> getAlt() {
         for (String[] parts : mockAltHeaders) {
-            if (parts.length > 1 && encodedEndpoint.equals(parts[0])) {
+            if (parts.length > 1 && encodedEndpoint.equalsIgnoreCase(parts[0])) {
                 return Optional.of(parts[1]);
             }
         }
@@ -151,7 +151,7 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     Map<String, String> getHeaderVariables() {
         Map<String, String> result = new HashMap<>();
         mockVarHeaders.forEach(parts -> {
-            if (parts.length > 2 && encodedEndpoint.equals(parts[0])) {
+            if (parts.length > 2 && encodedEndpoint.equalsIgnoreCase(parts[0])) {
                 result.put(parts[1], parts[2]);
             }
         });

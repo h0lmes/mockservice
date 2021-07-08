@@ -44,8 +44,8 @@ public class MockServiceImpl implements MockService {
         this.activeScenariosService = activeScenariosService;
         this.configRepository = configRepository;
         this.quantumTheory = quantumTheory;
-        responseCache = new ConcurrentLruCache<>(cacheSizeLimit, this::getResponse);
         this.requestService = requestService;
+        responseCache = new ConcurrentLruCache<>(cacheSizeLimit, this::getResponse);
     }
 
     private MockResponse getResponse(Route route) {
@@ -75,7 +75,18 @@ public class MockServiceImpl implements MockService {
         MockResponse response = responseCache.get(route);
         response.setVariables(request.getVariables());
         String body = response.getResponseBody();
+
         int statusCode = response.getResponseCode();
+        if (statusCode == 200 && route.getAlt().length() == 3) {
+            try {
+                int code = Integer.parseInt(route.getAlt());
+                if (code >= 200 && code <= 599) {
+                    statusCode = code;
+                }
+            } catch (Exception e) {
+                // ignore
+            }
+        }
 
         if (configRepository.getSettings().getQuantum()) {
             if (RouteType.REST.equals(route.getType())) {

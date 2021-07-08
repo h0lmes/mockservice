@@ -62,7 +62,6 @@
 
         <div v-show="editing" class="mock-col w100">
             <button type="button" class="btn btn-sm btn-primary" @click="save">SAVE</button>
-            <button type="button" class="btn btn-sm btn-default" @click="saveAsCopy">SAVE AS COPY</button>
             <button type="button" class="btn btn-sm btn-default" @click="cancel">CANCEL</button>
         </div>
 
@@ -132,14 +131,7 @@
             save() {
                 this.editing = false;
                 this.$nuxt.$loading.start();
-                this.saveRoute([{...this.route, response: ''}, this.editingRoute])
-                    .then(() => this.$nuxt.$loading.finish());
-            },
-            saveAsCopy() {
-                this.editing = false;
-                this.$nuxt.$loading.start();
-                this.saveRoute([{}, this.editingRoute])
-                    .then(() => this.$nuxt.$loading.finish());
+                this.saveRoute(this.editingRoute).then(() => this.$nuxt.$loading.finish());
             },
         }
     }

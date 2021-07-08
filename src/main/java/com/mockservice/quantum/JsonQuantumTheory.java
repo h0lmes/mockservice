@@ -18,22 +18,18 @@ public class JsonQuantumTheory implements QuantumTheory {
     }
 
     @Override
-    public String apply(String data) {
+    public String apply(String input) {
         if (RandomUtil.withChance(20)) {
-            return randomJson();
+            return JsonGenerator.generate();
         }
         if (RandomUtil.withChance(10)) {
             return "";
         }
         if (RandomUtil.withChance(40)) {
-            return data;
+            return input;
         }
 
-        return randomizeJsonValues(data); // 43,2% chance
-    }
-
-    private String randomJson() {
-        return JsonGenerator.generate();
+        return randomizeJsonValues(input); // 43,2% chance
     }
 
     private String randomizeJsonValues(String data) {

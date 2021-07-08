@@ -1,7 +1,6 @@
 package com.mockservice.service;
 
 import com.mockservice.domain.Route;
-import com.mockservice.domain.RouteAlreadyExistsException;
 import com.mockservice.repository.ConfigRepository;
 import org.springframework.stereotype.Service;
 
@@ -54,14 +53,14 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
-    public synchronized List<Route> putRoute(Route route, Route replacement) throws IOException, RouteAlreadyExistsException {
-        configRepository.putRoute(route, replacement);
+    public synchronized List<Route> putRoute(Route route) throws IOException {
+        configRepository.putRoute(route);
         return getRoutesAsList();
     }
 
     @Override
-    public synchronized List<Route> putRoutes(List<Route> routes) throws IOException, RouteAlreadyExistsException {
-        configRepository.putRoutes(routes);
+    public synchronized List<Route> putRoutes(List<Route> routes, boolean overwrite) throws IOException {
+        configRepository.putRoutes(routes, overwrite);
         return getRoutesAsList();
     }
 

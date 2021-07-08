@@ -1,7 +1,10 @@
 package com.mockservice.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mockservice.domain.*;
+import com.mockservice.domain.Route;
+import com.mockservice.domain.Scenario;
+import com.mockservice.domain.ScenarioAlreadyExistsException;
+import com.mockservice.domain.Settings;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,8 +21,8 @@ public interface ConfigRepository {
 
     List<Route> findAllRoutes();
     Optional<Route> findRoute(Route route);
-    void putRoute(Route route, Route replacement) throws RouteAlreadyExistsException, IOException;
-    void putRoutes(List<Route> routes) throws RouteAlreadyExistsException, IOException;
+    void putRoute(Route route) throws IOException;
+    void putRoutes(List<Route> routes, boolean overwrite) throws IOException;
     void deleteRoutes(List<Route> routes) throws IOException;
 
     List<Scenario> findAllScenarios();

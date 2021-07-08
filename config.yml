@@ -42,7 +42,7 @@ routes:
   method: GET
   type: REST
   alt: 400
-  response: "HTTP/1.1 400\n\n[]"
+  response: "[]"
   disabled: false
 - group: entity service
   path: /api/v2/entity/filter
@@ -71,6 +71,20 @@ routes:
   type: SOAP
   alt: ""
   response: "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:web=\"http://www.dataaccess.com/webservicesserver/\">\n  <soapenv:Header/>\n  <soapenv:Body>\n    <web:NumberToDollarsResponse>\n      <web:NumberToDollarsResult>${enum:TEST1:TEST2}</web:NumberToDollarsResult>\n      <web:Result>${NumberToDollarsRequest.Value:DEFAULT_VALUE}</web:Result>\n    </web:NumberToDollarsResponse>\n  </soapenv:Body>\n</soapenv:Envelope>"
+  disabled: false
+- group: pet
+  path: /v2/pet/findByStatus
+  method: GET
+  type: REST
+  alt: ""
+  response: "{\r\n  \"type\" : \"array\",\r\n  \"exampleSetFlag\" : false,\r\n  \"items\" : {\r\n    \"required\" : [ \"name\", \"photoUrls\" ],\r\n    \"type\" : \"object\",\r\n    \"properties\" : {\r\n      \"id\" : {\r\n        \"type\" : \"integer\",\r\n        \"format\" : \"int64\",\r\n        \"exampleSetFlag\" : false\r\n      },\r\n      \"category\" : {\r\n        \"type\" : \"object\",\r\n        \"properties\" : {\r\n          \"id\" : {\r\n            \"type\" : \"integer\",\r\n            \"format\" : \"int64\",\r\n            \"exampleSetFlag\" : false\r\n          },\r\n          \"name\" : {\r\n            \"type\" : \"string\",\r\n            \"exampleSetFlag\" : false\r\n          }\r\n        },\r\n        \"xml\" : {\r\n          \"name\" : \"Category\"\r\n        },\r\n        \"exampleSetFlag\" : false\r\n      },\r\n      \"name\" : {\r\n        \"type\" : \"string\",\r\n        \"example\" : \"doggie\",\r\n        \"exampleSetFlag\" : true\r\n      },\r\n      \"photoUrls\" : {\r\n        \"type\" : \"array\",\r\n        \"xml\" : {\r\n          \"name\" : \"photoUrl\",\r\n          \"wrapped\" : true\r\n        },\r\n        \"exampleSetFlag\" : false,\r\n        \"items\" : {\r\n          \"type\" : \"string\",\r\n          \"exampleSetFlag\" : false\r\n        }\r\n      },\r\n      \"tags\" : {\r\n        \"type\" : \"array\",\r\n        \"xml\" : {\r\n          \"name\" : \"tag\",\r\n          \"wrapped\" : true\r\n        },\r\n        \"exampleSetFlag\" : false,\r\n        \"items\" : {\r\n          \"type\" : \"object\",\r\n          \"properties\" : {\r\n            \"id\" : {\r\n              \"type\" : \"integer\",\r\n              \"format\" : \"int64\",\r\n              \"exampleSetFlag\" : false\r\n            },\r\n            \"name\" : {\r\n              \"type\" : \"string\",\r\n              \"exampleSetFlag\" : false\r\n            }\r\n          },\r\n          \"xml\" : {\r\n            \"name\" : \"Tag\"\r\n          },\r\n          \"exampleSetFlag\" : false\r\n        }\r\n      },\r\n      \"status\" : {\r\n        \"type\" : \"string\",\r\n        \"description\" : \"pet status in the store\",\r\n        \"exampleSetFlag\" : false,\r\n        \"enum\" : [ \"available\", \"pending\", \"sold\" ]\r\n      }\r\n    },\r\n    \"xml\" : {\r\n      \"name\" : \"Pet\"\r\n    },\r\n    \"exampleSetFlag\" : false\r\n  }\r\n}"
+  disabled: false
+- group: pet
+  path: /v2/pet/findByStatus
+  method: GET
+  type: REST
+  alt: 400
+  response: ""
   disabled: false
 scenarios:
 - group: Default

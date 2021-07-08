@@ -2,7 +2,7 @@
     <div class="monospace">
 
         <div class="component-toolbar mb-5">
-            <button type="button" class="btn btn-default" @click="$fetch()">GENERATE</button>
+            <button type="button" class="btn btn-primary" @click="$fetch()">GENERATE</button>
             <button type="button" class="btn btn-default" @click="copyToClipboard(value)">
                 TO CLIPBOARD
                 <span v-show="copied">&#9989;</span>

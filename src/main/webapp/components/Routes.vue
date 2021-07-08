@@ -17,7 +17,9 @@
             return {}
         },
         components: {Route},
-        props: ["routes"],
+        props: {
+            routes: {type: Array},
+        },
         methods: {
             groupStart(route, index) {
                 return index === 0 || route.group !== this.routes[index - 1].group;

@@ -151,62 +151,61 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     @Override
-    public void putRoute(Route route, Route replacement) throws RouteAlreadyExistsException, IOException {
-        // do not allow duplicates
-        if (!route.equals(replacement)) {
-            Route maybeRoute = findRoute(replacement).orElse(null);
-            if (maybeRoute != null) {
-                throw new RouteAlreadyExistsException(replacement);
-            }
-        }
+    public void putRoute(Route route) throws IOException {
+        Route existingRoute = findRoute(route).orElse(null);
 
-        boolean updated = false;
-        Route maybeRoute = findRoute(route).orElse(null);
-        if (maybeRoute == null) {
-            config.getRoutes().add(replacement);
+        if (existingRoute == null) {
+            config.getRoutes().add(route);
+            notifyRouteCreated(route);
         } else {
-            maybeRoute.assignFrom(replacement);
-            updated = true;
+            notifyRouteDeleted(existingRoute);
+            existingRoute.assignFrom(route);
+            notifyRouteCreated(route);
         }
 
         config.getRoutes().sort(Route::compareTo);
-
-        if (updated) {
-            notifyRouteDeleted(route);
-        }
-        notifyRouteCreated(replacement);
         trySaveConfigToFile();
     }
 
     @Override
-    public void putRoutes(List<Route> routes) throws RouteAlreadyExistsException, IOException {
-        // do not allow duplicates
+    public void putRoutes(List<Route> routes, boolean overwrite) throws IOException {
+        boolean modified = false;
+
         for (Route route : routes) {
-            Route maybeRoute = findRoute(route).orElse(null);
-            if (maybeRoute != null) {
-                throw new RouteAlreadyExistsException(route);
+            Route existingRoute = findRoute(route).orElse(null);
+
+            if (existingRoute == null) {
+                config.getRoutes().add(route);
+                notifyRouteCreated(route);
+                modified = true;
+            } else {
+                if (overwrite) {
+                    notifyRouteDeleted(existingRoute);
+                    existingRoute.assignFrom(route);
+                    notifyRouteCreated(route);
+                    modified = true;
+                }
             }
         }
 
-        for (Route route : routes) {
-            config.getRoutes().add(route);
-            notifyRouteCreated(route);
+        if (modified) {
+            config.getRoutes().sort(Route::compareTo);
+            trySaveConfigToFile();
         }
-        config.getRoutes().sort(Route::compareTo);
-
-        trySaveConfigToFile();
     }
 
     @Override
     public void deleteRoutes(List<Route> routes) throws IOException {
-        boolean deleted = false;
+        boolean modified = false;
+
         for (Route route : routes) {
             if (config.getRoutes().remove(route)) {
-                deleted = true;
                 notifyRouteDeleted(route);
+                modified = true;
             }
         }
-        if (deleted) {
+
+        if (modified) {
             trySaveConfigToFile();
         }
     }

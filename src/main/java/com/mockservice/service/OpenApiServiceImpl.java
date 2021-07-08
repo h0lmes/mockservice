@@ -97,24 +97,24 @@ public class OpenApiServiceImpl implements OpenApiService {
         Paths paths = openApi.getPaths();
         if (paths != null) {
             for (Map.Entry<String, PathItem> e : paths.entrySet()) {
-                routesFromPath(routes, e.getKey(), e.getValue(), openApi);
+                routesFromPath(routes, e.getKey(), e.getValue());
             }
         }
         return routes;
     }
 
-    private void routesFromPath(List<Route> routes, String path, PathItem pathItem, OpenAPI openApi) {
-        routesFromOperation(routes, path, "GET", pathItem.getGet(), openApi);
-        routesFromOperation(routes, path, "POST", pathItem.getPost(), openApi);
-        routesFromOperation(routes, path, "PUT", pathItem.getPut(), openApi);
-        routesFromOperation(routes, path, "DELETE", pathItem.getDelete(), openApi);
-        routesFromOperation(routes, path, "PATCH", pathItem.getPatch(), openApi);
+    private void routesFromPath(List<Route> routes, String path, PathItem pathItem) {
+        routesFromOperation(routes, path, "GET", pathItem.getGet());
+        routesFromOperation(routes, path, "POST", pathItem.getPost());
+        routesFromOperation(routes, path, "PUT", pathItem.getPut());
+        routesFromOperation(routes, path, "DELETE", pathItem.getDelete());
+        routesFromOperation(routes, path, "PATCH", pathItem.getPatch());
     }
 
-    private void routesFromOperation(List<Route> routes, String path, String method, Operation operation, OpenAPI openApi) {
+    private void routesFromOperation(List<Route> routes, String path, String method, Operation operation) {
         if (operation != null) {
             String group = tagsFromOperation(operation);
-            routesFromResponses(routes, group, path, method, operation, openApi);
+            routesFromResponses(routes, group, path, method, operation);
         }
     }
 
@@ -135,8 +135,7 @@ public class OpenApiServiceImpl implements OpenApiService {
                                      String group,
                                      String path,
                                      String method,
-                                     Operation operation,
-                                     OpenAPI openApi) {
+                                     Operation operation) {
         ApiResponses responses = operation.getResponses();
         if (responses != null) {
             for (Map.Entry<String, ApiResponse> e : responses.entrySet()) {
