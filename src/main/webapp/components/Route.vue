@@ -61,6 +61,11 @@
         </div>
 
         <div v-show="editing" class="mock-col w100">
+            <div class="mock-col-header">RESPONSE SCHEMA</div>
+            <AutoSizeTextArea v-model="editingRoute.responseSchema"></AutoSizeTextArea>
+        </div>
+
+        <div v-show="editing" class="mock-col w100">
             <button type="button" class="btn btn-sm btn-primary" @click="save">SAVE</button>
             <button type="button" class="btn btn-sm btn-default" @click="cancel">CANCEL</button>
         </div>

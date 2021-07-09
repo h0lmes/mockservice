@@ -4,6 +4,7 @@
         <div class="component-toolbar mb-4">
             <button type="button" class="btn btn-primary" @click="$refs.file_file.click()">IMPORT OPENAPI FILE</button>
             <button type="button" class="btn btn-default" @click="addAll()">ADD ALL ROUTES</button>
+            <ToggleSwitch v-model="overwrite">Overwrite existing routes</ToggleSwitch>
         </div>
         <ImportedRoutes class="smaller"
                         :imported-routes="importedRoutes"
@@ -17,14 +18,16 @@
     import {mapActions} from 'vuex';
     import Loading from "../components/Loading";
     import AutoSizeTextArea from "../components/AutoSizeTextArea";
+    import ToggleSwitch from "../components/ToggleSwitch";
     import ImportedRoutes from "../components/ImportedRoutes";
 
     export default {
         name: "import",
-        components: {AutoSizeTextArea, Loading, ImportedRoutes},
+        components: {AutoSizeTextArea, Loading, ToggleSwitch, ImportedRoutes},
         data() {
             return {
                 value: '',
+                overwrite: false,
             }
         },
         computed: {
@@ -55,7 +58,7 @@
             },
             addAll() {
                 this.$nuxt.$loading.start();
-                this.saveAllRoutes(routes, true).then(() => this.$nuxt.$loading.finish());
+                this.saveAllRoutes(routes, this.overwrite).then(() => this.$nuxt.$loading.finish());
             },
             openFile() {
                 const files = this.$refs.file_file.files;

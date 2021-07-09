@@ -71,7 +71,7 @@ public class OpenApiServiceImpl implements OpenApiService {
         for (String basePath : paths) {
             for (Route route : routes) {
                 String path = basePath + route.getPath();
-                result.add(route.clone().setPath(path));
+                result.add(new Route(route).setPath(path));
             }
         }
         return result;
@@ -145,10 +145,6 @@ public class OpenApiServiceImpl implements OpenApiService {
                 }
 
                 Content content = e.getValue().getContent();
-                String example = "";
-                if (content != null) {
-                    example = exampleFromSchema(content);
-                }
 
                 routes.add(new Route()
                         .setDisabled(false)
@@ -157,13 +153,14 @@ public class OpenApiServiceImpl implements OpenApiService {
                         .setMethod(RequestMethod.valueOf(method.toUpperCase()))
                         .setGroup(group)
                         .setAlt(responseCode)
-                        .setResponse(example)
+                        .setResponse(exampleFromContent(content))
+                        .setResponseSchema(schemaFromContent(content))
                 );
             }
         }
     }
 
-    private String exampleFromSchema(Content content) {
+    private String exampleFromContent(Content content) {
         if (content != null && !content.isEmpty()) {
             MediaType mediaType = content.get("application/json");
             if (mediaType == null) {
@@ -173,13 +170,24 @@ public class OpenApiServiceImpl implements OpenApiService {
                 Object example = mediaType.getExample();
                 if (example != null) {
                     return JsonUtil.unescape(example.toString());
-                } else {
-                    Schema schema = mediaType.getSchema();
-                    try {
-                        return jsonWriter.writeValueAsString(schema);
-                    } catch (JsonProcessingException e) {
-                        return "";
-                    }
+                }
+            }
+        }
+        return "";
+    }
+
+    private String schemaFromContent(Content content) {
+        if (content != null && !content.isEmpty()) {
+            MediaType mediaType = content.get("application/json");
+            if (mediaType == null) {
+                mediaType = content.get(content.keySet().iterator().next());
+            }
+            if (mediaType != null) {
+                Schema schema = mediaType.getSchema();
+                try {
+                    return jsonWriter.writeValueAsString(schema);
+                } catch (JsonProcessingException e) {
+                    return "";
                 }
             }
         }
