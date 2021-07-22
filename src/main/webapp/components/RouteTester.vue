@@ -72,10 +72,6 @@
                     const elapsed = new Date() - startTime;
                     this.println('----- response in ' + elapsed + ' ms with status ' + response.status + ' -----');
                     this.println(body);
-                    this.println('----- headers -----');
-                    for (let header of response.headers) {
-                        this.println(this.headerToString(header));
-                    }
                 } catch (err) {
                     this.println('----------');
                     this.println(err);
@@ -83,13 +79,6 @@
             },
             println(text) {
                 this.testResult = this.testResult + text + '\n';
-            },
-            headerToString(header) {
-              if (Array.isArray(header)) {
-                  return header[0] + ': ' + header[1];
-              } else {
-                  return header;
-              }
             },
         }
     }

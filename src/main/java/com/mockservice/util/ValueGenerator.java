@@ -1,4 +1,4 @@
-package com.mockservice.quantum;
+package com.mockservice.util;
 
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -52,6 +52,10 @@ public class ValueGenerator {
     }
 
     public static String randomNumberString() {
+        return maybeFloatify(randomIntegerString());
+    }
+
+    public static String randomIntegerString() {
         int len = RandomUtil.rnd(10) + 1;
         String number = ThreadLocalRandom.current()
                 .ints(0, 10)
@@ -59,11 +63,15 @@ public class ValueGenerator {
                 .boxed()
                 .map(String::valueOf)
                 .collect(Collectors.joining());
-        return maybeFloatify(number.replaceFirst("^0+(?!$)", ""));
+        return stripLeadingZeroes(number);
+    }
+
+    private static String stripLeadingZeroes(String str) {
+        return str.replaceFirst("^0+(?!$)", "");
     }
 
     private static String maybeFloatify(String number) {
-        if (RandomUtil.withChance(50)) {
+        if (RandomUtil.withChance(75)) {
             if (number.length() >= 2) {
                 int pointPosition = ThreadLocalRandom.current().nextInt(1, number.length());
                 number = number.substring(0, pointPosition) + "." + number.substring(pointPosition);

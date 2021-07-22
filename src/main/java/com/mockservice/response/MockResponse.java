@@ -5,13 +5,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 public interface MockResponse {
     MockResponse setVariables(@Nullable Map<String, String> variables);
     String getResponseBody();
-    int getResponseCode();
     HttpHeaders getResponseHeaders();
-    boolean hasRequest();
+    void ifHasRequest(Consumer<MockResponse> consumer);
     HttpMethod getRequestMethod();
     String getRequestUrl();
     HttpHeaders getRequestHeaders();

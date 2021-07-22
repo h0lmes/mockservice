@@ -7,96 +7,96 @@ routes:
   method: GET
   type: REST
   alt: ""
-  response: "HTTP/1.1 202\n\n{\"name\": \"Johnny 5\"}\n\nGET localhost:8081/api/robot HTTP/1.1\nMock-Alt: api-robot/R2D2\n\n{}"
-  responseSchema: ""
+  responseCode: 202
+  response: "HTTP/1.1\nExtra: extra-value\n\n{\"name\": \"Johnny 5\"}\n---\nGET localhost:8081/api/robot HTTP/1.1\nMock-Alt: api-robot/R2D2\n\n{}"
   disabled: false
 - group: a robot service
   path: /api/robot
   method: GET
   type: REST
   alt: R2D2
+  responseCode: 200
   response: "{\"name\": \"R2D2\"}"
-  responseSchema: ""
   disabled: false
 - group: a robot service
   path: /api/robot
   method: GET
   type: REST
   alt: terminator
+  responseCode: 200
   response: "{\"name\": \"terminator\"}"
-  responseSchema: ""
   disabled: false
 - group: a test service
   path: /api with spaces
   method: GET
   type: REST
   alt: ""
+  responseCode: 200
   response: "[\n  {\n    \"_id\": \"56af331efbeca6240c61b2ca\",\n    \"index\": 120000,\n    \"percent\": -0.12,\n    \"exp_number\": 1.123244e12,\n    \"guid\": \"bedb2018-c017-429E-b520-696ea3666692\",\n    \"isValid\": true,\n    \"comment\": null,\n    \"isActive\": false,\n    \"balance\": \"$2,202,350\",\n    \"object\": {\n        \"name\": \"am\",\n        \"lastname\": \"lang\"\n    }\n  }\n]"
-  responseSchema: ""
   disabled: false
 - group: entity service
   path: /api/v2/entity
   method: GET
   type: REST
   alt: ""
+  responseCode: 200
   response: "[\n  {\"id\": ${sequence}, \"name\": \"${random_string}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"}\n]"
-  responseSchema: ""
   disabled: false
 - group: entity service
   path: /api/v2/entity
   method: GET
   type: REST
   alt: 400
+  responseCode: 400
   response: "[]"
-  responseSchema: ""
   disabled: false
 - group: entity service
   path: /api/v2/entity/filter
   method: GET
   type: REST
   alt: ""
+  responseCode: 200
   response: "[\n  {\"id\": 2, \"name\": \"${a:default a}\"},\n  {\"id\": 3, \"name\": \"${b:${enum:default B1:default B2:default B3}}\"}\n]"
-  responseSchema: ""
   disabled: true
 - group: entity service
   path: "/api/v2/entity/{id}"
   method: GET
   type: REST
   alt: ""
+  responseCode: 200
   response: "{\"id\": ${id}, \"name\": \"entity name\"}"
-  responseSchema: ""
   disabled: true
 - group: entity service
   path: /api/v2/entity
   method: POST
   type: REST
   alt: ""
-  response: "HTTP/1.1 201\nCustom-Header: entity-created\n\n{\"id\": ${random_int}, \"name\": \"${name:default name}\"}"
-  responseSchema: ""
+  responseCode: 201
+  response: "{\"id\": ${random_int}, \"name\": \"${name:default name}\"}"
   disabled: false
 - group: number conversion service
   path: /mockNumberConversion
   method: POST
   type: SOAP
   alt: ""
+  responseCode: 200
   response: "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:web=\"http://www.dataaccess.com/webservicesserver/\">\n  <soapenv:Header/>\n  <soapenv:Body>\n    <web:NumberToDollarsResponse>\n      <web:NumberToDollarsResult>${enum:TEST1:TEST2}</web:NumberToDollarsResult>\n      <web:Result>${NumberToDollarsRequest.Value:DEFAULT_VALUE}</web:Result>\n    </web:NumberToDollarsResponse>\n  </soapenv:Body>\n</soapenv:Envelope>"
-  responseSchema: ""
   disabled: false
 - group: pet
   path: /v2/pet/findByStatus
   method: GET
   type: REST
   alt: ""
-  response: ""
-  responseSchema: "{\r\n  \"type\" : \"array\",\r\n  \"exampleSetFlag\" : false,\r\n  \"items\" : {\r\n    \"required\" : [ \"name\", \"photoUrls\" ],\r\n    \"type\" : \"object\",\r\n    \"properties\" : {\r\n      \"id\" : {\r\n        \"type\" : \"integer\",\r\n        \"format\" : \"int64\",\r\n        \"exampleSetFlag\" : false\r\n      },\r\n      \"category\" : {\r\n        \"type\" : \"object\",\r\n        \"properties\" : {\r\n          \"id\" : {\r\n            \"type\" : \"integer\",\r\n            \"format\" : \"int64\",\r\n            \"exampleSetFlag\" : false\r\n          },\r\n          \"name\" : {\r\n            \"type\" : \"string\",\r\n            \"exampleSetFlag\" : false\r\n          }\r\n        },\r\n        \"xml\" : {\r\n          \"name\" : \"Category\"\r\n        },\r\n        \"exampleSetFlag\" : false\r\n      },\r\n      \"name\" : {\r\n        \"type\" : \"string\",\r\n        \"example\" : \"doggie\",\r\n        \"exampleSetFlag\" : true\r\n      },\r\n      \"photoUrls\" : {\r\n        \"type\" : \"array\",\r\n        \"xml\" : {\r\n          \"name\" : \"photoUrl\",\r\n          \"wrapped\" : true\r\n        },\r\n        \"exampleSetFlag\" : false,\r\n        \"items\" : {\r\n          \"type\" : \"string\",\r\n          \"exampleSetFlag\" : false\r\n        }\r\n      },\r\n      \"tags\" : {\r\n        \"type\" : \"array\",\r\n        \"xml\" : {\r\n          \"name\" : \"tag\",\r\n          \"wrapped\" : true\r\n        },\r\n        \"exampleSetFlag\" : false,\r\n        \"items\" : {\r\n          \"type\" : \"object\",\r\n          \"properties\" : {\r\n            \"id\" : {\r\n              \"type\" : \"integer\",\r\n              \"format\" : \"int64\",\r\n              \"exampleSetFlag\" : false\r\n            },\r\n            \"name\" : {\r\n              \"type\" : \"string\",\r\n              \"exampleSetFlag\" : false\r\n            }\r\n          },\r\n          \"xml\" : {\r\n            \"name\" : \"Tag\"\r\n          },\r\n          \"exampleSetFlag\" : false\r\n        }\r\n      },\r\n      \"status\" : {\r\n        \"type\" : \"string\",\r\n        \"description\" : \"pet status in the store\",\r\n        \"exampleSetFlag\" : false,\r\n        \"enum\" : [ \"available\", \"pending\", \"sold\" ]\r\n      }\r\n    },\r\n    \"xml\" : {\r\n      \"name\" : \"Pet\"\r\n    },\r\n    \"exampleSetFlag\" : false\r\n  }\r\n}"
+  responseCode: 200
+  response: "[\n{\n\"id\": 177480488,\n\"category\": {\"id\": 87568468, \"name\": \" p deyvL I\"},\n\"name\": \"to theory\",\n\"photoUrls\": [\"tiny\", \"space-time\", \"inhabits einsteins\"],\n\"tags\": [{\"id\": 58354605, \"name\": \"and\"}, {\"id\": 793, \"name\": \"physicists\"}, {\"id\": 6760111, \"name\": \"gravity with\"}],\n\"status\": \"available\"\n}\n]"
   disabled: false
 - group: pet
   path: /v2/pet/findByStatus
   method: GET
   type: REST
   alt: 400
+  responseCode: 400
   response: ""
-  responseSchema: ""
   disabled: false
 scenarios:
 - group: Default

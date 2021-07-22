@@ -2,8 +2,6 @@ package com.mockservice.service;
 
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
-import com.mockservice.quantum.QuantumTheory;
-import com.mockservice.quantum.RandomUtil;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.request.RequestFacade;
 import com.mockservice.response.MockResponse;
@@ -32,7 +30,7 @@ public class MockServiceImpl implements MockService {
     private final ConcurrentLruCache<Route, MockResponse> responseCache;
     private final RequestService requestService;
 
-    public MockServiceImpl(@Value("${application.cache.response}") int cacheSizeLimit,
+    public MockServiceImpl(@Value("${application.cache.response}") int cacheSize,
                            TemplateEngine templateEngine,
                            RouteService routeService,
                            ActiveScenariosService activeScenariosService,
@@ -45,13 +43,7 @@ public class MockServiceImpl implements MockService {
         this.configRepository = configRepository;
         this.quantumTheory = quantumTheory;
         this.requestService = requestService;
-        responseCache = new ConcurrentLruCache<>(cacheSizeLimit, this::getResponse);
-    }
-
-    private MockResponse getResponse(Route route) {
-        return routeService.getEnabledRoute(route)
-                .map(this::routeToMockResponse)
-                .orElse(null);
+        responseCache = new ConcurrentLruCache<>(cacheSize, this::routeToMockResponse);
     }
 
     private MockResponse routeToMockResponse(Route route) {
@@ -72,36 +64,19 @@ public class MockServiceImpl implements MockService {
     @Override
     public ResponseEntity<String> mock(RequestFacade request) {
         Route route = getRoute(request);
+        int statusCode = route.getResponseCode();
         MockResponse response = responseCache.get(route);
         response.setVariables(request.getVariables());
         String body = response.getResponseBody();
 
-        int statusCode = response.getResponseCode();
-        if (statusCode == 200 && route.getAlt().length() == 3) {
-            try {
-                int code = Integer.parseInt(route.getAlt());
-                if (code >= 200 && code <= 599) {
-                    statusCode = code;
-                }
-            } catch (Exception e) {
-                // ignore
-            }
+
+        if (configRepository.getSettings().getQuantum() && RouteType.REST.equals(route.getType())) {
+            body = quantumTheory.apply(body);
+            statusCode = quantumTheory.apply(statusCode);
+            quantumTheory.delay();
         }
 
-        if (configRepository.getSettings().getQuantum()) {
-            if (RouteType.REST.equals(route.getType())) {
-                body = quantumTheory.apply(body);
-            }
-
-            delay();
-            if (RandomUtil.withChance(20)) {
-                statusCode = quantumTheory.randomStatusCode();
-            }
-        }
-
-        if (response.hasRequest()) {
-            requestService.schedule(response);
-        }
+        response.ifHasRequest(requestService::schedule);
 
         return ResponseEntity
                 .status(statusCode)
@@ -119,6 +94,8 @@ public class MockServiceImpl implements MockService {
                 .or(() -> random ? routeService.getRandomAltFor(route) : Optional.empty())
                 .or(() -> activeScenariosService.getAltFor(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
                 .orElse("");
-        return route.setAlt(alt);
+        route.setAlt(alt);
+
+        return routeService.getEnabledRoute(route).orElseThrow(NoRouteFoundException::new);
     }
 }

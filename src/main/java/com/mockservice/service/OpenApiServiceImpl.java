@@ -1,15 +1,23 @@
 package com.mockservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.Annotated;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
+import com.fasterxml.jackson.databind.ser.PropertyWriter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
+import com.mockservice.util.JsonFromSchemaGenerator;
 import com.mockservice.util.JsonUtil;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
@@ -34,10 +42,10 @@ public class OpenApiServiceImpl implements OpenApiService {
     private static final Logger log = LoggerFactory.getLogger(OpenApiServiceImpl.class);
 
     private static final String URL_PARTS_REGEX = "(https?:\\/\\/)?(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\b(\\/.*)";
-    private final ObjectWriter jsonWriter;
+    private final ObjectMapper mapper;
 
     public OpenApiServiceImpl(YamlMapperService yamlMapperService) {
-        jsonWriter = yamlMapperService.jsonWriter();
+        mapper = yamlMapperService.getJsonMapper();
     }
 
     @Override
@@ -114,7 +122,7 @@ public class OpenApiServiceImpl implements OpenApiService {
     private void routesFromOperation(List<Route> routes, String path, String method, Operation operation) {
         if (operation != null) {
             String group = tagsFromOperation(operation);
-            routesFromResponses(routes, group, path, method, operation);
+            routesFromOperation(routes, group, path, method, operation);
         }
     }
 
@@ -131,7 +139,7 @@ public class OpenApiServiceImpl implements OpenApiService {
         return group;
     }
 
-    private void routesFromResponses(List<Route> routes,
+    private void routesFromOperation(List<Route> routes,
                                      String group,
                                      String path,
                                      String method,
@@ -144,53 +152,108 @@ public class OpenApiServiceImpl implements OpenApiService {
                     responseCode = "";
                 }
 
-                Content content = e.getValue().getContent();
-
-                routes.add(new Route()
-                        .setDisabled(false)
-                        .setType(RouteType.REST)
-                        .setPath(path)
-                        .setMethod(RequestMethod.valueOf(method.toUpperCase()))
-                        .setGroup(group)
-                        .setAlt(responseCode)
-                        .setResponse(exampleFromContent(content))
-                        .setResponseSchema(schemaFromContent(content))
-                );
+                routeFromApiResponse(routes, group, path, method, responseCode, e.getValue());
             }
         }
     }
 
-    private String exampleFromContent(Content content) {
-        if (content != null && !content.isEmpty()) {
-            MediaType mediaType = content.get("application/json");
-            if (mediaType == null) {
-                mediaType = content.get(content.keySet().iterator().next());
-            }
-            if (mediaType != null) {
-                Object example = mediaType.getExample();
-                if (example != null) {
-                    return JsonUtil.unescape(example.toString());
-                }
+    private void routeFromApiResponse(List<Route> routes,
+                                      String group,
+                                      String path,
+                                      String method,
+                                      String responseCode,
+                                      ApiResponse apiResponse) {
+        MediaType mediaType = mediaTypeFromContent(apiResponse.getContent());
+
+        String response = exampleFromMediaType(mediaType);
+        if (response.isEmpty()) {
+            String jsonSchema = schemaFromMediaType(mediaType);
+            try {
+                Map<String, Object> jsonSchemaMap = mapper.readValue(jsonSchema, Map.class);
+                response = JsonFromSchemaGenerator.jsonFromSchema(jsonSchemaMap);
+            } catch (JsonProcessingException e) {
+                //
             }
         }
-        return "";
+
+        routes.add(new Route()
+                .setDisabled(false)
+                .setType(RouteType.REST)
+                .setPath(path)
+                .setMethod(RequestMethod.valueOf(method.toUpperCase()))
+                .setGroup(group)
+                .setAlt(responseCode)
+                .setResponseCodeString(responseCode)
+                .setResponse(response)
+        );
     }
 
-    private String schemaFromContent(Content content) {
+    private MediaType mediaTypeFromContent(Content content) {
         if (content != null && !content.isEmpty()) {
             MediaType mediaType = content.get("application/json");
-            if (mediaType == null) {
+            if (mediaType == null && content.keySet().iterator().hasNext()) {
                 mediaType = content.get(content.keySet().iterator().next());
             }
-            if (mediaType != null) {
-                Schema schema = mediaType.getSchema();
+            return mediaType;
+        }
+        return null;
+    }
+
+    private String exampleFromMediaType(MediaType mediaType) {
+        if (mediaType != null) {
+            Object example = mediaType.getExample();
+            if (example != null) {
+                return JsonUtil.unescape(example.toString());
+            }
+            Map<String, Example> examples = mediaType.getExamples();
+            if (examples != null && examples.values().iterator().hasNext()) {
+                Example example1 = examples.values().iterator().next();
                 try {
-                    return jsonWriter.writeValueAsString(schema);
+                    return mapper.writeValueAsString(example1.getValue());
                 } catch (JsonProcessingException e) {
-                    return "";
+                    //
                 }
             }
         }
         return "";
+    }
+
+    private String schemaFromMediaType(MediaType mediaType) {
+        if (mediaType != null) {
+            try {
+                return serializeJsonSchema(mapper, mediaType.getSchema());
+            } catch (JsonProcessingException e) {
+                //
+            }
+        }
+        return "";
+    }
+
+    public static String serializeJsonSchema(ObjectMapper mapper, Object schema) throws JsonProcessingException {
+        SimpleFilterProvider filters = new SimpleFilterProvider();
+        final String filterName = "exclude-xml-and-example-set-flag";
+        mapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
+            @Override
+            public Object findFilterId(Annotated a) {
+                if (Map.class.isAssignableFrom(a.getRawType())
+                        || io.swagger.v3.oas.models.media.Schema.class.isAssignableFrom(a.getRawType())) {
+                    return filterName;
+                }
+                return super.findFilterId(a);
+            }
+        });
+        filters.addFilter(filterName, new SimpleBeanPropertyFilter() {
+            @Override
+            protected boolean include(BeanPropertyWriter writer) {
+                return true;
+            }
+
+            @Override
+            protected boolean include(PropertyWriter writer) {
+                return !writer.getName().equalsIgnoreCase("xml")
+                        && !writer.getName().equalsIgnoreCase("exampleSetFlag");
+            }
+        });
+        return mapper.writer(filters).writeValueAsString(schema);
     }
 }

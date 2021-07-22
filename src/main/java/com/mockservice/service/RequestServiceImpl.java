@@ -51,7 +51,7 @@ public class RequestServiceImpl implements RequestService {
                 url = host.toString() + url;
             }
 
-            log.debug("sendRequest():\nmethod = {}\nurl = {}\nbody = {}\nheaders = {}",
+            log.info("sendRequest():\nmethod = {}\nurl = {}\nbody = {}\nheaders = {}",
                     mockResponse.getRequestMethod(),
                     url,
                     mockResponse.getRequestBody(),
@@ -65,7 +65,7 @@ public class RequestServiceImpl implements RequestService {
                     .retrieve()
                     .bodyToMono(String.class)
                     .block(REQUEST_TIMEOUT);
-            log.debug(response);
+            log.info(response);
         } catch (Exception e) {
             log.error("", e);
         }

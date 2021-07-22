@@ -1,4 +1,8 @@
-package com.mockservice.quantum;
+package com.mockservice.service;
+
+import com.mockservice.util.RandomUtil;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public interface QuantumTheory {
     int[] statusCodes = {
@@ -10,6 +14,21 @@ public interface QuantumTheory {
 
     default int randomStatusCode() {
         return statusCodes[RandomUtil.rnd(statusCodes.length)];
+    }
+
+    default int apply(int statusCode) {
+        if (RandomUtil.withChance(20)) {
+             return randomStatusCode();
+        }
+        return statusCode;
+    }
+
+    default void delay() {
+        try {
+            Thread.sleep(ThreadLocalRandom.current().nextInt(10, 3000));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     String apply(String data);

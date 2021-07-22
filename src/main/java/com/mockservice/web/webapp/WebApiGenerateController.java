@@ -1,6 +1,6 @@
 package com.mockservice.web.webapp;
 
-import com.mockservice.quantum.JsonGenerator;
+import com.mockservice.util.JsonGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;

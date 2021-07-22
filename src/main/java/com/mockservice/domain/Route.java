@@ -1,5 +1,6 @@
 package com.mockservice.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.Objects;
@@ -11,8 +12,8 @@ public class Route implements Comparable<Route> {
     private RequestMethod method = RequestMethod.GET;
     private RouteType type = RouteType.REST;
     private String alt = "";
+    private int responseCode = 200;
     private String response = "";
-    private String responseSchema = "";
     private boolean disabled = false;
 
     public Route() {
@@ -73,21 +74,34 @@ public class Route implements Comparable<Route> {
         return this;
     }
 
+    public int getResponseCode() {
+        return responseCode;
+    }
+
+    public Route setResponseCode(int responseCode) {
+        this.responseCode = responseCode;
+        return this;
+    }
+
+    @JsonIgnore
+    public Route setResponseCodeString(String responseCode) {
+        try {
+            int code = Integer.parseInt(responseCode);
+            if (code >= 200 && code <= 599) {
+                setResponseCode(code);
+            }
+        } catch (Exception e) {
+            //
+        }
+        return this;
+    }
+
     public String getResponse() {
         return response;
     }
 
     public Route setResponse(String response) {
         this.response = response == null ? "" : response;
-        return this;
-    }
-
-    public String getResponseSchema() {
-        return responseSchema;
-    }
-
-    public Route setResponseSchema(String responseSchema) {
-        this.responseSchema = responseSchema == null ? "" : responseSchema;
         return this;
     }
 
@@ -106,8 +120,8 @@ public class Route implements Comparable<Route> {
         setMethod(source.getMethod());
         setType(source.getType());
         setAlt(source.getAlt());
+        setResponseCode(source.getResponseCode());
         setResponse(source.getResponse());
-        setResponseSchema(source.getResponseSchema());
         setDisabled(source.getDisabled());
         return this;
     }

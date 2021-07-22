@@ -42,6 +42,11 @@
             <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.alt"/>
         </div>
 
+        <div v-show="editing" class="mock-col">
+            <div class="mock-col-header">RESPONSE CODE</div>
+            <input type="text" class="form-control form-control-sm monospace" v-model="editingRoute.responseCode"/>
+        </div>
+
         <div v-show="editing" class="mock-col text-center">
             <div class="mock-col-header">DISABLED</div>
             <ToggleSwitch class="mock-col-value" v-model="editingRoute.disabled"></ToggleSwitch>
@@ -56,13 +61,8 @@
         </div>
 
         <div v-show="editing" class="mock-col w100">
-            <div class="mock-col-header">RESPONSE (BODY)</div>
-            <AutoSizeTextArea v-model="editingRoute.response"></AutoSizeTextArea>
-        </div>
-
-        <div v-show="editing" class="mock-col w100">
-            <div class="mock-col-header">RESPONSE SCHEMA</div>
-            <AutoSizeTextArea v-model="editingRoute.responseSchema"></AutoSizeTextArea>
+            <div class="mock-col-header">RESPONSE BODY</div>
+            <AutoSizeTextArea v-model="editingRoute.response" :min-rows="1"></AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-col w100">

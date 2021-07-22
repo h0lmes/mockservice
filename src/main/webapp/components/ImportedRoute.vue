@@ -1,5 +1,5 @@
 <template>
-    <div class="component row">
+    <div class="component row" :class="{'open' : open}">
         <div class="item w-fixed-auto">
             <button type="button" class="btn btn-sm btn-default" @click="$emit('add', route)">{{ addLabel }}</button>
             <button type="button" class="btn btn-sm btn-default" @click="toggle">more...</button>
@@ -23,10 +23,8 @@
             <div class="mock-col-value link" @click="toggle">{{ hasResponse }}</div>
         </div>
         <div class="item w100" v-show="open">
-            <div class="mock-col-header">RESPONSE (BODY)</div>
+            <div class="mock-col-header">RESPONSE BODY</div>
             <AutoSizeTextArea v-model="route.response"></AutoSizeTextArea>
-            <div class="mock-col-header">RESPONSE SCHEMA</div>
-            <AutoSizeTextArea v-model="route.responseSchema"></AutoSizeTextArea>
         </div>
     </div>
 </template>
@@ -48,8 +46,7 @@
         },
         computed: {
             hasResponse() {
-                return (!!this.route.response ? 'has example response' : '')
-                    + (!!this.route.responseSchema ? '\nhas response schema' : '');
+                return !!this.route.response ? 'has response' : '';
             },
             exists() {
                 return this.existingRoutes.some(e => e.method === this.route.method && e.path === this.route.path && e.alt === this.route.alt);
@@ -58,7 +55,7 @@
                 return this.exists ? 'exists' : '-';
             },
             addLabel() {
-                return this.exists ? 'overwrite' : '.. add ..';
+                return this.exists ? 'overwrite' : 'add route';
             }
         },
         methods: {
@@ -77,6 +74,10 @@
         column-gap: 0.5rem;
         margin-bottom: 1px;
         padding: 0.2rem 0.7rem;
+
+        &.open {
+            background-color: var(--bg-component-active);
+        }
     }
 
     .item {

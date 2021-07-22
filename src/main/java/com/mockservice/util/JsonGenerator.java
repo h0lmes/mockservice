@@ -1,4 +1,4 @@
-package com.mockservice.quantum;
+package com.mockservice.util;
 
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -9,7 +9,7 @@ public class JsonGenerator {
     private static final int MAX_NUMBER_OF_ELEMENTS = 10;
 
     public enum JsonValueType {
-        NUMBER, STRING, BOOLEAN, ARRAY, OBJECT
+        STRING, NUMBER, INTEGER, BOOLEAN, NULL, ARRAY, OBJECT
     }
 
     private static final JsonValueType[] rootValueTypes = {
@@ -21,11 +21,12 @@ public class JsonGenerator {
     };
     private static final JsonValueType[] valueTypes = {
             JsonValueType.NUMBER,
-            JsonValueType.NUMBER,
+            JsonValueType.INTEGER,
             JsonValueType.STRING,
             JsonValueType.STRING,
             JsonValueType.BOOLEAN,
             JsonValueType.BOOLEAN,
+            JsonValueType.NULL,
             JsonValueType.ARRAY,
             JsonValueType.OBJECT,
             JsonValueType.OBJECT,
@@ -42,10 +43,12 @@ public class JsonGenerator {
 
     private static String generateValue(JsonValueType elementType, int level) {
         switch (elementType) {
-            case NUMBER:
-                return generateNumberValue();
             case STRING:
                 return generateStringValue();
+            case NUMBER:
+                return generateNumberValue();
+            case INTEGER:
+                return generateIntegerValue();
             case BOOLEAN:
                 return generateBooleanValue();
             case ARRAY:
@@ -53,16 +56,20 @@ public class JsonGenerator {
             case OBJECT:
                 return generateObjectValue(level);
             default:
-                return "";
+                return "null";
         }
-    }
-
-    private static String generateNumberValue() {
-        return ValueGenerator.randomNumberString();
     }
 
     private static String generateStringValue() {
         return "\"" + ValueGenerator.randomString() + "\"";
+    }
+
+    private static String generateIntegerValue() {
+        return ValueGenerator.randomIntegerString();
+    }
+
+    private static String generateNumberValue() {
+        return ValueGenerator.randomNumberString();
     }
 
     private static String generateBooleanValue() {

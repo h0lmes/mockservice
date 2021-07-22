@@ -11,17 +11,18 @@ import org.springframework.lang.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class RestMockResponse implements MockResponse {
 
     private static final Logger log = LoggerFactory.getLogger(RestMockResponse.class);
 
     private static final String HTTP_1_1 = "HTTP/1.1";
+    private static final String DELIMITER_STRING = "---";
     private static final String HTTP_HEADER_DELIMITER = ":";
     private static final int HTTP_HEADER_DELIMITER_LEN = HTTP_HEADER_DELIMITER.length();
 
     private Map<String, String> variables;
-    private int responseCode = 200;
     private final HttpHeaders responseHeaders = new HttpHeaders();
     private final StringTemplate responseBody;
     private boolean containsRequest = false;
@@ -45,10 +46,11 @@ public class RestMockResponse implements MockResponse {
         boolean readingHead = false;
 
         for (String line : lines) {
-            if (isResponseStart(line)) {
+            if (isDelimiter(line)) {
+                // ignore
+            } else if (isResponseStart(line)) {
                 readingRequest = false;
                 readingHead = true;
-                setResponse(line);
             } else if (isRequestStart(line)) {
                 readingRequest = true;
                 readingHead = true;
@@ -69,21 +71,16 @@ public class RestMockResponse implements MockResponse {
         }
     }
 
-    private boolean isResponseStart(String line) {
-        return line.startsWith(HTTP_1_1);
-    }
-
     private boolean isRequestStart(String line) {
         return line.trim().endsWith(HTTP_1_1);
     }
 
-    private void setResponse(String line) {
-        try {
-            String[] split = line.split("\\s+");
-            responseCode = Integer.parseInt(split[1]);
-        } catch (NumberFormatException e) {
-            log.warn("NaN response HTTP code: {}", line);
-        }
+    private boolean isResponseStart(String line) {
+        return line.trim().startsWith(HTTP_1_1);
+    }
+
+    private boolean isDelimiter(String line) {
+        return line.trim().startsWith(DELIMITER_STRING);
     }
 
     private void setRequest(String line) {
@@ -112,11 +109,6 @@ public class RestMockResponse implements MockResponse {
     }
 
     @Override
-    public int getResponseCode() {
-        return responseCode;
-    }
-
-    @Override
     public HttpHeaders getResponseHeaders() {
         return responseHeaders;
     }
@@ -127,8 +119,10 @@ public class RestMockResponse implements MockResponse {
     }
 
     @Override
-    public boolean hasRequest() {
-        return containsRequest;
+    public void ifHasRequest(Consumer<MockResponse> consumer) {
+        if (containsRequest) {
+            consumer.accept(this);
+        }
     }
 
     @Override

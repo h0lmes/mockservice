@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class SoapMockResponse implements MockResponse {
 
@@ -14,9 +15,9 @@ public class SoapMockResponse implements MockResponse {
     private final HttpHeaders headers = new HttpHeaders();
     private final StringTemplate body;
 
-    public SoapMockResponse(TemplateEngine engine, String resource) {
+    public SoapMockResponse(TemplateEngine engine, String response) {
         body = new StringTemplate(engine);
-        body.add(resource);
+        body.add(response);
         headers.add(HttpHeaders.CONTENT_TYPE, "text/xml;charset=UTF-8");
     }
 
@@ -24,11 +25,6 @@ public class SoapMockResponse implements MockResponse {
     public MockResponse setVariables(@Nullable Map<String, String> variables) {
         this.variables = variables;
         return this;
-    }
-
-    @Override
-    public int getResponseCode() {
-        return 200;
     }
 
     @Override
@@ -42,8 +38,8 @@ public class SoapMockResponse implements MockResponse {
     }
 
     @Override
-    public boolean hasRequest() {
-        return false;
+    public void ifHasRequest(Consumer<MockResponse> consumer) {
+        //
     }
 
     @Override

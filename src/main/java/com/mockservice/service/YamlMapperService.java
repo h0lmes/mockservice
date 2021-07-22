@@ -1,10 +1,7 @@
 package com.mockservice.service;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import org.springframework.stereotype.Service;
@@ -13,6 +10,7 @@ import org.springframework.stereotype.Service;
 public class YamlMapperService {
 
     private final ObjectMapper yamlMapper;
+
     private final ObjectMapper jsonMapper;
 
     public YamlMapperService() {
@@ -29,6 +27,7 @@ public class YamlMapperService {
         factory.disable(YAMLGenerator.Feature.SPLIT_LINES);
         ObjectMapper mapper = new ObjectMapper(factory);
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         mapper.findAndRegisterModules();
         return mapper;
     }
@@ -43,6 +42,7 @@ public class YamlMapperService {
 
     private ObjectMapper getJsonObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -56,5 +56,9 @@ public class YamlMapperService {
 
     public ObjectWriter jsonWriter() {
         return jsonMapper.writer();
+    }
+
+    public ObjectMapper getJsonMapper() {
+        return jsonMapper;
     }
 }
