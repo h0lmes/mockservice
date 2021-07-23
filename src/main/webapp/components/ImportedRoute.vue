@@ -2,7 +2,6 @@
     <div class="component row" :class="{'open' : open}">
         <div class="item w-fixed-auto">
             <button type="button" class="btn btn-sm btn-default" @click="$emit('add', route)">{{ addLabel }}</button>
-            <button type="button" class="btn btn-sm btn-default" @click="toggle">more...</button>
         </div>
         <div class="item">
             <div class="mock-col-value" :class="{'color-accent-one' : exists}">{{ existsLabel }}</div>
@@ -11,7 +10,9 @@
             <div class="mock-col-value">{{ route.group }}</div>
         </div>
         <div class="item">
-            <div class="mock-col-value">{{ route.method }}</div>
+            <div class="mock-col-value">
+                <route-method :value="route.method">{{ route.method }}</route-method>
+            </div>
         </div>
         <div class="item w3">
             <div class="mock-col-value">{{ route.path }}</div>
@@ -20,7 +21,7 @@
             <div class="mock-col-value">{{ route.alt }}</div>
         </div>
         <div class="item">
-            <div class="mock-col-value link" @click="toggle">{{ hasResponse }}</div>
+            <div class="mock-col-value link" @click="toggle" :class="{'color-accent-one' : hasResponse}">{{ hasResponseLabel }}</div>
         </div>
         <div class="item w100" v-show="open">
             <div class="mock-col-header">RESPONSE BODY</div>
@@ -30,10 +31,11 @@
 </template>
 <script>
     import AutoSizeTextArea from "./AutoSizeTextArea";
+    import RouteMethod from "./RouteMethod";
 
     export default {
         name: "ImportedRoute",
-        components: {AutoSizeTextArea},
+        components: {AutoSizeTextArea, RouteMethod},
         data() {
             return {
                 open: false,
@@ -46,7 +48,10 @@
         },
         computed: {
             hasResponse() {
-                return !!this.route.response ? 'has response' : '';
+                return !!this.route.response;
+            },
+            hasResponseLabel() {
+                return this.hasResponse ? 'has response' : '-';
             },
             exists() {
                 return this.existingRoutes.some(e => e.method === this.route.method && e.path === this.route.path && e.alt === this.route.alt);
@@ -55,7 +60,7 @@
                 return this.exists ? 'exists' : '-';
             },
             addLabel() {
-                return this.exists ? 'overwrite' : 'add route';
+                return this.exists ? 'overwrite' : '-- add --';
             }
         },
         methods: {

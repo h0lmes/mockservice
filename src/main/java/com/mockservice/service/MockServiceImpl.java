@@ -47,11 +47,11 @@ public class MockServiceImpl implements MockService {
     }
 
     private MockResponse routeToMockResponse(Route route) {
-        log.info("Route requested: {}", route);
         if (RouteType.REST.equals(route.getType())) {
             return new RestMockResponse(templateEngine, route.getResponse());
+        } else {
+            return new SoapMockResponse(templateEngine, route.getResponse());
         }
-        return new SoapMockResponse(templateEngine, route.getResponse());
     }
 
     @Override
@@ -64,11 +64,12 @@ public class MockServiceImpl implements MockService {
     @Override
     public ResponseEntity<String> mock(RequestFacade request) {
         Route route = getRoute(request);
+        log.info("Route requested: {}", route);
         int statusCode = route.getResponseCode();
+
         MockResponse response = responseCache.get(route);
         response.setVariables(request.getVariables());
         String body = response.getResponseBody();
-
 
         if (configRepository.getSettings().getQuantum() && RouteType.REST.equals(route.getType())) {
             body = quantumTheory.apply(body);
@@ -84,18 +85,27 @@ public class MockServiceImpl implements MockService {
                 .body(body);
     }
 
-    private Route getRoute(RequestFacade requestFacade) {
-        Route route = new Route()
-                .setMethod(requestFacade.getRequestMethod())
-                .setPath(requestFacade.getEndpoint());
+    private Route getRoute(RequestFacade request) {
+        return routeService
+                .getEnabledRoute(
+                        new Route()
+                                .setMethod(request.getRequestMethod())
+                                .setPath(request.getEndpoint())
+                                .setAlt(getRouteAlt(request))
+                )
+                .orElseThrow(NoRouteFoundException::new);
+    }
 
-        boolean random = configRepository.getSettings().getRandomAlt() || configRepository.getSettings().getQuantum();
-        String alt = requestFacade.getAlt()
-                .or(() -> random ? routeService.getRandomAltFor(route) : Optional.empty())
-                .or(() -> activeScenariosService.getAltFor(requestFacade.getRequestMethod(), requestFacade.getEndpoint()))
+    private String getRouteAlt(RequestFacade request) {
+        return request.getAlt()
+                .or(() -> activeScenariosService.getAltFor(request.getRequestMethod(), request.getEndpoint()))
+                .or(() -> {
+                    if (configRepository.getSettings().getRandomAlt() || configRepository.getSettings().getQuantum()) {
+                        return routeService.getRandomAltFor(request.getRequestMethod(), request.getEndpoint());
+                    } else {
+                        return Optional.empty();
+                    }
+                })
                 .orElse("");
-        route.setAlt(alt);
-
-        return routeService.getEnabledRoute(route).orElseThrow(NoRouteFoundException::new);
     }
 }

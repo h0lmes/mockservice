@@ -20,7 +20,6 @@ import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
-import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.servers.Server;
@@ -167,8 +166,8 @@ public class OpenApiServiceImpl implements OpenApiService {
 
         String response = exampleFromMediaType(mediaType);
         if (response.isEmpty()) {
-            String jsonSchema = schemaFromMediaType(mediaType);
             try {
+                String jsonSchema = schemaFromMediaType(mediaType);
                 Map<String, Object> jsonSchemaMap = mapper.readValue(jsonSchema, Map.class);
                 response = JsonFromSchemaGenerator.jsonFromSchema(jsonSchemaMap);
             } catch (JsonProcessingException e) {
@@ -201,10 +200,6 @@ public class OpenApiServiceImpl implements OpenApiService {
 
     private String exampleFromMediaType(MediaType mediaType) {
         if (mediaType != null) {
-            Object example = mediaType.getExample();
-            if (example != null) {
-                return JsonUtil.unescape(example.toString());
-            }
             Map<String, Example> examples = mediaType.getExamples();
             if (examples != null && examples.values().iterator().hasNext()) {
                 Example example1 = examples.values().iterator().next();
@@ -213,6 +208,11 @@ public class OpenApiServiceImpl implements OpenApiService {
                 } catch (JsonProcessingException e) {
                     //
                 }
+            }
+
+            Object example = mediaType.getExample();
+            if (example != null) {
+                return JsonUtil.unescape(example.toString());
             }
         }
         return "";

@@ -1,8 +1,8 @@
 package com.mockservice.service;
 
 import com.mockservice.util.JsonGenerator;
-import com.mockservice.util.ValueGenerator;
 import com.mockservice.util.RandomUtil;
+import com.mockservice.util.ValueGenerator;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.MatchResult;

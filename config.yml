@@ -88,10 +88,26 @@ routes:
   type: REST
   alt: ""
   responseCode: 200
-  response: "[\n{\n\"id\": 177480488,\n\"category\": {\"id\": 87568468, \"name\": \" p deyvL I\"},\n\"name\": \"to theory\",\n\"photoUrls\": [\"tiny\", \"space-time\", \"inhabits einsteins\"],\n\"tags\": [{\"id\": 58354605, \"name\": \"and\"}, {\"id\": 793, \"name\": \"physicists\"}, {\"id\": 6760111, \"name\": \"gravity with\"}],\n\"status\": \"available\"\n}\n]"
+  response: "[{\"id\": 130781, \"category\": {\"id\": 2283, \"name\": \"among\"}, \"name\": \"of strings\", \"photoUrls\": [\"or quantum\", \" prOGFPA!RyiYMXOgrO KM-qgUukT\", \"obvious appearances\"], \"tags\": [{\"id\": 5279, \"name\": \"which to\"}, {\"id\": 76299, \"name\": \"in\"}, {\"id\": 790425, \"name\": \"specific theory\"}], \"status\": \"available\"}, {\"id\": 21, \"category\": {\"id\": 516644, \"name\": \"in\"}, \"name\": \"together ends some\", \"photoUrls\": [\"theory\", \"j!ikRjZuGKMl Vop G Vgm\", \"unsolved\"], \"tags\": [{\"id\": 87302306, \"name\": \"attempts\"}, {\"id\": 368, \"name\": \"attracted theory\"}], \"status\": \"available\"}]"
   disabled: false
 - group: pet
   path: /v2/pet/findByStatus
+  method: GET
+  type: REST
+  alt: 400
+  responseCode: 400
+  response: ""
+  disabled: false
+- group: pet
+  path: /v2/pet/findByTags
+  method: GET
+  type: REST
+  alt: ""
+  responseCode: 200
+  response: "[{\"id\": 44860056, \"category\": {\"id\": 6145429, \"name\": \"space-time vibrate argue\"}, \"name\": \"the the\", \"photoUrls\": [\"included\"], \"tags\": [{\"id\": 3, \"name\": \"itself quantum appearances\"}], \"status\": \"pending\"}]"
+  disabled: false
+- group: pet
+  path: /v2/pet/findByTags
   method: GET
   type: REST
   alt: 400

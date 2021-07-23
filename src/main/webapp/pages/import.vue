@@ -17,13 +17,12 @@
 <script>
     import {mapActions} from 'vuex';
     import Loading from "../components/Loading";
-    import AutoSizeTextArea from "../components/AutoSizeTextArea";
     import ToggleSwitch from "../components/ToggleSwitch";
     import ImportedRoutes from "../components/ImportedRoutes";
 
     export default {
         name: "import",
-        components: {AutoSizeTextArea, Loading, ToggleSwitch, ImportedRoutes},
+        components: {Loading, ToggleSwitch, ImportedRoutes},
         data() {
             return {
                 value: '',

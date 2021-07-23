@@ -27,24 +27,26 @@ https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages
 
 **RESPONSE**
 
-Parser looks for `HTTP/1.1` at the beginning of a line
-to start reading response.
-  
-Then an empty line should go indicating head ended
-(head is optional for response part).
-Then goes the body if any.
+Response MUST go first.
+
+If parser sees `HTTP/1.1` at the beginning of a line
+it knows there are headers (are optional) in response.
+After headers an empty line should go indicating head ended.
+Then goes body if not blank.
 > Anything that goes before head start
 (before `HTTP/1.1`, or if head is not there at all)
 is considered a response body as well.
 
 **REQUEST** (optional)
 
+Optional `---` may go between response and request for the sake of convenience.
+
 Parser looks for `HTTP/1.1` at the end of a line
 to start reading request.
-Then headers may go.
+Then headers may go (optional).
 Then an empty line should go indicating head ended
 (head is mandatory for request part).
-Then goes the body if not blank.
+Then goes body if not blank.
 
 If request is present it would be executed asynchronously
 after the response was sent.
@@ -55,20 +57,20 @@ after the response was sent.
 
 **RESPONSE EXAMPLE** (with head)
 
-    HTTP/1.1 400
+    HTTP/1.1
     Cache-Control: no-cache
         
     {"code": "E000394", "message": "Internal error"}
 
 **RESPONSE EXAMPLE** (head + body + request head + request body)
 
-    HTTP/1.1 202
+    HTTP/1.1
     
     {
         "status": "PROCESSING",
         "id": "${item_id}"
     }
-    
+    ---
     POST /store/cart/item/${item_id} HTTP/1.1
     Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5...
     

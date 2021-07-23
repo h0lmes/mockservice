@@ -2,15 +2,14 @@ package com.mockservice.service;
 
 import com.mockservice.domain.Route;
 import com.mockservice.repository.ConfigRepository;
-import com.mockservice.util.JsonUtil;
+import com.mockservice.util.RandomUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,12 +29,13 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
-    public Optional<String> getRandomAltFor(Route route) {
-        Predicate<Route> condition = r -> route.getMethod().equals(r.getMethod())
-                && route.getPath().equals(r.getPath())
-                && !r.getDisabled();
-        List<String> alts = configRepository.findAllRoutes().stream()
-                .filter(condition)
+    public Optional<String> getRandomAltFor(RequestMethod method, String path) {
+        List<String> alts = configRepository
+                .findAllRoutes()
+                .stream()
+                .filter(r -> method.equals(r.getMethod())
+                        && path.equals(r.getPath())
+                        && !r.getDisabled())
                 .map(Route::getAlt)
                 .collect(Collectors.toList());
         if (alts.isEmpty()) {
@@ -44,8 +44,7 @@ public class RouteServiceImpl implements RouteService {
         if (alts.size() == 1) {
             return Optional.of(alts.get(0));
         }
-        int index = ThreadLocalRandom.current().nextInt(0, alts.size());
-        return Optional.of(alts.get(index));
+        return Optional.of(alts.get(RandomUtil.rnd(alts.size())));
     }
 
     @Override

@@ -1,7 +1,7 @@
 <template>
     <div class="config-page monospace">
         <div class="component-toolbar mb-5">
-            <button type="button" class="btn btn-danger" @click="save">SAVE AND APPLY</button>
+            <button type="button" class="btn btn-primary" @click="save">SAVE AND APPLY</button>
             <button type="button" class="btn btn-default" @click="download">DOWNLOAD AS FILE</button>
             <button type="button" class="btn btn-default" @click="backup">BACKUP ON SERVER</button>
             <button type="button" class="btn btn-default" @click="restore">RESTORE FROM BACKUP</button>

@@ -21,7 +21,6 @@ public abstract class AbstractRequestFacade implements RequestFacade {
 
     private final String endpoint;
     private final String encodedEndpoint;
-    private final String basePath;
     private final RequestMethod requestMethod;
     private final Map<String, String> pathVariables;
     private final Map<String, String> requestParams = new HashMap<>();
@@ -33,7 +32,6 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     public AbstractRequestFacade(HttpServletRequest request) {
         endpoint = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         encodedEndpoint = encodeEndpoint(endpoint);
-        basePath = getBasePathInternal(request);
         requestMethod = RequestMethod.valueOf(request.getMethod());
 
         Object o = request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
@@ -64,35 +62,6 @@ public abstract class AbstractRequestFacade implements RequestFacade {
         return endpoint.toLowerCase();
     }
 
-    private String getBasePathInternal(HttpServletRequest request) {
-        String scheme = getScheme(request);
-        String domain = getRemoteHost(request);
-        int port = "http".equalsIgnoreCase(scheme) ? 8080 : 8443;
-        return scheme + "://" + domain + ":" + port;
-    }
-
-    private String getScheme(HttpServletRequest request) {
-        String result = request.getHeader("X-Forwarded-Proto");
-        if (result == null || result.isEmpty()) {
-            result = request.getHeader("X-Forwarded-Protocol");
-        }
-        if (result == null || result.isEmpty()) {
-            result = request.getHeader("X-Url-Scheme");
-        }
-        if (result == null || result.isEmpty()) {
-            result = request.getScheme();
-        }
-        return result;
-    }
-
-    private String getRemoteHost(HttpServletRequest request) {
-        String result = request.getHeader("X-Forwarded-For");
-        if (result == null || result.isEmpty()) {
-            result = request.getRemoteHost();
-        }
-        return result;
-    }
-
     private List<String[]> getHeadersParts(HttpServletRequest request, String headerName) {
         List<String[]> result = new ArrayList<>();
         Enumeration<String> headers = request.getHeaders(headerName);
@@ -103,11 +72,6 @@ public abstract class AbstractRequestFacade implements RequestFacade {
             }
         }
         return result;
-    }
-
-    @Override
-    public String getBasePath() {
-        return basePath;
     }
 
     @Override
@@ -132,12 +96,6 @@ public abstract class AbstractRequestFacade implements RequestFacade {
 
     String getBody() {
         return body;
-    }
-
-    Map<String, String> getBaseVariables() {
-        Map<String, String> vars = new HashMap<>();
-        vars.put("REQUEST_BASE_PATH", getBasePath());
-        return vars;
     }
 
     Map<String, String> getPathVariables() {

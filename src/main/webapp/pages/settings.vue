@@ -11,7 +11,7 @@
             </ToggleSwitch>
         </p>
         <div class="mt-5 pl-1">
-            <button type="button" class="btn btn-default" @click="save">SAVE</button>
+            <button type="button" class="btn btn-primary" @click="save">SAVE</button>
         </div>
         <Loading v-if="$fetchState.pending"></Loading>
     </div>

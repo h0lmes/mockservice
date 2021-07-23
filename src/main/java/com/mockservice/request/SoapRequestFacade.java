@@ -18,7 +18,7 @@ public class SoapRequestFacade extends AbstractRequestFacade {
 
     @Override
     public Map<String, String> getVariables() {
-        Map<String, String> vars = getBaseVariables();
+        Map<String, String> vars = new HashMap<>();
         vars.putAll(getBodyAsVariables());
         vars.putAll(getHeaderVariables());
         return vars;
