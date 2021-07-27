@@ -45,7 +45,7 @@
 }
 
 .dark-mode {
-  --blue: #005ab4;
+  --blue: #0060bf;
   --indigo: #5624b3;
   --purple: #673eb3;
   --pink: #8a305b;
@@ -69,15 +69,27 @@
   --bg-border-active: var(--color-accent-one);
 }
 
-.aws-mode {
-  --color-primary: #dae1ec;
-  --color-secondary: #667898;
-  --color-disabled: #445573;
-  --color-accent-one: #3998d2;
+.dark2-mode {
+  --blue: #0060bf;
+  --indigo: #5624b3;
+  --purple: #673eb3;
+  --pink: #8a305b;
+  --red: #8c3843;
+  --orange: #b3580e;
+  --orange-yellow: #b36b0e;
+  --yellow: #b38a12;
+  --green: #388c49;
+  --teal: #1d8c69;
+  --cyan: #1d7f8c;
+  /**/
+  --color-primary: #dae2eb;
+  --color-secondary: #667c96;
+  --color-disabled: #455a73;
+  --color-accent-one: #478bb3;
   --color-accent-two: #faa23d;
-  --bg-page: #1b222e;
-  --bg-component: #252e3f;
-  --bg-component-active: #2a3447;
+  --bg-page: #20262e;
+  --bg-component: #2a313b;
+  --bg-component-active: #303945;
   --bg-border: var(--bg-component);
   --bg-border-active: var(--color-accent-one);
 }
@@ -243,7 +255,6 @@ pre {
   margin-bottom: var(--margin-bottom);
   padding: var(--padding);
   font-size: smaller;
-  //box-shadow: 0 1px 1px 0 rgb(0 0 0 / 10%), 0 1px 5px 0 rgb(0 0 0 / 12%);
   transition: margin-bottom 0.15s ease;
 
   &.open {

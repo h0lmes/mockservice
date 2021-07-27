@@ -11,10 +11,19 @@ export const mutations = {
 import {handleError} from "../js/common";
 
 export const actions = {
-    async json({commit, rootState}) {
+    async json({commit, rootState}, schema) {
         try {
             const url = rootState.BASE_URL + '/web-api/generate/json';
-            const res = await fetch(url);
+            let res;
+            if (schema) {
+                const params = {
+                    method: 'POST',
+                    body: schema
+                };
+                res = await fetch(url, params);
+            } else {
+                res = await fetch(url);
+            }
             await handleError(res);
             const data = await res.text();
             commit('store', data);

@@ -1,14 +1,18 @@
 <template>
     <div class="monospace">
 
-        <div class="component-toolbar mb-5">
-            <button type="button" class="btn btn-primary" @click="$fetch()">GENERATE</button>
+        <div class="component-toolbar mb-4">
+            <button type="button" class="btn btn-primary" @click="$fetch()">GENERATE JSON</button>
             <button type="button" class="btn btn-default" @click="copyToClipboard(value)">
-                TO CLIPBOARD
+                COPY TO CLIPBOARD
                 <span v-show="copied">&#9989;</span>
             </button>
-            <button type="button" class="btn btn-default" @click="download">DOWNLOAD</button>
+            <button type="button" class="btn btn-default" @click="download">DOWNLOAD AS FILE</button>
         </div>
+        <AutoSizeTextArea class="mb-4"
+                          :placeholder="'Paste JSON schema (in JSON or YAML format) here or leave empty to generate random JSON'"
+                          v-model="schema"
+        ></AutoSizeTextArea>
         <pre class="smaller">{{ value }}</pre>
 
         <Loading v-if="$fetchState.pending"></Loading>
@@ -17,14 +21,16 @@
 <script>
     import {mapActions} from 'vuex';
     import Loading from "../components/Loading";
+    import AutoSizeTextArea from "../components/AutoSizeTextArea";
     import copy from "../assets/clipboard";
 
     export default {
         name: "generate",
-        components: {Loading},
+        components: {Loading, AutoSizeTextArea},
         data() {
             return {
                 copied: false,
+                schema: ''
             }
         },
         computed: {
@@ -34,7 +40,7 @@
         },
         async fetch() {
             this.copied = false;
-            return this.generateJson();
+            return this.generateJson(this.schema);
         },
         fetchDelay: 0,
         methods: {

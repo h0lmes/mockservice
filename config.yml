@@ -96,7 +96,7 @@ routes:
   type: REST
   alt: ""
   responseCode: 200
-  response: "[{\"id\": 2097, \"category\": {\"id\": 2794085, \"name\": \"null\"}, \"name\": \"doggie\", \"photoUrls\": [\"null\", \"null\", \"null\"], \"tags\": [{\"id\": 873028, \"name\": \"null\"}, {\"id\": 9671, \"name\": \"null\"}], \"status\": \"available\"}, {\"id\": 7802, \"category\": {\"id\": 2172968117, \"name\": \"null\"}, \"name\": \"doggie\", \"photoUrls\": [\"null\", \"null\", \"null\"], \"tags\": [{\"id\": 5147268, \"name\": \"null\"}, {\"id\": 838, \"name\": \"null\"}, {\"id\": 8, \"name\": \"null\"}], \"status\": \"pending\"}]"
+  response: "[{\n        \"id\": 1,\n        \"category\": {\n            \"id\": 9119923556,\n            \"name\": \"einsteins less\"\n        },\n        \"name\": \"doggie\",\n        \"photoUrls\": [\"gs SYTVMjB\", \"the space-time bits\"],\n        \"tags\": [{\n                \"id\": 1,\n                \"name\": \"in obvious\"\n            }],\n        \"status\": \"pending\"\n    }]"
   disabled: false
 - group: pet
   path: /v2/pet/findByStatus
@@ -112,7 +112,7 @@ routes:
   type: REST
   alt: ""
   responseCode: 200
-  response: "[{\"id\": 945893, \"category\": {\"id\": 3024, \"name\": \"null\"}, \"name\": \"doggie\", \"photoUrls\": [\"null\", \"null\", \"null\"], \"tags\": [{\"id\": 75, \"name\": \"null\"}], \"status\": \"available\"}, {\"id\": 6678357, \"category\": {\"id\": 890650, \"name\": \"null\"}, \"name\": \"doggie\", \"photoUrls\": [\"null\", \"null\"], \"tags\": [{\"id\": 3, \"name\": \"null\"}], \"status\": \"sold\"}]"
+  response: "[{\n        \"id\": 8420797081,\n        \"category\": {\n            \"id\": 2049,\n            \"name\": \"separate\"\n        },\n        \"name\": \"doggie\",\n        \"photoUrls\": [\"practitioners\", \"researchers the\"],\n        \"tags\": [{\n                \"id\": 6755,\n                \"name\": \"background implies has\"\n            }, {\n                \"id\": 85450312,\n                \"name\": \"how\"\n            }],\n        \"status\": \"pending\"\n    }]"
   disabled: false
 - group: pet
   path: /v2/pet/findByTags

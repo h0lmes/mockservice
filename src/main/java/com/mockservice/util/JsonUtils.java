@@ -1,8 +1,8 @@
 package com.mockservice.util;
 
-public class JsonUtil {
+public class JsonUtils {
     
-    private JsonUtil() {
+    private JsonUtils() {
         // default
     }
 
@@ -43,5 +43,10 @@ public class JsonUtil {
         }
 
         return builder.toString();
+    }
+
+    public static boolean isJson(String value) {
+        value = value.stripLeading();
+        return value.startsWith("{") || value.startsWith("[") || value.startsWith("null");
     }
 }

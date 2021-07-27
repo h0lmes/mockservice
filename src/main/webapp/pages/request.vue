@@ -46,7 +46,7 @@
         components: {AutoSizeTextArea, Loading},
         data() {
             return {
-                requestPlaceholder: 'POST http://localhost:8081/api/v2/entity\n\n{"name": "Johnny 5"}',
+                requestPlaceholder: 'POST http://localhost:8081/api/v2/entity\r\n\r\n{"name": "Johnny 5"}',
                 requestValue: '',
                 responseValue: '',
                 copied: false,

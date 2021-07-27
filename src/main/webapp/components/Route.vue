@@ -1,6 +1,5 @@
 <template>
-    <div class="component component-row"
-         :class="{'open' : open, 'disabled' : route.disabled}">
+    <div class="component component-row" :class="{'open' : open, 'disabled' : route.disabled}">
 
         <div class="mock-col w2">
             <div class="mock-col-header" :class="{'color-accent-one' : groupStart}">GROUP</div>
@@ -42,17 +41,13 @@
             <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.alt"/>
         </div>
 
-        <div v-show="editing" class="mock-col">
+        <div v-show="editing" class="mock-col w1">
             <div class="mock-col-header">RESPONSE CODE</div>
             <input type="text" class="form-control form-control-sm monospace" v-model="editingRoute.responseCode"/>
         </div>
 
-        <div v-show="editing" class="mock-col text-center">
-            <div class="mock-col-header">DISABLED</div>
-            <ToggleSwitch class="mock-col-value" v-model="editingRoute.disabled"></ToggleSwitch>
-        </div>
-
         <div class="mock-col w-fixed-auto">
+            <div v-show="editing" class="mock-col-header"></div>
             <div>
                 <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
                 <button type="button" class="btn btn-sm btn-default" @click="test">test</button>
@@ -61,11 +56,14 @@
         </div>
 
         <div v-show="editing" class="mock-col w100">
-            <div class="mock-col-header">RESPONSE BODY</div>
-            <AutoSizeTextArea v-model="editingRoute.response" :min-rows="1"></AutoSizeTextArea>
+            <AutoSizeTextArea v-model="editingRoute.response" :min-rows="1" placeholder="RESPONSE BODY"></AutoSizeTextArea>
         </div>
 
-        <div v-show="editing" class="mock-col w100">
+        <div v-show="editing" class="mock-col w1">
+            <ToggleSwitch class="mock-col-value" v-model="editingRoute.disabled">DISABLED</ToggleSwitch>
+        </div>
+
+        <div v-show="editing" class="mock-col w-fixed-auto">
             <button type="button" class="btn btn-sm btn-primary" @click="save">SAVE</button>
             <button type="button" class="btn btn-sm btn-default" @click="cancel">CANCEL</button>
         </div>
@@ -73,7 +71,6 @@
         <div v-if="testing" class="mock-col w100">
             <RouteTester :route="route" @close="testing = false"></RouteTester>
         </div>
-
     </div>
 </template>
 <script>

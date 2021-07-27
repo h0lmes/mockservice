@@ -11,22 +11,22 @@
   --nav-color: #8c7b6b;
   --nav-color-active: #594f46;
   --nav-color-group: #969188;
-  --nav-bg: var(--bg-page);
-  --nav-bg-active: var(--bg-component);
+  --nav-bg: var(--bg-component);
+  --nav-bg-active: var(--bg-component-active);
 }
 
 .dark-mode {
   --nav-color: #6a6d76;
   --nav-color-active: #aeb3bf;
   --nav-color-group: #4c4e54;
-  --nav-bg: var(--bg-page);
-  --nav-bg-active: var(--bg-page);
+  --nav-bg: var(--bg-component);
+  --nav-bg-active: var(--bg-component-active);
 }
 
-.aws-mode {
+.dark2-mode {
   --nav-color: #dae1ec;
   --nav-color-active: #fff;
-  --nav-color-group: #5a7099;
+  --nav-color-group: #5a7699;
   --nav-bg: var(--bg-component);
   --nav-bg-active: var(--bg-component-active);
 }

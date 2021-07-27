@@ -18,22 +18,22 @@
 <script>
     import IconSystem from '@/assets/icons/system.svg?inline';
     import IconLight from '@/assets/icons/light.svg?inline';
-    import IconDark from '@/assets/icons/dark.svg?inline';
     import IconSepia from '@/assets/icons/sepia.svg?inline';
-    import IconAws from '@/assets/icons/aws.svg?inline';
+    import IconDark from '@/assets/icons/dark.svg?inline';
+    import IconDark2 from '@/assets/icons/cloud.svg?inline';
 
     export default {
         name: "ColorModePicker",
         components: {
             IconSystem,
             IconLight,
-            IconDark,
             IconSepia,
-            IconAws
+            IconDark,
+            IconDark2
         },
         data() {
             return {
-                colors: [/*'system',*/ 'light', 'sepia', 'dark', 'aws']
+                colors: [/*'system',*/ 'light', 'sepia', 'dark', 'dark2']
             }
         },
         methods: {

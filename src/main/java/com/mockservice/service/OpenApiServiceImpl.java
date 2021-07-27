@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
 import com.mockservice.util.JsonFromSchemaGenerator;
-import com.mockservice.util.JsonUtil;
+import com.mockservice.util.JsonUtils;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -214,7 +214,7 @@ public class OpenApiServiceImpl implements OpenApiService {
 
             Object example = mediaType.getExample();
             if (example != null) {
-                return JsonUtil.unescape(example.toString());
+                return JsonUtils.unescape(example.toString());
             }
         }
         return "";
