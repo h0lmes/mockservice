@@ -8,10 +8,12 @@ Supports importing routes from OpenAPI3/Swagger2 YAML files.
 It requires you to provide a valid SOAP envelope as a response.
 There is NO support for WSDL/XSD.
 
+This project is licensed under the MIT License - see the [LICENSE](/LICENSE) file for details
+
 #
 ### Where to start
 
-Refer to README in `src/main/webapp` for instructions on how to build web application.
+Refer to [README](/src/main/webapp/README.md) in `src/main/webapp` for instructions on how to build web application.
 
 #
 ### Route Response

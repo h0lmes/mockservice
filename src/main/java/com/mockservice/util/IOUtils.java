@@ -11,11 +11,11 @@ import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class IOUtil {
+public class IOUtils {
 
     private static final String CLASSPATH = "classpath:";
 
-    private IOUtil() {
+    private IOUtils() {
         // private
     }
 

@@ -8,7 +8,7 @@ import com.mockservice.repository.RoutesChangedListener;
 import com.mockservice.request.RequestFacade;
 import com.mockservice.request.SoapRequestFacade;
 import com.mockservice.service.MockService;
-import com.mockservice.util.IOUtil;
+import com.mockservice.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,7 +58,7 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
         }
 
         try {
-            errorBody = IOUtil.asString(soapErrorDataFile);
+            errorBody = IOUtils.asString(soapErrorDataFile);
         } catch (IOException e) {
             log.error("Error loading SOAP error data file, using fallback.", e);
             errorBody = "<code>" + FAULT_CODE_PLACEHOLDER + "</code>\n<message>" + FAULT_MESSAGE_PLACEHOLDER + "</message>";

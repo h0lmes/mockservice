@@ -34,7 +34,7 @@ public class JsonGenerator {
     };
 
     public static String generate() {
-        return generate(rootValueTypes[RandomUtil.rnd(rootValueTypes.length)]);
+        return generate(rootValueTypes[RandomUtils.rnd(rootValueTypes.length)]);
     }
 
     public static String generate(JsonValueType rootElementType) {
@@ -78,12 +78,12 @@ public class JsonGenerator {
 
     private static String generateArrayValue(int level) {
         int percent = 95 - level * 30;
-        if (percent < 10 || RandomUtil.withChance(100 - percent)) {
+        if (percent < 10 || RandomUtils.withChance(100 - percent)) {
             return "null";
         }
 
-        int numberOfElements = RandomUtil.rnd(MAX_NUMBER_OF_ELEMENTS + 1);
-        JsonValueType elementType = valueTypes[RandomUtil.rnd(valueTypes.length)];
+        int numberOfElements = RandomUtils.rnd(MAX_NUMBER_OF_ELEMENTS + 1);
+        JsonValueType elementType = valueTypes[RandomUtils.rnd(valueTypes.length)];
 
         if (JsonValueType.OBJECT.equals(elementType) || JsonValueType.ARRAY.equals(elementType)) {
             String content = IntStream.range(0, numberOfElements)
@@ -106,11 +106,11 @@ public class JsonGenerator {
 
     private static String generateObjectValue(int level) {
         int percent = 95 - level * 20;
-        if (percent < 10 || RandomUtil.withChance(100 - percent)) {
+        if (percent < 10 || RandomUtils.withChance(100 - percent)) {
             return "null";
         }
 
-        int numberOfElements = RandomUtil.rnd(MAX_NUMBER_OF_ELEMENTS + 1);
+        int numberOfElements = RandomUtils.rnd(MAX_NUMBER_OF_ELEMENTS + 1);
         String content = Stream
                 .generate(() -> ValueGenerator.randomWords(1))
                 .distinct()
@@ -124,7 +124,7 @@ public class JsonGenerator {
     }
 
     private static String makeObjectElement(String name, int level) {
-        return offset(level) + makeKey(name, generateValue(valueTypes[RandomUtil.rnd(valueTypes.length)], level));
+        return offset(level) + makeKey(name, generateValue(valueTypes[RandomUtils.rnd(valueTypes.length)], level));
     }
 
     private static String makeKey(String name, String value) {

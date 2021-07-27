@@ -1,6 +1,6 @@
 package com.mockservice.web.webapp;
 
-import com.mockservice.util.IOUtil;
+import com.mockservice.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class WebApiLogsController {
 
     @GetMapping("log")
     public String getLog() throws IOException {
-        return IOUtil.asString(new File("./logs/mockservice.log"));
+        return IOUtils.asString(new File("./logs/mockservice.log"));
     }
 
     @ExceptionHandler

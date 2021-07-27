@@ -2,7 +2,7 @@ package com.mockservice.response;
 
 import com.mockservice.template.StringTemplate;
 import com.mockservice.template.TemplateEngine;
-import com.mockservice.util.IOUtil;
+import com.mockservice.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -41,7 +41,7 @@ public class RestMockResponse implements MockResponse {
     }
 
     private void read(String resource) {
-        List<String> lines = IOUtil.toList(resource);
+        List<String> lines = IOUtils.toList(resource);
         boolean readingRequest = false;
         boolean readingHead = false;
 

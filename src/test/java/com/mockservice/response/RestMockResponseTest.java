@@ -1,6 +1,6 @@
 package com.mockservice.response;
 
-import com.mockservice.util.IOUtil;
+import com.mockservice.util.IOUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ public class RestMockResponseTest {
 
     @Test
     public void parserTest() throws IOException {
-        String json = IOUtil.asString("resource.json");
+        String json = IOUtils.asString("resource.json");
         MockResponse resource = new RestMockResponse(null, json);
 
         assertEquals(TEST_BODY, resource.getResponseBody());

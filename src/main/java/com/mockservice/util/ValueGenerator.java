@@ -26,10 +26,10 @@ public class ValueGenerator {
     }
 
     public static String randomString() {
-        if (RandomUtil.withChance(20)) {
+        if (RandomUtils.withChance(20)) {
             return randomChars();
         }
-        return randomWords(stringLengths[RandomUtil.rnd(stringLengths.length)]);
+        return randomWords(stringLengths[RandomUtils.rnd(stringLengths.length)]);
     }
 
     public static String randomWords(int numberOfWords) {
@@ -56,7 +56,7 @@ public class ValueGenerator {
     }
 
     public static String randomIntegerString() {
-        int len = RandomUtil.rnd(10) + 1;
+        int len = RandomUtils.rnd(10) + 1;
         String number = ThreadLocalRandom.current()
                 .ints(0, 10)
                 .limit(len)
@@ -71,7 +71,7 @@ public class ValueGenerator {
     }
 
     private static String maybeFloatify(String number) {
-        if (RandomUtil.withChance(75)) {
+        if (RandomUtils.withChance(75)) {
             if (number.length() >= 2) {
                 int pointPosition = ThreadLocalRandom.current().nextInt(1, number.length());
                 number = number.substring(0, pointPosition) + "." + number.substring(pointPosition);
@@ -83,6 +83,6 @@ public class ValueGenerator {
     }
 
     public static String randomBooleanString() {
-        return booleans[RandomUtil.rnd(2)];
+        return booleans[RandomUtils.rnd(2)];
     }
 }

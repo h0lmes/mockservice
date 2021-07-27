@@ -1,7 +1,7 @@
 package com.mockservice.service;
 
 import com.mockservice.util.JsonGenerator;
-import com.mockservice.util.RandomUtil;
+import com.mockservice.util.RandomUtils;
 import com.mockservice.util.ValueGenerator;
 import org.springframework.stereotype.Service;
 
@@ -22,13 +22,13 @@ public class JsonQuantumTheory implements QuantumTheory {
 
     @Override
     public String apply(String input) {
-        if (RandomUtil.withChance(20)) {
+        if (RandomUtils.withChance(20)) {
             return JsonGenerator.generate();
         }
-        if (RandomUtil.withChance(10)) {
+        if (RandomUtils.withChance(10)) {
             return "";
         }
-        if (RandomUtil.withChance(40)) {
+        if (RandomUtils.withChance(40)) {
             return input;
         }
 
@@ -59,7 +59,7 @@ public class JsonQuantumTheory implements QuantumTheory {
 
     private String stringReplacer(MatchResult matchResult) {
         String name = matchResult.groupCount() > 0 ? matchResult.group(1) : ValueGenerator.randomWords(1);
-        if (RandomUtil.withChance(10)) {
+        if (RandomUtils.withChance(10)) {
             return "\"" + name + "\": null";
         }
         return "\"" + name + "\": \"" + ValueGenerator.randomString() + "\"";
@@ -67,7 +67,7 @@ public class JsonQuantumTheory implements QuantumTheory {
 
     private String numberReplacer(MatchResult matchResult) {
         String name = matchResult.groupCount() > 0 ? matchResult.group(1) : ValueGenerator.randomWords(1);
-        if (RandomUtil.withChance(10)) {
+        if (RandomUtils.withChance(10)) {
             return "\"" + name + "\": null";
         }
         return "\"" + name + "\": " + ValueGenerator.randomNumberString();

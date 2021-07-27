@@ -2,7 +2,7 @@ package com.mockservice.service;
 
 import com.mockservice.domain.Route;
 import com.mockservice.repository.ConfigRepository;
-import com.mockservice.util.RandomUtil;
+import com.mockservice.util.RandomUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -44,7 +44,7 @@ public class RouteServiceImpl implements RouteService {
         if (alts.size() == 1) {
             return Optional.of(alts.get(0));
         }
-        return Optional.of(alts.get(RandomUtil.rnd(alts.size())));
+        return Optional.of(alts.get(RandomUtils.rnd(alts.size())));
     }
 
     @Override

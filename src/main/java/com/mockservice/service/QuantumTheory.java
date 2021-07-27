@@ -1,6 +1,6 @@
 package com.mockservice.service;
 
-import com.mockservice.util.RandomUtil;
+import com.mockservice.util.RandomUtils;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -13,11 +13,11 @@ public interface QuantumTheory {
     };
 
     default int randomStatusCode() {
-        return statusCodes[RandomUtil.rnd(statusCodes.length)];
+        return statusCodes[RandomUtils.rnd(statusCodes.length)];
     }
 
     default int apply(int statusCode) {
-        if (RandomUtil.withChance(20)) {
+        if (RandomUtils.withChance(20)) {
              return randomStatusCode();
         }
         return statusCode;

@@ -10,7 +10,7 @@ public class MapUtilsTest {
 
     @Test
     public void jsonToFlatMapTest() throws IOException {
-        String json = IOUtil.asString("map.json");
+        String json = IOUtils.asString("map.json");
         Map<String, Object> objectMap = MapUtils.jsonToMap(json);
         Map<String, String> map = MapUtils.flattenMap(objectMap);
 

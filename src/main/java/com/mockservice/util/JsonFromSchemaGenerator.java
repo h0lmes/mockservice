@@ -12,8 +12,12 @@ public class JsonFromSchemaGenerator {
         // default
     }
 
-    @SuppressWarnings("unchecked")
     public static String jsonFromSchema(Map<String, Object> map) {
+        return jsonFromSchema(map, 0);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static String jsonFromSchema(Map<String, Object> map, int level) {
         if (!map.containsKey("type")) {
             return "null";
         }
@@ -26,35 +30,43 @@ public class JsonFromSchemaGenerator {
 
         switch (type) {
             case "array":
-                return makeArray(map);
+                return makeArray(map, level);
             case "object":
-                return makeObject(map);
+                return makeObject(map, level);
             case "number":
-                return makeNumber(map);
+                return makeNumber(map, level);
             case "integer":
-                return makeInteger(map);
+                return makeInteger(map, level);
             case "string":
-                return makeString(map);
+                return makeString(map, level);
             case "boolean":
-                return makeBoolean();
+                return makeBoolean(map, level);
             case "enum":
-                return makeEnum(map);
+                return makeEnum(map, level);
             default:
-                return "null";
+                return makeNull(map, level);
         }
     }
 
+    private static String offset(int level) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < level; i++) {
+            builder.append("    ");
+        }
+        return builder.toString();
+    }
+
     @SuppressWarnings("unchecked")
-    private static String makeArray(Map<String, Object> map) {
+    private static String makeArray(Map<String, Object> map, int level) {
         Map<String, Object> items = (Map) map.get("items");
-        int numberOfElements = RandomUtil.rnd(MIN_NUMBER_OF_ELEMENTS, MAX_NUMBER_OF_ELEMENTS);
+        int numberOfElements = RandomUtils.rnd(MIN_NUMBER_OF_ELEMENTS, MAX_NUMBER_OF_ELEMENTS);
 
         StringBuilder sb = new StringBuilder("[");
         String delimiter = "";
 
         for (int i = 0; i < numberOfElements; i++) {
             sb.append(delimiter)
-                    .append(jsonFromSchema(items));
+                    .append(jsonFromSchema(items, level + 1));
             delimiter = ", ";
         }
 
@@ -62,37 +74,44 @@ public class JsonFromSchemaGenerator {
     }
 
     @SuppressWarnings("unchecked")
-    private static String makeObject(Map<String, Object> map) {
+    private static String makeObject(Map<String, Object> map, int level) {
         StringBuilder sb = new StringBuilder("{");
         String delimiter = "";
 
         Map<String, Object> properties = (Map) map.get("properties");
         if (properties != null) {
             for (Map.Entry<String, Object> e : properties.entrySet()) {
-                sb.append(delimiter)
+                sb
+                        .append(delimiter)
+                        .append("\n")
+                        .append(offset(level + 1))
                         .append("\"")
                         .append(e.getKey())
                         .append("\": ")
-                        .append(jsonFromSchema((Map) e.getValue()));
-                delimiter = ", ";
+                        .append(jsonFromSchema((Map) e.getValue(), level + 1));
+                delimiter = ",";
             }
         }
 
-        return sb.append("}").toString();
+        return sb
+                .append("\n")
+                .append(offset(level))
+                .append("}")
+                .toString();
     }
 
     @SuppressWarnings("unchecked")
-    private static String makeNumber(Map<String, Object> map) {
+    private static String makeNumber(Map<String, Object> map, int level) {
         return ValueGenerator.randomNumberString();
     }
 
     @SuppressWarnings("unchecked")
-    private static String makeInteger(Map<String, Object> map) {
+    private static String makeInteger(Map<String, Object> map, int level) {
         return ValueGenerator.randomIntegerString();
     }
 
     @SuppressWarnings("unchecked")
-    private static String makeString(Map<String, Object> map) {
+    private static String makeString(Map<String, Object> map, int level) {
         if (map.containsKey("example")) {
             return "\"" + map.get("example").toString() + "\"";
         }
@@ -120,15 +139,15 @@ public class JsonFromSchemaGenerator {
         }
     }
 
-    private static String makeBoolean() {
+    private static String makeBoolean(Map<String, Object> map, int level) {
         return ValueGenerator.randomBooleanString();
     }
 
     @SuppressWarnings("unchecked")
-    private static String makeEnum(Map<String, Object> map) {
+    private static String makeEnum(Map<String, Object> map, int level) {
         List<Object> enumList = (List) map.get("enum");
         if (enumList != null) {
-            int index = RandomUtil.rnd(enumList.size());
+            int index = RandomUtils.rnd(enumList.size());
             if (enumList.get(index) instanceof String) {
                 return "\"" + enumList.get(index).toString() + "\"";
             } else {
@@ -136,6 +155,10 @@ public class JsonFromSchemaGenerator {
             }
         }
 
+        return "null";
+    }
+
+    private static String makeNull(Map<String, Object> map, int level) {
         return "null";
     }
 }

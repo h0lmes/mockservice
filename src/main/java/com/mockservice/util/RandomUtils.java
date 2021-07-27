@@ -2,9 +2,9 @@ package com.mockservice.util;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class RandomUtil {
+public class RandomUtils {
 
-    private RandomUtil() {}
+    private RandomUtils() {}
 
     public static int rnd(int numberOfAlternatives) {
         return ThreadLocalRandom.current().nextInt(0, numberOfAlternatives);
