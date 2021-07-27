@@ -2,6 +2,7 @@ package com.mockservice.web.internal;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
 import com.mockservice.repository.ConfigChangedListener;
@@ -12,6 +13,7 @@ import com.mockservice.service.MockService;
 import com.mockservice.web.webapp.ErrorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,16 +37,19 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
     private final ConfigRepository configRepository;
     private Method mockMethod = null;
+    private final ObjectWriter objectWriter;
     private final Map<String, Integer> registeredRoutes = new ConcurrentHashMap<>();
 
     public ConfigBasedRestController(HttpServletRequest request,
                                      MockService mockService,
                                      RequestMappingHandlerMapping requestMappingHandlerMapping,
-                                     ConfigRepository configRepository) {
+                                     ConfigRepository configRepository,
+                                     @Qualifier("jsonMapper") ObjectMapper jsonMapper) {
         this.request = request;
         this.mockService = mockService;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
         this.configRepository = configRepository;
+        this.objectWriter = jsonMapper.writer();
 
         log.info("ForkJoinPool parallelism = {}, poolSize = {}",
                 ForkJoinPool.commonPool().getParallelism(),
@@ -118,7 +123,7 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
 
     private String mockError(Throwable t) {
         try {
-            return new ObjectMapper().writeValueAsString(new ErrorInfo(t));
+            return objectWriter.writeValueAsString(new ErrorInfo(t));
         } catch (JsonProcessingException e) {
             return "";
         }

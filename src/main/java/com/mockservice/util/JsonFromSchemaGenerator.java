@@ -93,9 +93,8 @@ public class JsonFromSchemaGenerator {
 
     @SuppressWarnings("unchecked")
     private static String makeString(Map<String, Object> map) {
-        String example = String.valueOf(map.get("example"));
-        if (!example.isEmpty()) {
-            return "\"" + example + "\"";
+        if (map.containsKey("example")) {
+            return "\"" + map.get("example").toString() + "\"";
         }
 
         String format = String.valueOf(map.get("format"));

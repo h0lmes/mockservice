@@ -2,7 +2,8 @@
     <div class="monospace">
         <input type="file" ref="file_file" id="file_file" @change="openFile()"/>
         <div class="component-toolbar mb-4">
-            <button type="button" class="btn btn-primary" @click="$refs.file_file.click()">IMPORT OPENAPI FILE</button>
+            <div>{{ fileName }}</div>
+            <button type="button" class="btn btn-primary" @click="selectFile()">IMPORT OPENAPI FILE</button>
             <button type="button" class="btn btn-default" @click="addAll()">ADD ALL ROUTES</button>
             <ToggleSwitch v-model="overwrite">Overwrite existing routes</ToggleSwitch>
         </div>
@@ -27,6 +28,7 @@
             return {
                 value: '',
                 overwrite: false,
+                fileName: 'Select a file'
             }
         },
         computed: {
@@ -59,9 +61,15 @@
                 this.$nuxt.$loading.start();
                 this.saveAllRoutes(routes, this.overwrite).then(() => this.$nuxt.$loading.finish());
             },
+            selectFile() {
+                this.fileName = 'Select a file';
+                this.$refs.file_file.value = null;
+                this.$refs.file_file.click()
+            },
             openFile() {
                 const files = this.$refs.file_file.files;
                 if (files && files[0]) {
+                    this.fileName = 'Loading...';
                     this.$nuxt.$loading.start();
                     const reader = new FileReader();
                     reader.readAsText(files[0], "UTF-8");
@@ -69,8 +77,12 @@
                         this.$nuxt.$loading.finish();
                         this.value = e.target.result;
                         this.$fetch();
+                        this.fileName = files[0].name;
                     };
-                    reader.onerror = () => this.$nuxt.$loading.finish();
+                    reader.onerror = () => {
+                        this.$nuxt.$loading.finish();
+                        this.fileName = 'Error';
+                    }
                 }
             },
         }

@@ -84,10 +84,6 @@ after the response was sent.
 
 Alt allow you to create alternative responses for the same path.
 
-If an Alt is a numeric HTTP status code (e.g. 400)
-and no response status code specified in RESPONSE BODY
-then Alt would be used as a response status code.
-
 To select an Alt:
 - send **Mock-Alt** header in HTTP request
 - enable **Random Alt** in **Settings**
@@ -145,12 +141,14 @@ Variables are collected from the following sources:
 
 1. Path variables (`/api/v1/account/{id}`).
 2. Request parameters (`/api/v1/account?id=1`).
-3. Request payload (JSON). All fields of the JSON would be collected
+3. Authorization JWT token. All fields of the payload JSON
+would be collected as variables (preserving hierarchy).
+4. Request payload (JSON). All fields of the JSON would be collected
 as variables (preserving hierarchy).
-4. Request payload (SOAP). All fields of the SOAP envelope Body tag
+5. Request payload (SOAP). All fields of the SOAP envelope Body tag
 would be collected as variables
 (without namespace, preserving hierarchy).
-5. **Mock-Variable** header (see section below).
+6. **Mock-Variable** header (see section below).
 
 Example of request payload (JSON):
 

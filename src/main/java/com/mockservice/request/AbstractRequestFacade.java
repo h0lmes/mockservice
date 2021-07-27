@@ -17,6 +17,7 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     private static final String NAME_DELIMITER = "-";
     private static final String ALT_HEADER = "Mock-Alt";
     private static final String VARIABLE_HEADER = "Mock-Variable";
+    private static final String AUTH_HEADER = "Authorization";
     private static final String HEADER_SPLIT = "/";
 
     private final String endpoint;
@@ -26,6 +27,7 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     private final Map<String, String> requestParams = new HashMap<>();
     private final List<String[]> mockVarHeaders;
     private final List<String[]> mockAltHeaders;
+    final List<String[]> authHeaders;
     private String body = "";
 
     @SuppressWarnings("unchecked")
@@ -45,6 +47,7 @@ public abstract class AbstractRequestFacade implements RequestFacade {
 
         mockVarHeaders = getHeadersParts(request, VARIABLE_HEADER);
         mockAltHeaders = getHeadersParts(request, ALT_HEADER);
+        authHeaders = getHeadersParts(request, AUTH_HEADER);
 
         try {
             body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));

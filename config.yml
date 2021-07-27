@@ -2,6 +2,14 @@ settings:
   randomAlt: false
   quantum: false
 routes:
+- group: Default
+  path: /jwt
+  method: GET
+  type: REST
+  alt: ""
+  responseCode: 200
+  response: "{\n  \"sub\": \"${sub:DEFAULT}\",\n  \"name\": \"${name:DEFAULT}\",\n  \"iat\": ${iat:0}\n}"
+  disabled: false
 - group: a robot service
   path: /api/robot
   method: GET
@@ -88,7 +96,7 @@ routes:
   type: REST
   alt: ""
   responseCode: 200
-  response: "[{\"id\": 130781, \"category\": {\"id\": 2283, \"name\": \"among\"}, \"name\": \"of strings\", \"photoUrls\": [\"or quantum\", \" prOGFPA!RyiYMXOgrO KM-qgUukT\", \"obvious appearances\"], \"tags\": [{\"id\": 5279, \"name\": \"which to\"}, {\"id\": 76299, \"name\": \"in\"}, {\"id\": 790425, \"name\": \"specific theory\"}], \"status\": \"available\"}, {\"id\": 21, \"category\": {\"id\": 516644, \"name\": \"in\"}, \"name\": \"together ends some\", \"photoUrls\": [\"theory\", \"j!ikRjZuGKMl Vop G Vgm\", \"unsolved\"], \"tags\": [{\"id\": 87302306, \"name\": \"attempts\"}, {\"id\": 368, \"name\": \"attracted theory\"}], \"status\": \"available\"}]"
+  response: "[{\"id\": 2097, \"category\": {\"id\": 2794085, \"name\": \"null\"}, \"name\": \"doggie\", \"photoUrls\": [\"null\", \"null\", \"null\"], \"tags\": [{\"id\": 873028, \"name\": \"null\"}, {\"id\": 9671, \"name\": \"null\"}], \"status\": \"available\"}, {\"id\": 7802, \"category\": {\"id\": 2172968117, \"name\": \"null\"}, \"name\": \"doggie\", \"photoUrls\": [\"null\", \"null\", \"null\"], \"tags\": [{\"id\": 5147268, \"name\": \"null\"}, {\"id\": 838, \"name\": \"null\"}, {\"id\": 8, \"name\": \"null\"}], \"status\": \"pending\"}]"
   disabled: false
 - group: pet
   path: /v2/pet/findByStatus
@@ -104,7 +112,7 @@ routes:
   type: REST
   alt: ""
   responseCode: 200
-  response: "[{\"id\": 44860056, \"category\": {\"id\": 6145429, \"name\": \"space-time vibrate argue\"}, \"name\": \"the the\", \"photoUrls\": [\"included\"], \"tags\": [{\"id\": 3, \"name\": \"itself quantum appearances\"}], \"status\": \"pending\"}]"
+  response: "[{\"id\": 945893, \"category\": {\"id\": 3024, \"name\": \"null\"}, \"name\": \"doggie\", \"photoUrls\": [\"null\", \"null\", \"null\"], \"tags\": [{\"id\": 75, \"name\": \"null\"}], \"status\": \"available\"}, {\"id\": 6678357, \"category\": {\"id\": 890650, \"name\": \"null\"}, \"name\": \"doggie\", \"photoUrls\": [\"null\", \"null\"], \"tags\": [{\"id\": 3, \"name\": \"null\"}], \"status\": \"sold\"}]"
   disabled: false
 - group: pet
   path: /v2/pet/findByTags

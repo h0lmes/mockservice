@@ -4,7 +4,7 @@
             <div class="toolbar-item">
                 <input ref="search"
                        type="search"
-                       class="form-control"
+                       class="form-control monospace"
                        placeholder="search here or click on values"
                        @input="debounce($event.target.value)"/>
             </div>

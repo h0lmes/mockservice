@@ -1,12 +1,13 @@
 package com.mockservice.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.mockservice.domain.*;
-import com.mockservice.service.YamlMapperService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -33,11 +34,11 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     public ConfigRepositoryImpl(@Value("${application.config-filename}") String fileConfigPath,
                                 @Value("${application.config-backup-filename}") String fileConfigBackupPath,
-                                YamlMapperService yamlMapperService) {
+                                @Qualifier("yamlMapper") ObjectMapper yamlMapper) {
         this.fileConfigPath = fileConfigPath;
         this.fileConfigBackupPath = fileConfigBackupPath;
-        this.yamlReader = yamlMapperService.yamlReader();
-        this.yamlWriter = yamlMapperService.yamlWriter();
+        this.yamlReader = yamlMapper.reader();
+        this.yamlWriter = yamlMapper.writer();
 
         try {
             readConfigFromFile();

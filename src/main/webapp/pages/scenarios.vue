@@ -5,7 +5,7 @@
                 <input ref="search"
                        type="search"
                        placeholder="search here or click on values"
-                       class="form-control"
+                       class="form-control monospace"
                        @input="debounce($event.target.value)"/>
             </div>
             <button type="button" class="toolbar-item-fixed btn" @click="setFilter('')">Clear filter</button>

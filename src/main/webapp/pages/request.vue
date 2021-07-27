@@ -80,20 +80,21 @@
             } else {
                 lines = this.requestValue.substring(selStart, selEnd).split('\n');
             }
-            const len = lines.length;
             const spaceIndex = lines[0].indexOf(' ');
             const method = spaceIndex > -1 ? lines[0].substring(0, spaceIndex).toUpperCase() : 'GET';
             const url = spaceIndex > -1 ? lines[0].substring(spaceIndex + 1) : lines[0];
 
             const headers = {};
             let i = 1;
-            while (i < len && lines[i]) {
-                // add header
+            while (i < lines.length && !!lines[i]) {
+                const index = lines[i].indexOf(':');
+                const headerName = lines[i].substring(0, index);
+                headers[headerName] = lines[i].substring(index + 1);
                 i++;
             }
 
             let body = '';
-            while (++i < len) {
+            while (++i < lines.length) {
                 body += lines[i] + '\n';
             }
 

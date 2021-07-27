@@ -27,6 +27,7 @@ import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -43,8 +44,8 @@ public class OpenApiServiceImpl implements OpenApiService {
     private static final String URL_PARTS_REGEX = "(https?:\\/\\/)?(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\b(\\/.*)";
     private final ObjectMapper mapper;
 
-    public OpenApiServiceImpl(YamlMapperService yamlMapperService) {
-        mapper = yamlMapperService.getJsonMapper();
+    public OpenApiServiceImpl(@Qualifier("jsonMapper") ObjectMapper jsonMapper) {
+        mapper = jsonMapper;
     }
 
     @Override
@@ -57,6 +58,7 @@ public class OpenApiServiceImpl implements OpenApiService {
         parseOptions.setResolve(true);
         parseOptions.setResolveFully(true);
         SwaggerParseResult result = new OpenAPIParser().readContents(yaml, null, parseOptions);
+        //
         if (result.getMessages() != null) {
             result.getMessages().forEach(log::warn);
         }
