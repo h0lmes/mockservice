@@ -122,6 +122,22 @@ routes:
   responseCode: 400
   response: ""
   disabled: false
+- group: pet
+  path: "/v2/pet/{petId}"
+  method: GET
+  type: REST
+  alt: ""
+  responseCode: 200
+  response: "{\n    \"id\": 80939,\n    \"category\": {\n        \"id\": 10,\n        \"name\": \"GjvyEkmfe!H, I-sgr  Nak \"\n    },\n    \"name\": \"doggie\",\n    \"photoUrls\": [\"differences decades\", \"attracted\"],\n    \"tags\": [{\n            \"id\": 5956,\n            \"name\": \" bb. Z H VfXdh phfbk v-b kV L\"\n        }],\n    \"status\": \"pending\"\n}"
+  disabled: false
+- group: pet
+  path: "/v2/pet/{petId}"
+  method: GET
+  type: REST
+  alt: 400
+  responseCode: 400
+  response: ""
+  disabled: false
 scenarios:
 - group: Default
   alias: entity 400

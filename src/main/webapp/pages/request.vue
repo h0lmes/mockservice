@@ -8,6 +8,7 @@
         </div>
         <AutoSizeTextArea class="mb-4"
                           ref="requestText"
+                          :min-rows="3"
                           :placeholder="requestPlaceholder"
                           @keydown.ctrl.enter.exact="$fetch()"
                           @keydown.116.exact.prevent="storeRequest"
@@ -16,7 +17,7 @@
 
         <div v-show="responseValue" class="component-toolbar mb-4">
             <button type="button" class="btn btn-default" @click="copyToClipboard(responseValue)">
-                TO CLIPBOARD
+                COPY TO CLIPBOARD
                 <span v-show="copied">&#9989;</span>
             </button>
             <button type="button" class="btn btn-default" @click="saveResponse">SAVE RESPONSE TO FILE</button>

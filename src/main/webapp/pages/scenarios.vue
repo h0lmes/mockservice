@@ -15,7 +15,10 @@
 
         <Scenarios :scenarios="filtered"
                    :activeScenarios="activeScenarios"
-                   @filter="setFilter($event)"></Scenarios>
+                   @filter="setFilter($event)"
+        ></Scenarios>
+
+        <div class="secondary mt-4 smaller">(middle-click Scenario to edit)</div>
 
         <Loading v-if="$fetchState.pending"></Loading>
     </div>

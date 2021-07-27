@@ -1,9 +1,10 @@
 <template>
-    <div class="component component-row" :class="{'open' : open, 'disabled' : route.disabled}">
+    <div class="component component-row" :class="{'open' : open, 'disabled' : route.disabled}" @click.middle="edit">
 
         <div class="mock-col w2">
             <div class="mock-col-header" :class="{'color-accent-one' : groupStart}">GROUP</div>
-            <div v-show="!editing" class="mock-col-value link" :class="{'color-accent-one' : groupStart}"
+            <div v-show="!editing" class="mock-col-value link"
+                 :class="{'color-accent-one' : groupStart}"
                  @click="filter(route.group)">{{ route.group }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingRoute.group"/>
         </div>

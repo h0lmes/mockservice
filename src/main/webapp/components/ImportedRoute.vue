@@ -1,7 +1,7 @@
 <template>
-    <div class="component row" :class="{'open' : open}">
+    <div class="component row" :class="{'open' : open}" @click="toggle">
         <div class="item w-fixed-auto">
-            <button type="button" class="btn btn-sm btn-default" @click="$emit('add', route)">{{ addLabel }}</button>
+            <button type="button" class="btn btn-sm btn-default" @click.stop="$emit('add', route)">{{ addLabel }}</button>
         </div>
         <div class="item">
             <div class="mock-col-value" :class="{'color-accent-one' : exists}">{{ existsLabel }}</div>
@@ -21,10 +21,9 @@
             <div class="mock-col-value">{{ route.alt }}</div>
         </div>
         <div class="item">
-            <div class="mock-col-value link" @click="toggle" :class="{'color-accent-one' : hasResponse}">{{ hasResponseLabel }}</div>
+            <div class="mock-col-value link" :class="{'color-accent-one' : hasResponse}">{{ hasResponseLabel }}</div>
         </div>
         <div class="item w100" v-show="open">
-            <div class="mock-col-header">RESPONSE BODY</div>
             <AutoSizeTextArea v-model="route.response"></AutoSizeTextArea>
         </div>
     </div>
@@ -60,7 +59,7 @@
                 return this.exists ? 'exists' : '-';
             },
             addLabel() {
-                return this.exists ? 'overwrite' : '-- add --';
+                return this.exists ? 'overwrite' : '\u00A0\u00A0 add \u00A0\u00A0';
             }
         },
         methods: {

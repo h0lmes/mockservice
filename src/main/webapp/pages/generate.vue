@@ -10,7 +10,7 @@
             <button type="button" class="btn btn-default" @click="download">DOWNLOAD AS FILE</button>
         </div>
         <AutoSizeTextArea class="mb-4"
-                          :placeholder="'Paste JSON schema (in JSON or YAML format) here or leave empty to generate random JSON'"
+                          :placeholder="'Paste JSON schema here (in JSON or YAML format) or leave empty to generate random JSON\nRead more about JSON schema at https://json-schema.org/'"
                           v-model="schema"
         ></AutoSizeTextArea>
         <pre class="smaller">{{ value }}</pre>

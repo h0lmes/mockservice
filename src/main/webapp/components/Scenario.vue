@@ -1,5 +1,5 @@
 <template>
-    <div class="component component-row" :class="{'open' : open}">
+    <div class="component component-row" :class="{'open' : open}" @click.middle="edit">
 
         <div class="mock-col">
             <div class="mock-col-header" :class="{'color-accent-one' : groupStart}">GROUP</div>

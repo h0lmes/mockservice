@@ -16,6 +16,8 @@
 
         <Routes :routes="filtered" @filter="setFilter($event)"></Routes>
 
+        <div class="secondary mt-4 smaller">(middle-click Route to edit)</div>
+
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
 </template>
