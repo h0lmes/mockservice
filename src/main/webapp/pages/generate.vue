@@ -22,7 +22,7 @@
     import {mapActions} from 'vuex';
     import Loading from "../components/Loading";
     import AutoSizeTextArea from "../components/AutoSizeTextArea";
-    import copy from "../assets/clipboard";
+    import copy from "../js/clipboard";
 
     export default {
         name: "generate",

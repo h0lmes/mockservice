@@ -60,6 +60,13 @@
             <AutoSizeTextArea v-model="editingRoute.response" :min-rows="1" placeholder="RESPONSE BODY"></AutoSizeTextArea>
         </div>
 
+        <div v-show="editing" class="mock-col w100">
+            <ToggleSwitch class="mock-col-value" v-model="showRequestBodySchema">SHOW REQUEST BODY SCHEMA</ToggleSwitch>
+        </div>
+        <div v-show="editing && showRequestBodySchema" class="mock-col w100">
+            <AutoSizeTextArea v-model="editingRoute.requestBodySchema" :min-rows="1" placeholder="REQUEST BODY SCHEMA (JSON)"></AutoSizeTextArea>
+        </div>
+
         <div v-show="editing" class="mock-col w1">
             <ToggleSwitch class="mock-col-value" v-model="editingRoute.disabled">DISABLED</ToggleSwitch>
         </div>
@@ -88,6 +95,7 @@
                 editing: false,
                 editingRoute: {},
                 testing: false,
+                showRequestBodySchema: false,
             }
         },
         props: {
@@ -110,6 +118,7 @@
             edit() {
                 this.testing = false;
                 this.editingRoute = {...this.route};
+                this.showRequestBodySchema = !!this.editingRoute.requestBodySchema;
                 this.editing = !this.editing;
             },
             test() {

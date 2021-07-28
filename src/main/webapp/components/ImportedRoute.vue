@@ -21,10 +21,14 @@
             <div class="mock-col-value">{{ route.alt }}</div>
         </div>
         <div class="item">
-            <div class="mock-col-value link" :class="{'color-accent-one' : hasResponse}">{{ hasResponseLabel }}</div>
+            <div class="mock-col-value link" :class="{'color-accent-one' : more}">{{ moreLabel }}</div>
         </div>
-        <div class="item w100" v-show="open">
+        <div class="item w100" v-show="open" @click.stop>
             <AutoSizeTextArea v-model="route.response"></AutoSizeTextArea>
+        </div>
+        <div class="item w100" v-show="open && !!route.requestBodySchema" @click.stop>
+            <div class="mock-col-header">REQUEST BODY SCHEMA</div>
+            <AutoSizeTextArea v-model="route.requestBodySchema"></AutoSizeTextArea>
         </div>
     </div>
 </template>
@@ -46,11 +50,14 @@
             groupStart: {type: Boolean},
         },
         computed: {
-            hasResponse() {
-                return !!this.route.response;
+            more() {
+                return !!this.route.response || !!this.route.requestBodySchema;
             },
-            hasResponseLabel() {
-                return this.hasResponse ? 'has response' : '-';
+            moreLabel() {
+                let label = '';
+                if (!!this.route.response) label += 'has response';
+                if (!!this.route.requestBodySchema) label += (!!label ? ', ' : '') + 'has request body schema';
+                return !!label ? label : '-';
             },
             exists() {
                 return this.existingRoutes.some(e => e.method === this.route.method && e.path === this.route.path && e.alt === this.route.alt);

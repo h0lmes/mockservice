@@ -30,17 +30,10 @@
 <script>
     import Loading from "../components/Loading";
     import AutoSizeTextArea from "../components/AutoSizeTextArea";
-    import copy from "../assets/clipboard";
+    import copy from "../js/clipboard";
+    import {handleError} from "../js/common";
 
     const storageKey = 'MockServiceRequest';
-
-    async function handleError(response) {
-        if (!response.ok) {
-            const err = await response.json();
-            throw Error(err.statusText || err.error || err.message || err);
-        }
-        return response;
-    }
 
     export default {
         name: "request",

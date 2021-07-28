@@ -14,6 +14,7 @@ public class Route implements Comparable<Route> {
     private String alt = "";
     private int responseCode = 200;
     private String response = "";
+    private String requestBodySchema = "";
     private boolean disabled = false;
 
     public Route() {
@@ -65,6 +66,11 @@ public class Route implements Comparable<Route> {
         return this;
     }
 
+    @JsonIgnore
+    public boolean isRest() {
+        return RouteType.REST.equals(type);
+    }
+
     public String getAlt() {
         return alt;
     }
@@ -105,6 +111,15 @@ public class Route implements Comparable<Route> {
         return this;
     }
 
+    public String getRequestBodySchema() {
+        return requestBodySchema;
+    }
+
+    public Route setRequestBodySchema(String requestBodySchema) {
+        this.requestBodySchema = requestBodySchema == null ? "" : requestBodySchema;
+        return this;
+    }
+
     public boolean getDisabled() {
         return disabled;
     }
@@ -122,6 +137,7 @@ public class Route implements Comparable<Route> {
         setAlt(source.getAlt());
         setResponseCode(source.getResponseCode());
         setResponse(source.getResponse());
+        setRequestBodySchema(source.getRequestBodySchema());
         setDisabled(source.getDisabled());
         return this;
     }

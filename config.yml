@@ -1,6 +1,7 @@
 settings:
   randomAlt: false
   quantum: false
+  failedInputValidationAlt400: true
 routes:
 - group: Default
   path: /jwt
@@ -9,6 +10,7 @@ routes:
   alt: ""
   responseCode: 200
   response: "{\n  \"sub\": \"${sub:DEFAULT}\",\n  \"name\": \"${name:DEFAULT}\",\n  \"iat\": ${iat:0}\n}"
+  requestBodySchema: ""
   disabled: false
 - group: a robot service
   path: /api/robot
@@ -17,6 +19,7 @@ routes:
   alt: ""
   responseCode: 202
   response: "HTTP/1.1\nExtra: extra-value\n\n{\"name\": \"Johnny 5\"}\n---\nGET localhost:8081/api/robot HTTP/1.1\nMock-Alt: api-robot/R2D2\n\n{}"
+  requestBodySchema: ""
   disabled: false
 - group: a robot service
   path: /api/robot
@@ -25,6 +28,7 @@ routes:
   alt: R2D2
   responseCode: 200
   response: "{\"name\": \"R2D2\"}"
+  requestBodySchema: ""
   disabled: false
 - group: a robot service
   path: /api/robot
@@ -33,6 +37,7 @@ routes:
   alt: terminator
   responseCode: 200
   response: "{\"name\": \"terminator\"}"
+  requestBodySchema: ""
   disabled: false
 - group: a test service
   path: /api with spaces
@@ -41,6 +46,7 @@ routes:
   alt: ""
   responseCode: 200
   response: "[\n  {\n    \"_id\": \"56af331efbeca6240c61b2ca\",\n    \"index\": 120000,\n    \"percent\": -0.12,\n    \"exp_number\": 1.123244e12,\n    \"guid\": \"bedb2018-c017-429E-b520-696ea3666692\",\n    \"isValid\": true,\n    \"comment\": null,\n    \"isActive\": false,\n    \"balance\": \"$2,202,350\",\n    \"object\": {\n        \"name\": \"am\",\n        \"lastname\": \"lang\"\n    }\n  }\n]"
+  requestBodySchema: ""
   disabled: false
 - group: entity service
   path: /api/v2/entity
@@ -49,6 +55,7 @@ routes:
   alt: ""
   responseCode: 200
   response: "[\n  {\"id\": ${sequence}, \"name\": \"${random_string}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"}\n]"
+  requestBodySchema: ""
   disabled: false
 - group: entity service
   path: /api/v2/entity
@@ -57,6 +64,7 @@ routes:
   alt: 400
   responseCode: 400
   response: "[]"
+  requestBodySchema: ""
   disabled: false
 - group: entity service
   path: /api/v2/entity/filter
@@ -65,6 +73,7 @@ routes:
   alt: ""
   responseCode: 200
   response: "[\n  {\"id\": 2, \"name\": \"${a:default a}\"},\n  {\"id\": 3, \"name\": \"${b:${enum:default B1:default B2:default B3}}\"}\n]"
+  requestBodySchema: ""
   disabled: true
 - group: entity service
   path: "/api/v2/entity/{id}"
@@ -73,6 +82,7 @@ routes:
   alt: ""
   responseCode: 200
   response: "{\"id\": ${id}, \"name\": \"entity name\"}"
+  requestBodySchema: ""
   disabled: true
 - group: entity service
   path: /api/v2/entity
@@ -81,6 +91,7 @@ routes:
   alt: ""
   responseCode: 201
   response: "{\"id\": ${random_int}, \"name\": \"${name:default name}\"}"
+  requestBodySchema: ""
   disabled: false
 - group: number conversion service
   path: /mockNumberConversion
@@ -89,6 +100,7 @@ routes:
   alt: ""
   responseCode: 200
   response: "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:web=\"http://www.dataaccess.com/webservicesserver/\">\n  <soapenv:Header/>\n  <soapenv:Body>\n    <web:NumberToDollarsResponse>\n      <web:NumberToDollarsResult>${enum:TEST1:TEST2}</web:NumberToDollarsResult>\n      <web:Result>${NumberToDollarsRequest.Value:DEFAULT_VALUE}</web:Result>\n    </web:NumberToDollarsResponse>\n  </soapenv:Body>\n</soapenv:Envelope>"
+  requestBodySchema: ""
   disabled: false
 - group: pet
   path: /v2/pet/findByStatus
@@ -97,6 +109,7 @@ routes:
   alt: ""
   responseCode: 200
   response: "[{\n        \"id\": 1,\n        \"category\": {\n            \"id\": 9119923556,\n            \"name\": \"einsteins less\"\n        },\n        \"name\": \"doggie\",\n        \"photoUrls\": [\"gs SYTVMjB\", \"the space-time bits\"],\n        \"tags\": [{\n                \"id\": 1,\n                \"name\": \"in obvious\"\n            }],\n        \"status\": \"pending\"\n    }]"
+  requestBodySchema: ""
   disabled: false
 - group: pet
   path: /v2/pet/findByStatus
@@ -105,6 +118,7 @@ routes:
   alt: 400
   responseCode: 400
   response: ""
+  requestBodySchema: ""
   disabled: false
 - group: pet
   path: /v2/pet/findByTags
@@ -113,6 +127,7 @@ routes:
   alt: ""
   responseCode: 200
   response: "[{\n        \"id\": 8420797081,\n        \"category\": {\n            \"id\": 2049,\n            \"name\": \"separate\"\n        },\n        \"name\": \"doggie\",\n        \"photoUrls\": [\"practitioners\", \"researchers the\"],\n        \"tags\": [{\n                \"id\": 6755,\n                \"name\": \"background implies has\"\n            }, {\n                \"id\": 85450312,\n                \"name\": \"how\"\n            }],\n        \"status\": \"pending\"\n    }]"
+  requestBodySchema: ""
   disabled: false
 - group: pet
   path: /v2/pet/findByTags
@@ -121,22 +136,25 @@ routes:
   alt: 400
   responseCode: 400
   response: ""
+  requestBodySchema: ""
   disabled: false
-- group: pet
-  path: "/v2/pet/{petId}"
-  method: GET
+- group: store
+  path: /v2/store/order
+  method: POST
   type: REST
   alt: ""
   responseCode: 200
-  response: "{\n    \"id\": 80939,\n    \"category\": {\n        \"id\": 10,\n        \"name\": \"GjvyEkmfe!H, I-sgr  Nak \"\n    },\n    \"name\": \"doggie\",\n    \"photoUrls\": [\"differences decades\", \"attracted\"],\n    \"tags\": [{\n            \"id\": 5956,\n            \"name\": \" bb. Z H VfXdh phfbk v-b kV L\"\n        }],\n    \"status\": \"pending\"\n}"
+  response: "{\n    \"id\": 9585378182,\n    \"petId\": 793835,\n    \"quantity\": 79463074,\n    \"shipDate\": \"2018-11-13T20:20:39+00:00\",\n    \"status\": \"placed\",\n    \"complete\": true\n}"
+  requestBodySchema: "{\r\n  \"type\" : \"object\",\r\n  \"properties\" : {\r\n    \"id\" : {\r\n      \"type\" : \"integer\",\r\n      \"format\" : \"int64\"\r\n    },\r\n    \"petId\" : {\r\n      \"type\" : \"integer\",\r\n      \"format\" : \"int64\"\r\n    },\r\n    \"quantity\" : {\r\n      \"type\" : \"integer\",\r\n      \"format\" : \"int32\"\r\n    },\r\n    \"shipDate\" : {\r\n      \"type\" : \"string\",\r\n      \"format\" : \"date-time\"\r\n    },\r\n    \"status\" : {\r\n      \"type\" : \"string\",\r\n      \"description\" : \"Order Status\",\r\n      \"enum\" : [ \"placed\", \"approved\", \"delivered\" ]\r\n    },\r\n    \"complete\" : {\r\n      \"type\" : \"boolean\",\r\n      \"default\" : false\r\n    }\r\n  }\r\n}"
   disabled: false
-- group: pet
-  path: "/v2/pet/{petId}"
-  method: GET
+- group: store
+  path: /v2/store/order
+  method: POST
   type: REST
   alt: 400
   responseCode: 400
-  response: ""
+  response: "{\n    \"id\": 9585378182,\n    \"petId\": 793835,\n    \"quantity\": 79463074,\n    \"shipDate\": \"2018-11-13T20:20:39+00:00\",\n    \"status\": \"placed\",\n    \"complete\": true,\n    \"errorMessage\": \"${requestBodyValidationErrorMessage:}\"\n}"
+  requestBodySchema: ""
   disabled: false
 scenarios:
 - group: Default

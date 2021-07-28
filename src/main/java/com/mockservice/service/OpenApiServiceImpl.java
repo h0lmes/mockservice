@@ -20,6 +20,7 @@ import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.servers.Server;
@@ -40,18 +41,20 @@ import java.util.regex.Pattern;
 public class OpenApiServiceImpl implements OpenApiService {
 
     private static final Logger log = LoggerFactory.getLogger(OpenApiServiceImpl.class);
-
     private static final String URL_PARTS_REGEX = "(https?:\\/\\/)?(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\b(\\/.*)";
-    private final ObjectMapper mapper;
+
+    private final ObjectMapper jsonMapper;
 
     public OpenApiServiceImpl(@Qualifier("jsonMapper") ObjectMapper jsonMapper) {
-        mapper = jsonMapper;
+        this.jsonMapper = jsonMapper;
     }
 
     @Override
     public List<Route> routesFromYaml(String yaml) {
+        List<Route> routes = new ArrayList<>();
+
         if (yaml == null || yaml.isEmpty()) {
-            return new ArrayList<>();
+            return routes;
         }
 
         ParseOptions parseOptions = new ParseOptions();
@@ -64,10 +67,10 @@ public class OpenApiServiceImpl implements OpenApiService {
         }
         OpenAPI openApi = result.getOpenAPI();
         if (openApi == null) {
-            return new ArrayList<>();
+            return routes;
         }
 
-        List<Route> routes = routesFromOpenApi(openApi);
+        routesFromOpenApi(routes, openApi);
         Set<String> paths = serversFromOpenApi(openApi);
         if (paths.isEmpty()) {
             return routes;
@@ -101,30 +104,55 @@ public class OpenApiServiceImpl implements OpenApiService {
         return paths;
     }
 
-    private List<Route> routesFromOpenApi(OpenAPI openApi) {
-        List<Route> routes = new ArrayList<>();
+    private void routesFromOpenApi(List<Route> routes, OpenAPI openApi) {
         Paths paths = openApi.getPaths();
         if (paths != null) {
             for (Map.Entry<String, PathItem> e : paths.entrySet()) {
                 routesFromPath(routes, e.getKey(), e.getValue());
             }
         }
-        return routes;
     }
 
     private void routesFromPath(List<Route> routes, String path, PathItem pathItem) {
         routesFromOperation(routes, path, "GET", pathItem.getGet());
         routesFromOperation(routes, path, "POST", pathItem.getPost());
         routesFromOperation(routes, path, "PUT", pathItem.getPut());
-        routesFromOperation(routes, path, "DELETE", pathItem.getDelete());
         routesFromOperation(routes, path, "PATCH", pathItem.getPatch());
+        routesFromOperation(routes, path, "DELETE", pathItem.getDelete());
     }
 
     private void routesFromOperation(List<Route> routes, String path, String method, Operation operation) {
         if (operation != null) {
             String group = tagsFromOperation(operation);
-            routesFromOperation(routes, group, path, method, operation);
+            String requestBodySchema = requestBodySchemaFromOperation(operation);
+            routesFromResponses(routes, group, path, method, operation.getResponses(), requestBodySchema);
         }
+    }
+
+    private String requestBodySchemaFromOperation(Operation operation) {
+        if (operation != null) {
+            RequestBody requestBody = operation.getRequestBody();
+            if (requestBody != null) {
+                MediaType mediaType = mediaTypeFromContent(requestBody.getContent());
+                return schemaFromMediaType(mediaType);
+            }
+        }
+        return "";
+    }
+
+    private void routesFromResponses(List<Route> routes, String group, String path, String method, ApiResponses responses, String requestBodySchema) {
+        if (responses != null) {
+            for (Map.Entry<String, ApiResponse> e : responses.entrySet()) {
+                routeFromApiResponse(routes, group, path, method, responseCode(e.getKey()), e.getValue(), requestBodySchema);
+            }
+        }
+    }
+
+    private String responseCode(String code) {
+        if ("200".equals(code) || "default".equals(code)) {
+            return "";
+        }
+        return code;
     }
 
     private String tagsFromOperation(Operation operation) {
@@ -133,29 +161,11 @@ public class OpenApiServiceImpl implements OpenApiService {
         if (tags != null) {
             String separator = "";
             for (String tag : tags) {
-                group += separator + tag; // not using builder since in most cases there will be 0 or 1 tag
+                group += separator + tag; // not using builder since in most cases there will be 1 tag
                 separator = ", ";
             }
         }
         return group;
-    }
-
-    private void routesFromOperation(List<Route> routes,
-                                     String group,
-                                     String path,
-                                     String method,
-                                     Operation operation) {
-        ApiResponses responses = operation.getResponses();
-        if (responses != null) {
-            for (Map.Entry<String, ApiResponse> e : responses.entrySet()) {
-                String responseCode = e.getKey();
-                if ("200".equals(responseCode) || "default".equals(responseCode)) {
-                    responseCode = "";
-                }
-
-                routeFromApiResponse(routes, group, path, method, responseCode, e.getValue());
-            }
-        }
     }
 
     private void routeFromApiResponse(List<Route> routes,
@@ -163,29 +173,31 @@ public class OpenApiServiceImpl implements OpenApiService {
                                       String path,
                                       String method,
                                       String responseCode,
-                                      ApiResponse apiResponse) {
+                                      ApiResponse apiResponse,
+                                      String requestBodySchema) {
         MediaType mediaType = mediaTypeFromContent(apiResponse.getContent());
 
         String response = exampleFromMediaType(mediaType);
         if (response.isEmpty()) {
             try {
                 String jsonSchema = schemaFromMediaType(mediaType);
-                Map<String, Object> jsonSchemaMap = mapper.readValue(jsonSchema, Map.class);
+                Map<String, Object> jsonSchemaMap = jsonMapper.readValue(jsonSchema, Map.class);
                 response = JsonFromSchemaGenerator.jsonFromSchema(jsonSchemaMap);
             } catch (JsonProcessingException e) {
                 //
             }
         }
 
-        routes.add(new Route()
-                .setDisabled(false)
-                .setType(RouteType.REST)
-                .setPath(path)
-                .setMethod(RequestMethod.valueOf(method.toUpperCase()))
-                .setGroup(group)
-                .setAlt(responseCode)
-                .setResponseCodeString(responseCode)
-                .setResponse(response)
+        routes.add(
+                new Route()
+                        .setType(RouteType.REST)
+                        .setGroup(group)
+                        .setMethod(RequestMethod.valueOf(method.toUpperCase()))
+                        .setPath(path)
+                        .setAlt(responseCode)
+                        .setResponseCodeString(responseCode)
+                        .setResponse(response)
+                        .setRequestBodySchema(requestBodySchema)
         );
     }
 
@@ -206,7 +218,7 @@ public class OpenApiServiceImpl implements OpenApiService {
             if (examples != null && examples.values().iterator().hasNext()) {
                 Example example1 = examples.values().iterator().next();
                 try {
-                    return mapper.writeValueAsString(example1.getValue());
+                    return jsonMapper.writeValueAsString(example1.getValue());
                 } catch (JsonProcessingException e) {
                     //
                 }
@@ -222,18 +234,13 @@ public class OpenApiServiceImpl implements OpenApiService {
 
     private String schemaFromMediaType(MediaType mediaType) {
         if (mediaType != null) {
-            try {
-                return serializeJsonSchema(mapper, mediaType.getSchema());
-            } catch (JsonProcessingException e) {
-                //
-            }
+            return serializeJsonSchema(jsonMapper, mediaType.getSchema());
         }
         return "";
     }
 
-    public static String serializeJsonSchema(ObjectMapper mapper, Object schema) throws JsonProcessingException {
-        SimpleFilterProvider filters = new SimpleFilterProvider();
-        final String filterName = "exclude-xml-and-example-set-flag";
+    private static String serializeJsonSchema(ObjectMapper mapper, Object schema) {
+        final String filterName = "exclude-not-in-spec-fields";
         mapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
             @Override
             public Object findFilterId(Annotated a) {
@@ -244,6 +251,7 @@ public class OpenApiServiceImpl implements OpenApiService {
                 return super.findFilterId(a);
             }
         });
+        SimpleFilterProvider filters = new SimpleFilterProvider();
         filters.addFilter(filterName, new SimpleBeanPropertyFilter() {
             @Override
             protected boolean include(BeanPropertyWriter writer) {
@@ -256,6 +264,10 @@ public class OpenApiServiceImpl implements OpenApiService {
                         && !writer.getName().equalsIgnoreCase("exampleSetFlag");
             }
         });
-        return mapper.writer(filters).writeValueAsString(schema);
+        try {
+            return mapper.writer(filters).writeValueAsString(schema);
+        } catch (JsonProcessingException e) {
+            return "";
+        }
     }
 }

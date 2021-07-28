@@ -33,9 +33,9 @@ Response MUST go first.
 
 If parser sees `HTTP/1.1` at the beginning of a line
 it knows there are headers (are optional) in response.
-After headers an empty line should go indicating head ended.
+After headers an empty line should go indicating end of HTTP head.
 Then goes body if not blank.
-> Anything that goes before head start
+> Anything that goes before HTTP head start
 (before `HTTP/1.1`, or if head is not there at all)
 is considered a response body as well.
 
@@ -67,6 +67,7 @@ after the response was sent.
 **RESPONSE EXAMPLE** (head + body + request head + request body)
 
     HTTP/1.1
+    Extra-Header: some data
     
     {
         "status": "PROCESSING",
@@ -80,6 +81,25 @@ after the response was sent.
         "status": "PROCESSED",
         "id": "${item_id}"
     }
+
+#
+### Request Validation
+
+You can define **Request Body Schema** (in JSON format) for any Route
+to have request body validated against the schema.
+
+> See JSON schema homepage
+https://json-schema.org/specification.html
+
+Request body schema may also automatically come from OpenAPI 3 file
+for imported routes.
+Presence of schema would be indicated at import page.
+
+If validation fails you would receive:
+- a Route marked with Alt = '400' (this is the default option in Settings).
+A special variable with error message would be available
+to use in response (see Settings).
+- or Error description (with `type` and `message` fields)
 
 #
 ### Route Alt (Alternative)

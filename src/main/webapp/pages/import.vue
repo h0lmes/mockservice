@@ -12,7 +12,7 @@
                         :existing-routes="existingRoutes"
                         @add="add($event)"
         ></ImportedRoutes>
-        <div class="secondary mt-4 smaller">(click Route to expand)</div>
+        <div class="color-secondary mt-4 smaller">(click Route to expand)</div>
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
 </template>

@@ -12,7 +12,7 @@
 
 	<groupId>com</groupId>
 	<artifactId>mockservice</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
     <packaging>jar</packaging>
     <name>mockservice</name>
 	<description>Mock Service application</description>
@@ -69,6 +69,11 @@
 			<groupId>io.swagger.parser.v3</groupId>
 			<artifactId>swagger-parser</artifactId>
 			<version>2.0.27</version>
+		</dependency>
+		<dependency>
+			<groupId>org.everit.json</groupId>
+			<artifactId>org.everit.json.schema</artifactId>
+			<version>1.5.1</version>
 		</dependency>
 
 

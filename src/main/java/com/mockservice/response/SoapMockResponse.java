@@ -6,12 +6,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
 public class SoapMockResponse implements MockResponse {
 
-    private Map<String, String> variables;
+    private Map<String, String> variables = new HashMap<>();
     private final HttpHeaders headers = new HttpHeaders();
     private final StringTemplate body;
 
@@ -22,8 +23,8 @@ public class SoapMockResponse implements MockResponse {
     }
 
     @Override
-    public MockResponse setVariables(@Nullable Map<String, String> variables) {
-        this.variables = variables;
+    public MockResponse putVariables(@Nullable Map<String, String> variables) {
+        this.variables.putAll(variables);
         return this;
     }
 

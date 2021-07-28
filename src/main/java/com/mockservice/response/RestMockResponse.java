@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -22,7 +23,7 @@ public class RestMockResponse implements MockResponse {
     private static final String HTTP_HEADER_DELIMITER = ":";
     private static final int HTTP_HEADER_DELIMITER_LEN = HTTP_HEADER_DELIMITER.length();
 
-    private Map<String, String> variables;
+    private final Map<String, String> variables = new HashMap<>();
     private final HttpHeaders responseHeaders = new HttpHeaders();
     private final StringTemplate responseBody;
     private boolean containsRequest = false;
@@ -103,8 +104,8 @@ public class RestMockResponse implements MockResponse {
     }
 
     @Override
-    public MockResponse setVariables(@Nullable Map<String, String> variables) {
-        this.variables = variables;
+    public MockResponse putVariables(@Nullable Map<String, String> variables) {
+        this.variables.putAll(variables);
         return this;
     }
 

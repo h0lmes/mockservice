@@ -1,14 +1,19 @@
 <template>
     <div class="monospace">
         <p class="mb-4">
-            <ToggleSwitch :id="'randomAlt'"
-                          v-model="randomAlt">Random Alt (return random of existing alternatives for requested Route)
-            </ToggleSwitch>
+            <ToggleSwitch v-model="randomAlt"
+            >Random Alt (return random of existing alternatives for requested Route)</ToggleSwitch>
         </p>
         <p class="mb-4">
-            <ToggleSwitch :id="'quantum'"
-                          v-model="quantum">Go Quantum (Routes are now quantum objects, so don't expect anything deterministic)
-            </ToggleSwitch>
+            <ToggleSwitch v-model="quantum"
+            >Go Quantum (Routes are now quantum objects, so don't expect anything deterministic)</ToggleSwitch>
+        </p>
+        <p class="mb-2">
+            <ToggleSwitch v-model="failedInputValidationAlt400"
+            >When input validation failed respond with an existing Alt = '400' route instead of validation error</ToggleSwitch>
+        </p>
+        <p class="pl-5 mb-4 color-secondary smaller">
+            (variable ${requestBodyValidationErrorMessage} would be available to use in Alt = '400' response)
         </p>
         <div class="mt-5 pl-1">
             <button type="button" class="btn btn-primary" @click="save">SAVE</button>
@@ -27,7 +32,8 @@
         data() {
             return {
                 randomAlt: false,
-                quantum: false
+                quantum: false,
+                failedInputValidationAlt400: true,
             }
         },
         async fetch() {
@@ -43,6 +49,7 @@
             settings() {
                 this.randomAlt = this.settings.randomAlt;
                 this.quantum = this.settings.quantum;
+                this.failedInputValidationAlt400 = this.settings.failedInputValidationAlt400;
             },
         },
         methods: {
@@ -55,7 +62,8 @@
                 await this.saveSettings(
                     {
                         randomAlt: this.randomAlt,
-                        quantum: this.quantum
+                        quantum: this.quantum,
+                        failedInputValidationAlt400: this.failedInputValidationAlt400
                     }
                 ).then(() => this.$nuxt.$loading.finish());
             },

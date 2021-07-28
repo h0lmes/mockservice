@@ -24,10 +24,12 @@
         </div>
 
         <div class="mock-col text-center">
+            <div v-show="editing" class="mock-col-header"></div>
             <ToggleSwitch v-model="activeSwitch" @toggle="activeToggled()">Active</ToggleSwitch>
         </div>
 
         <div class="mock-col w-fixed-auto">
+            <div v-show="editing" class="mock-col-header"></div>
             <div>
                 <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
                 <button type="button" class="btn btn-sm btn-danger" @click="del">delete</button>
@@ -39,7 +41,7 @@
             <AutoSizeTextArea v-model="editingScenario.data"></AutoSizeTextArea>
         </div>
 
-        <div v-show="editing" class="mock-col w100">
+        <div v-show="editing" class="mock-col w-fixed-auto">
             <button type="button" class="btn btn-sm btn-default" @click="toggleRoutes">TOGGLE ROUTES</button>
             <button type="button" class="btn btn-sm btn-primary" @click="save">SAVE</button>
             <button type="button" class="btn btn-sm btn-default" @click="saveAsCopy">SAVE AS COPY</button>

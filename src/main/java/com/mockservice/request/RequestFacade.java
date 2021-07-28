@@ -10,4 +10,5 @@ public interface RequestFacade {
     String getEndpoint();
     Optional<String> getAlt();
     Map<String, String> getVariables();
+    String getBody();
 }

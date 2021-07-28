@@ -97,7 +97,8 @@ public abstract class AbstractRequestFacade implements RequestFacade {
         return Optional.empty();
     }
 
-    String getBody() {
+    @Override
+    public String getBody() {
         return body;
     }
 

@@ -8,6 +8,7 @@ import com.mockservice.response.MockResponse;
 import com.mockservice.response.RestMockResponse;
 import com.mockservice.response.SoapMockResponse;
 import com.mockservice.template.TemplateEngine;
+import com.mockservice.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -64,14 +67,21 @@ public class MockServiceImpl implements MockService {
     @Override
     public ResponseEntity<String> mock(RequestFacade request) {
         Route route = getRoute(request);
-        log.info("Route requested: {}", route);
-        int statusCode = route.getResponseCode();
 
+        RequestBodyValidationResult validationResult = validateRequestBody(route, request);
+        if (!validationResult.isOk()) {
+            route = validationResult.getRoute();
+        }
+
+        int statusCode = route.getResponseCode();
         MockResponse response = responseCache.get(route);
-        response.setVariables(request.getVariables());
+        response.putVariables(request.getVariables());
+        if (!validationResult.isOk()) {
+            response.putVariables(validationResult.getVariables());
+        }
         String body = response.getResponseBody();
 
-        if (configRepository.getSettings().getQuantum() && RouteType.REST.equals(route.getType())) {
+        if (route.isRest() && validationResult.isOk() && configRepository.getSettings().getQuantum()) {
             body = quantumTheory.apply(body);
             statusCode = quantumTheory.apply(statusCode);
             quantumTheory.delay();
@@ -86,14 +96,14 @@ public class MockServiceImpl implements MockService {
     }
 
     private Route getRoute(RequestFacade request) {
+        Route searchRoute = new Route()
+                .setMethod(request.getRequestMethod())
+                .setPath(request.getEndpoint())
+                .setAlt(getRouteAlt(request));
+        log.info("Route requested: {}", searchRoute);
         return routeService
-                .getEnabledRoute(
-                        new Route()
-                                .setMethod(request.getRequestMethod())
-                                .setPath(request.getEndpoint())
-                                .setAlt(getRouteAlt(request))
-                )
-                .orElseThrow(NoRouteFoundException::new);
+                .getEnabledRoute(searchRoute)
+                .orElseThrow(() -> new NoRouteFoundException(searchRoute));
     }
 
     private String getRouteAlt(RequestFacade request) {
@@ -107,5 +117,31 @@ public class MockServiceImpl implements MockService {
                     }
                 })
                 .orElse("");
+    }
+
+    private RequestBodyValidationResult validateRequestBody(Route route, RequestFacade request) {
+        if (!route.getRequestBodySchema().isEmpty()) {
+            try {
+                JsonUtils.validate(request.getBody(), route.getRequestBodySchema());
+            } catch (RuntimeException e) {
+                if (configRepository.getSettings().getFailedInputValidationAlt400()) {
+                    Route route400 = getRoute400For(route);
+                    if (route400 != null) {
+                        log.info("Route requested: {}", route400);
+                        Map<String, String> vars = new HashMap<>();
+                        vars.put("requestBodyValidationErrorMessage", e.toString());
+                        return new RequestBodyValidationResult(e, route400, vars);
+                    }
+                }
+
+                throw e;
+            }
+        }
+        return new RequestBodyValidationResult();
+    }
+
+    private Route getRoute400For(Route route) {
+        Route route400 = new Route(route).setAlt("400");
+        return routeService.getEnabledRoute(route400).orElse(null);
     }
 }

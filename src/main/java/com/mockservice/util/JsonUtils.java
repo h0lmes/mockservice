@@ -1,5 +1,10 @@
 package com.mockservice.util;
 
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 public class JsonUtils {
     
     private JsonUtils() {
@@ -48,5 +53,11 @@ public class JsonUtils {
     public static boolean isJson(String value) {
         value = value.stripLeading();
         return value.startsWith("{") || value.startsWith("[") || value.startsWith("null");
+    }
+
+    public static void validate(String json, String schema) {
+        JSONObject jsonSchema = new JSONObject(new JSONTokener(schema));
+        JSONObject jsonSubject = new JSONObject(new JSONTokener(json));
+        SchemaLoader.load(jsonSchema).validate(jsonSubject);
     }
 }
