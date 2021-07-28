@@ -47,7 +47,6 @@
         props: {
             route: {type: Object},
             existingRoutes: {type: Array},
-            groupStart: {type: Boolean},
         },
         computed: {
             more() {
@@ -95,7 +94,7 @@
         flex: 1 1 0;
         box-sizing: border-box;
         margin: 0;
-        padding: 0.5rem 0;
+        padding: 0.3rem 0;
 
         &.w-fixed-auto {
             flex: 0 0 auto;

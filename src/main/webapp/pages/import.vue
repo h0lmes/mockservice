@@ -7,8 +7,7 @@
             <button type="button" class="btn btn-default" @click="addAll()">ADD ALL ROUTES</button>
             <ToggleSwitch v-model="overwrite">Overwrite existing routes</ToggleSwitch>
         </div>
-        <ImportedRoutes class="smaller"
-                        :imported-routes="importedRoutes"
+        <ImportedRoutes :imported-routes="importedRoutes"
                         :existing-routes="existingRoutes"
                         @add="add($event)"
         ></ImportedRoutes>
