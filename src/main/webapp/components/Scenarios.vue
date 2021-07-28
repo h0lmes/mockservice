@@ -1,10 +1,10 @@
 <template>
     <div>
-        <p v-if="scenarios.length === 0">No scenarios found</p>
+        <p v-if="scenarios.length === 0">No scenarios</p>
         <div v-for="(scenario, index) in scenarios" :key="scenario.alias">
+            <div v-if="groupStart(scenario, index)" class="component-row-group-boundary"></div>
             <Scenario :scenario="scenario"
                       :active="activeScenarios.includes(scenario.alias)"
-                      :groupStart="groupStart(scenario, index)"
                       @filter="$emit('filter', $event)"></Scenario>
         </div>
     </div>
@@ -20,12 +20,13 @@
         components: {Scenario},
         props: {
             scenarios: {type: Array},
-            activeScenarios: {type: Array}
+            activeScenarios: {type: Array},
         },
         methods: {
             groupStart(scenario, index) {
-                return index === 0 || scenario.group !== this.scenarios[index - 1].group;
-            }
+                return index > 0
+                    && scenario.group !== this.scenarios[index - 1].group;
+            },
         }
     }
 </script>

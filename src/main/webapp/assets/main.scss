@@ -15,16 +15,16 @@
   --cyan: #1aaaba;
   /**/
   --color-primary: #243746;
-  --color-secondary: #bfb3ad;
+  --color-secondary: #999491;
   --color-disabled: #bfbfbf;
   --color-accent-one: var(--cyan);
   --color-accent-two: var(--teal);
   --color-link: #0056b3;
   --color-link-hover: #007bff;
   --bg-page: #ededed;
-  --bg-component: #fff;
+  --bg-component: #fafafa;
   --bg-component-active: #fffaf2;
-  --bg-border: #fff;
+  --bg-border: #fafafa;
   --bg-border-active: #dbe0e5;
 }
 
@@ -35,7 +35,7 @@
   --color-primary: #433422;
   --color-secondary: #b3887d;
   --color-disabled: #bfb8a6;
-  --color-accent-one: var(--orange-yellow);
+  --color-accent-one: #cc8e47;
   --color-accent-two: var(--green);
   --bg-page: #e3d9c5;
   --bg-component: #f5ebd3;
@@ -247,6 +247,18 @@ pre {
 
   .component & {
     padding: 1rem 2rem;
+  }
+}
+
+.component-row-group-boundary {
+  height: 1rem;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  border: none;
+
+  .compact-view & {
+    height: 0.5rem;
   }
 }
 

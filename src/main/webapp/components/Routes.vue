@@ -1,9 +1,9 @@
 <template>
     <div>
-        <p v-if="routes.length === 0">No routes found</p>
+        <p v-if="routes.length === 0">No routes</p>
         <div v-for="(route, index) in routes" :key="route.method + route.path + route.alt">
+            <div v-if="groupStart(route, index)" class="component-row-group-boundary"></div>
             <Route :route="route"
-                   :groupStart="groupStart(route, index)"
                    @filter="$emit('filter', $event)"></Route>
         </div>
     </div>
@@ -13,17 +13,18 @@
 
     export default {
         name: "Routes",
+        components: {Route},
         data() {
             return {}
         },
-        components: {Route},
         props: {
             routes: {type: Array},
         },
         methods: {
             groupStart(route, index) {
-                return index === 0 || route.group !== this.routes[index - 1].group;
-            }
+                return index > 0
+                    && route.group !== this.routes[index - 1].group;
+            },
         }
     }
 </script>

@@ -2,18 +2,18 @@
     <div class="monospace">
         <p class="mb-4">
             <ToggleSwitch v-model="randomAlt"
-            >Random Alt (return random of existing alternatives for requested Route)</ToggleSwitch>
+                          sub="Return random of existing Alt (alternatives) for requested Route"
+            >Random Alt</ToggleSwitch>
         </p>
         <p class="mb-4">
             <ToggleSwitch v-model="quantum"
-            >Go Quantum (Routes are now quantum objects, so don't expect anything deterministic)</ToggleSwitch>
+                          sub="Routes are now quantum objects, so don't expect anything deterministic"
+            >Go Quantum</ToggleSwitch>
         </p>
         <p class="mb-2">
             <ToggleSwitch v-model="failedInputValidationAlt400"
+                          sub="Variable ${requestBodyValidationErrorMessage} would be available to use in Alt = '400' response"
             >When input validation failed respond with an existing Alt = '400' route instead of validation error</ToggleSwitch>
-        </p>
-        <p class="pl-5 mb-4 color-secondary smaller">
-            (variable ${requestBodyValidationErrorMessage} would be available to use in Alt = '400' response)
         </p>
         <div class="mt-5 pl-1">
             <button type="button" class="btn btn-primary" @click="save">SAVE</button>

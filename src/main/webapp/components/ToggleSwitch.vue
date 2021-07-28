@@ -8,6 +8,8 @@
                 </div>
             </div>
             <slot></slot>
+            <div v-if="sub"></div>
+            <div v-if="sub" class="mt-2 color-secondary smaller">{{sub}}</div>
         </label>
     </div>
 </template>
@@ -22,6 +24,7 @@
         props: {
             value: {type: Boolean},
             small: {type: Boolean},
+            sub: {type: String},
         },
         computed: {
             hasTitle() {

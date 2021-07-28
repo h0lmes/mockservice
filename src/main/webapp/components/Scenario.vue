@@ -1,22 +1,22 @@
 <template>
-    <div class="component component-row" :class="{'open' : open}" @click.middle="edit">
+    <div class="component component-row monospace" :class="{'open' : open}" @click.middle="edit">
 
         <div class="mock-col">
-            <div class="mock-col-header" :class="{'color-accent-one' : groupStart}">GROUP</div>
+            <div class="mock-col-header">GROUP</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.group)">{{ scenario.group }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingScenario.group"/>
+            <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingScenario.group"/>
         </div>
 
         <div class="mock-col">
             <div class="mock-col-header">ALIAS</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.alias)">{{ scenario.alias }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm monospace" v-model="editingScenario.alias"/>
+            <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingScenario.alias"/>
         </div>
 
         <div class="mock-col">
             <div class="mock-col-header">TYPE</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.type)">{{ scenario.type }}</div>
-            <select v-show="editing" class="form-control form-control-sm monospace" v-model="editingScenario.type">
+            <select v-show="editing" class="form-control form-control-sm" v-model="editingScenario.type">
                 <option>MAP</option>
                 <option>QUEUE</option>
                 <option>CIRCULAR_QUEUE</option>
@@ -74,7 +74,6 @@
         props: {
             scenario: {type: Object},
             active: {type: Boolean},
-            groupStart: {type: Boolean}
         },
         computed: {
             routes() {

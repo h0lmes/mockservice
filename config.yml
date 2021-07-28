@@ -39,15 +39,6 @@ routes:
   response: "{\"name\": \"terminator\"}"
   requestBodySchema: ""
   disabled: false
-- group: a test service
-  path: /api with spaces
-  method: GET
-  type: REST
-  alt: ""
-  responseCode: 200
-  response: "[\n  {\n    \"_id\": \"56af331efbeca6240c61b2ca\",\n    \"index\": 120000,\n    \"percent\": -0.12,\n    \"exp_number\": 1.123244e12,\n    \"guid\": \"bedb2018-c017-429E-b520-696ea3666692\",\n    \"isValid\": true,\n    \"comment\": null,\n    \"isActive\": false,\n    \"balance\": \"$2,202,350\",\n    \"object\": {\n        \"name\": \"am\",\n        \"lastname\": \"lang\"\n    }\n  }\n]"
-  requestBodySchema: ""
-  disabled: false
 - group: entity service
   path: /api/v2/entity
   method: GET
