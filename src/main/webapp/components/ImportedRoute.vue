@@ -83,7 +83,7 @@
         row-gap: 0.3rem;
         column-gap: 0.5rem;
         margin-bottom: 1px;
-        padding: 0.2rem 0.7rem;
+        padding: 0.5rem 0.7rem;
 
         &.open {
             background-color: var(--bg-component-active);
@@ -94,7 +94,7 @@
         flex: 1 1 0;
         box-sizing: border-box;
         margin: 0;
-        padding: 0.3rem 0;
+        padding: 0;
 
         &.w-fixed-auto {
             flex: 0 0 auto;

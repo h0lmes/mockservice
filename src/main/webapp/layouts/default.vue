@@ -15,18 +15,18 @@
                     </NuxtLink>
                 </li>
                 <li>
+                    <NuxtLink to="/import">
+                        <FontAwesomeIcon icon="file-import" class="nav-icon icon-width-fix"/>
+                        <span class="nav-label">Import</span>
+                    </NuxtLink>
+                </li>
+                <li>
                     <NuxtLink to="/scenarios">
                         <FontAwesomeIcon icon="receipt" class="nav-icon icon-width-fix"/>
                         <span class="nav-label">Scenarios</span>
                     </NuxtLink>
                 </li>
                 <li class="nav-group">TOOLS</li>
-                <li>
-                    <NuxtLink to="/import">
-                        <FontAwesomeIcon icon="file-import" class="nav-icon icon-width-fix"/>
-                        <span class="nav-label">Import</span>
-                    </NuxtLink>
-                </li>
                 <li>
                     <NuxtLink to="/request">
                         <FontAwesomeIcon icon="play" class="nav-icon icon-width-fix"/>

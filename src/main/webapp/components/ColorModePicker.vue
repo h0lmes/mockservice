@@ -7,12 +7,12 @@
                            :class="getClasses(color)" />
             </li>
         </ul>
-        <!--<p class="scheme-info">-->
-            <!--<ColorScheme placeholder="..." tag="span">-->
-                <!--Color mode: <b>{{ $colorMode.preference }}</b>-->
-                <!--<span v-if="$colorMode.preference === 'system'">(<i>{{ $colorMode.value }}</i>)</span>-->
-            <!--</ColorScheme>-->
-        <!--</p>-->
+        <p class="scheme-info">
+            <ColorScheme placeholder="..." tag="span">
+                Color mode: <b>{{ $colorMode.preference }}</b>
+                <span v-if="$colorMode.preference === 'system'">(<i>{{ $colorMode.value }}</i>)</span>
+            </ColorScheme>
+        </p>
     </div>
 </template>
 <script>
@@ -33,7 +33,7 @@
         },
         data() {
             return {
-                colors: [/*'system',*/ 'light', 'sepia', 'dark', 'dark2']
+                colors: ['system', 'light', 'sepia', 'dark', 'dark2']
             }
         },
         methods: {
@@ -58,12 +58,12 @@
     }
     ul li {
         display: inline-block;
-        padding: 5px;
+        padding: 0;
         outline: 0;
     }
-    ul li:focus {
-        background-color: var(--nav-bg-active);
-    }
+    /*ul li:focus {*/
+        /*background-color: var(--nav-bg-active);*/
+    /*}*/
     p {
         margin: 0;
         padding-top: 5px;
@@ -75,7 +75,7 @@
         position: relative;
         top: 0;
         margin: 0;
-        padding: 4px;
+        padding: 7px;
         background-color: transparent;
         color: var(--nav-color);
         border-radius: 5px;
@@ -83,10 +83,11 @@
     }
     .feather.preferred {
         color: var(--color-accent-one);
+        background-color: var(--nav-bg-active);
     }
-    /*.feather.selected {*/
-        /*color: var(--color-accent-one);*/
-    /*}*/
+    .feather.selected {
+        color: var(--color-accent-one);
+    }
     .scheme-info {
         font-size: smaller;
         font-weight: lighter;

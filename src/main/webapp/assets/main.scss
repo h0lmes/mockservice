@@ -1,7 +1,9 @@
 :root {
   --grey: #6e6e6e;
   --gray: #6e6e6e;
+  --cyan-blue: #179ae6;
   --blue: #0077ff;
+  --violet: #4d52ff;
   --indigo: #5f1ce6;
   --purple: #7143bf;
   --pink: #e63e89;
@@ -9,7 +11,8 @@
   --red: #dc3545;
   --orange: #fc7c19;
   --orange-yellow: #e68c17;
-  --yellow: #ffb700;
+  --yellow: #e6bf00;
+  --yellow-green: #8ebd00;
   --green: #29a649;
   --teal: #1dc288;
   --cyan: #1aaaba;
@@ -45,17 +48,20 @@
 }
 
 .dark-mode {
-  --blue: #0060bf;
+  --cyan-blue: #2e7599;
+  --blue: #1f5e99;
+  --violet: #3d3dcc;
   --indigo: #5624b3;
   --purple: #673eb3;
   --pink: #8a305b;
   --red: #8c3843;
   --orange: #b3580e;
   --orange-yellow: #b36b0e;
-  --yellow: #b38a12;
+  --yellow: #b39f47;
+  --yellow-green: #80992e;
   --green: #388c49;
-  --teal: #1d8c69;
-  --cyan: #1d7f8c;
+  --teal: #338066;
+  --cyan: #297e8a;
   /**/
   --color-primary: #c2b9b4;
   --color-secondary: #6a6d76;
@@ -70,17 +76,20 @@
 }
 
 .dark2-mode {
-  --blue: #0060bf;
+  --cyan-blue: #2e7599;
+  --blue: #1f5e99;
+  --violet: #3d3dcc;
   --indigo: #5624b3;
   --purple: #673eb3;
   --pink: #8a305b;
   --red: #8c3843;
   --orange: #b3580e;
   --orange-yellow: #b36b0e;
-  --yellow: #b38a12;
+  --yellow: #b39f47;
+  --yellow-green: #80992e;
   --green: #388c49;
-  --teal: #1d8c69;
-  --cyan: #1d7f8c;
+  --teal: #338066;
+  --cyan: #297e8a;
   /**/
   --color-primary: #dae2eb;
   --color-secondary: #667c96;
@@ -98,16 +107,22 @@
 .color-secondary {color: var(--color-secondary) !important;}
 .color-accent-one {color: var(--color-accent-one) !important;}
 
-.red {color: var(--red) !important;}
-.orange {color: var(--orange) !important;}
-.yellow {color: var(--yellow) !important;}
-.green {color: var(--green) !important;}
-.teal {color: var(--teal) !important;}
-.cyan {color: var(--cyan) !important;}
-.blue {color: var(--blue) !important;}
-.indigo {color: var(--indigo) !important;}
-.purple {color: var(--purple) !important;}
-.pink {color: var(--pink) !important;}
+.gray {color: var(--gray) !important; text-decoration-color: var(--gray) !important;}
+.grey {color: var(--grey) !important; text-decoration-color: var(--grey) !important;}
+.cyan-blue {color: var(--cyan-blue) !important; text-decoration-color: var(--cyan-blue) !important;}
+.blue {color: var(--blue) !important; text-decoration-color: var(--blue) !important;}
+.violet {color: var(--violet) !important; text-decoration-color: var(--violet) !important;}
+.indigo {color: var(--indigo) !important; text-decoration-color: var(--indigo) !important;}
+.purple {color: var(--purple) !important; text-decoration-color: var(--purple) !important;}
+.pink {color: var(--pink) !important; text-decoration-color: var(--pink) !important;}
+.red {color: var(--red) !important; text-decoration-color: var(--red) !important;}
+.orange {color: var(--orange) !important; text-decoration-color: var(--orange) !important;}
+.orange-yellow {color: var(--orange-yellow) !important; text-decoration-color: var(--orange-yellow) !important;}
+.yellow {color: var(--yellow) !important; text-decoration-color: var(--yellow) !important;}
+.yellow-green {color: var(--yellow-green) !important; text-decoration-color: var(--yellow-green) !important;}
+.green {color: var(--green) !important; text-decoration-color: var(--green) !important;}
+.teal {color: var(--teal) !important; text-decoration-color: var(--teal) !important;}
+.cyan {color: var(--cyan) !important; text-decoration-color: var(--cyan) !important;}
 
 
 // --- general declarations ---------------------------------------------------------------------------------
@@ -257,14 +272,13 @@ pre {
 
 
 .component-row-group-boundary {
-  height: 1rem;
   background: transparent;
-  margin: 0;
+  margin: 1.5rem 0;
   padding: 0;
-  border: none;
+  border-top: 1px dashed var(--bg-component);
 
   .compact-view & {
-    height: 0.3rem;
+    margin: 0.5rem 0;
   }
 }
 
@@ -292,7 +306,7 @@ pre {
   }
 
   .compact-view &:not(.open) {
-    --padding: 0.3rem 0.4rem;
+    --padding: 0.5rem;
   }
 }
 

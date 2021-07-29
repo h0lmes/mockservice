@@ -39,16 +39,16 @@ routes:
   response: "{\"name\": \"terminator\"}"
   requestBodySchema: ""
   disabled: false
-- group: entity service
+- group: entity
   path: /api/v2/entity
   method: GET
   type: REST
   alt: ""
   responseCode: 200
-  response: "[\n  {\"id\": ${sequence}, \"name\": \"${random_string}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"}\n]"
+  response: "[\n  {\"id\": ${sequence}, \"name\": \"${random_string}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${lang:${enum:Java:C++:Python:JavaScript}}\"}\n]"
   requestBodySchema: ""
   disabled: false
-- group: entity service
+- group: entity
   path: /api/v2/entity
   method: GET
   type: REST
@@ -57,16 +57,7 @@ routes:
   response: "[]"
   requestBodySchema: ""
   disabled: false
-- group: entity service
-  path: /api/v2/entity/filter
-  method: GET
-  type: REST
-  alt: ""
-  responseCode: 200
-  response: "[\n  {\"id\": 2, \"name\": \"${a:default a}\"},\n  {\"id\": 3, \"name\": \"${b:${enum:default B1:default B2:default B3}}\"}\n]"
-  requestBodySchema: ""
-  disabled: true
-- group: entity service
+- group: entity
   path: "/api/v2/entity/{id}"
   method: GET
   type: REST
@@ -75,12 +66,21 @@ routes:
   response: "{\"id\": ${id}, \"name\": \"entity name\"}"
   requestBodySchema: ""
   disabled: true
-- group: entity service
+- group: entity
   path: /api/v2/entity
-  method: POST
+  method: PUT
   type: REST
   alt: ""
   responseCode: 201
+  response: "{\"id\": ${random_int}, \"name\": \"${name:default name}\"}"
+  requestBodySchema: ""
+  disabled: false
+- group: entity
+  path: "/api/v2/entity/{id}"
+  method: DELETE
+  type: REST
+  alt: ""
+  responseCode: 200
   response: "{\"id\": ${random_int}, \"name\": \"${name:default name}\"}"
   requestBodySchema: ""
   disabled: false

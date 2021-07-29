@@ -5,16 +5,17 @@
     export default {
         name: "RouteMethod",
         props: {
-            value: {type: String}
+            value: {type: String},
+            disabled: {type: Boolean, default: false},
         },
         computed: {
             color() {
                 return {
-                    'green': this.value === 'GET',
-                    'blue': this.value === 'POST',
-                    'yellow': this.value === 'PUT',
-                    'orange': this.value === 'PATCH',
-                    'red': this.value === 'DELETE',
+                    'teal': !this.disabled && this.value === 'GET',
+                    'blue': !this.disabled && this.value === 'POST',
+                    'yellow': !this.disabled && this.value === 'PUT',
+                    'orange': !this.disabled && this.value === 'PATCH',
+                    'pink': !this.disabled && this.value === 'DELETE',
                 }
             }
         },

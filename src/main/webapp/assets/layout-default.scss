@@ -61,6 +61,7 @@
   display: block;
   background: var(--nav-bg);
   transition: width 0.15s;
+  overflow: hidden auto;
 }
 
 .navbar-mini .navbar {
@@ -113,8 +114,7 @@
   }
 }
 
-.navbar .nav > li > a:hover,
-.navbar .nav > li > a:focus {
+.navbar .nav > li > a:hover {
   color: var(--nav-color-active);
   background-color: var(--nav-bg-active);
   text-decoration: none;
@@ -128,6 +128,7 @@
   padding: 1.5rem 20px 0.5rem 25px;
   font-size: smaller;
   font-family: monospace, monospace;
+  font-weight: 700;
   color: var(--nav-color-group) !important;
 }
 

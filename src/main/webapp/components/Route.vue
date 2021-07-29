@@ -18,7 +18,9 @@
 
         <div class="mock-col">
             <div class="mock-col-header">METHOD</div>
-            <div v-show="!editing" class="mock-col-value link" @click="filter(route.method)">{{ route.method }}</div>
+            <div v-show="!editing" class="mock-col-value link" @click="filter(route.method)">
+                <route-method :value="route.method" :disabled="route.disabled"></route-method>
+            </div>
             <select v-show="editing" class="form-control form-control-sm" v-model="editingRoute.method">
                 <option>GET</option>
                 <option>POST</option>
@@ -86,10 +88,11 @@
     import RouteTester from "./RouteTester";
     import ToggleSwitch from "./ToggleSwitch";
     import AutoSizeTextArea from "./AutoSizeTextArea";
+    import RouteMethod from "./RouteMethod";
 
     export default {
         name: "Route",
-        components: {AutoSizeTextArea, RouteTester, ToggleSwitch},
+        components: {AutoSizeTextArea, RouteTester, ToggleSwitch, RouteMethod},
         data() {
             return {
                 editing: false,
@@ -133,8 +136,7 @@
                     this.deleteRoutes([this.route]);
                 } else if (confirm('Sure?')) {
                     this.$nuxt.$loading.start();
-                    this.deleteRoutes([this.route])
-                        .then(() => this.$nuxt.$loading.finish());
+                    this.deleteRoutes([this.route]).then(() => this.$nuxt.$loading.finish());
                 }
             },
             save() {
