@@ -77,6 +77,7 @@
 </script>
 <style lang="scss" scoped>
     .row {
+        cursor: pointer;
         display: flex;
         flex-wrap: wrap;
         align-items: center;

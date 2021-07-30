@@ -11,12 +11,14 @@
             <button type="button" class="toolbar-item-fixed btn" @click="setFilter('')">Clear filter</button>
             <button type="button" class="toolbar-item-fixed btn" @click="addRoute">Add route</button>
             <button type="button" class="toolbar-item-fixed btn btn-danger" @click="deleteVisibleRoutes">Delete visible routes</button>
-            <ViewSelector class="toolbar-item-fixed"></ViewSelector>
         </div>
 
         <Routes :routes="filtered" @filter="setFilter($event)"></Routes>
 
-        <div class="color-secondary mt-4 smaller">(middle-click Route to edit)</div>
+        <div class="color-secondary mt-4 smaller">(middle-click to edit)</div>
+        <div class="color-secondary mt-2 smaller">
+            Note: METHOD, PATH and ALT define a unique Route, changing any of them creates a new Route instead of replacing the existing one.
+        </div>
 
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
@@ -25,11 +27,10 @@
     import {mapActions} from 'vuex';
     import Routes from "../components/Routes";
     import Loading from "../components/Loading";
-    import ViewSelector from "../components/ViewSelector";
 
     export default {
         name: "index",
-        components: {Routes, Loading, ViewSelector},
+        components: {Routes, Loading},
         data() {
             return {
                 query: '',
@@ -48,6 +49,19 @@
             filtered() {
                 if (!this.query.trim())
                     return this.routes;
+
+                if (this.query.startsWith(':')) {
+                    if (this.query === ':enabled') {
+                        return this.routes.filter(
+                            v => !v.disabled
+                        );
+                    }
+                    if (this.query === ':disabled') {
+                        return this.routes.filter(
+                            v => v.disabled
+                        );
+                    }
+                }
 
                 return this.routes.filter(
                     v => v.group.toLowerCase().includes(this.query)

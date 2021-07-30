@@ -1,5 +1,5 @@
 <template>
-    <div class="bold" :class="color">{{ value }}</div>
+    <div :class="color">{{ value }}</div>
 </template>
 <script>
     export default {
@@ -11,6 +11,7 @@
         computed: {
             color() {
                 return {
+                    'bold': !this.disabled,
                     'teal': !this.disabled && this.value === 'GET',
                     'blue': !this.disabled && this.value === 'POST',
                     'yellow': !this.disabled && this.value === 'PUT',

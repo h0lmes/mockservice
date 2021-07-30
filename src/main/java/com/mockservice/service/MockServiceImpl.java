@@ -68,20 +68,15 @@ public class MockServiceImpl implements MockService {
     public ResponseEntity<String> mock(RequestFacade request) {
         Route route = getRoute(request);
 
-        RequestBodyValidationResult validationResult = validateRequestBody(route, request);
-        if (!validationResult.isOk()) {
-            route = validationResult.getRoute();
-        }
+        var validationResult = validateRequestBody(route, request);
+        route = validationResult.getRoute();
 
-        int statusCode = route.getResponseCode();
         MockResponse response = responseCache.get(route);
-        response.putVariables(request.getVariables());
-        if (!validationResult.isOk()) {
-            response.putVariables(validationResult.getVariables());
-        }
+        response.setVariables(validationResult.getVariables());
+        int statusCode = route.getResponseCode();
         String body = response.getResponseBody();
 
-        if (route.isRest() && validationResult.isOk() && configRepository.getSettings().getQuantum()) {
+        if (route.isRest() && configRepository.getSettings().getQuantum()) {
             body = quantumTheory.apply(body);
             statusCode = quantumTheory.apply(statusCode);
             quantumTheory.delay();
@@ -96,18 +91,7 @@ public class MockServiceImpl implements MockService {
     }
 
     private Route getRoute(RequestFacade request) {
-        Route searchRoute = new Route()
-                .setMethod(request.getRequestMethod())
-                .setPath(request.getEndpoint())
-                .setAlt(getRouteAlt(request));
-        log.info("Route requested: {}", searchRoute);
-        return routeService
-                .getEnabledRoute(searchRoute)
-                .orElseThrow(() -> new NoRouteFoundException(searchRoute));
-    }
-
-    private String getRouteAlt(RequestFacade request) {
-        return request.getAlt()
+        String alt = request.getAlt()
                 .or(() -> activeScenariosService.getAltFor(request.getRequestMethod(), request.getEndpoint()))
                 .or(() -> {
                     if (configRepository.getSettings().getRandomAlt() || configRepository.getSettings().getQuantum()) {
@@ -117,6 +101,17 @@ public class MockServiceImpl implements MockService {
                     }
                 })
                 .orElse("");
+
+        Route searchRoute = new Route()
+                .setMethod(request.getRequestMethod())
+                .setPath(request.getEndpoint())
+                .setAlt(alt);
+
+        log.info("Route requested: {}", searchRoute);
+        
+        return routeService
+                .getEnabledRoute(searchRoute)
+                .orElseThrow(() -> new NoRouteFoundException(searchRoute));
     }
 
     private RequestBodyValidationResult validateRequestBody(Route route, RequestFacade request) {
@@ -128,16 +123,16 @@ public class MockServiceImpl implements MockService {
                     Route route400 = getRoute400For(route);
                     if (route400 != null) {
                         log.info("Route requested: {}", route400);
-                        Map<String, String> vars = new HashMap<>();
+                        Map<String, String> vars = request.getVariables();
                         vars.put("requestBodyValidationErrorMessage", e.toString());
-                        return new RequestBodyValidationResult(e, route400, vars);
+                        return RequestBodyValidationResult.error(e, route400, vars);
                     }
                 }
 
                 throw e;
             }
         }
-        return new RequestBodyValidationResult();
+        return RequestBodyValidationResult.success(route, request.getVariables());
     }
 
     private Route getRoute400For(Route route) {

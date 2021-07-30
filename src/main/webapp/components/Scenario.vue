@@ -41,14 +41,16 @@
             <AutoSizeTextArea v-model="editingScenario.data"></AutoSizeTextArea>
         </div>
 
+        <div v-show="editing" class="mock-col w1">
+            <ToggleSwitch class="mock-col-value" v-model="showRoutes">SHOW ROUTES</ToggleSwitch>
+        </div>
         <div v-show="editing" class="mock-col w-fixed-auto">
-            <button type="button" class="btn btn-sm btn-default" @click="toggleRoutes">TOGGLE ROUTES</button>
             <button type="button" class="btn btn-sm btn-primary" @click="save">SAVE</button>
             <button type="button" class="btn btn-sm btn-default" @click="saveAsCopy">SAVE AS COPY</button>
             <button type="button" class="btn btn-sm btn-default" @click="cancel">CANCEL</button>
         </div>
 
-        <div v-if="editing && addRoute" class="mock-col w100">
+        <div v-if="editing && showRoutes" class="mock-col w100">
             <RoutesToAdd :routes="routes" @add="add($event)"></RoutesToAdd>
         </div>
 
@@ -67,8 +69,8 @@
             return {
                 editing: false,
                 editingScenario: {},
-                addRoute: false,
-                activeSwitch: false
+                activeSwitch: false,
+                showRoutes: false,
             }
         },
         props: {
@@ -154,9 +156,6 @@
             },
             add(route) {
                 this.editingScenario.data += '\n' + route.method + ';' + route.path + ';' + route.alt;
-            },
-            toggleRoutes() {
-                this.addRoute = !this.addRoute;
             },
         }
     }

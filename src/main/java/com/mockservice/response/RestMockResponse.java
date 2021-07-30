@@ -104,7 +104,8 @@ public class RestMockResponse implements MockResponse {
     }
 
     @Override
-    public MockResponse putVariables(@Nullable Map<String, String> variables) {
+    public MockResponse setVariables(@Nullable Map<String, String> variables) {
+        this.variables.clear();
         this.variables.putAll(variables);
         return this;
     }

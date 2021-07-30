@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public interface MockResponse {
-    MockResponse putVariables(@Nullable Map<String, String> variables);
+    MockResponse setVariables(@Nullable Map<String, String> variables);
     String getResponseBody();
     HttpHeaders getResponseHeaders();
     void ifHasRequest(Consumer<MockResponse> consumer);

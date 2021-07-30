@@ -10,11 +10,15 @@ public class RequestBodyValidationResult {
     private Route route = null;
     private Map<String, String> variables = null;
 
-    public RequestBodyValidationResult() {
-        // default
+    public static RequestBodyValidationResult success(Route route, Map<String, String> variables) {
+        return new RequestBodyValidationResult(null, route, variables);
     }
 
-    public RequestBodyValidationResult(Exception e, Route route, Map<String, String> variables) {
+    public static RequestBodyValidationResult error(Exception e, Route route, Map<String, String> variables) {
+        return new RequestBodyValidationResult(e, route, variables);
+    }
+
+    private RequestBodyValidationResult(Exception e, Route route, Map<String, String> variables) {
         this.e = e;
         this.route = route;
         this.variables = variables;
@@ -24,7 +28,7 @@ public class RequestBodyValidationResult {
         return e == null;
     }
 
-    public Exception getE() {
+    public Exception getException() {
         return e;
     }
 

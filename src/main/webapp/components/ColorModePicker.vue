@@ -9,7 +9,7 @@
         </ul>
         <p class="scheme-info">
             <ColorScheme placeholder="..." tag="span">
-                Color mode: <b>{{ $colorMode.preference }}</b>
+                <b>{{ $colorMode.preference }}</b>
                 <span v-if="$colorMode.preference === 'system'">(<i>{{ $colorMode.value }}</i>)</span>
             </ColorScheme>
         </p>
@@ -61,13 +61,13 @@
         padding: 0;
         outline: 0;
     }
-    /*ul li:focus {*/
-        /*background-color: var(--nav-bg-active);*/
-    /*}*/
+    ul li:hover,
+    ul li:focus {
+        background-color: var(--nav-bg-active);
+    }
     p {
         margin: 0;
-        padding-top: 5px;
-        padding-bottom: 20px;
+        padding: 5px 0;
     }
     .feather {
         box-sizing: content-box;
@@ -75,7 +75,7 @@
         position: relative;
         top: 0;
         margin: 0;
-        padding: 7px;
+        padding: 0.7rem;
         background-color: transparent;
         color: var(--nav-color);
         border-radius: 5px;
@@ -83,7 +83,6 @@
     }
     .feather.preferred {
         color: var(--color-accent-one);
-        background-color: var(--nav-bg-active);
     }
     .feather.selected {
         color: var(--color-accent-one);

@@ -55,13 +55,12 @@
 }
 
 .navbar {
+  position: fixed;
   width: 220px;
   height: 100vh;
-  position: fixed;
   display: block;
   background: var(--nav-bg);
   transition: width 0.15s;
-  overflow: hidden auto;
 }
 
 .navbar-mini .navbar {
@@ -74,17 +73,51 @@
 }
 
 .nav {
-  display: flex;
-  flex-wrap: wrap;
-  padding-left: 0;
-  margin-bottom: 0;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0;
+  margin: 0;
   list-style: none;
+  overflow: hidden auto;
+
+  &.nav-hidden {
+    display: none;
+  }
 }
 
 .nav-header {
+  box-sizing: border-box;
   padding: 0;
   border: 0;
   outline: 0;
+}
+
+.nav .nav-group {
+  box-sizing: border-box;
+  padding: 1.5rem 20px 0.9rem 25px;
+  font-size: smaller;
+  font-family: monospace, monospace;
+  font-weight: 700;
+  color: var(--nav-color-group) !important;
+
+  .navbar-mini &,
+  .navbar-maximizing & {
+    display: none;
+  }
+}
+
+.nav .nav-block {
+  box-sizing: border-box;
+  padding: 0 20px;
+  text-align: center;
+
+  .navbar-mini &,
+  .navbar-maximizing & {
+    display: none;
+  }
 }
 
 .nav > li {
@@ -95,10 +128,15 @@
 }
 
 .nav > li > a {
-  color: var(--nav-color);
-  font-weight: 400;
-  padding: 14px 20px 14px 25px;
   display: block;
+  padding: 14px 20px 14px 35px;
+  font-weight: 400;
+  color: var(--nav-color);
+
+  .navbar-mini &,
+  .navbar-maximizing & {
+    padding-left: 25px;
+  }
 }
 
 .nav > li > a .nav-icon {
@@ -115,6 +153,7 @@
 }
 
 .nav > li.nav-item > a:hover,
+.nav > li.nav-item > a:focus,
 .nav > li.nav-item > a.nuxt-link-exact-active:hover {
   color: var(--nav-color-active);
   background-color: var(--nav-bg-active);
@@ -125,33 +164,46 @@
   }
 }
 
-.nav .nav-group {
-  padding: 1.5rem 20px 0.5rem 25px;
-  font-size: smaller;
-  font-family: monospace, monospace;
-  font-weight: 700;
-  color: var(--nav-color-group) !important;
-}
-
-.navbar-mini .nav-group,
-.navbar-maximizing .nav-group {
-  display: none;
-}
-
 .navbar-mini .nav-label,
-.navbar-maximizing .nav-label,
 .navbar-mini .hidden-when-mini,
+.navbar-maximizing .nav-label,
 .navbar-maximizing .hidden-when-mini {
   display: none;
 }
 
-.btn-minimize-navbar {
-  cursor: pointer;
-  border-radius: 3px;
-  padding: 4px 12px;
+
+// --- footer ---------------------------------------------------------------------------------
+
+
+.nav-footer {
+  z-index: 1;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
   margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  place-content: space-evenly;
+  flex-wrap: wrap-reverse;
+  background-color: var(--nav-bg);
 }
 
-.nav > li > a.btn-minimize-navbar:hover {
-  color: var(--color-accent-one) !important;
+.nav-footer-item {
+  flex: 0 0 50%;
+  text-align: center;
+  padding: 1rem 0;
+  outline: none;
+  color: var(--nav-color);
+
+  .navbar-mini & {
+    flex: 0 0 100%;
+  }
+
+  &:hover,
+  &:focus {
+    background-color: var(--nav-bg-active);
+  }
 }

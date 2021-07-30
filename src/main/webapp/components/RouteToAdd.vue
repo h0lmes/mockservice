@@ -1,5 +1,8 @@
 <template>
     <div class="row">
+        <div class="item w-fixed-auto">
+            <button type="button" class="btn btn-sm btn-default" @click="$emit('add', route)">ADD</button>
+        </div>
         <div class="item w2">
             <div class="mock-col-value">{{ route.group }}</div>
         </div>
@@ -11,9 +14,6 @@
         </div>
         <div class="item w2">
             <div class="mock-col-value">{{ route.alt }}</div>
-        </div>
-        <div class="item w2">
-            <button type="button" class="btn btn-sm btn-default" @click="$emit('add', route)">ADD</button>
         </div>
     </div>
 </template>
@@ -33,29 +33,30 @@
     .row {
         display: flex;
         flex-wrap: wrap;
-        margin-bottom: 0;
-        padding: 0 .3rem;
-        border-radius: 5px;
+        align-items: center;
+        row-gap: 0.3rem;
+        column-gap: 0.5rem;
+        margin: 0;
+        padding: 0.5rem 0.7rem;
     }
 
     .item {
-        flex: 1;
+        flex: 1 1 0;
         box-sizing: border-box;
         margin: 0;
-        padding: .8rem .5rem;
-        vertical-align: top;
-        text-align: center;
+        padding: 0;
+
+        &.w-fixed-auto {
+            flex: 0 0 auto;
+            min-width: initial;
+        }
 
         &.w2 {
-            flex: 2;
+            flex: 2 1 0;
         }
 
         &.w3 {
-            flex: 3;
-        }
-
-        & .btn {
-            margin: -0.3rem 0;
+            flex: 3 1 0;
         }
     }
 </style>

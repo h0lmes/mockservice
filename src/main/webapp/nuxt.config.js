@@ -7,7 +7,7 @@ export default {
     ],
     fontawesome: {
         icons: {
-            solid: ['faBars', 'faRoute', 'faPlay', 'faCode', 'faFileAlt', 'faCogs', 'faQuestionCircle', 'faHammer', 'faReceipt', 'faFileImport']
+            solid: ['faBars', 'faRoute', 'faPlay', 'faCode', 'faFileAlt', 'faCog', 'faCogs', 'faQuestionCircle', 'faHammer', 'faReceipt', 'faFileImport']
         }
     },
     css: [
@@ -25,7 +25,7 @@ export default {
         ]
     },
     loading: {
-        color: '#158876',
+        color: '#ab1147',
         height: '.7rem',
         continuous: true
     },

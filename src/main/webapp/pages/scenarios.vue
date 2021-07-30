@@ -10,7 +10,6 @@
             </div>
             <button type="button" class="toolbar-item-fixed btn" @click="setFilter('')">Clear filter</button>
             <button type="button" class="toolbar-item-fixed btn" @click="add">Add scenario</button>
-            <ViewSelector class="toolbar-item-fixed"></ViewSelector>
         </div>
 
         <Scenarios :scenarios="filtered"
@@ -18,7 +17,10 @@
                    @filter="setFilter($event)"
         ></Scenarios>
 
-        <div class="color-secondary mt-4 smaller">(middle-click Scenario to edit)</div>
+        <div class="color-secondary mt-4 smaller">(middle-click to edit)</div>
+        <div class="color-secondary mt-2 smaller">MAP: search all routes by METHOD + PATH, return ALT from the first match or empty if not found.</div>
+        <div class="color-secondary mt-2 smaller">QUEUE: same as MAP but tries to match only topmost route, removes matched route from the queue.</div>
+        <div class="color-secondary mt-2 smaller">CIRCULAR QUEUE: same as QUEUE plus auto-restart when queue depleted.</div>
 
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
@@ -27,11 +29,10 @@
     import {mapActions} from 'vuex';
     import Scenarios from "../components/Scenarios";
     import Loading from "../components/Loading";
-    import ViewSelector from "../components/ViewSelector";
 
     export default {
         name: "scenarios",
-        components: {Scenarios, Loading, ViewSelector},
+        components: {Scenarios, Loading},
         data() {
             return {
                 query: '',
