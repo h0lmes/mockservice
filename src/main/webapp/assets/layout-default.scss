@@ -114,7 +114,8 @@
   }
 }
 
-.navbar .nav > li > a:hover {
+.nav > li.nav-item > a:hover,
+.nav > li.nav-item > a.nuxt-link-exact-active:hover {
   color: var(--nav-color-active);
   background-color: var(--nav-bg-active);
   text-decoration: none;
@@ -124,7 +125,7 @@
   }
 }
 
-.nav-group {
+.nav .nav-group {
   padding: 1.5rem 20px 0.5rem 25px;
   font-size: smaller;
   font-family: monospace, monospace;
@@ -151,7 +152,6 @@
   margin: 0;
 }
 
-.navbar .nav > li > a.btn-minimize-navbar:hover,
-.navbar .nav > li > a.btn-minimize-navbar:focus {
+.nav > li > a.btn-minimize-navbar:hover {
   color: var(--color-accent-one) !important;
 }

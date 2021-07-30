@@ -64,10 +64,13 @@
 
                 try {
                     const startTime = new Date();
-                    const response = await fetch(this.host + this.route.path, {
-                        method: this.route.method,
-                        headers: this.testHeaders
-                    });
+                    const response = await fetch(
+                        this.host + this.route.path,
+                        {
+                            method: this.route.method,
+                            headers: this.testHeaders
+                        }
+                    );
                     const body = await response.text();
                     const elapsed = new Date() - startTime;
                     this.println('----- response in ' + elapsed + ' ms with status ' + response.status + ' -----');

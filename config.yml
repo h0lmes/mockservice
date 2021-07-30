@@ -3,40 +3,13 @@ settings:
   quantum: false
   failedInputValidationAlt400: true
 routes:
-- group: Default
+- group: default
   path: /jwt
   method: GET
   type: REST
   alt: ""
   responseCode: 200
   response: "{\n  \"sub\": \"${sub:DEFAULT}\",\n  \"name\": \"${name:DEFAULT}\",\n  \"iat\": ${iat:0}\n}"
-  requestBodySchema: ""
-  disabled: false
-- group: a robot service
-  path: /api/robot
-  method: GET
-  type: REST
-  alt: ""
-  responseCode: 202
-  response: "HTTP/1.1\nExtra: extra-value\n\n{\"name\": \"Johnny 5\"}\n---\nGET localhost:8081/api/robot HTTP/1.1\nMock-Alt: api-robot/R2D2\n\n{}"
-  requestBodySchema: ""
-  disabled: false
-- group: a robot service
-  path: /api/robot
-  method: GET
-  type: REST
-  alt: R2D2
-  responseCode: 200
-  response: "{\"name\": \"R2D2\"}"
-  requestBodySchema: ""
-  disabled: false
-- group: a robot service
-  path: /api/robot
-  method: GET
-  type: REST
-  alt: terminator
-  responseCode: 200
-  response: "{\"name\": \"terminator\"}"
   requestBodySchema: ""
   disabled: false
 - group: entity
@@ -84,7 +57,7 @@ routes:
   response: "{\"id\": ${random_int}, \"name\": \"${name:default name}\"}"
   requestBodySchema: ""
   disabled: false
-- group: number conversion service
+- group: number conversion
   path: /mockNumberConversion
   method: POST
   type: SOAP
@@ -127,6 +100,33 @@ routes:
   alt: 400
   responseCode: 400
   response: ""
+  requestBodySchema: ""
+  disabled: false
+- group: robot
+  path: /api/robot
+  method: GET
+  type: REST
+  alt: ""
+  responseCode: 202
+  response: "HTTP/1.1\nExtra: extra-value\n\n{\"name\": \"Johnny 5\"}\n---\nGET localhost:8081/api/robot HTTP/1.1\nMock-Alt: api-robot/R2D2\n\n{}"
+  requestBodySchema: ""
+  disabled: false
+- group: robot
+  path: /api/robot
+  method: GET
+  type: REST
+  alt: R2D2
+  responseCode: 200
+  response: "{\"name\": \"R2D2\"}"
+  requestBodySchema: ""
+  disabled: false
+- group: robot
+  path: /api/robot
+  method: GET
+  type: REST
+  alt: terminator
+  responseCode: 200
+  response: "{\"name\": \"terminator\"}"
   requestBodySchema: ""
   disabled: false
 - group: store

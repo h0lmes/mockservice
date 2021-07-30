@@ -8,57 +8,57 @@
                     </a>
                 </li>
                 <li class="nav-group">MOCKS</li>
-                <li>
+                <li class="nav-item">
                     <NuxtLink to="/">
                         <FontAwesomeIcon icon="route" class="nav-icon"/>
                         <span class="nav-label">Routes</span>
                     </NuxtLink>
                 </li>
-                <li>
+                <li class="nav-item">
                     <NuxtLink to="/import">
                         <FontAwesomeIcon icon="file-import" class="nav-icon icon-width-fix"/>
                         <span class="nav-label">Import</span>
                     </NuxtLink>
                 </li>
-                <li>
+                <li class="nav-item">
                     <NuxtLink to="/scenarios">
                         <FontAwesomeIcon icon="receipt" class="nav-icon icon-width-fix"/>
                         <span class="nav-label">Scenarios</span>
                     </NuxtLink>
                 </li>
                 <li class="nav-group">TOOLS</li>
-                <li>
+                <li class="nav-item">
                     <NuxtLink to="/request">
                         <FontAwesomeIcon icon="play" class="nav-icon icon-width-fix"/>
                         <span class="nav-label">Request</span>
                     </NuxtLink>
                 </li>
-                <li>
+                <li class="nav-item">
                     <NuxtLink to="/generate">
                         <FontAwesomeIcon icon="hammer" class="nav-icon icon-width-fix"/>
                         <span class="nav-label">Generate</span>
                     </NuxtLink>
                 </li>
                 <li class="nav-group">SERVICE</li>
-                <li>
+                <li class="nav-item">
                     <NuxtLink to="/settings">
                         <FontAwesomeIcon icon="cogs" class="nav-icon"/>
                         <span class="nav-label">Settings</span>
                     </NuxtLink>
                 </li>
-                <li>
+                <li class="nav-item">
                     <NuxtLink to="/config">
                         <FontAwesomeIcon icon="code" class="nav-icon"/>
                         <span class="nav-label">Config</span>
                     </NuxtLink>
                 </li>
-                <li>
+                <li class="nav-item">
                     <NuxtLink to="/log">
                         <FontAwesomeIcon icon="file-alt" class="nav-icon larger icon-width-fix"/>
                         <span class="nav-label">Log</span>
                     </NuxtLink>
                 </li>
-                <li>
+                <li class="nav-item">
                     <NuxtLink to="/about">
                         <FontAwesomeIcon icon="question-circle" class="nav-icon icon-width-fix"/>
                         <span class="nav-label">About</span>
