@@ -1,6 +1,5 @@
 package com.mockservice.util;
 
-import org.everit.json.schema.Schema;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -8,7 +7,7 @@ import org.json.JSONTokener;
 public class JsonUtils {
     
     private JsonUtils() {
-        // default
+        /* hidden */
     }
 
     public static String unescape(String str) {
@@ -20,21 +19,25 @@ public class JsonUtils {
         while (i < len) {
             char ch = chars[i++];
 
-            if (ch == '\\' && i < len) {
+            if (ch == '\\') {
+
+                if (i >= len) {
+                    throw new IllegalArgumentException("Illegal escape sequence at the end of string.");
+                }
 
                 ch = chars[i++];
 
-                if(ch == '\\' || ch == '/' || ch == '"' || ch == '\'') {
+                if (ch == '\\' || ch == '/' || ch == '"' || ch == '\'') {
                     builder.append(ch);
                 }
-                else if(ch == 'n') builder.append('\n');
-                else if(ch == 'r') builder.append('\r');
-                else if(ch == 't') builder.append('\t');
-                else if(ch == 'b') builder.append('\b');
-                else if(ch == 'f') builder.append('\f');
-                else if(ch == 'u') {
+                else if (ch == 'n') builder.append('\n');
+                else if (ch == 'r') builder.append('\r');
+                else if (ch == 't') builder.append('\t');
+                else if (ch == 'b') builder.append('\b');
+                else if (ch == 'f') builder.append('\f');
+                else if (ch == 'u') {
                     if (i + 4 > len) {
-                        throw new IllegalArgumentException("Malformed unicode char at " + i + ". Must have 4 digits.");
+                        throw new IllegalArgumentException("Malformed unicode char at " + i + ". Must be \\uXXXX.");
                     }
                     int charCode = Integer.parseInt("" + chars[i] + chars[i + 1] + chars[i + 2] + chars[i + 3], 16);
                     builder.append((char) charCode);
@@ -42,8 +45,6 @@ public class JsonUtils {
                 } else {
                     throw new IllegalArgumentException("Illegal escape sequence: \\" + ch);
                 }
-            } else {
-                builder.append(ch);
             }
         }
 

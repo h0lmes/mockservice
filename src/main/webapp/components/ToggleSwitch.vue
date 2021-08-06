@@ -7,9 +7,9 @@
                     <div class="handle"></div>
                 </div>
             </div>
-            <slot></slot>
+            <div class="inline-block overflow-wrap-anywhere"><slot></slot></div>
             <div v-if="sub"></div>
-            <div v-if="sub" class="mt-2 color-secondary smaller">{{sub}}</div>
+            <div v-if="sub" class="inline-block overflow-wrap-anywhere mt-2 color-secondary smaller">{{sub}}</div>
         </label>
     </div>
 </template>

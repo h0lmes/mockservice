@@ -1,5 +1,8 @@
 <template>
-    <div class="component component-row monospace" :class="{'open' : open, 'disabled' : route.disabled}" @click.middle="edit">
+    <div class="component component-row monospace"
+         :class="{'open' : open, 'disabled' : route.disabled}"
+         @click.middle.stop.prevent="edit"
+         @keydown.esc.exact="cancel">
 
         <div class="mock-col w2">
             <div class="mock-col-header">GROUP</div>
@@ -49,15 +52,17 @@
 
         <div class="mock-col w-fixed-auto">
             <div v-show="editing" class="mock-col-header"></div>
-            <div>
-                <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
-                <button type="button" class="btn btn-sm btn-default" @click="test">test</button>
-                <button type="button" class="btn btn-sm btn-danger" @click="del">delete</button>
-            </div>
+            <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
+            <button type="button" class="btn btn-sm btn-default" @click="test">test</button>
+            <button type="button" class="btn btn-sm btn-danger" @click="del">delete</button>
         </div>
 
         <div v-show="editing" class="mock-col w100">
-            <AutoSizeTextArea v-model="editingRoute.response" :min-rows="1" :max-rows="256" placeholder="RESPONSE BODY"
+            <AutoSizeTextArea v-model="editingRoute.response"
+                              :min-rows="1"
+                              :max-rows="256"
+                              placeholder="RESPONSE BODY"
+                              ref="response"
             ></AutoSizeTextArea>
         </div>
 
@@ -122,6 +127,7 @@
                 this.editingRoute = {...this.route};
                 this.showRequestBodySchema = !!this.editingRoute.requestBodySchema;
                 this.editing = !this.editing;
+                if (this.editing) this.$nextTick(() => this.$refs.response.focus());
             },
             test() {
                 this.cancel();
@@ -134,7 +140,7 @@
             del() {
                 if (!!this.route._new) {
                     this.deleteRoutes([this.route]);
-                } else if (confirm('Sure?')) {
+                } else if (confirm('Sure you want to delete?')) {
                     this.$nuxt.$loading.start();
                     this.deleteRoutes([this.route]).then(() => this.$nuxt.$loading.finish());
                 }

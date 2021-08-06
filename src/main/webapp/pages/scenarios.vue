@@ -17,7 +17,7 @@
                    @filter="setFilter($event)"
         ></Scenarios>
 
-        <div class="color-secondary mt-4 smaller">(middle-click to edit)</div>
+        <div class="color-secondary mt-4 smaller">(middle-click to edit, Esc on any field to cancel)</div>
         <div class="color-secondary mt-2 smaller">MAP: search all routes by METHOD + PATH, return ALT from the first match or empty if not found.</div>
         <div class="color-secondary mt-2 smaller">QUEUE: same as MAP but tries to match only topmost route, removes matched route from the queue.</div>
         <div class="color-secondary mt-2 smaller">CIRCULAR QUEUE: same as QUEUE plus auto-restart when queue depleted.</div>

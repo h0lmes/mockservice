@@ -3,7 +3,6 @@ package com.mockservice.repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.Scenario;
-import com.mockservice.domain.ScenarioAlreadyExistsException;
 import com.mockservice.domain.Settings;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ public interface ConfigRepository {
 
     List<Scenario> findAllScenarios();
     Optional<Scenario> findScenario(Scenario scenario);
-    void putScenario(Scenario scenario, Scenario replacement) throws ScenarioAlreadyExistsException, IOException;
+    void putScenario(Scenario scenario, Scenario replacement) throws IOException;
     void deleteScenario(Scenario scenario) throws IOException;
 
     void registerConfigChangedListener(ConfigChangedListener listener);

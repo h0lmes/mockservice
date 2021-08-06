@@ -2,7 +2,6 @@ package com.mockservice.service;
 
 import com.mockservice.domain.Route;
 import com.mockservice.domain.Scenario;
-import com.mockservice.domain.ScenarioParseException;
 import com.mockservice.repository.ConfigChangedListener;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.repository.ScenariosChangedListener;
@@ -86,14 +85,14 @@ public class ActiveScenariosServiceImpl implements ActiveScenariosService, Confi
     }
 
     @Override
-    public synchronized Set<String> activateScenario(String alias) throws ScenarioParseException {
+    public synchronized Set<String> activateScenario(String alias) {
         Scenario scenario = findByAlias(alias)
                 .orElseThrow(() -> new IllegalArgumentException("Scenario not found: " + alias));
         activateScenarioInternal(scenario);
         return getActiveScenarios();
     }
 
-    private void activateScenarioInternal(Scenario scenario) throws ScenarioParseException {
+    private void activateScenarioInternal(Scenario scenario) {
         activeScenarios.put(scenario.getAlias(), new ActiveScenario(scenario));
     }
 

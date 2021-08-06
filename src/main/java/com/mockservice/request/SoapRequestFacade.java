@@ -1,5 +1,6 @@
 package com.mockservice.request;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +13,8 @@ public class SoapRequestFacade extends AbstractRequestFacade {
 
     private static final Logger log = LoggerFactory.getLogger(SoapRequestFacade.class);
 
-    public SoapRequestFacade(HttpServletRequest request) {
-        super(request);
+    public SoapRequestFacade(HttpServletRequest request, ObjectMapper jsonMapper) {
+        super(request, jsonMapper);
     }
 
     @Override

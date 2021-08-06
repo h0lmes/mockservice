@@ -1,5 +1,6 @@
 package com.mockservice.request;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,6 +21,7 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     private static final String AUTH_HEADER = "Authorization";
     private static final String HEADER_SPLIT = "/";
 
+    final ObjectMapper jsonMapper;
     private final String endpoint;
     private final String encodedEndpoint;
     private final RequestMethod requestMethod;
@@ -31,7 +33,8 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     private String body = "";
 
     @SuppressWarnings("unchecked")
-    public AbstractRequestFacade(HttpServletRequest request) {
+    public AbstractRequestFacade(HttpServletRequest request, ObjectMapper jsonMapper) {
+        this.jsonMapper = jsonMapper;
         endpoint = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         encodedEndpoint = encodeEndpoint(endpoint);
         requestMethod = RequestMethod.valueOf(request.getMethod());

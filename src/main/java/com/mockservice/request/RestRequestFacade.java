@@ -1,6 +1,7 @@
 package com.mockservice.request;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +15,8 @@ public class RestRequestFacade extends AbstractRequestFacade {
 
     private static final Logger log = LoggerFactory.getLogger(RestRequestFacade.class);
 
-    public RestRequestFacade(HttpServletRequest request) {
-        super(request);
+    public RestRequestFacade(HttpServletRequest request, ObjectMapper jsonMapper) {
+        super(request, jsonMapper);
     }
 
     @Override
@@ -33,7 +34,7 @@ public class RestRequestFacade extends AbstractRequestFacade {
         String body = getBody();
         if (body != null && !body.isEmpty()) {
             try {
-                return MapUtils.flattenMap(MapUtils.jsonToMap(body));
+                return MapUtils.flattenMap(MapUtils.jsonToMap(body, jsonMapper));
             } catch (JsonProcessingException e) {
                 log.warn("Invalid JSON:\n{}", body);
             }
@@ -51,7 +52,7 @@ public class RestRequestFacade extends AbstractRequestFacade {
                     Base64.Decoder decoder = Base64.getDecoder();
                     String payload = new String(decoder.decode(chunks[1]));
                     try {
-                        return MapUtils.flattenMap(MapUtils.jsonToMap(payload));
+                        return MapUtils.flattenMap(MapUtils.jsonToMap(payload, jsonMapper));
                     } catch (JsonProcessingException e) {
                         log.warn("Invalid JWT payload:\n{}", payload);
                     }

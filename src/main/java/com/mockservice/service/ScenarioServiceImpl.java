@@ -1,7 +1,6 @@
 package com.mockservice.service;
 
 import com.mockservice.domain.Scenario;
-import com.mockservice.domain.ScenarioAlreadyExistsException;
 import com.mockservice.repository.ConfigRepository;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +23,7 @@ public class ScenarioServiceImpl implements ScenarioService {
     }
 
     @Override
-    public synchronized List<Scenario> putScenario(Scenario scenario, Scenario replacement) throws IOException, ScenarioAlreadyExistsException {
+    public synchronized List<Scenario> putScenario(Scenario scenario, Scenario replacement) throws IOException {
         configRepository.putScenario(scenario, replacement);
         return getScenariosAsList();
     }

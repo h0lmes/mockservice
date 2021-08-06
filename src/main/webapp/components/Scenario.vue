@@ -1,5 +1,8 @@
 <template>
-    <div class="component component-row monospace" :class="{'open' : open}" @click.middle="edit">
+    <div class="component component-row monospace"
+         :class="{'open' : open}"
+         @click.middle.stop.prevent="edit"
+         @keydown.esc.exact="cancel">
 
         <div class="mock-col">
             <div class="mock-col-header">GROUP</div>
@@ -30,15 +33,15 @@
 
         <div class="mock-col w-fixed-auto">
             <div v-show="editing" class="mock-col-header"></div>
-            <div>
-                <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
-                <button type="button" class="btn btn-sm btn-danger" @click="del">delete</button>
-            </div>
+            <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
+            <button type="button" class="btn btn-sm btn-danger" @click="del">delete</button>
         </div>
 
         <div v-show="editing" class="mock-col w100">
             <div class="mock-col-header">SCENARIO (ROUTES)</div>
-            <AutoSizeTextArea v-model="editingScenario.data"></AutoSizeTextArea>
+            <AutoSizeTextArea v-model="editingScenario.data"
+                              ref="data"
+            ></AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-col w1">
@@ -126,6 +129,7 @@
             edit() {
                 this.editingScenario = {...this.scenario};
                 this.editing = !this.editing;
+                if (this.editing) this.$nextTick(() => this.$refs.data.focus());
             },
             cancel() {
                 this.editing = false;
@@ -136,7 +140,7 @@
                     this.deleteScenario(this.scenario);
                     return;
                 }
-                if (confirm('Sure?')) {
+                if (confirm('Sure you want to delete?')) {
                     this.$nuxt.$loading.start();
                     this.deleteScenario(this.scenario)
                         .then(() => this.$nuxt.$loading.finish());

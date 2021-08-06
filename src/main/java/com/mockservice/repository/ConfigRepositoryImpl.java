@@ -123,7 +123,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     //----------------------------------------------------------------------
 
     @Override
-    public Settings getSettings() {
+    public synchronized Settings getSettings() {
         return config.getSettings();
     }
 
@@ -230,7 +230,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     @Override
-    public void putScenario(Scenario scenario, Scenario replacement) throws ScenarioAlreadyExistsException, IOException {
+    public void putScenario(Scenario scenario, Scenario replacement) throws IOException {
         // do not allow duplicates
         if (!scenario.equals(replacement)) {
             Scenario maybeScenario = findScenario(replacement).orElse(null);

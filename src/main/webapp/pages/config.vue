@@ -6,7 +6,8 @@
             <button type="button" class="btn btn-default" @click="backup">BACKUP ON SERVER</button>
             <button type="button" class="btn btn-default" @click="restore">RESTORE FROM BACKUP</button>
         </div>
-        <AutoSizeTextArea v-model="config" :max-rows="30"></AutoSizeTextArea>
+        <AutoSizeTextArea class="main" v-model="config" :max-rows="maxRows"></AutoSizeTextArea>
+        <AutoSizeTextArea class="helper invisible" v-model="config" :min-rows="1" :max-rows="1"></AutoSizeTextArea>
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
 </template>
@@ -21,11 +22,15 @@
         data() {
             return {
                 config: '',
+                maxRows: 30,
             }
         },
         async fetch() {
             return this.fetchConfig()
-                .then(response => this.config = response);
+                .then(response => {
+                    this.config = response;
+                    this.$nextTick(() => this.calcMaxRows());
+                });
         },
         fetchDelay: 0,
         methods: {
@@ -35,6 +40,12 @@
                 backupConfig: 'config/backup',
                 restoreConfig: 'config/restore'
             }),
+            calcMaxRows() {
+                const ma = document.querySelector('textarea.main').getBoundingClientRect();
+                const ha = document.querySelector('textarea.helper').getBoundingClientRect();
+                const lineHeight = (ma.height - ha.height) / (this.maxRows - 1);
+                this.maxRows += (window.innerHeight - ma.bottom) / lineHeight - 2;
+            },
             async save() {
                 if (confirm('Ye be warned =)')) {
                     this.$nuxt.$loading.start();
@@ -78,5 +89,7 @@
     .invisible {
         position: absolute;
         top: -20rem;
+        left: 0;
+        right: 0;
     }
 </style>

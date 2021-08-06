@@ -1,20 +1,16 @@
 <template>
     <div class="bg monospace">
         <div class="about">
-            <h1>Mock Service</h1>
-            <p></p>
-            <p>An easy to use service to mock REST and SOAP services. Suitable for integration testing and similar purposes.</p>
-            <p></p>
-            <p>
+            <h1 class="mb-5">Mock Service</h1>
+            <p class="mb-2">An easy to use service to mock REST and SOAP services. Suitable for integration testing and similar purposes.</p>
+            <p class="mb-2">
                 <a target="_blank" href="https://github.com/h0lmes/mockservice" rel="noopener noreferrer">GitHub</a>
             </p>
-            <p></p>
-            <p></p>
-            <pre>         --------                       </pre>
-            <pre>    V   | Mock ? |   -------       V    </pre>
-            <pre>  (o o) |/-------   | Mock ! \   (o o)  </pre>
-            <pre> (  V  )             ---------- (  V  ) </pre>
-            <pre>...m.m............................m.m...</pre>
+            <pre class="ascii">         --------                       </pre>
+            <pre class="ascii">    V   | Mock ? |   -------       V    </pre>
+            <pre class="ascii">  (o o) |/-------   | Mock ! \   (o o)  </pre>
+            <pre class="ascii"> (  V  )             ---------- (  V  ) </pre>
+            <pre class="ascii">...m.m............................m.m...</pre>
         </div>
     </div>
 </template>
@@ -34,11 +30,18 @@
 
     .about {
         position: relative;
+        box-sizing: border-box;
         max-width: 30rem;
         margin: 0 auto;
         top: 50%;
         transform: translateY(-50%);
         background: transparent;
         text-align: center;
+    }
+
+    @media screen and (max-width: 599px) {
+        .ascii {
+            display: none;
+        }
     }
 </style>

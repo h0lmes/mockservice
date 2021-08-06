@@ -4,10 +4,10 @@ public class Settings {
 
     private boolean randomAlt = false;
     private boolean quantum = false;
-    private boolean failedInputValidationAlt400 = true;
+    private boolean alt400OnFailedRequestValidation = true;
 
     public Settings() {
-        // default
+        /* default */
     }
 
     public boolean getRandomAlt() {
@@ -18,7 +18,7 @@ public class Settings {
         return quantum;
     }
 
-    public boolean getFailedInputValidationAlt400() {
-        return failedInputValidationAlt400;
+    public boolean getAlt400OnFailedRequestValidation() {
+        return alt400OnFailedRequestValidation;
     }
 }

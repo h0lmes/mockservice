@@ -11,15 +11,15 @@
                     </NuxtLink>
                 </li>
                 <li class="nav-item">
-                    <NuxtLink to="/import">
-                        <FontAwesomeIcon icon="file-import" class="nav-icon icon-width-fix"/>
-                        <span class="nav-label">Import</span>
-                    </NuxtLink>
-                </li>
-                <li class="nav-item">
                     <NuxtLink to="/scenarios">
                         <FontAwesomeIcon icon="receipt" class="nav-icon icon-width-fix"/>
                         <span class="nav-label">Scenarios</span>
+                    </NuxtLink>
+                </li>
+                <li class="nav-item">
+                    <NuxtLink to="/import">
+                        <FontAwesomeIcon icon="file-import" class="nav-icon icon-width-fix"/>
+                        <span class="nav-label">Import</span>
                     </NuxtLink>
                 </li>
                 <li class="nav-group">TOOLS</li>
@@ -60,6 +60,7 @@
                         <span class="nav-label">About</span>
                     </NuxtLink>
                 </li>
+                <li class="nav-block nav-dummy"></li>
             </ul>
 
             <ul class="nav nav-hidden" ref="settings">
@@ -139,6 +140,8 @@
 
                 if (!this.isSettings) {
                     this.sets();
+                } else {
+                    this.nav();
                 }
             },
             open() {
@@ -167,5 +170,9 @@
 <style scoped>
     .icon-width-fix {
         width: 1.2rem;
+    }
+
+    .nav-dummy {
+        height: 3rem;
     }
 </style>

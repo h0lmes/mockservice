@@ -35,7 +35,7 @@ public class WebApiScenariosController {
     }
 
     @PutMapping("scenarios")
-    public List<Scenario> putScenario(@RequestBody List<Scenario> scenarios) throws IOException, ScenarioAlreadyExistsException {
+    public List<Scenario> putScenario(@RequestBody List<Scenario> scenarios) throws IOException {
         if (scenarios.size() != 2) {
             throw new IllegalArgumentException("There must be exactly 2 scenarios, the old and the new one.");
         }
@@ -53,7 +53,7 @@ public class WebApiScenariosController {
     }
 
     @PutMapping("scenarios/active")
-    public Set<String> activateScenario(@RequestBody String alias) throws ScenarioParseException {
+    public Set<String> activateScenario(@RequestBody String alias) {
         return activeScenariosService.activateScenario(alias);
     }
 

@@ -11,9 +11,10 @@
             >Go Quantum</ToggleSwitch>
         </p>
         <p class="mb-2">
-            <ToggleSwitch v-model="failedInputValidationAlt400"
-                          sub="Variable ${requestBodyValidationErrorMessage} would be available to use in Alt = '400' response"
-            >When input validation failed respond with an existing Alt = '400' route instead of validation error</ToggleSwitch>
+            <ToggleSwitch v-model="alt400OnFailedRequestValidation"
+                          sub="When request body validation fails respond with an existing Alt = '400' route instead of standard error.
+                          Variable ${requestBodyValidationErrorMessage} would be available to use in response body."
+            >Alt '400' on failed request validation</ToggleSwitch>
         </p>
         <div class="mt-5 pl-1">
             <button type="button" class="btn btn-primary" @click="save">SAVE</button>
@@ -33,7 +34,7 @@
             return {
                 randomAlt: false,
                 quantum: false,
-                failedInputValidationAlt400: true,
+                alt400OnFailedRequestValidation: true,
             }
         },
         async fetch() {
@@ -49,7 +50,7 @@
             settings() {
                 this.randomAlt = this.settings.randomAlt;
                 this.quantum = this.settings.quantum;
-                this.failedInputValidationAlt400 = this.settings.failedInputValidationAlt400;
+                this.alt400OnFailedRequestValidation = this.settings.alt400OnFailedRequestValidation;
             },
         },
         methods: {

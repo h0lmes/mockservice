@@ -1,68 +1,47 @@
 package com.mockservice.response;
 
-import com.mockservice.template.StringTemplate;
-import com.mockservice.template.TemplateEngine;
 import com.mockservice.util.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.lang.Nullable;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 
-public class RestMockResponse implements MockResponse {
-
-    private static final Logger log = LoggerFactory.getLogger(RestMockResponse.class);
+public class RestMockResponse extends BaseMockResponse {
 
     private static final String HTTP_1_1 = "HTTP/1.1";
     private static final String DELIMITER_STRING = "---";
     private static final String HTTP_HEADER_DELIMITER = ":";
     private static final int HTTP_HEADER_DELIMITER_LEN = HTTP_HEADER_DELIMITER.length();
 
-    private final Map<String, String> variables = new HashMap<>();
-    private final HttpHeaders responseHeaders = new HttpHeaders();
-    private final StringTemplate responseBody;
-    private boolean containsRequest = false;
-    private HttpMethod requestMethod = HttpMethod.GET;
-    private final StringTemplate requestUrl;
-    private final HttpHeaders requestHeaders = new HttpHeaders();
-    private final StringTemplate requestBody;
-
-    public RestMockResponse(TemplateEngine engine, String resource) {
-        responseBody = new StringTemplate(engine);
-        requestBody = new StringTemplate(engine);
-        requestUrl = new StringTemplate(engine);
+    public RestMockResponse(String response) {
+        super();
         responseHeaders.add(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8");
         requestHeaders.add(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8");
-        read(resource);
+        read(response);
     }
 
-    private void read(String resource) {
-        List<String> lines = IOUtils.toList(resource);
+    private void read(String response) {
+        List<String> lines = IOUtils.toList(response);
         boolean readingRequest = false;
         boolean readingHead = false;
 
         for (String line : lines) {
-            if (isDelimiter(line)) {
-                // ignore
-            } else if (isResponseStart(line)) {
+            if (isResponseStart(line)) {
                 readingRequest = false;
                 readingHead = true;
             } else if (isRequestStart(line)) {
                 readingRequest = true;
                 readingHead = true;
                 setRequest(line);
-            } else if (readingHead && line.trim().isEmpty()) {
-                readingHead = false;
-            } else if (!readingRequest && readingHead) {
-                addHeader(line, responseHeaders);
-            } else if (readingRequest && readingHead) {
-                addHeader(line, requestHeaders);
-            } else if (!line.isEmpty()) {
+            } else if (readingHead) {
+                if (line.trim().isEmpty()) {
+                    readingHead = false;
+                } else if (readingRequest) {
+                    addHeader(line, requestHeaders);
+                } else {
+                    addHeader(line, responseHeaders);
+                }
+            } else if (!skipLine(line)) {
                 if (readingRequest) {
                     requestBody.add(line);
                 } else {
@@ -80,8 +59,8 @@ public class RestMockResponse implements MockResponse {
         return line.trim().startsWith(HTTP_1_1);
     }
 
-    private boolean isDelimiter(String line) {
-        return line.trim().startsWith(DELIMITER_STRING);
+    private boolean skipLine(String line) {
+        return line.isEmpty() || line.startsWith(DELIMITER_STRING);
     }
 
     private void setRequest(String line) {
@@ -92,7 +71,7 @@ public class RestMockResponse implements MockResponse {
             requestMethod = HttpMethod.valueOf(methodStr);
             containsRequest = true;
         } catch (Exception e) {
-            log.warn("Invalid request first line: {}", line);
+            throw new IllegalArgumentException("Invalid request first line.", e);
         }
     }
 
@@ -101,49 +80,5 @@ public class RestMockResponse implements MockResponse {
         String key = line.substring(0, delimiter);
         String value = line.substring(delimiter + HTTP_HEADER_DELIMITER_LEN).trim();
         toHeaders.add(key, value);
-    }
-
-    @Override
-    public MockResponse setVariables(@Nullable Map<String, String> variables) {
-        this.variables.clear();
-        this.variables.putAll(variables);
-        return this;
-    }
-
-    @Override
-    public HttpHeaders getResponseHeaders() {
-        return responseHeaders;
-    }
-
-    @Override
-    public String getResponseBody() {
-        return responseBody.toString(variables);
-    }
-
-    @Override
-    public void ifHasRequest(Consumer<MockResponse> consumer) {
-        if (containsRequest) {
-            consumer.accept(this);
-        }
-    }
-
-    @Override
-    public HttpMethod getRequestMethod() {
-        return requestMethod;
-    }
-
-    @Override
-    public String getRequestUrl() {
-        return requestUrl.toString(variables);
-    }
-
-    @Override
-    public HttpHeaders getRequestHeaders() {
-        return requestHeaders;
-    }
-
-    @Override
-    public String getRequestBody() {
-        return requestBody.toString(variables);
     }
 }

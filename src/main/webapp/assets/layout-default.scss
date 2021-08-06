@@ -82,6 +82,26 @@
   margin: 0;
   list-style: none;
   overflow: hidden auto;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 13px;
+    background-color: var(--nav-bg);
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: var(--nav-bg);
+  }
+
+  &::-webkit-scrollbar-track-piece {
+    background-color: var(--nav-bg);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    width: 13px;
+    height: 1rem;
+    background: var(--nav-bg-active);
+  }
 
   &.nav-hidden {
     display: none;

@@ -12,19 +12,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 
+@SuppressWarnings("unchecked")
 public class MapUtils {
 
     private MapUtils() {
-        // hidden
+        /* hidden */
     }
 
-    @SuppressWarnings("unchecked")
     public static Map<String, Object> jsonToMap(String json) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        return jsonToMap(json, mapper);
+    }
+
+    public static Map<String, Object> jsonToMap(String json, ObjectMapper mapper) throws JsonProcessingException {
         return mapper.readValue(json, Map.class);
     }
 
@@ -34,12 +38,12 @@ public class MapUtils {
         return getXmlMapKeyAsMap(map, "body");
     }
 
-    @SuppressWarnings("unchecked")
     private static Map<String, Object> getXmlMapKeyAsMap(Map<String, Object> map, String key) {
         if (map != null) {
-            for (String k : map.keySet()) {
-                if (k.equalsIgnoreCase(key) && (map.get(k) instanceof Map)) {
-                    return (Map<String, Object>) map.get(k);
+            for (Map.Entry<String, Object> e : map.entrySet()) {
+                Object value = e.getValue();
+                if (e.getKey().equalsIgnoreCase(key) && (value instanceof Map)) {
+                    return (Map<String, Object>) value;
                 }
             }
         }
@@ -52,7 +56,6 @@ public class MapUtils {
         return runBfs(queue);
     }
 
-    @SuppressWarnings("unchecked")
     private static Map<String, String> runBfs(Queue<TriEntry> queue) {
         Map<String, String> result = new HashMap<>();
         while (!queue.isEmpty()) {

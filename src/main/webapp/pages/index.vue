@@ -15,7 +15,7 @@
 
         <Routes :routes="filtered" @filter="setFilter($event)"></Routes>
 
-        <div class="color-secondary mt-4 smaller">(middle-click to edit)</div>
+        <div class="color-secondary mt-4 smaller">(middle-click to edit, Esc on any field to cancel)</div>
         <div class="color-secondary mt-2 smaller">
             Note: METHOD, PATH and ALT define a unique Route, changing any of them creates a new Route instead of replacing the existing one.
         </div>

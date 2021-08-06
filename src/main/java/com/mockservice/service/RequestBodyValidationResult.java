@@ -6,12 +6,12 @@ import java.util.Map;
 
 public class RequestBodyValidationResult {
 
-    private Exception e = null;
-    private Route route = null;
-    private Map<String, String> variables = null;
+    private Exception e;
+    private Route route;
+    private Map<String, String> variables;
 
-    public static RequestBodyValidationResult success(Route route, Map<String, String> variables) {
-        return new RequestBodyValidationResult(null, route, variables);
+    public static RequestBodyValidationResult success(Route route) {
+        return new RequestBodyValidationResult(null, route, null);
     }
 
     public static RequestBodyValidationResult error(Exception e, Route route, Map<String, String> variables) {

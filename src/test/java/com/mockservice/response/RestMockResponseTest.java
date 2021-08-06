@@ -14,7 +14,7 @@ public class RestMockResponseTest {
     @Test
     public void parserTest() throws IOException {
         String json = IOUtils.asString("resource.json");
-        MockResponse resource = new RestMockResponse(null, json);
+        MockResponse resource = new RestMockResponse(json);
 
         assertEquals(TEST_BODY, resource.getResponseBody());
     }

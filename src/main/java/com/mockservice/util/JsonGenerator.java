@@ -33,6 +33,10 @@ public class JsonGenerator {
             JsonValueType.OBJECT,
     };
 
+    private JsonGenerator() {
+        /* hidden */
+    }
+
     public static String generate() {
         return generate(rootValueTypes[RandomUtils.rnd(rootValueTypes.length)]);
     }
@@ -44,13 +48,13 @@ public class JsonGenerator {
     private static String generateValue(JsonValueType elementType, int level) {
         switch (elementType) {
             case STRING:
-                return generateStringValue();
+                return "\"" + ValueGenerator.randomString() + "\"";
             case NUMBER:
-                return generateNumberValue();
+                return ValueGenerator.randomNumberString();
             case INTEGER:
-                return generateIntegerValue();
+                return ValueGenerator.randomIntegerString();
             case BOOLEAN:
-                return generateBooleanValue();
+                return ValueGenerator.randomBooleanString();
             case ARRAY:
                 return generateArrayValue(level);
             case OBJECT:
@@ -58,22 +62,6 @@ public class JsonGenerator {
             default:
                 return "null";
         }
-    }
-
-    private static String generateStringValue() {
-        return "\"" + ValueGenerator.randomString() + "\"";
-    }
-
-    private static String generateIntegerValue() {
-        return ValueGenerator.randomIntegerString();
-    }
-
-    private static String generateNumberValue() {
-        return ValueGenerator.randomNumberString();
-    }
-
-    private static String generateBooleanValue() {
-        return ValueGenerator.randomBooleanString();
     }
 
     private static String generateArrayValue(int level) {
@@ -86,22 +74,26 @@ public class JsonGenerator {
         JsonValueType elementType = valueTypes[RandomUtils.rnd(valueTypes.length)];
 
         if (JsonValueType.OBJECT.equals(elementType) || JsonValueType.ARRAY.equals(elementType)) {
-            String content = IntStream.range(0, numberOfElements)
-                    .boxed()
-                    .map(i -> makeArrayElement(elementType, level + 1))
-                    .collect(Collectors.joining(",\n"));
-            return "[\n" + content + "\n" + offset(level) + "]";
+            String content = createArrayElements(elementType, numberOfElements, level + 1, ",\n");
+            return "[\n" + content + "\n" + padWithSpaces(level) + "]";
         }
 
-        String content = IntStream.range(0, numberOfElements)
-                .boxed()
-                .map(i -> makeArrayElement(elementType, 0))
-                .collect(Collectors.joining(", "));
+        String content = createArrayElements(elementType, numberOfElements, 0, ", ");
         return "[" + content + "]";
     }
 
+    private static String createArrayElements(JsonValueType elementType,
+                                              int numberOfElements,
+                                              int elementsIndentationLevel,
+                                              String elementsDelimiter) {
+        return IntStream.range(0, numberOfElements)
+                .boxed()
+                .map(i -> makeArrayElement(elementType, elementsIndentationLevel))
+                .collect(Collectors.joining(elementsDelimiter));
+    }
+
     private static String makeArrayElement(JsonValueType elementType, int level) {
-        return offset(level) + generateValue(elementType, level);
+        return padWithSpaces(level) + generateValue(elementType, level);
     }
 
     private static String generateObjectValue(int level) {
@@ -117,25 +109,21 @@ public class JsonGenerator {
                 .limit(numberOfElements)
                 .map(keyName -> makeObjectElement(keyName, level + 1))
                 .collect(Collectors.joining(",\n"));
-        if (content.isEmpty()) {
-            return "{}";
-        }
-        return "{\n" + content + "\n" + offset(level) + "}";
+        if (content.isEmpty()) return "{}";
+        return "{\n" + content + "\n" + padWithSpaces(level) + "}";
     }
 
     private static String makeObjectElement(String name, int level) {
-        return offset(level) + makeKey(name, generateValue(valueTypes[RandomUtils.rnd(valueTypes.length)], level));
+        return padWithSpaces(level) + makeKey(name, generateValue(valueTypes[RandomUtils.rnd(valueTypes.length)], level));
     }
 
     private static String makeKey(String name, String value) {
         return "\"" + name + "\": " + value;
     }
 
-    private static String offset(int level) {
+    private static String padWithSpaces(int level) {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < level; i++) {
-            builder.append("    ");
-        }
+        for (int i = 0; i < level; i++) builder.append("    ");
         return builder.toString();
     }
 }

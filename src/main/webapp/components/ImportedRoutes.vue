@@ -1,5 +1,5 @@
 <template>
-    <div class="monospace smaller">
+    <div>
         <p v-if="importedRoutes.length === 0">No routes</p>
         <div v-for="(route, index) in importedRoutes" :key="route.method + route.path + route.alt">
             <div v-if="groupStart(route, index)" class="component-row-group-boundary"></div>

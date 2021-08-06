@@ -48,7 +48,7 @@
   --cyan-blue: #2e7599;
   --blue: #1f5e99;
   --violet: #4d4dff;
-  --indigo: #2d26ff;
+  --indigo: #3633ff;
   --purple: #7141d9;
   --pink: #8a305d;
   --red: #8c3843;
@@ -75,7 +75,7 @@
   --cyan-blue: #2e7599;
   --blue: #1f5e99;
   --violet: #4d4dff;
-  --indigo: #2d26ff;
+  --indigo: #3633ff;
   --purple: #7141d9;
   --pink: #8a305d;
   --red: #8c3843;
@@ -185,6 +185,10 @@ button {
   text-align: center;
 }
 
+.overflow-wrap-anywhere {
+  overflow-wrap: anywhere;
+}
+
 h1, h2, h3, h4, h5 {
   font-weight: 500;
   margin: 0 0 1.5rem;
@@ -270,7 +274,7 @@ pre {
   }
 
   & .toolbar-item-fixed {
-    flex: 0 0 auto;
+    flex: 0 1 auto;
   }
 }
 
@@ -341,7 +345,7 @@ pre {
   min-width: 7rem;
 
   &.w-fixed-auto {
-    flex: 0 0 auto;
+    flex: 0 1 auto;
     min-width: initial;
   }
 
@@ -391,7 +395,7 @@ pre {
   color: var(--color-primary);
   margin: 0 auto;
   text-align: center;
-  word-wrap: break-word;
+  overflow-wrap: anywhere;
 
   &.link:hover {
     cursor: pointer;

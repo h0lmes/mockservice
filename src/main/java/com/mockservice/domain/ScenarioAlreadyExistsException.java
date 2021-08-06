@@ -1,8 +1,8 @@
 package com.mockservice.domain;
 
-public class ScenarioAlreadyExistsException extends Exception {
+public class ScenarioAlreadyExistsException extends RuntimeException {
 
-    private final Scenario scenario;
+    private final transient Scenario scenario;
 
     public ScenarioAlreadyExistsException(Scenario scenario) {
         this.scenario = scenario;

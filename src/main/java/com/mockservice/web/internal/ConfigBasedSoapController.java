@@ -1,5 +1,6 @@
 package com.mockservice.web.internal;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
 import com.mockservice.repository.ConfigChangedListener;
@@ -11,6 +12,7 @@ import com.mockservice.service.MockService;
 import com.mockservice.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +40,7 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
     private final ConfigRepository configRepository;
     private Method mockMethod = null;
+    private final ObjectMapper jsonMapper;
     private final Map<String, Integer> registeredRoutes = new ConcurrentHashMap<>();
     private String errorBody;
 
@@ -45,11 +48,13 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
                                      HttpServletRequest request,
                                      MockService mockService,
                                      RequestMappingHandlerMapping requestMappingHandlerMapping,
-                                     ConfigRepository configRepository) {
+                                     ConfigRepository configRepository,
+                                     @Qualifier("jsonMapper") ObjectMapper jsonMapper) {
         this.request = request;
         this.mockService = mockService;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
         this.configRepository = configRepository;
+        this.jsonMapper = jsonMapper;
 
         try {
             mockMethod = this.getClass().getMethod("mock");
@@ -72,7 +77,7 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
     }
 
     public CompletableFuture<ResponseEntity<String>> mock() {
-        RequestFacade facade = new SoapRequestFacade(request);
+        RequestFacade facade = new SoapRequestFacade(request, jsonMapper);
         return CompletableFuture.supplyAsync(() -> mockService.mock(facade));
     }
 

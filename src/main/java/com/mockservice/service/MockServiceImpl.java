@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,9 +52,9 @@ public class MockServiceImpl implements MockService {
 
     private MockResponse routeToMockResponse(Route route) {
         if (RouteType.REST.equals(route.getType())) {
-            return new RestMockResponse(templateEngine, route.getResponse());
+            return new RestMockResponse(route.getResponse());
         } else {
-            return new SoapMockResponse(templateEngine, route.getResponse());
+            return new SoapMockResponse(route.getResponse());
         }
     }
 
@@ -68,11 +69,13 @@ public class MockServiceImpl implements MockService {
     public ResponseEntity<String> mock(RequestFacade request) {
         Route route = getRoute(request);
 
-        var validationResult = validateRequestBody(route, request);
+        var validationResult = validateRequestBody(route, request.getBody());
         route = validationResult.getRoute();
 
         MockResponse response = responseCache.get(route);
-        response.setVariables(validationResult.getVariables());
+        Map<String, String> vars = request.getVariables();
+        if (!validationResult.isOk()) vars.putAll(validationResult.getVariables());
+        response.setVariables(vars, templateEngine.getFunctions());
         int statusCode = route.getResponseCode();
         String body = response.getResponseBody();
 
@@ -93,13 +96,7 @@ public class MockServiceImpl implements MockService {
     private Route getRoute(RequestFacade request) {
         String alt = request.getAlt()
                 .or(() -> activeScenariosService.getAltFor(request.getRequestMethod(), request.getEndpoint()))
-                .or(() -> {
-                    if (configRepository.getSettings().getRandomAlt() || configRepository.getSettings().getQuantum()) {
-                        return routeService.getRandomAltFor(request.getRequestMethod(), request.getEndpoint());
-                    } else {
-                        return Optional.empty();
-                    }
-                })
+                .or(() -> maybeGetRandomAltFor(request.getRequestMethod(), request.getEndpoint()))
                 .orElse("");
 
         Route searchRoute = new Route()
@@ -108,31 +105,41 @@ public class MockServiceImpl implements MockService {
                 .setAlt(alt);
 
         log.info("Route requested: {}", searchRoute);
-        
+
         return routeService
                 .getEnabledRoute(searchRoute)
                 .orElseThrow(() -> new NoRouteFoundException(searchRoute));
     }
 
-    private RequestBodyValidationResult validateRequestBody(Route route, RequestFacade request) {
-        if (!route.getRequestBodySchema().isEmpty()) {
-            try {
-                JsonUtils.validate(request.getBody(), route.getRequestBodySchema());
-            } catch (RuntimeException e) {
-                if (configRepository.getSettings().getFailedInputValidationAlt400()) {
-                    Route route400 = getRoute400For(route);
-                    if (route400 != null) {
-                        log.info("Route requested: {}", route400);
-                        Map<String, String> vars = request.getVariables();
-                        vars.put("requestBodyValidationErrorMessage", e.toString());
-                        return RequestBodyValidationResult.error(e, route400, vars);
-                    }
-                }
+    private Optional<? extends String> maybeGetRandomAltFor(RequestMethod method, String path) {
+        if (configRepository.getSettings().getRandomAlt() || configRepository.getSettings().getQuantum()) {
+            return routeService.getRandomAltFor(method, path);
+        }
+        return Optional.empty();
+    }
 
-                throw e;
+    private RequestBodyValidationResult validateRequestBody(Route route, String body) {
+        String schema = route.getRequestBodySchema();
+        try {
+            if (!schema.isEmpty()) JsonUtils.validate(body, schema);
+        } catch (RuntimeException e) {
+            return returnValidationErrorOrThrow(e, route);
+        }
+        return RequestBodyValidationResult.success(route);
+    }
+
+    private RequestBodyValidationResult returnValidationErrorOrThrow(RuntimeException e, Route route) {
+        if (configRepository.getSettings().getAlt400OnFailedRequestValidation()) {
+            Route route400 = getRoute400For(route);
+            if (route400 != null) {
+                log.info("Route requested: {}", route400);
+                Map<String, String> vars = new HashMap<>();
+                vars.put("requestBodyValidationErrorMessage", e.toString());
+                return RequestBodyValidationResult.error(e, route400, vars);
             }
         }
-        return RequestBodyValidationResult.success(route, request.getVariables());
+
+        throw e;
     }
 
     private Route getRoute400For(Route route) {

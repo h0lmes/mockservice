@@ -42,6 +42,9 @@
             selectionEnd() {
                 return this.$refs.textArea.selectionEnd;
             },
+            focus() {
+                this.$refs.textArea.focus();
+            },
         },
     }
 </script>

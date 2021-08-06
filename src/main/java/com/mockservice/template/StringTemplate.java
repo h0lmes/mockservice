@@ -1,7 +1,5 @@
 package com.mockservice.template;
 
-import org.springframework.lang.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,11 +32,6 @@ public class StringTemplate {
      */
     private final List<String> strings = new ArrayList<>();
     private State state = State.EMPTY;
-    private final TemplateEngine engine;
-
-    public StringTemplate(TemplateEngine engine) {
-        this.engine = engine;
-    }
 
     // parser
 
@@ -70,12 +63,7 @@ public class StringTemplate {
 
     // builder
 
-    public String toString(@Nullable Map<String, String> variables) {
-        Map<String, Function<String[], String>> functions = null;
-        if (engine != null) {
-            functions = engine.getFunctions();
-        }
-
+    public String toString(Map<String, String> variables, Map<String, Function<String[], String>> functions) {
         StringBuilder builder = new StringBuilder();
         for (String s : strings) {
             String value = map(s, variables, functions);
@@ -87,11 +75,11 @@ public class StringTemplate {
         return builder.toString();
     }
 
-    private static String map(String token, @Nullable Map<String, String> variables, Map<String, Function<String[], String>> functions) {
+    private static String map(String token, Map<String, String> variables, Map<String, Function<String[], String>> functions) {
         if (TokenParser.isToken(token)) {
             String[] args = TokenParser.parseToken(token);
 
-            if (variables != null && variables.containsKey(args[0])) {
+            if (variables.containsKey(args[0])) {
                 String var = variables.get(args[0]);
                 while (TokenParser.isToken(var)) {
                     var = map(var, variables, functions);
@@ -99,7 +87,7 @@ public class StringTemplate {
                 return var;
             }
 
-            if (functions != null && functions.containsKey(args[0])) {
+            if (functions.containsKey(args[0])) {
                 return functions.get(args[0]).apply(args);
             }
 

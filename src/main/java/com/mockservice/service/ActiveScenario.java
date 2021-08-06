@@ -12,12 +12,12 @@ public class ActiveScenario {
     private final Scenario scenario;
     private final List<Route> routes = new ArrayList<>();
 
-    public ActiveScenario(Scenario scenario) throws ScenarioParseException {
+    public ActiveScenario(Scenario scenario) {
         this.scenario = scenario;
         parse();
     }
 
-    private void parse() throws ScenarioParseException {
+    private void parse() {
         List<String> list = scenario.getData().lines().collect(Collectors.toList());
         for (int i = 0; i < list.size(); i++) {
             try {
@@ -28,7 +28,7 @@ public class ActiveScenario {
         }
     }
 
-    private void parseScenarioLine(List<Route> routes, String s) throws ScenarioParseException {
+    private void parseScenarioLine(List<Route> routes, String s) {
         if (s.trim().isEmpty()) {
             return;
         }

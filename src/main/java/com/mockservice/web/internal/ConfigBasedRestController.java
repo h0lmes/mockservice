@@ -2,7 +2,6 @@ package com.mockservice.web.internal;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
 import com.mockservice.repository.ConfigChangedListener;
@@ -37,7 +36,7 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
     private final ConfigRepository configRepository;
     private Method mockMethod = null;
-    private final ObjectWriter objectWriter;
+    private final ObjectMapper jsonMapper;
     private final Map<String, Integer> registeredRoutes = new ConcurrentHashMap<>();
 
     public ConfigBasedRestController(HttpServletRequest request,
@@ -49,7 +48,7 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
         this.mockService = mockService;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
         this.configRepository = configRepository;
-        this.objectWriter = jsonMapper.writer();
+        this.jsonMapper = jsonMapper;
 
         log.info("ForkJoinPool parallelism = {}, poolSize = {}",
                 ForkJoinPool.commonPool().getParallelism(),
@@ -69,7 +68,7 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
     }
 
     public CompletableFuture<ResponseEntity<String>> mock() {
-        RestRequestFacade facade = new RestRequestFacade(request);
+        RestRequestFacade facade = new RestRequestFacade(request, jsonMapper);
         return CompletableFuture.supplyAsync(() -> mockService.mock(facade));
     }
 
@@ -123,7 +122,7 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
 
     private String mockError(Throwable t) {
         try {
-            return objectWriter.writeValueAsString(new ErrorInfo(t));
+            return jsonMapper.writeValueAsString(new ErrorInfo(t));
         } catch (JsonProcessingException e) {
             return "";
         }
