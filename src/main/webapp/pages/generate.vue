@@ -2,12 +2,12 @@
     <div class="monospace">
 
         <div class="component-toolbar mb-4">
-            <button type="button" class="btn btn-primary" @click="$fetch()">GENERATE JSON</button>
+            <button type="button" class="btn btn-primary" @click="$fetch()">Generate JSON</button>
             <button type="button" class="btn btn-default" @click="copyToClipboard(value)">
-                COPY TO CLIPBOARD
+                Copy to clipboard
                 <span v-show="copied">&#9989;</span>
             </button>
-            <button type="button" class="btn btn-default" @click="download">DOWNLOAD AS FILE</button>
+            <button type="button" class="btn btn-default" @click="download">Download as file</button>
         </div>
         <AutoSizeTextArea class="mb-4"
                           :placeholder="'Paste JSON schema here (in JSON or YAML format) or leave empty to generate random JSON\nRead more about JSON schema at https://json-schema.org/'"

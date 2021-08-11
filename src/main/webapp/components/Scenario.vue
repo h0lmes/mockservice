@@ -33,8 +33,10 @@
 
         <div class="mock-col w-fixed-auto">
             <div v-show="editing" class="mock-col-header"></div>
-            <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
-            <button type="button" class="btn btn-sm btn-danger" @click="del">delete</button>
+            <div class="mock-col-value">
+                <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
+                <button type="button" class="btn btn-sm btn-danger" @click="del">delete</button>
+            </div>
         </div>
 
         <div v-show="editing" class="mock-col w100">

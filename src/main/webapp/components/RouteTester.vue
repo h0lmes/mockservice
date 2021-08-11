@@ -1,8 +1,8 @@
 <template>
     <div>
         <div class="route-tester-buttons">
-            <button type="button" class="btn btn-sm btn-primary" @click="test">RETRY</button>
-            <button type="button" class="btn btn-sm btn-default" @click="$emit('close')">CLOSE</button>
+            <button type="button" class="btn btn-sm btn-primary" @click="test">retry</button>
+            <button type="button" class="btn btn-sm btn-default" @click="$emit('close')">close</button>
         </div>
         <div class="route-tester-result">
             <pre class="form-control form-control-sm monospace">{{ testResult }}</pre>

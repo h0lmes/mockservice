@@ -9,6 +9,8 @@ import java.util.function.Function;
 
 public interface MockResponse {
     MockResponse setVariables(Map<String, String> variables, Map<String, Function<String[], String>> functions);
+
+    int getResponseCode();
     String getResponseBody();
     HttpHeaders getResponseHeaders();
     void ifHasRequest(Consumer<MockResponse> consumer);

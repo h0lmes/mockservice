@@ -1,10 +1,10 @@
 <template>
     <div class="config-page monospace">
         <div class="component-toolbar mb-5">
-            <button type="button" class="btn btn-primary" @click="save">SAVE AND APPLY</button>
-            <button type="button" class="btn btn-default" @click="download">DOWNLOAD AS FILE</button>
-            <button type="button" class="btn btn-default" @click="backup">BACKUP ON SERVER</button>
-            <button type="button" class="btn btn-default" @click="restore">RESTORE FROM BACKUP</button>
+            <button type="button" class="btn btn-primary" @click="save">Save and apply</button>
+            <button type="button" class="btn btn-default" @click="download">Download as file</button>
+            <button type="button" class="btn btn-default" @click="backup">Backup on server</button>
+            <button type="button" class="btn btn-default" @click="restore">Restore server backup</button>
         </div>
         <AutoSizeTextArea class="main" v-model="config" :max-rows="maxRows"></AutoSizeTextArea>
         <AutoSizeTextArea class="helper invisible" v-model="config" :min-rows="1" :max-rows="1"></AutoSizeTextArea>

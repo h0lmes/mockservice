@@ -3,8 +3,8 @@
         <input type="file" ref="file" id="file_file" @change="openFile()"/>
         <div class="component-toolbar mb-4">
             <div>{{ fileName }}</div>
-            <button type="button" class="btn btn-primary" @click="selectFile()">IMPORT OPENAPI FILE</button>
-            <button type="button" class="btn btn-default" @click="addAll()">ADD ALL ROUTES</button>
+            <button type="button" class="btn btn-primary" @click="selectFile()">Import OpenAPI file</button>
+            <button type="button" class="btn btn-default" @click="addAll()">Add all Routes</button>
             <ToggleSwitch v-model="overwrite">Overwrite existing routes</ToggleSwitch>
         </div>
         <ImportedRoutes :imported-routes="importedRoutes"

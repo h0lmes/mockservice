@@ -9,6 +9,7 @@ import com.mockservice.response.RestMockResponse;
 import com.mockservice.response.SoapMockResponse;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.util.JsonUtils;
+import com.mockservice.util.QuantumTheory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,31 +31,28 @@ public class MockServiceImpl implements MockService {
     private final RouteService routeService;
     private final ActiveScenariosService activeScenariosService;
     private final ConfigRepository configRepository;
-    private final QuantumTheory quantumTheory;
-    private final ConcurrentLruCache<Route, MockResponse> responseCache;
     private final RequestService requestService;
+    private final ConcurrentLruCache<Route, MockResponse> responseCache;
 
     public MockServiceImpl(@Value("${application.cache.response}") int cacheSize,
                            TemplateEngine templateEngine,
                            RouteService routeService,
                            ActiveScenariosService activeScenariosService,
                            ConfigRepository configRepository,
-                           QuantumTheory quantumTheory,
                            RequestService requestService) {
         this.templateEngine = templateEngine;
         this.routeService = routeService;
         this.activeScenariosService = activeScenariosService;
         this.configRepository = configRepository;
-        this.quantumTheory = quantumTheory;
         this.requestService = requestService;
-        responseCache = new ConcurrentLruCache<>(cacheSize, this::routeToMockResponse);
+        responseCache = new ConcurrentLruCache<>(cacheSize, this::mockResponseFromRoute);
     }
 
-    private MockResponse routeToMockResponse(Route route) {
+    private MockResponse mockResponseFromRoute(Route route) {
         if (RouteType.REST.equals(route.getType())) {
-            return new RestMockResponse(route.getResponse());
+            return new RestMockResponse(route.getResponseCode(), route.getResponse());
         } else {
-            return new SoapMockResponse(route.getResponse());
+            return new SoapMockResponse(route.getResponseCode(), route.getResponse());
         }
     }
 
@@ -67,33 +65,46 @@ public class MockServiceImpl implements MockService {
 
     @Override
     public ResponseEntity<String> mock(RequestFacade request) {
-        Route route = getRoute(request);
+        Route route = findRouteForRequest(request);
 
         var validationResult = validateRequestBody(route, request.getBody());
         route = validationResult.getRoute();
 
         MockResponse response = responseCache.get(route);
+
         Map<String, String> vars = request.getVariables();
         if (!validationResult.isOk()) vars.putAll(validationResult.getVariables());
         response.setVariables(vars, templateEngine.getFunctions());
-        int statusCode = route.getResponseCode();
-        String body = response.getResponseBody();
 
-        if (route.isRest() && configRepository.getSettings().getQuantum()) {
-            body = quantumTheory.apply(body);
-            statusCode = quantumTheory.apply(statusCode);
-            quantumTheory.delay();
-        }
+        ResponseEntity<String> responseEntity = responseEntityFromResponse(response);
+        responseEntity = applyQuantumTheoryIfSetSo(responseEntity);
 
         response.ifHasRequest(requestService::schedule);
 
-        return ResponseEntity
-                .status(statusCode)
-                .headers(response.getResponseHeaders())
-                .body(body);
+        return responseEntity;
     }
 
-    private Route getRoute(RequestFacade request) {
+    private ResponseEntity<String> responseEntityFromResponse(MockResponse response) {
+        return ResponseEntity
+                .status(response.getResponseCode())
+                .headers(response.getResponseHeaders())
+                .body(response.getResponseBody());
+    }
+
+    private ResponseEntity<String> applyQuantumTheoryIfSetSo(ResponseEntity<String> responseEntity) {
+        if (configRepository.getSettings().getQuantum()) {
+            String body = QuantumTheory.apply(responseEntity.getBody());
+            int statusCode = QuantumTheory.apply(responseEntity.getStatusCodeValue());
+            QuantumTheory.delay();
+            return ResponseEntity
+                    .status(statusCode)
+                    .headers(responseEntity.getHeaders())
+                    .body(body);
+        }
+        return responseEntity;
+    }
+
+    private Route findRouteForRequest(RequestFacade request) {
         String alt = request.getAlt()
                 .or(() -> activeScenariosService.getAltFor(request.getRequestMethod(), request.getEndpoint()))
                 .or(() -> maybeGetRandomAltFor(request.getRequestMethod(), request.getEndpoint()))

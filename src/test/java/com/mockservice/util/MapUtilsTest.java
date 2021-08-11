@@ -1,10 +1,12 @@
 package com.mockservice.util;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class MapUtilsTest {
 
@@ -14,12 +16,12 @@ public class MapUtilsTest {
         Map<String, Object> objectMap = MapUtils.jsonToMap(json);
         Map<String, String> map = MapUtils.flattenMap(objectMap);
 
-        Assertions.assertEquals(2, objectMap.size());
-        Assertions.assertEquals(5, map.size());
-        Assertions.assertEquals("value 1", map.get("key1"));
-        Assertions.assertEquals("2021-04-19", map.get("key2.key1"));
-        Assertions.assertEquals("10101", map.get("key2.key2.key1"));
-        Assertions.assertNull(map.get("key2.key2.key2"));
-        Assertions.assertEquals("[value 1, value 2]", map.get("key2.key2.key3"));
+        assertEquals(2, objectMap.size());
+        assertEquals(5, map.size());
+        assertEquals("value 1", map.get("key1"));
+        assertEquals("2021-04-19", map.get("key2.key1"));
+        assertEquals("10101", map.get("key2.key2.key1"));
+        assertNull(map.get("key2.key2.key2"));
+        assertEquals("[value 1, value 2]", map.get("key2.key2.key3"));
     }
 }

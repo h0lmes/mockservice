@@ -7,7 +7,7 @@
                     <div class="handle"></div>
                 </div>
             </div>
-            <div class="inline-block overflow-wrap-anywhere"><slot></slot></div>
+            <slot></slot>
             <div v-if="sub"></div>
             <div v-if="sub" class="inline-block overflow-wrap-anywhere mt-2 color-secondary smaller">{{sub}}</div>
         </label>
@@ -85,6 +85,7 @@
         grid-template-columns: auto auto;
         column-gap: 0;
         line-height: var(--height);
+        overflow-wrap: anywhere;
 
         &.gap {
             column-gap: 1rem;

@@ -2,9 +2,9 @@
     <div class="monospace">
 
         <div class="component-toolbar mb-4">
-            <button type="button" class="btn btn-primary" @click="$fetch()">FETCH (CTRL + ENTER)</button>
-            <button type="button" class="btn btn-default" @click="storeRequest">SAVE REQUEST (F5)</button>
-            <button type="button" class="btn btn-default" @click="forgetRequest">FORGET REQUEST</button>
+            <button type="button" class="btn btn-primary" @click="$fetch()">Fetch (Ctrl + Enter)</button>
+            <button type="button" class="btn btn-default" @click="storeRequest">Save request (F5)</button>
+            <button type="button" class="btn btn-default" @click="forgetRequest">Forget request</button>
         </div>
         <AutoSizeTextArea class="mb-4"
                           ref="requestText"

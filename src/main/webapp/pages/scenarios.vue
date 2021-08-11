@@ -8,8 +8,8 @@
                        class="form-control monospace"
                        @input="debounce($event.target.value)"/>
             </div>
-            <button type="button" class="toolbar-item-fixed btn" @click="setFilter('')">Clear filter</button>
-            <button type="button" class="toolbar-item-fixed btn" @click="add">Add scenario</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="setFilter('')">Clear filter</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="add">Add scenario</button>
         </div>
 
         <Scenarios :scenarios="filtered"

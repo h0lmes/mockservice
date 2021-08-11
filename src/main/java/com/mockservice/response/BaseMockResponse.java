@@ -13,6 +13,7 @@ public class BaseMockResponse implements MockResponse {
 
     private final Map<String, String> variables = new HashMap<>();
     private final Map<String, Function<String[], String>> functions = new HashMap<>();
+    final int responseCode;
     final HttpHeaders responseHeaders = new HttpHeaders();
     final StringTemplate responseBody;
     boolean containsRequest = false;
@@ -21,7 +22,8 @@ public class BaseMockResponse implements MockResponse {
     final HttpHeaders requestHeaders = new HttpHeaders();
     final StringTemplate requestBody;
 
-    BaseMockResponse() {
+    BaseMockResponse(int responseCode) {
+        this.responseCode = responseCode;
         responseBody = new StringTemplate();
         requestBody = new StringTemplate();
         requestUrl = new StringTemplate();
@@ -34,6 +36,11 @@ public class BaseMockResponse implements MockResponse {
         this.functions.clear();
         this.functions.putAll(functions);
         return this;
+    }
+
+    @Override
+    public int getResponseCode() {
+        return responseCode;
     }
 
     @Override

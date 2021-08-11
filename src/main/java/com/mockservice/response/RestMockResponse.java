@@ -13,8 +13,8 @@ public class RestMockResponse extends BaseMockResponse {
     private static final String HTTP_HEADER_DELIMITER = ":";
     private static final int HTTP_HEADER_DELIMITER_LEN = HTTP_HEADER_DELIMITER.length();
 
-    public RestMockResponse(String response) {
-        super();
+    public RestMockResponse(int responseCode, String response) {
+        super(responseCode);
         responseHeaders.add(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8");
         requestHeaders.add(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8");
         read(response);

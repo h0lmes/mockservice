@@ -8,9 +8,9 @@
                        placeholder="search here or click on values"
                        @input="debounce($event.target.value)"/>
             </div>
-            <button type="button" class="toolbar-item-fixed btn" @click="setFilter('')">Clear filter</button>
-            <button type="button" class="toolbar-item-fixed btn" @click="addRoute">Add route</button>
-            <button type="button" class="toolbar-item-fixed btn btn-danger" @click="deleteVisibleRoutes">Delete visible routes</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="setFilter('')">Clear filter</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRoute">Add route</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger" @click="deleteVisibleRoutes">Delete visible routes</button>
         </div>
 
         <Routes :routes="filtered" @filter="setFilter($event)"></Routes>

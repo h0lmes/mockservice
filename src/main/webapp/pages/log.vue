@@ -1,7 +1,7 @@
 <template>
     <div class="monospace">
         <div class="component-toolbar mb-5">
-            <button type="button" class="btn btn-primary" @click="download">DOWNLOAD</button>
+            <button type="button" class="btn btn-primary" @click="download">Download</button>
         </div>
         <pre class="smaller">{{ value }}</pre>
         <Loading v-if="$fetchState.pending"></Loading>
