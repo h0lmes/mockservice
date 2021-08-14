@@ -1,7 +1,7 @@
 settings:
   randomAlt: false
   quantum: false
-  failedInputValidationAlt400: true
+  alt400OnFailedRequestValidation: true
 routes:
 - group: default
   path: /jwt

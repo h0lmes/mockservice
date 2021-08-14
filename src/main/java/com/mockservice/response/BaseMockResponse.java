@@ -13,7 +13,7 @@ public class BaseMockResponse implements MockResponse {
 
     private final Map<String, String> variables = new HashMap<>();
     private final Map<String, Function<String[], String>> functions = new HashMap<>();
-    final int responseCode;
+    private final int responseCode;
     final HttpHeaders responseHeaders = new HttpHeaders();
     final StringTemplate responseBody;
     boolean containsRequest = false;
@@ -35,6 +35,12 @@ public class BaseMockResponse implements MockResponse {
         this.variables.putAll(variables);
         this.functions.clear();
         this.functions.putAll(functions);
+        return this;
+    }
+
+    @Override
+    public MockResponse addVariables(Map<String, String> variables) {
+        this.variables.putAll(variables);
         return this;
     }
 

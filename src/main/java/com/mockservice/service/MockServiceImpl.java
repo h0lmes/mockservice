@@ -9,6 +9,7 @@ import com.mockservice.response.RestMockResponse;
 import com.mockservice.response.SoapMockResponse;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.util.JsonUtils;
+import com.mockservice.util.JsonValidationException;
 import com.mockservice.util.QuantumTheory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -72,35 +71,14 @@ public class MockServiceImpl implements MockService {
 
         MockResponse response = responseCache.get(route);
 
-        Map<String, String> vars = request.getVariables();
-        if (!validationResult.isOk()) vars.putAll(validationResult.getVariables());
-        response.setVariables(vars, templateEngine.getFunctions());
+        response.setVariables(request.getVariables(), templateEngine.getFunctions());
+        validationResult.ifError(response::addVariables);
 
         ResponseEntity<String> responseEntity = responseEntityFromResponse(response);
         responseEntity = applyQuantumTheoryIfSetSo(responseEntity);
 
         response.ifHasRequest(requestService::schedule);
 
-        return responseEntity;
-    }
-
-    private ResponseEntity<String> responseEntityFromResponse(MockResponse response) {
-        return ResponseEntity
-                .status(response.getResponseCode())
-                .headers(response.getResponseHeaders())
-                .body(response.getResponseBody());
-    }
-
-    private ResponseEntity<String> applyQuantumTheoryIfSetSo(ResponseEntity<String> responseEntity) {
-        if (configRepository.getSettings().getQuantum()) {
-            String body = QuantumTheory.apply(responseEntity.getBody());
-            int statusCode = QuantumTheory.apply(responseEntity.getStatusCodeValue());
-            QuantumTheory.delay();
-            return ResponseEntity
-                    .status(statusCode)
-                    .headers(responseEntity.getHeaders())
-                    .body(body);
-        }
         return responseEntity;
     }
 
@@ -132,21 +110,20 @@ public class MockServiceImpl implements MockService {
     private RequestBodyValidationResult validateRequestBody(Route route, String body) {
         String schema = route.getRequestBodySchema();
         try {
-            if (!schema.isEmpty()) JsonUtils.validate(body, schema);
-        } catch (RuntimeException e) {
-            return returnValidationErrorOrThrow(e, route);
+            if (!schema.isEmpty())
+                JsonUtils.validate(body, schema);
+        } catch (JsonValidationException e) {
+            return validationErrorOrThrow(e, route);
         }
         return RequestBodyValidationResult.success(route);
     }
 
-    private RequestBodyValidationResult returnValidationErrorOrThrow(RuntimeException e, Route route) {
+    private RequestBodyValidationResult validationErrorOrThrow(JsonValidationException e, Route route) {
         if (configRepository.getSettings().getAlt400OnFailedRequestValidation()) {
             Route route400 = getRoute400For(route);
             if (route400 != null) {
-                log.info("Route requested: {}", route400);
-                Map<String, String> vars = new HashMap<>();
-                vars.put("requestBodyValidationErrorMessage", e.toString());
-                return RequestBodyValidationResult.error(e, route400, vars);
+                log.info("Validation error. Route 400: {}", route400);
+                return RequestBodyValidationResult.error(route400, e);
             }
         }
 
@@ -156,5 +133,25 @@ public class MockServiceImpl implements MockService {
     private Route getRoute400For(Route route) {
         Route route400 = new Route(route).setAlt("400");
         return routeService.getEnabledRoute(route400).orElse(null);
+    }
+
+    private ResponseEntity<String> responseEntityFromResponse(MockResponse response) {
+        return ResponseEntity
+                .status(response.getResponseCode())
+                .headers(response.getResponseHeaders())
+                .body(response.getResponseBody());
+    }
+
+    private ResponseEntity<String> applyQuantumTheoryIfSetSo(ResponseEntity<String> responseEntity) {
+        if (configRepository.getSettings().getQuantum()) {
+            String body = QuantumTheory.apply(responseEntity.getBody());
+            int statusCode = QuantumTheory.apply(responseEntity.getStatusCodeValue());
+            QuantumTheory.delay();
+            return ResponseEntity
+                    .status(statusCode)
+                    .headers(responseEntity.getHeaders())
+                    .body(body);
+        }
+        return responseEntity;
     }
 }

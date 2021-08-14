@@ -14,17 +14,19 @@ import java.util.concurrent.TimeUnit;
 public class RequestServiceImpl implements RequestService {
 
     private static final Logger log = LoggerFactory.getLogger(RequestServiceImpl.class);
+
+    private static final long EXECUTION_DELAY_SECONDS = 2;
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(5);
 
     @Override
     public void schedule(MockResponse response) {
         CompletableFuture.runAsync(
-                () -> sendRequest(response),
-                CompletableFuture.delayedExecutor(2, TimeUnit.SECONDS)
+                () -> executeRequest(response),
+                CompletableFuture.delayedExecutor(EXECUTION_DELAY_SECONDS, TimeUnit.SECONDS)
         );
     }
 
-    private void sendRequest(MockResponse mockResponse) {
+    private void executeRequest(MockResponse mockResponse) {
         try {
             String url = mockResponse.getRequestUrl();
 

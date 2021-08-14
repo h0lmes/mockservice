@@ -128,9 +128,7 @@ public class DefaultTemplateEngine implements TemplateEngine {
             if (args.length > index) {
                 return Integer.parseInt(args[index]);
             }
-        } catch (Exception e) {
-            // ignore
-        }
+        } catch (Exception e) { /* ignore */ }
         return def;
     }
 
@@ -139,9 +137,7 @@ public class DefaultTemplateEngine implements TemplateEngine {
             if (args.length > index) {
                 return Long.parseLong(args[index]);
             }
-        } catch (Exception e) {
-            // ignore
-        }
+        } catch (Exception e) { /* ignore */ }
         return def;
     }
 }

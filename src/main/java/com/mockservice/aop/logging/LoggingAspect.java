@@ -38,8 +38,7 @@ public class LoggingAspect {
     /**
      * Pointcut that matches all Spring beans in the application's main packages.
      */
-    @Pointcut("within(com.mockservice.quantum..*)" +
-            " || within(com.mockservice.service..*)" +
+    @Pointcut("within(com.mockservice.service..*)" +
             " || within(com.mockservice.web..*)")
     public void applicationPackagePointcut() {
         // Method is empty as this is just a Pointcut, the implementations are in the advices.

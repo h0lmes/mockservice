@@ -13,6 +13,10 @@ public class Scenario implements Comparable<Scenario> {
         // default
     }
 
+    public Scenario(Scenario scenario) {
+        assignFrom(scenario);
+    }
+
     public String getGroup() {
         return group;
     }

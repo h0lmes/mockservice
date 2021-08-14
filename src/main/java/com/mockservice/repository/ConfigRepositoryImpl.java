@@ -2,8 +2,6 @@ package com.mockservice.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.mockservice.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +22,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     private final String fileConfigPath;
     private final String fileConfigBackupPath;
-    private final ObjectReader yamlReader;
-    private final ObjectWriter yamlWriter;
+    private final ObjectMapper yamlMapper;
     private Config config;
     private final List<ConfigChangedListener> configChangedListeners = new ArrayList<>();
     private final List<RoutesChangedListener> routesChangedListeners = new ArrayList<>();
@@ -37,8 +34,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
                                 @Qualifier("yamlMapper") ObjectMapper yamlMapper) {
         this.fileConfigPath = fileConfigPath;
         this.fileConfigBackupPath = fileConfigBackupPath;
-        this.yamlReader = yamlMapper.reader();
-        this.yamlWriter = yamlMapper.writer();
+        this.yamlMapper = yamlMapper;
 
         try {
             readConfigFromFile();
@@ -53,12 +49,18 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     private void readConfigFromFile(File file) throws IOException {
-        config = yamlReader.readValue(file, Config.class);
+        config = yamlMapper.readValue(file, Config.class);
+        if (config == null) {
+            throw new IOException("Mapper returned null Config.");
+        }
     }
 
     private void readConfigFromString(String yaml) throws IOException {
         try {
-            config = yamlReader.readValue(yaml, Config.class);
+            config = yamlMapper.readValue(yaml, Config.class);
+            if (config == null) {
+                throw new IOException("Mapper returned null Config.");
+            }
         } catch (IOException e) {
             throw new IOException("Could not deserialize config. " + e.getMessage(), e);
         }
@@ -70,7 +72,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     private void trySaveConfigToFile(File file) throws IOException {
         try {
-            yamlWriter.writeValue(file, config);
+            yamlMapper.writeValue(file, config);
         } catch (IOException e) {
             throw new IOException("Could not write config to file. " + e.getMessage(), e);
         }
@@ -92,7 +94,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     @Override
     public synchronized String getConfigData() throws JsonProcessingException {
-        return yamlWriter.writeValueAsString(config);
+        return yamlMapper.writeValueAsString(config);
     }
 
     @Override
@@ -104,12 +106,12 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     @Override
-    public void backup() throws IOException {
+    public synchronized void backup() throws IOException {
         trySaveConfigToFile(getConfigBackupFile());
     }
 
     @Override
-    public void restore() throws IOException {
+    public synchronized void restore() throws IOException {
         notifyBeforeConfigChanged();
         readConfigFromFile(getConfigBackupFile());
         notifyAfterConfigChanged();
@@ -153,16 +155,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     @Override
     public void putRoute(Route route) throws IOException {
-        Route existingRoute = findRoute(route).orElse(null);
-
-        if (existingRoute == null) {
-            config.getRoutes().add(route);
-            notifyRouteCreated(route);
-        } else {
-            notifyRouteDeleted(existingRoute);
-            existingRoute.assignFrom(route);
-            notifyRouteCreated(route);
-        }
+        putRouteInternal(route, true);
 
         config.getRoutes().sort(Route::compareTo);
         trySaveConfigToFile();
@@ -173,26 +166,31 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         boolean modified = false;
 
         for (Route route : routes) {
-            Route existingRoute = findRoute(route).orElse(null);
-
-            if (existingRoute == null) {
-                config.getRoutes().add(route);
-                notifyRouteCreated(route);
-                modified = true;
-            } else {
-                if (overwrite) {
-                    notifyRouteDeleted(existingRoute);
-                    existingRoute.assignFrom(route);
-                    notifyRouteCreated(route);
-                    modified = true;
-                }
-            }
+            modified |= putRouteInternal(route, overwrite);
         }
 
         if (modified) {
             config.getRoutes().sort(Route::compareTo);
             trySaveConfigToFile();
         }
+    }
+
+    private boolean putRouteInternal(Route route, boolean overwrite) {
+        Route existingRoute = findRoute(route).orElse(null);
+
+        if (existingRoute == null) {
+            config.getRoutes().add(route);
+            notifyRouteCreated(route);
+            return true;
+        } else {
+            if (overwrite) {
+                notifyRouteDeleted(existingRoute);
+                existingRoute.assignFrom(route);
+                notifyRouteCreated(route);
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

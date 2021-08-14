@@ -9,6 +9,7 @@ import java.util.function.Function;
 
 public interface MockResponse {
     MockResponse setVariables(Map<String, String> variables, Map<String, Function<String[], String>> functions);
+    MockResponse addVariables(Map<String, String> variables);
 
     int getResponseCode();
     String getResponseBody();
