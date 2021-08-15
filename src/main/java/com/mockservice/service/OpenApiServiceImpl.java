@@ -53,7 +53,7 @@ public class OpenApiServiceImpl implements OpenApiService {
     public List<Route> routesFromYaml(String yaml) {
         List<Route> routes = new ArrayList<>();
 
-        if (yaml == null || yaml.isEmpty()) {
+        if (yaml == null || yaml.trim().isEmpty()) {
             return routes;
         }
 
@@ -106,10 +106,10 @@ public class OpenApiServiceImpl implements OpenApiService {
 
     private void routesFromOpenApi(List<Route> routes, OpenAPI openApi) {
         Paths paths = openApi.getPaths();
-        if (paths != null) {
-            for (Map.Entry<String, PathItem> e : paths.entrySet()) {
-                routesFromPath(routes, e.getKey(), e.getValue());
-            }
+        Objects.requireNonNull(paths, "routesFromOpenApi(): paths MUST NOT be null!");
+
+        for (Map.Entry<String, PathItem> e : paths.entrySet()) {
+            routesFromPath(routes, e.getKey(), e.getValue());
         }
     }
 
@@ -130,12 +130,12 @@ public class OpenApiServiceImpl implements OpenApiService {
     }
 
     private String requestBodySchemaFromOperation(Operation operation) {
-        if (operation != null) {
-            RequestBody requestBody = operation.getRequestBody();
-            if (requestBody != null) {
-                MediaType mediaType = mediaTypeFromContent(requestBody.getContent());
-                return schemaFromMediaType(mediaType);
-            }
+        Objects.requireNonNull(operation, "requestBodySchemaFromOperation(): operation MUST NOT be null!");
+
+        RequestBody requestBody = operation.getRequestBody();
+        if (requestBody != null) {
+            MediaType mediaType = mediaTypeFromContent(requestBody.getContent());
+            return schemaFromMediaType(mediaType);
         }
         return "";
     }

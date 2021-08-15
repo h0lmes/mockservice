@@ -1,20 +1,33 @@
-package com.mockservice.util;
+package com.mockservice.service.quantum;
+
+import com.mockservice.util.JsonGenerator;
+import com.mockservice.util.JsonUtils;
+import com.mockservice.util.RandomUtils;
+import com.mockservice.util.ValueGenerator;
+import org.springframework.stereotype.Service;
 
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class JsonQuantumTheory {
+@Service
+public class JsonQuantumTheory implements QuantumTheory {
 
     private static final String REGEX_JSON_STRING_VALUE = "\"(\\w+)\"\\s*:\\s*\"((\\\\\"|[^\"])*)\"";
     private static final String REGEX_JSON_NUMERIC_VALUE = "\"(\\w+)\"\\s*:\\s*(-?[\\d\\.e]+)";
     private static final String REGEX_JSON_BOOLEAN_VALUE = "\"(\\w+)\"\\s*:\\s*(false|true)";
 
-    private JsonQuantumTheory() {
-        /* hidden */
+    public JsonQuantumTheory() {
+        /* default */
     }
 
-    public static String apply(String input) {
+    @Override
+    public boolean applicable(String data) {
+        return JsonUtils.isJson(data);
+    }
+
+    @Override
+    public String apply(String input) {
         if (RandomUtils.withChance(20)) {
             return JsonGenerator.generate();
         }

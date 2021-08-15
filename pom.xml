@@ -12,7 +12,7 @@
 
     <groupId>com</groupId>
     <artifactId>mockservice</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.6</version>
     <packaging>jar</packaging>
     <name>mockservice</name>
     <description>Mock Service application</description>
@@ -128,6 +128,8 @@
         </dependency>
     </dependencies>
 
+    <!-- BUILD -->
+
     <build>
         <defaultGoal>spring-boot:run</defaultGoal>
         <plugins>
@@ -151,6 +153,9 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <!-- JaCoCo -->
+
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -159,6 +164,8 @@
                     <excludes>
                         <exclude>**/aop/logging/*</exclude>
                         <exclude>**/config/*</exclude>
+                        <exclude>com/mockservice</exclude>
+                        <exclude>com/mockservice/MockServiceApplication.java</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -169,20 +176,62 @@
                     </execution>
                     <execution>
                         <id>report</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report-test</id>
                         <phase>test</phase>
                         <goals>
                             <goal>report</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>jacoco-check</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.75</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.75</minimum>
+                                        </limit>
+                                    </limits>
+                                    <excludes>
+                                        <exclude>com.mockservice</exclude>
+                                    </excludes>
+                                </rule>
+                                <rule>
+                                    <element>PACKAGE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.50</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.50</minimum>
+                                        </limit>
+                                    </limits>
+                                    <excludes>
+                                        <exclude>com.mockservice</exclude>
+                                    </excludes>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
+
+            <!-- (next plugin here) -->
         </plugins>
     </build>
 </project>

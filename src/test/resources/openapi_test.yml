@@ -8,19 +8,12 @@ tags:
 - name: default
 paths:
   /test:
-    put:
+    get:
       tags:
-      - default
       summary: Test
-      operationId: testPut
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Test'
-        required: true
+      operationId: testGet
       responses:
-        200:
+        '200':
           description: successful operation
           content:
             application/json:
@@ -28,6 +21,50 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Test'
+    put:
+      tags:
+      summary: Test operation with no responses
+      operationId: testPut
+    post:
+      tags:
+      - default
+      summary: Test
+      operationId: testPost
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Test'
+        required: true
+      responses:
+        default:
+          description: successful operation
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Test'
+        '204':
+          description: no content
+        '400':
+          description: successful operation
+          content:
+            text/plain:
+              example: 'example string'
+              schema:
+                type: string
+        '404':
+          description: successful operation
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                default:
+                  value: Not found
+                resource:
+                  value: Resource not found
 components:
   schemas:
     Test:

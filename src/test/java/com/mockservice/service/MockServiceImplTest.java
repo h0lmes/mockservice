@@ -1,9 +1,11 @@
 package com.mockservice.service;
 
 import com.mockservice.domain.Route;
+import com.mockservice.domain.RouteType;
 import com.mockservice.domain.Settings;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.request.RequestFacade;
+import com.mockservice.service.quantum.QuantumTheory;
 import com.mockservice.template.TemplateEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -39,6 +42,8 @@ public class MockServiceImplTest {
     private static final String VALID_JSON = "{\"product_id\": 1}";
     private static final String INVALID_JSON = "{\"product_id\": \"\"}";
 
+    private static final String XML_DATA = "<soapenv:Envelope></soapenv:Envelope>";
+
     @Mock
     private TemplateEngine templateEngine;
     @Mock
@@ -51,10 +56,13 @@ public class MockServiceImplTest {
     private RequestService requestService;
     @Mock
     private RequestFacade request;
+    @Mock
+    private QuantumTheory quantumTheory;
 
     private MockService createMockService() {
         return new MockServiceImpl(
-                2, templateEngine, routeService, activeScenariosService, configRepository, requestService);
+                2, templateEngine, routeService, activeScenariosService, configRepository, requestService,
+                List.of(quantumTheory));
     }
 
     @BeforeEach
@@ -120,14 +128,13 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_RandomAltEnabled_RandomAlt400_SearchForRouteWithAlt400() {
+    public void mock_RandomAltEnabled_RandomAltReturned400_SearchesRouteWithAlt400() {
         when(request.getAlt()).thenReturn(Optional.empty());
         when(routeService.getRandomAltFor(any(), any())).thenReturn(Optional.of(ALT_400));
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(VALID_JSON);
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
 
-        Settings settings = new Settings();
-        settings.setRandomAlt(true);
+        Settings settings = new Settings().setRandomAlt(true);
         when(configRepository.getSettings()).thenReturn(settings);
 
         MockService mockService = createMockService();
@@ -136,6 +143,67 @@ public class MockServiceImplTest {
         ArgumentCaptor<Route> argument = ArgumentCaptor.forClass(Route.class);
         verify(routeService).getEnabledRoute(argument.capture());
         assertEquals(ALT_400, argument.getValue().getAlt());
+    }
+
+    @Test
+    public void mock_SoapRoute_ReturnsBody() {
+        Route route = new Route().setType(RouteType.SOAP).setMethod(GET_METHOD).setPath(PATH).setResponse(XML_DATA);
+        when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
+
+        MockService mockService = createMockService();
+        ResponseEntity<String> responseEntity = mockService.mock(request);
+
+        assertEquals(XML_DATA, responseEntity.getBody());
+    }
+
+    @Test
+    public void mock_NoRouteFound_ExceptionThrown() {
+        when(routeService.getEnabledRoute(any())).thenReturn(Optional.empty());
+        MockService mockService = createMockService();
+
+        assertThrows(NoRouteFoundException.class, () -> mockService.mock(request));
+    }
+
+    @Test
+    public void mock_QuantumEnabled_UsesQuantumToAlterResponse() {
+        Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(VALID_JSON);
+        when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
+
+        Settings settings = new Settings().setQuantum(true);
+        when(configRepository.getSettings()).thenReturn(settings);
+
+        when(quantumTheory.applicable(any())).thenReturn(true);
+        when(quantumTheory.apply(any())).thenReturn(INVALID_JSON);
+
+        MockService mockService = createMockService();
+        ResponseEntity<String> responseEntity = mockService.mock(request);
+
+        assertEquals(INVALID_JSON, responseEntity.getBody());
+    }
+
+    //----------------------------------------------------------------------
+    //
+    //   cache
+    //
+    //----------------------------------------------------------------------
+
+    @Test
+    public void cacheRemove_RouteResponseChanged_ReturnNewResponse() {
+        Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(INVALID_JSON);
+        when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
+        MockService mockService = createMockService();
+
+        ResponseEntity<String> responseEntity;
+        responseEntity = mockService.mock(request);
+        assertEquals(INVALID_JSON, responseEntity.getBody());
+
+        route.setResponse(VALID_JSON);
+        responseEntity = mockService.mock(request);
+        assertEquals(INVALID_JSON, responseEntity.getBody());
+
+        mockService.cacheRemove(route);
+        responseEntity = mockService.mock(request);
+        assertEquals(VALID_JSON, responseEntity.getBody());
     }
 
     //----------------------------------------------------------------------

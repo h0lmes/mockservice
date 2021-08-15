@@ -62,6 +62,8 @@ public class JsonUtils {
                 } else {
                     throw new IllegalArgumentException("Illegal escape sequence: \\" + ch);
                 }
+            } else {
+                builder.append(ch);
             }
         }
 

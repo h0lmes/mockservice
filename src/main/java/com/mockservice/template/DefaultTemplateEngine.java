@@ -91,7 +91,8 @@ public class DefaultTemplateEngine implements TemplateEngine {
         long startEpochDay = LocalDate.of(1970, 1, 1).toEpochDay();
         long endEpochDay = LocalDate.of(2100, 1, 1).toEpochDay();
         long randomEpochDay = ThreadLocalRandom.current().nextLong(startEpochDay, endEpochDay);
-        return LocalDate.ofEpochDay(randomEpochDay).toString();
+        return LocalDate.ofEpochDay(randomEpochDay)
+                .format(DateTimeFormatter.ofPattern("uuuu-MM-dd"));
     }
 
     @SuppressWarnings("unused")
@@ -107,7 +108,8 @@ public class DefaultTemplateEngine implements TemplateEngine {
 
     @SuppressWarnings("unused")
     private static String currentDate(String[] args) {
-        return LocalDate.now().toString();
+        return LocalDate.now()
+                .format(DateTimeFormatter.ofPattern("uuuu-MM-dd"));
     }
 
     @SuppressWarnings("unused")

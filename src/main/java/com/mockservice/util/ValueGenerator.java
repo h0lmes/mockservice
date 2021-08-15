@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 public class ValueGenerator {
 
     private static final String QUERTY = "ABCDEF GHIJKLMN OPQRST UVWXYZ abcdef ghijklmn opqrst uvwxyz ,.!-";
-    private static final char[] chars = QUERTY.toCharArray();
-    private static final String article = "Eight decades have passed since physicists realized that the theories of quantum mechanics and gravity don’t fit together, and the puzzle of how to combine the two remains unsolved. In the last few decades, researchers have pursued the problem in two separate programs — string theory and loop quantum gravity — that are widely considered incompatible by their practitioners. But now some scientists argue that joining forces is the way forward.\n" +
+    private static final char[] CHARS = QUERTY.toCharArray();
+    private static final String ARTICLE = "Eight decades have passed since physicists realized that the theories of quantum mechanics and gravity don’t fit together, and the puzzle of how to combine the two remains unsolved. In the last few decades, researchers have pursued the problem in two separate programs — string theory and loop quantum gravity — that are widely considered incompatible by their practitioners. But now some scientists argue that joining forces is the way forward.\n" +
             "\n" +
             "Among the attempts to unify quantum theory and gravity, string theory has attracted the most attention. Its premise is simple: Everything is made of tiny strings. The strings may be closed unto themselves or have loose ends; they can vibrate, stretch, join or split. And in these manifold appearances lie the explanations for all phenomena we observe, both matter and space-time included.\n" +
             "\n" +
@@ -18,8 +18,12 @@ public class ValueGenerator {
     private static final int[] stringLengths = {1, 1, 1, 2, 2, 3};
     private static final String[] booleans = {"false", "true"};
 
+    private ValueGenerator() {
+        /* hidden */
+    }
+
     static {
-        vocabulary = article
+        vocabulary = ARTICLE
                 .replaceAll("[^A-Za-z\\-\\s]", "")
                 .toLowerCase()
                 .split("\\s+");
@@ -44,9 +48,9 @@ public class ValueGenerator {
     private static String randomChars() {
         int len = ThreadLocalRandom.current().nextInt(1, 31);
         return ThreadLocalRandom.current()
-                .ints(0, chars.length)
+                .ints(0, CHARS.length)
                 .limit(len)
-                .map(i -> chars[i])
+                .map(i -> CHARS[i])
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
     }
@@ -56,9 +60,9 @@ public class ValueGenerator {
     }
 
     public static String randomIntegerString() {
-        int len = RandomUtils.rnd(10) + 1;
+        int len = RandomUtils.rnd(8) + 1;
         String number = ThreadLocalRandom.current()
-                .ints(0, 10)
+                .ints(0, 9)
                 .limit(len)
                 .boxed()
                 .map(String::valueOf)

@@ -10,7 +10,7 @@ import com.mockservice.response.SoapMockResponse;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.util.JsonUtils;
 import com.mockservice.util.JsonValidationException;
-import com.mockservice.util.QuantumTheory;
+import com.mockservice.service.quantum.QuantumTheory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,6 +32,7 @@ public class MockServiceImpl implements MockService {
     private final ActiveScenariosService activeScenariosService;
     private final ConfigRepository configRepository;
     private final RequestService requestService;
+    private final List<QuantumTheory> quantumTheories;
     private final ConcurrentLruCache<Route, MockResponse> responseCache;
 
     public MockServiceImpl(@Value("${application.cache.response}") int cacheSize,
@@ -38,12 +40,14 @@ public class MockServiceImpl implements MockService {
                            RouteService routeService,
                            ActiveScenariosService activeScenariosService,
                            ConfigRepository configRepository,
-                           RequestService requestService) {
+                           RequestService requestService,
+                           List<QuantumTheory> quantumTheories) {
         this.templateEngine = templateEngine;
         this.routeService = routeService;
         this.activeScenariosService = activeScenariosService;
         this.configRepository = configRepository;
         this.requestService = requestService;
+        this.quantumTheories = quantumTheories;
         responseCache = new ConcurrentLruCache<>(cacheSize, this::mockResponseFromRoute);
     }
 
@@ -144,13 +148,18 @@ public class MockServiceImpl implements MockService {
 
     private ResponseEntity<String> applyQuantumTheoryIfSetSo(ResponseEntity<String> responseEntity) {
         if (configRepository.getSettings().getQuantum()) {
-            String body = QuantumTheory.apply(responseEntity.getBody());
-            int statusCode = QuantumTheory.apply(responseEntity.getStatusCodeValue());
-            QuantumTheory.delay();
-            return ResponseEntity
-                    .status(statusCode)
-                    .headers(responseEntity.getHeaders())
-                    .body(body);
+            String body = responseEntity.getBody();
+            for (QuantumTheory theory : quantumTheories) {
+                if (theory.applicable(body)) {
+                    body = theory.apply(body);
+                    int statusCode = theory.apply(responseEntity.getStatusCodeValue());
+                    theory.delay();
+                    return ResponseEntity
+                            .status(statusCode)
+                            .headers(responseEntity.getHeaders())
+                            .body(body);
+                }
+            }
         }
         return responseEntity;
     }
