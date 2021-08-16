@@ -7,11 +7,12 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MapUtilsTest {
 
     @Test
-    public void jsonToFlatMapTest() throws IOException {
+    public void jsonTotMapAndFlattenMap_ValidJson_MapAsExpected() throws IOException {
         String json = IOUtils.asString("map.json");
         Map<String, Object> objectMap = MapUtils.jsonToMap(json);
         Map<String, String> map = MapUtils.flattenMap(objectMap);
@@ -23,5 +24,11 @@ public class MapUtilsTest {
         assertEquals("10101", map.get("key2.key2.key1"));
         assertNull(map.get("key2.key2.key2"));
         assertEquals("[value 1, value 2]", map.get("key2.key2.key3"));
+    }
+
+    @Test
+    public void jsonToMap_EmptyString_ReturnsEmptyMap() throws IOException {
+        Map<String, Object> objectMap = MapUtils.jsonToMap("");
+        assertTrue(objectMap.isEmpty());
     }
 }

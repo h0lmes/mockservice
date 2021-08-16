@@ -46,7 +46,10 @@ public abstract class AbstractRequestFacade implements RequestFacade {
             pathVariables = new HashMap<>();
         }
 
-        request.getParameterMap().forEach((k, v) -> requestParams.put(k, v[0]));
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        if (parameterMap != null) {
+            parameterMap.forEach((k, v) -> requestParams.put(k, v[0]));
+        }
 
         mockVarHeaders = getHeadersParts(request, VARIABLE_HEADER);
         mockAltHeaders = getHeadersParts(request, ALT_HEADER);
@@ -71,10 +74,12 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     private List<String[]> getHeadersParts(HttpServletRequest request, String headerName) {
         List<String[]> result = new ArrayList<>();
         Enumeration<String> headers = request.getHeaders(headerName);
-        while (headers.hasMoreElements()) {
-            String header = headers.nextElement();
-            if (header != null && !header.isEmpty()) {
-                result.add(header.trim().split(HEADER_SPLIT));
+        if (headers != null) {
+            while (headers.hasMoreElements()) {
+                String header = headers.nextElement();
+                if (header != null && !header.isEmpty()) {
+                    result.add(header.trim().split(HEADER_SPLIT));
+                }
             }
         }
         return result;

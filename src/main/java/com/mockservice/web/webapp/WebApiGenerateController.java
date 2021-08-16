@@ -30,10 +30,7 @@ public class WebApiGenerateController {
     }
 
     @GetMapping("json")
-    public String json(@RequestParam(name = "root", required = false) String rootValueType) {
-        if (rootValueType != null && !rootValueType.isEmpty()) {
-            return JsonGenerator.generate(JsonGenerator.JsonValueType.valueOf(rootValueType));
-        }
+    public String json() {
         return JsonGenerator.generate();
     }
 

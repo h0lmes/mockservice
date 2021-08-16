@@ -62,23 +62,15 @@ public class WebApiScenariosController {
         return activeScenariosService.deactivateScenario(alias);
     }
 
-    @ExceptionHandler
-    protected ResponseEntity<ErrorInfo> handleScenarioAlreadyExistsException(ScenarioAlreadyExistsException e) {
+    @ExceptionHandler({ScenarioAlreadyExistsException.class, ScenarioParseException.class})
+    protected ResponseEntity<ErrorInfo> handleScenarioException(Exception e) {
         log.warn(e.getMessage());
         return ResponseEntity
                 .badRequest()
                 .body(new ErrorInfo(e));
     }
 
-    @ExceptionHandler
-    protected ResponseEntity<ErrorInfo> handleScenarioParseException(ScenarioParseException e) {
-        log.warn(e.getMessage());
-        return ResponseEntity
-                .badRequest()
-                .body(new ErrorInfo(e));
-    }
-
-    @ExceptionHandler
+    @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorInfo> handleException(Exception e) {
         log.error("", e);
         return ResponseEntity
