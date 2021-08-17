@@ -14,8 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -24,7 +23,9 @@ import static org.mockito.Mockito.when;
 public class RouteServiceImplTest {
 
     private static final RequestMethod METHOD = RequestMethod.POST;
+    private static final RequestMethod METHOD_OTHER = RequestMethod.PUT;
     private static final String PATH = "/test";
+    private static final String PATH_OTHER = "/api/test";
     private static final String ALT1 = "400";
     private static final String ALT2 = "204";
 
@@ -45,16 +46,16 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void getEnabledRoute_RouteDisabled_ReturnsRoute() {
+    public void getEnabledRoute_RouteDisabled_ReturnsEmpty() {
         Route route = new Route().setPath(PATH).setDisabled(true);
         when(configRepository.findRoute(any())).thenReturn(Optional.of(route));
 
         RouteService service = createRouteService();
-        assertFalse(service.getEnabledRoute(route).isPresent());
+        assertTrue(service.getEnabledRoute(route).isEmpty());
     }
 
     @Test
-    public void getRandomAltFor_ExistingRoutes_ReturnsAltOfOneOfExistingRoutes() {
+    public void getRandomAltFor_MoreThanOneRouteSatisfiesSearchCondition_ReturnsAltOfEither() {
         Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1);
         Route route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT2);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route1, route2));
@@ -64,5 +65,49 @@ public class RouteServiceImplTest {
         Optional<String> alt = service.getRandomAltFor(METHOD, PATH);
         assertTrue(alt.isPresent());
         assertTrue(Set.of(ALT1, ALT2).contains(alt.get()));
+    }
+
+    @Test
+    public void getRandomAltFor_OneRouteSatisfiesSearchCondition_ReturnsAltOfTheRoute() {
+        Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1);
+        when(configRepository.findAllRoutes()).thenReturn(List.of(route1));
+
+        RouteService service = createRouteService();
+
+        Optional<String> alt = service.getRandomAltFor(METHOD, PATH);
+        assertTrue(alt.isPresent());
+        assertEquals(ALT1, alt.get());
+    }
+
+    @Test
+    public void getRandomAltFor_NoRoutesSatisfySearchConditionByMethod_ReturnsEmpty() {
+        Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1);
+        when(configRepository.findAllRoutes()).thenReturn(List.of(route1));
+
+        RouteService service = createRouteService();
+
+        assertTrue(service.getRandomAltFor(METHOD_OTHER, PATH).isEmpty());
+    }
+
+    @Test
+    public void getRandomAltFor_NoRoutesSatisfySearchConditionByPath_ReturnsEmpty() {
+        Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1);
+        Route route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT2);
+        when(configRepository.findAllRoutes()).thenReturn(List.of(route1, route2));
+
+        RouteService service = createRouteService();
+
+        assertTrue(service.getRandomAltFor(METHOD, PATH_OTHER).isEmpty());
+    }
+
+    @Test
+    public void getRandomAltFor_AnyNumberOfRoutesSatisfySearchConditionButAreDisabled_ReturnsEmpty() {
+        Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1).setDisabled(true);
+        Route route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT2).setDisabled(true);
+        when(configRepository.findAllRoutes()).thenReturn(List.of(route1, route2));
+
+        RouteService service = createRouteService();
+
+        assertTrue(service.getRandomAltFor(METHOD, PATH).isEmpty());
     }
 }

@@ -24,7 +24,7 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     final ObjectMapper jsonMapper;
     private final String endpoint;
     private final String encodedEndpoint;
-    private final RequestMethod requestMethod;
+    private final String requestMethod;
     private final Map<String, String> pathVariables;
     private final Map<String, String> requestParams = new HashMap<>();
     private final List<String[]> mockVarHeaders;
@@ -35,9 +35,10 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     @SuppressWarnings("unchecked")
     public AbstractRequestFacade(HttpServletRequest request, ObjectMapper jsonMapper) {
         this.jsonMapper = jsonMapper;
-        endpoint = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        endpoint = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE) == null
+                ? "" : (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         encodedEndpoint = encodeEndpoint(endpoint);
-        requestMethod = RequestMethod.valueOf(request.getMethod());
+        requestMethod = request.getMethod();
 
         Object o = request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         if (o instanceof Map) {
@@ -87,7 +88,7 @@ public abstract class AbstractRequestFacade implements RequestFacade {
 
     @Override
     public RequestMethod getRequestMethod() {
-        return requestMethod;
+        return RequestMethod.valueOf(requestMethod);
     }
 
     @Override

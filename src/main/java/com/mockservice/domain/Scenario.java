@@ -49,7 +49,7 @@ public class Scenario implements Comparable<Scenario> {
     }
 
     public Scenario setData(String data) {
-        this.data = data;
+        this.data = data == null ? "" : data;
         return this;
     }
 

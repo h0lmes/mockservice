@@ -39,7 +39,7 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
     private final MockService mockService;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
     private final ConfigRepository configRepository;
-    private Method mockMethod = null;
+    private final Method mockMethod;
     private final ObjectMapper jsonMapper;
     private final Map<String, Integer> registeredRoutes = new ConcurrentHashMap<>();
     private String errorBody;
@@ -49,18 +49,14 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
                                      MockService mockService,
                                      RequestMappingHandlerMapping requestMappingHandlerMapping,
                                      ConfigRepository configRepository,
-                                     @Qualifier("jsonMapper") ObjectMapper jsonMapper) {
+                                     @Qualifier("jsonMapper") ObjectMapper jsonMapper) throws NoSuchMethodException {
         this.request = request;
         this.mockService = mockService;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
         this.configRepository = configRepository;
         this.jsonMapper = jsonMapper;
 
-        try {
-            mockMethod = this.getClass().getMethod("mock");
-        } catch (NoSuchMethodException e) {
-            log.error("", e);
-        }
+        mockMethod = this.getClass().getMethod("mock");
 
         try {
             errorBody = IOUtils.asString(soapErrorDataFile);

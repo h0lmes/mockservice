@@ -1,3 +1,6 @@
+![Coverage](.github/badges/jacoco.svg)
+![Branches](.github/badges/branches.svg)
+
 ### Mock Service
 
 An easy to use service to mock REST and SOAP endpoints.

@@ -35,8 +35,6 @@ public class RestRequestFacadeTest {
     @Test
     public void getRequestMethod_MethodIsGet_ReturnsGet() {
         when(request.getMethod()).thenReturn("GET");
-        when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH);
-
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
 
         assertEquals(RequestMethod.GET, facade.getRequestMethod());
@@ -44,9 +42,7 @@ public class RestRequestFacadeTest {
 
     @Test
     public void getEndpoint_Path_ReturnsPath() {
-        when(request.getMethod()).thenReturn("GET");
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH);
-
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
 
         assertEquals(PATH, facade.getEndpoint());
@@ -54,9 +50,6 @@ public class RestRequestFacadeTest {
 
     @Test
     public void getBody_ValidJsonBody_ReturnsBodyJson() throws IOException {
-        when(request.getMethod()).thenReturn("GET");
-        when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH);
-
         Reader inputString = new StringReader(BODY);
         BufferedReader reader = new BufferedReader(inputString);
         when(request.getReader()).thenReturn(reader);
@@ -68,7 +61,6 @@ public class RestRequestFacadeTest {
 
     @Test
     public void getAlt_MockAltHeaderContainsPathAndAlt_ReturnsAlt() {
-        when(request.getMethod()).thenReturn("GET");
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH);
 
         Enumeration<String> headers = Collections.enumeration(List.of("test/" + ALT));
@@ -82,7 +74,6 @@ public class RestRequestFacadeTest {
 
     @Test
     public void getAlt_MockAltHeaderContainsWrongPath_ReturnsEmpty() {
-        when(request.getMethod()).thenReturn("GET");
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH);
 
         Enumeration<String> headers = Collections.enumeration(List.of("wrong-path/" + ALT));
@@ -95,7 +86,6 @@ public class RestRequestFacadeTest {
 
     @Test
     public void getAlt_MockAltHeaderEmpty_ReturnsEmpty() {
-        when(request.getMethod()).thenReturn("GET");
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH);
 
         Enumeration<String> headers = Collections.enumeration(List.of(""));
@@ -108,7 +98,6 @@ public class RestRequestFacadeTest {
 
     @Test
     public void getAlt_MockAltHeaderIsNull_ReturnsEmpty() {
-        when(request.getMethod()).thenReturn("GET");
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH);
 
         List<String> list = new ArrayList<>();
@@ -123,9 +112,7 @@ public class RestRequestFacadeTest {
 
     @Test
     public void getAlt_NoMockAltHeader_ReturnsEmpty() {
-        when(request.getMethod()).thenReturn("GET");
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH);
-
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
 
         assertTrue(facade.getAlt().isEmpty());
@@ -133,8 +120,9 @@ public class RestRequestFacadeTest {
 
     @Test
     public void getVariables_MultipleSources_ReturnsVariables() throws IOException {
-        when(request.getMethod()).thenReturn("GET");
         lenient().when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH);
+        Enumeration<String> headers = Collections.enumeration(List.of("test/headerVariable/42 42"));
+        lenient().when(request.getHeaders(eq("Mock-Variable"))).thenReturn(headers);
 
         Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("pathVariable", "42");
@@ -143,9 +131,6 @@ public class RestRequestFacadeTest {
         Map<String, String[]> parameterMap = new HashMap<>();
         parameterMap.put("parameterVariable", new String[]{"42 42 42"});
         when(request.getParameterMap()).thenReturn(parameterMap);
-
-        Enumeration<String> headers = Collections.enumeration(List.of("test/headerVariable/42 42"));
-        lenient().when(request.getHeaders(eq("Mock-Variable"))).thenReturn(headers);
 
         Reader inputString = new StringReader(BODY);
         BufferedReader reader = new BufferedReader(inputString);

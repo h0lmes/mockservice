@@ -23,11 +23,6 @@ public interface RouteRegisteringController {
             return;
         }
 
-        if (mockMethod == null) {
-            log.warn("Register route (no method): {}", route);
-            return;
-        }
-
         String key = routeRegistrationKey(route);
         int regCount = Math.max(0, registeredRoutes.getOrDefault(key, 0));
         registeredRoutes.put(key, regCount + 1);
