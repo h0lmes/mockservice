@@ -10,12 +10,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,6 +45,7 @@ public class RouteServiceImplTest {
         when(configRepository.findRoute(any())).thenReturn(Optional.of(route));
 
         RouteService service = createRouteService();
+
         assertTrue(service.getEnabledRoute(route).isPresent());
     }
 
@@ -51,8 +55,63 @@ public class RouteServiceImplTest {
         when(configRepository.findRoute(any())).thenReturn(Optional.of(route));
 
         RouteService service = createRouteService();
+
         assertTrue(service.getEnabledRoute(route).isEmpty());
     }
+
+    @Test
+    public void getRoutesAsList() {
+        Route route = new Route().setPath(PATH);
+        when(configRepository.findAllRoutes()).thenReturn(List.of(route));
+
+        RouteService service = createRouteService();
+
+        assertTrue(service.getRoutesAsList().contains(route));
+        assertThrows(UnsupportedOperationException.class, () -> service.getRoutesAsList().add(route));
+    }
+
+    @Test
+    public void putRoute() throws IOException {
+        Route route = new Route().setPath(PATH);
+        when(configRepository.findAllRoutes()).thenReturn(List.of(route));
+
+        RouteService service = createRouteService();
+        List<Route> routes = service.putRoute(route);
+
+        verify(configRepository, times(1)).putRoute(route);
+        assertTrue(routes.contains(route));
+        assertThrows(UnsupportedOperationException.class, () -> routes.add(route));
+    }
+
+    @Test
+    public void putRoutes() throws IOException {
+        Route route = new Route().setPath(PATH);
+        when(configRepository.findAllRoutes()).thenReturn(List.of(route));
+
+        RouteService service = createRouteService();
+        List<Route> inRoutes = List.of(route);
+        List<Route> routes = service.putRoutes(inRoutes, true);
+
+        verify(configRepository, times(1)).putRoutes(inRoutes, true);
+        assertTrue(routes.contains(route));
+        assertThrows(UnsupportedOperationException.class, () -> routes.add(route));
+    }
+
+    @Test
+    public void deleteRoutes() throws IOException {
+        Route route = new Route().setPath(PATH);
+        when(configRepository.findAllRoutes()).thenReturn(List.of(route));
+
+        RouteService service = createRouteService();
+        List<Route> inRoutes = List.of(route);
+        List<Route> routes = service.deleteRoutes(inRoutes);
+
+        verify(configRepository, times(1)).deleteRoutes(inRoutes);
+        assertTrue(routes.contains(route));
+        assertThrows(UnsupportedOperationException.class, () -> routes.add(route));
+    }
+
+    // --- random alt -----------------------------------------------------
 
     @Test
     public void getRandomAltFor_MoreThanOneRouteSatisfiesSearchCondition_ReturnsAltOfEither() {

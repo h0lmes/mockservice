@@ -45,6 +45,21 @@ public class RouteTest {
         assertTrue(new Route().setType(null).isRest());
     }
 
+    @Test
+    public void setResponseCodeString_In100To599_SetsResponseCode() {
+        assertEquals(400, new Route().setResponseCodeString("400").getResponseCode());
+    }
+
+    @Test
+    public void setResponseCodeString_LessThan100_DoesNotChangeResponseCode() {
+        assertEquals(new Route().getResponseCode(), new Route().setResponseCodeString("99").getResponseCode());
+    }
+
+    @Test
+    public void setResponseCodeString_GreaterThan599_DoesNotChangeResponseCode() {
+        assertEquals(new Route().getResponseCode(), new Route().setResponseCodeString("600").getResponseCode());
+    }
+
     @DisplayName("Test Route equality based on method, path and alt (other parameters don't matter).")
     @Test
     public void equals_SameMethodPathAlt_OtherFieldsDiffer_True() {
@@ -61,6 +76,18 @@ public class RouteTest {
                 .setResponseCode(400)
                 .setDisabled(true);
         assertEquals(route1, route2);
+    }
+
+    @Test
+    public void equals_Null_False() {
+        Route route = new Route().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
+        assertNotEquals(null, route);
+    }
+
+    @Test
+    public void equals_ObjectOfOtherType_False() {
+        Route route = new Route().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
+        assertNotEquals(route, new Object());
     }
 
     @Test
@@ -82,5 +109,57 @@ public class RouteTest {
         Route route1 = new Route().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
         Route route2 = new Route(route1).setAlt(STR_2);
         assertNotEquals(route1, route2);
+    }
+
+    @Test
+    public void compareTo_Equal() {
+        Route route1 = new Route()
+                .setGroup(STR_1).setType(RouteType.REST).setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
+        Route route2 = new Route()
+                .setGroup(STR_1).setType(RouteType.REST).setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
+        assertEquals(0, route1.compareTo(route2));
+    }
+
+    @Test
+    public void compareTo_ByGroup() {
+        Route route1 = new Route()
+                .setGroup(STR_1).setType(RouteType.REST).setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
+        Route route2 = new Route()
+                .setGroup(STR_2).setType(RouteType.REST).setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
+        assertTrue(0 > route1.compareTo(route2));
+    }
+
+    @Test
+    public void compareTo_ByType() {
+        Route route1 = new Route()
+                .setGroup(STR_1).setType(RouteType.REST).setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
+        Route route2 = new Route()
+                .setGroup(STR_1).setType(RouteType.SOAP).setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
+        assertTrue(0 > route1.compareTo(route2));
+    }
+
+    @Test
+    public void compareTo_ByMethod() {
+        Route route1 = new Route()
+                .setGroup(STR_1).setType(RouteType.REST).setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
+        Route route2 = new Route()
+                .setGroup(STR_1).setType(RouteType.REST).setMethod(METHOD2).setPath(STR_1).setAlt(STR_1);
+        assertTrue(0 > route1.compareTo(route2));
+    }
+    @Test
+    public void compareTo_ByPath() {
+        Route route1 = new Route()
+                .setGroup(STR_1).setType(RouteType.REST).setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
+        Route route2 = new Route()
+                .setGroup(STR_1).setType(RouteType.REST).setMethod(METHOD1).setPath(STR_2).setAlt(STR_1);
+        assertTrue(0 > route1.compareTo(route2));
+    }
+    @Test
+    public void compareTo_ByAlt() {
+        Route route1 = new Route()
+                .setGroup(STR_1).setType(RouteType.REST).setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
+        Route route2 = new Route()
+                .setGroup(STR_1).setType(RouteType.REST).setMethod(METHOD1).setPath(STR_1).setAlt(STR_2);
+        assertTrue(0 > route1.compareTo(route2));
     }
 }

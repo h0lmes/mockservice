@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class JsonQuantumTheoryTest {
 
     private static final String VALID_JSON = "{\"product_id\": 1, \"label\": \"label\", \"in_stock\": true}";
+    private static final String EMPTY_OBJECT_JSON = "{}";
     private static final String NOT_A_JSON = "<test>test</test>";
 
     private QuantumTheory theory() {
@@ -32,8 +33,15 @@ public class JsonQuantumTheoryTest {
     }
 
     @RepeatedTest(10)
-    public void apply_ToValidJson_ReturnsJsonThatDeserializesSuccessfully() {
+    public void apply_ToValidJson_ReturnsDeserializableJson() {
         String json = theory().apply(VALID_JSON);
+        ObjectMapper mapper = new ObjectMapper();
+        assertDoesNotThrow(() -> mapper.readTree(json));
+    }
+
+    @Test
+    public void apply_ToEmptyObjectJson_ReturnsDeserializableJson() {
+        String json = theory().apply(EMPTY_OBJECT_JSON);
         ObjectMapper mapper = new ObjectMapper();
         assertDoesNotThrow(() -> mapper.readTree(json));
     }

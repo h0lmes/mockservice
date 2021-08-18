@@ -58,6 +58,17 @@ public class WebApiSettingsControllerTest {
     }
 
     @Test
+    public void getSettings_ExceptionThrown_ReturnsBadRequest() throws Exception {
+        when(configRepository.getSettings()).thenThrow(RuntimeException.class);
+
+        mvc.perform(
+                get(WEB_API_SETTINGS).contentType(MediaType.APPLICATION_JSON)
+        )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void putSettings() throws Exception {
         Settings settings = new Settings().setRandomAlt(false).setQuantum(false);
         when(configRepository.getSettings()).thenReturn(settings);

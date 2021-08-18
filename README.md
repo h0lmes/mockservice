@@ -1,5 +1,6 @@
 ![Coverage](.github/badges/jacoco.svg)
 ![Branches](.github/badges/branches.svg)
+![License](.github/badges/license.svg)
 
 ### Mock Service
 

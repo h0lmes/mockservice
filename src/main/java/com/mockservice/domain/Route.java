@@ -93,7 +93,7 @@ public class Route implements Comparable<Route> {
     public Route setResponseCodeString(String responseCode) {
         try {
             int code = Integer.parseInt(responseCode);
-            if (code >= 200 && code <= 599) {
+            if (code >= 100 && code <= 599) {
                 setResponseCode(code);
             }
         } catch (Exception e) {

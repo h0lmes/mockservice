@@ -64,6 +64,17 @@ public class WebApiRoutesControllerTest {
     }
 
     @Test
+    public void getRoutes_ExceptionThrown_ReturnsBadRequest() throws Exception {
+        when(service.getRoutesAsList()).thenThrow(RuntimeException.class);
+
+        mvc.perform(
+                get(WEB_API_ROUTES).contentType(MediaType.APPLICATION_JSON)
+        )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void patchRoutes() throws Exception {
         Route route = new Route().setPath(PATH);
         when(service.putRoute(any())).thenReturn(List.of(route));

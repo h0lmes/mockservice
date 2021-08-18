@@ -73,6 +73,17 @@ public class WebApiScenariosControllerTest {
     }
 
     @Test
+    public void getScenarios_ExceptionThrown_ReturnsBadRequest() throws Exception {
+        when(scenarioService.getScenariosAsList()).thenThrow(RuntimeException.class);
+
+        mvc.perform(
+                get(WEB_API_SCENARIOS).contentType(MediaType.APPLICATION_JSON)
+        )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void putScenario() throws Exception {
         Scenario scenario = new Scenario().setAlias(ALIAS);
         when(scenarioService.putScenario(any(), any())).thenReturn(List.of(scenario));

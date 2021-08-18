@@ -3,8 +3,7 @@ package com.mockservice.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ScenarioTest {
 
@@ -43,5 +42,38 @@ public class ScenarioTest {
                 .setData(STR_2)
                 .setType(ScenarioType.CIRCULAR_QUEUE);
         assertEquals(scenario1, scenario2);
+    }
+
+    @Test
+    public void equals_Null_False() {
+        Scenario scenario = new Scenario().setAlias(STR_1);
+        assertNotEquals(null, scenario);
+    }
+
+    @Test
+    public void equals_ObjectOfOtherType_False() {
+        Scenario scenario = new Scenario().setAlias(STR_1);
+        assertNotEquals(scenario, new Object());
+    }
+
+    @Test
+    public void compareTo_Equal() {
+        Scenario scenario1 = new Scenario().setGroup(STR_1).setAlias(STR_1);
+        Scenario scenario2 = new Scenario().setGroup(STR_1).setAlias(STR_1);
+        assertEquals(0, scenario1.compareTo(scenario2));
+    }
+
+    @Test
+    public void compareTo_ByGroup() {
+        Scenario scenario1 = new Scenario().setGroup(STR_1).setAlias(STR_1);
+        Scenario scenario2 = new Scenario().setGroup(STR_2).setAlias(STR_1);
+        assertTrue(0 > scenario1.compareTo(scenario2));
+    }
+
+    @Test
+    public void compareTo_ByType() {
+        Scenario scenario1 = new Scenario().setGroup(STR_1).setAlias(STR_1);
+        Scenario scenario2 = new Scenario().setGroup(STR_1).setAlias(STR_2);
+        assertTrue(0 > scenario1.compareTo(scenario2));
     }
 }

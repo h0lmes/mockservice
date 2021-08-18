@@ -64,7 +64,7 @@ public class JsonQuantumTheory implements QuantumTheory {
     }
 
     private static String stringReplacer(MatchResult matchResult) {
-        String name = matchResult.groupCount() > 0 ? matchResult.group(1) : ValueGenerator.randomWords(1);
+        String name = matchResult.group(1);
         if (RandomUtils.withChance(10)) {
             return "\"" + name + "\": null";
         }
@@ -72,7 +72,7 @@ public class JsonQuantumTheory implements QuantumTheory {
     }
 
     private static String numberReplacer(MatchResult matchResult) {
-        String name = matchResult.groupCount() > 0 ? matchResult.group(1) : ValueGenerator.randomWords(1);
+        String name = matchResult.group(1);
         if (RandomUtils.withChance(10)) {
             return "\"" + name + "\": null";
         }
@@ -80,7 +80,7 @@ public class JsonQuantumTheory implements QuantumTheory {
     }
 
     private static String booleanReplacer(MatchResult matchResult) {
-        String name = matchResult.groupCount() > 0 ? matchResult.group(1) : ValueGenerator.randomWords(1);
+        String name = matchResult.group(1);
         return "\"" + name + "\": " + ValueGenerator.randomBooleanString();
     }
 }
