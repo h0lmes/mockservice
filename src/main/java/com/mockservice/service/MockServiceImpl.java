@@ -8,9 +8,9 @@ import com.mockservice.response.MockResponse;
 import com.mockservice.response.RestMockResponse;
 import com.mockservice.response.SoapMockResponse;
 import com.mockservice.template.TemplateEngine;
-import com.mockservice.util.JsonUtils;
-import com.mockservice.util.JsonValidationException;
+import com.mockservice.validate.DataValidationException;
 import com.mockservice.service.quantum.QuantumTheory;
+import com.mockservice.validate.DataValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,21 +33,24 @@ public class MockServiceImpl implements MockService {
     private final ConfigRepository configRepository;
     private final RequestService requestService;
     private final List<QuantumTheory> quantumTheories;
+    private final List<DataValidator> dataValidators;
     private final ConcurrentLruCache<Route, MockResponse> responseCache;
 
-    public MockServiceImpl(@Value("${application.cache.response}") int cacheSize,
+    public MockServiceImpl(@Value("${application.mock-service.cache-size}") int cacheSize,
                            TemplateEngine templateEngine,
                            RouteService routeService,
                            ActiveScenariosService activeScenariosService,
                            ConfigRepository configRepository,
                            RequestService requestService,
-                           List<QuantumTheory> quantumTheories) {
+                           List<QuantumTheory> quantumTheories,
+                           List<DataValidator> dataValidators) {
         this.templateEngine = templateEngine;
         this.routeService = routeService;
         this.activeScenariosService = activeScenariosService;
         this.configRepository = configRepository;
         this.requestService = requestService;
         this.quantumTheories = quantumTheories;
+        this.dataValidators = dataValidators;
         responseCache = new ConcurrentLruCache<>(cacheSize, this::mockResponseFromRoute);
     }
 
@@ -104,7 +107,7 @@ public class MockServiceImpl implements MockService {
                 .orElseThrow(() -> new NoRouteFoundException(searchRoute));
     }
 
-    private Optional<? extends String> maybeGetRandomAltFor(RequestMethod method, String path) {
+    private Optional<String> maybeGetRandomAltFor(RequestMethod method, String path) {
         if (configRepository.getSettings().getRandomAlt() || configRepository.getSettings().getQuantum()) {
             return routeService.getRandomAltFor(method, path);
         }
@@ -114,15 +117,20 @@ public class MockServiceImpl implements MockService {
     private RequestBodyValidationResult validateRequestBody(Route route, String body) {
         String schema = route.getRequestBodySchema();
         try {
-            if (!schema.isEmpty())
-                JsonUtils.validate(body, schema);
-        } catch (JsonValidationException e) {
-            return validationErrorOrThrow(e, route);
+            if (!schema.isEmpty()) {
+                for (DataValidator validator : dataValidators) {
+                    if (validator.applicable(body)) {
+                        validator.validate(body, schema);
+                    }
+                }
+            }
+        } catch (DataValidationException e) {
+            return handleValidationException(e, route);
         }
         return RequestBodyValidationResult.success(route);
     }
 
-    private RequestBodyValidationResult validationErrorOrThrow(JsonValidationException e, Route route) {
+    private RequestBodyValidationResult handleValidationException(DataValidationException e, Route route) {
         if (configRepository.getSettings().getAlt400OnFailedRequestValidation()) {
             Route route400 = getRoute400For(route);
             if (route400 != null) {

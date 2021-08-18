@@ -7,6 +7,8 @@ import com.mockservice.repository.ConfigRepository;
 import com.mockservice.request.RequestFacade;
 import com.mockservice.service.quantum.QuantumTheory;
 import com.mockservice.template.TemplateEngine;
+import com.mockservice.validate.DataValidationException;
+import com.mockservice.validate.DataValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,11 +60,13 @@ public class MockServiceImplTest {
     private RequestFacade request;
     @Mock
     private QuantumTheory quantumTheory;
+    @Mock
+    private DataValidator dataValidator;
 
     private MockService createMockService() {
         return new MockServiceImpl(
                 2, templateEngine, routeService, activeScenariosService, configRepository, requestService,
-                List.of(quantumTheory));
+                List.of(quantumTheory), List.of(dataValidator));
     }
 
     @BeforeEach
@@ -73,7 +77,7 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_ResponseBodyHasNoVariables_BodyUnchanged() {
+    public void mock_RouteResponseHasNoVariables_BodyUnchanged() {
         String bodyWithoutVariables = "[]";
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(bodyWithoutVariables);
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
@@ -85,7 +89,7 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_ResponseBodyHasVariable_VariableSubstitutedWithValue() {
+    public void mock_RouteResponseHasVariable_VariableSubstitutedWithValue() {
         String variableName = "id";
         String variableValue = "5";
         String bodyWithVariables = "{\"test\": ${" + variableName + "}}";
@@ -104,7 +108,7 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_BodyWithNoCallbackRequest_NoRequestScheduled() {
+    public void mock_RouteResponseWithNoCallbackRequest_NoRequestScheduled() {
         String bodyWithoutRequest = "[]";
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(bodyWithoutRequest);
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
@@ -116,7 +120,7 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_BodyWithCallbackRequest_RequestScheduled() {
+    public void mock_RouteResponseWithCallbackRequest_RequestScheduled() {
         String bodyWithRequest = "[]\n\nGET http://localhost:8080/ HTTP/1.1";
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(bodyWithRequest);
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
@@ -128,17 +132,21 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_RandomAltEnabled_RandomAltReturned400_SearchesRouteWithAlt400() {
-        when(request.getAlt()).thenReturn(Optional.empty());
-        when(routeService.getRandomAltFor(any(), any())).thenReturn(Optional.of(ALT_400));
-        Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(VALID_JSON);
-        when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
-
+    public void mock_SettingsRandomAltTrue_RandomAlt400_SearchesRouteWithAlt400() {
         Settings settings = new Settings().setRandomAlt(true);
         when(configRepository.getSettings()).thenReturn(settings);
 
+        when(request.getAlt()).thenReturn(Optional.empty());
+
+        when(routeService.getRandomAltFor(any(), any())).thenReturn(Optional.of(ALT_400));
+
+        Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(VALID_JSON);
+        when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
+
         MockService mockService = createMockService();
-        mockService.mock(request);
+        ResponseEntity<String> responseEntity = mockService.mock(request);
+
+        //assertEquals(INVALID_JSON, responseEntity.getBody());
 
         ArgumentCaptor<Route> argument = ArgumentCaptor.forClass(Route.class);
         verify(routeService).getEnabledRoute(argument.capture());
@@ -213,7 +221,7 @@ public class MockServiceImplTest {
     //----------------------------------------------------------------------
 
     @Test
-    public void mock_HasBodySchema_ValidJson_NoExceptionThrown() {
+    public void mock_RouteHasRequestBodySchema_ValidJson_NoExceptionThrown() {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setRequestBodySchema(JSON_SCHEMA);
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
         when(request.getBody()).thenReturn(VALID_JSON);
@@ -223,41 +231,45 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_HasBodySchema_InvalidJson_Alt400Disabled_ExceptionThrown() {
+    public void mock_RouteHasRequestBodySchema_InvalidJson_Alt400Disabled_ExceptionThrown() {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setRequestBodySchema(JSON_SCHEMA);
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
-        when(request.getBody()).thenReturn(INVALID_JSON);
 
         Settings settings = new Settings();
         settings.setAlt400OnFailedRequestValidation(false);
         when(configRepository.getSettings()).thenReturn(settings);
 
+        when(dataValidator.applicable(any())).thenReturn(true);
+        doAnswer(invocation -> {
+            throw new DataValidationException();
+        }).when(dataValidator).validate(any(), any());
+
         MockService mockService = createMockService();
         assertThrows(RuntimeException.class, () -> mockService.mock(request));
     }
 
     @Test
-    public void mock_HasBodySchema_InvalidJson_Alt400Enabled_NoRoute400_ExceptionThrown() {
+    public void mock_RouteHasRequestBodySchema_InvalidJson_Alt400Enabled_NoRoute400_ExceptionThrown() {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setRequestBodySchema(JSON_SCHEMA);
         when(routeService.getEnabledRoute(any()))
                 .thenReturn(Optional.of(route))
                 .thenReturn(Optional.empty());
 
-        when(request.getBody()).thenReturn(INVALID_JSON);
-        when(request.getRequestMethod()).thenReturn(GET_METHOD);
-        when(request.getEndpoint()).thenReturn(PATH);
-        when(request.getAlt()).thenReturn(Optional.empty());
-
         Settings settings = new Settings();
         settings.setAlt400OnFailedRequestValidation(true);
         when(configRepository.getSettings()).thenReturn(settings);
+
+        when(dataValidator.applicable(any())).thenReturn(true);
+        doAnswer(invocation -> {
+            throw new DataValidationException();
+        }).when(dataValidator).validate(any(), any());
 
         MockService mockService = createMockService();
         assertThrows(RuntimeException.class, () -> mockService.mock(request));
     }
 
     @Test
-    public void mock_HasBodySchema_InvalidJson_Alt400Enabled_Route400Exists_NoExceptionThrown() {
+    public void mock_RouteHasRequestBodySchema_InvalidJson_Alt400Enabled_Route400Exists_NoExceptionThrown() {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setRequestBodySchema(JSON_SCHEMA);
         Route route400 = new Route(route).setAlt(ALT_400);
         when(routeService.getEnabledRoute(any()))

@@ -1,16 +1,14 @@
-package com.mockservice.util;
+package com.mockservice.producer;
+
+import com.mockservice.util.RandomUtils;
 
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class JsonGenerator {
+public class JsonProducerImpl implements JsonProducer {
 
     private static final int MAX_NUMBER_OF_ELEMENTS = 10;
-
-    public enum JsonValueType {
-        STRING, NUMBER, INTEGER, BOOLEAN, NULL, ARRAY, OBJECT
-    }
 
     private static final JsonValueType[] rootValueTypes = {
             JsonValueType.OBJECT,
@@ -33,28 +31,32 @@ public class JsonGenerator {
             JsonValueType.OBJECT,
     };
 
-    private JsonGenerator() {
-        /* hidden */
+    private final ValueProducer valueProducer;
+
+    public JsonProducerImpl(ValueProducer valueProducer) {
+        this.valueProducer = valueProducer;
     }
 
-    public static String generate() {
-        return generate(rootValueTypes[RandomUtils.rnd(rootValueTypes.length)]);
+    @Override
+    public String generate() {
+        return generate(getRandomJsonValueType(rootValueTypes));
     }
 
-    public static String generate(JsonValueType rootElementType) {
+    @Override
+    public String generate(JsonValueType rootElementType) {
         return generateValue(rootElementType, 0);
     }
 
-    private static String generateValue(JsonValueType elementType, int level) {
+    private String generateValue(JsonValueType elementType, int level) {
         switch (elementType) {
             case STRING:
-                return "\"" + ValueGenerator.randomString() + "\"";
+                return "\"" + valueProducer.randomString() + "\"";
             case NUMBER:
-                return ValueGenerator.randomNumberString();
+                return valueProducer.randomNumberString();
             case INTEGER:
-                return ValueGenerator.randomIntegerString();
+                return valueProducer.randomIntegerString();
             case BOOLEAN:
-                return ValueGenerator.randomBooleanString();
+                return valueProducer.randomBooleanString();
             case ARRAY:
                 return generateArrayValue(level);
             case OBJECT:
@@ -64,14 +66,13 @@ public class JsonGenerator {
         }
     }
 
-    private static String generateArrayValue(int level) {
-        int percent = 95 - level * 30;
-        if (percent < 10 || RandomUtils.withChance(100 - percent)) {
+    private String generateArrayValue(int level) {
+        if (stopAtLevel(level)) {
             return "null";
         }
 
-        int numberOfElements = RandomUtils.rnd(MAX_NUMBER_OF_ELEMENTS + 1);
-        JsonValueType elementType = valueTypes[RandomUtils.rnd(valueTypes.length)];
+        int numberOfElements = getRandomNumberOfElements();
+        JsonValueType elementType = getRandomJsonValueType(valueTypes);
 
         if (JsonValueType.OBJECT.equals(elementType) || JsonValueType.ARRAY.equals(elementType)) {
             String content = createArrayElements(elementType, numberOfElements, level + 1, ",\n");
@@ -82,7 +83,20 @@ public class JsonGenerator {
         return "[" + content + "]";
     }
 
-    private static String createArrayElements(JsonValueType elementType,
+    private JsonValueType getRandomJsonValueType(JsonValueType[] valueTypes) {
+        return valueTypes[RandomUtils.rnd(valueTypes.length)];
+    }
+
+    private boolean stopAtLevel(int level) {
+        int percent = 95 - level * 30;
+        return percent < 10 || RandomUtils.withChance(100 - percent);
+    }
+
+    private int getRandomNumberOfElements() {
+        return RandomUtils.rnd(MAX_NUMBER_OF_ELEMENTS + 1);
+    }
+
+    private String createArrayElements(JsonValueType elementType,
                                               int numberOfElements,
                                               int elementsIndentationLevel,
                                               String elementsDelimiter) {
@@ -92,29 +106,35 @@ public class JsonGenerator {
                 .collect(Collectors.joining(elementsDelimiter));
     }
 
-    private static String makeArrayElement(JsonValueType elementType, int level) {
+    private String makeArrayElement(JsonValueType elementType, int level) {
         return padWithSpaces(level) + generateValue(elementType, level);
     }
 
-    private static String generateObjectValue(int level) {
-        int percent = 95 - level * 20;
-        if (percent < 10 || RandomUtils.withChance(100 - percent)) {
+    private String generateObjectValue(int level) {
+        if (stopAtLevel(level)) {
             return "null";
         }
 
-        int numberOfElements = RandomUtils.rnd(MAX_NUMBER_OF_ELEMENTS + 1);
+        int numberOfElements = getRandomNumberOfElements();
+        return generateObjectValueInt(level, numberOfElements);
+    }
+
+    private String generateObjectValueInt(int level, int numberOfElements) {
         String content = Stream
-                .generate(() -> ValueGenerator.randomWords(1))
+                .generate(() -> valueProducer.randomWords(1))
                 .distinct()
                 .limit(numberOfElements)
                 .map(keyName -> makeObjectElement(keyName, level + 1))
                 .collect(Collectors.joining(",\n"));
-        if (content.isEmpty()) return "{}";
+        if (content.isEmpty()) {
+            return "{}";
+        }
         return "{\n" + content + "\n" + padWithSpaces(level) + "}";
     }
 
-    private static String makeObjectElement(String name, int level) {
-        return padWithSpaces(level) + makeKey(name, generateValue(valueTypes[RandomUtils.rnd(valueTypes.length)], level));
+    private String makeObjectElement(String name, int level) {
+        String value = generateValue(getRandomJsonValueType(valueTypes), level);
+        return padWithSpaces(level) + makeKey(name, value);
     }
 
     private static String makeKey(String name, String value) {

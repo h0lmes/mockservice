@@ -1,0 +1,56 @@
+{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "integer",
+      "format" : "int64"
+    },
+    "title" : {
+      "type" : "string"
+    },
+    "quantity" : {
+      "type" : "integer",
+      "format" : "int32"
+    },
+    "shipDate" : {
+      "type" : "string",
+      "format" : "date-time"
+    },
+    "productionDate" : {
+      "type" : "string",
+      "format" : "date"
+    },
+    "productionTime" : {
+      "type" : "string",
+      "format" : "time"
+    },
+    "contactEmail" : {
+      "type" : "string",
+      "format" : "email"
+    },
+    "tags" : {
+      "type" : "array",
+      "items" : {
+        "type" : "string"
+      }
+    },
+    "addons" : {
+      "type" : "object"
+    },
+    "weight" : {
+      "type" : "number"
+    },
+    "extra" : {
+      "type" : "null"
+    },
+    "status" : {
+      "type" : "string",
+      "description" : "Order Status",
+      "enum" : [ "placed", "approved", "delivered" ]
+    },
+    "complete" : {
+      "type" : "boolean",
+      "default" : false
+    }
+  }
+}

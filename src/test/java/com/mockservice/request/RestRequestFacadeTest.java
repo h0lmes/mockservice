@@ -28,6 +28,9 @@ public class RestRequestFacadeTest {
     private static final String PATH = "/test";
     private static final String ALT = "400";
     private static final String BODY = "{\"id\": 42}";
+    private static final String JWT =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ";
+    private static final String JWT_SUB = "1234567890";
 
     @Mock
     private HttpServletRequest request;
@@ -124,6 +127,9 @@ public class RestRequestFacadeTest {
         Enumeration<String> headers = Collections.enumeration(List.of("test/headerVariable/42 42"));
         lenient().when(request.getHeaders(eq("Mock-Variable"))).thenReturn(headers);
 
+        Enumeration<String> authHeaders = Collections.enumeration(List.of("bearer " + JWT));
+        lenient().when(request.getHeaders(eq("Authorization"))).thenReturn(authHeaders);
+
         Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("pathVariable", "42");
         lenient().when(request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE)).thenReturn(pathVariables);
@@ -142,5 +148,6 @@ public class RestRequestFacadeTest {
         assertEquals("42 42", facade.getVariables().get("headerVariable"));
         assertEquals("42", facade.getVariables().get("pathVariable"));
         assertEquals("42 42 42", facade.getVariables().get("parameterVariable"));
+        assertEquals(JWT_SUB, facade.getVariables().get("sub"));
     }
 }

@@ -148,7 +148,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     @Override
     public Optional<Route> findRoute(Route route) {
-        return config.getRoutes().stream()
+        return findAllRoutes().stream()
                 .filter(route::equals)
                 .findFirst();
     }

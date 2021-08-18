@@ -1,9 +1,9 @@
 package com.mockservice.service.quantum;
 
-import com.mockservice.util.JsonGenerator;
+import com.mockservice.producer.JsonProducer;
+import com.mockservice.producer.ValueProducer;
 import com.mockservice.util.JsonUtils;
 import com.mockservice.util.RandomUtils;
-import com.mockservice.util.ValueGenerator;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.MatchResult;
@@ -17,8 +17,12 @@ public class JsonQuantumTheory implements QuantumTheory {
     private static final String REGEX_JSON_NUMERIC_VALUE = "\"(\\w+)\"\\s*:\\s*(-?[\\d\\.e]+)";
     private static final String REGEX_JSON_BOOLEAN_VALUE = "\"(\\w+)\"\\s*:\\s*(false|true)";
 
-    public JsonQuantumTheory() {
-        /* default */
+    private final ValueProducer valueProducer;
+    private final JsonProducer jsonProducer;
+
+    public JsonQuantumTheory(ValueProducer valueProducer, JsonProducer jsonProducer) {
+        this.valueProducer = valueProducer;
+        this.jsonProducer = jsonProducer;
     }
 
     @Override
@@ -29,7 +33,7 @@ public class JsonQuantumTheory implements QuantumTheory {
     @Override
     public String apply(String input) {
         if (RandomUtils.withChance(20)) {
-            return JsonGenerator.generate();
+            return jsonProducer.generate();
         }
         if (RandomUtils.withChance(10)) {
             return "";
@@ -41,46 +45,46 @@ public class JsonQuantumTheory implements QuantumTheory {
         return randomizeJsonValues(input); // 43,2% chance
     }
 
-    private static String randomizeJsonValues(String data) {
+    private String randomizeJsonValues(String data) {
         Pattern pattern = Pattern.compile(REGEX_JSON_STRING_VALUE);
         Matcher matcher = pattern.matcher(data);
         if (matcher.find()) {
-            data = matcher.replaceAll(JsonQuantumTheory::stringReplacer);
+            data = matcher.replaceAll(this::stringReplacer);
         }
 
         pattern = Pattern.compile(REGEX_JSON_NUMERIC_VALUE);
         matcher = pattern.matcher(data);
         if (matcher.find()) {
-            data = matcher.replaceAll(JsonQuantumTheory::numberReplacer);
+            data = matcher.replaceAll(this::numberReplacer);
         }
 
         pattern = Pattern.compile(REGEX_JSON_BOOLEAN_VALUE);
         matcher = pattern.matcher(data);
         if (matcher.find()) {
-            data = matcher.replaceAll(JsonQuantumTheory::booleanReplacer);
+            data = matcher.replaceAll(this::booleanReplacer);
         }
 
         return data;
     }
 
-    private static String stringReplacer(MatchResult matchResult) {
+    private String stringReplacer(MatchResult matchResult) {
         String name = matchResult.group(1);
         if (RandomUtils.withChance(10)) {
             return "\"" + name + "\": null";
         }
-        return "\"" + name + "\": \"" + ValueGenerator.randomString() + "\"";
+        return "\"" + name + "\": \"" + valueProducer.randomString() + "\"";
     }
 
-    private static String numberReplacer(MatchResult matchResult) {
+    private String numberReplacer(MatchResult matchResult) {
         String name = matchResult.group(1);
         if (RandomUtils.withChance(10)) {
             return "\"" + name + "\": null";
         }
-        return "\"" + name + "\": " + ValueGenerator.randomNumberString();
+        return "\"" + name + "\": " + valueProducer.randomNumberString();
     }
 
-    private static String booleanReplacer(MatchResult matchResult) {
+    private String booleanReplacer(MatchResult matchResult) {
         String name = matchResult.group(1);
-        return "\"" + name + "\": " + ValueGenerator.randomBooleanString();
+        return "\"" + name + "\": " + valueProducer.randomBooleanString();
     }
 }

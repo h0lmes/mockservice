@@ -1,14 +1,5 @@
 package com.mockservice.util;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jackson.JsonLoader;
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.github.fge.jsonschema.core.report.ProcessingReport;
-import com.github.fge.jsonschema.main.JsonSchema;
-import com.github.fge.jsonschema.main.JsonSchemaFactory;
-
-import java.io.IOException;
-
 public class JsonUtils {
 
     private JsonUtils() {
@@ -73,36 +64,5 @@ public class JsonUtils {
     public static boolean isJson(String value) {
         value = value.stripLeading();
         return value.startsWith("{") || value.startsWith("[") || value.startsWith("null");
-    }
-
-    public static void validate(String json, String schema) {
-        final JsonNode nodeSchema;
-        final JsonNode nodeJson;
-        try {
-            nodeSchema = JsonLoader.fromString(schema);
-            nodeJson = JsonLoader.fromString(json);
-        } catch (IOException e) {
-            throw new JsonValidationException(e);
-        }
-        final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
-        final JsonSchema jsonSchema;
-        try {
-            jsonSchema = factory.getJsonSchema(nodeSchema);
-        } catch (ProcessingException e) {
-            throw new JsonValidationException(e);
-        }
-
-        ProcessingReport report = jsonSchema.validateUnchecked(nodeJson);
-
-        if (report != null && !report.isSuccess()) {
-            StringBuilder builder = new StringBuilder();
-            report.forEach(message -> {
-                if (builder.length() > 0) {
-                    builder.append("\n\n");
-                }
-                builder.append(message.asJson().toString());
-            });
-            throw new JsonValidationException(builder.toString());
-        }
     }
 }

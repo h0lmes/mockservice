@@ -20,11 +20,7 @@ public class ActiveScenario {
     private void parse() {
         List<String> list = scenario.getData().lines().collect(Collectors.toList());
         for (int i = 0; i < list.size(); i++) {
-            try {
-                parseScenarioLine(routes, list.get(i));
-            } catch (Exception e) {
-                throw new ScenarioParseException("Error while parsing scenario [" + scenario.getAlias() + "] at line " + i, e);
-            }
+            parseScenarioLine(routes, list.get(i));
         }
     }
 

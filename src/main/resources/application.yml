@@ -24,8 +24,5 @@ application:
   config-filename: ${CONFIG_FILENAME:.\config.yml}
   config-backup-filename: ${CONFIG_BACKUP_FILENAME:.\config-backup.yml}
   soap-error-data-file: soapFault.xml
-  cache:
-    response: 256
-  request-service:
-    initial-delay: 10000
-    fixed-delay: 5000
+  mock-service:
+    cache-size: 256

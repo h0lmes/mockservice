@@ -1,6 +1,8 @@
 package com.mockservice.service.quantum;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mockservice.producer.JsonProducerImpl;
+import com.mockservice.producer.ValueProducerImpl;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +21,8 @@ public class JsonQuantumTheoryTest {
     private static final String NOT_A_JSON = "<test>test</test>";
 
     private QuantumTheory theory() {
-        return new JsonQuantumTheory();
+        ValueProducerImpl valueProducer = new ValueProducerImpl();
+        return new JsonQuantumTheory(valueProducer, new JsonProducerImpl(valueProducer));
     }
 
     @Test

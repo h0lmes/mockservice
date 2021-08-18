@@ -13,20 +13,6 @@ public class JsonUtilsTest {
     private static final String ESCAPED_ILLEGAL_ESCAPE_CHAR = "\\a";
     private static final String ESCAPED_MALFORMED_UNICODE_CHAR = "\\u555";
 
-    private static final String JSON_SCHEMA = "{\"type\": \"object\",\n" +
-            "  \"properties\": {\n" +
-            "    \"product_id\": {\"type\": \"integer\"},\n" +
-            "    \"name\": {\"type\": \"string\"}\n" +
-            "  }}";
-    private static final String VALID_JSON = "{\"product_id\": 1, \"name\": \"product name\"}";
-    private static final String INVALID_JSON = "{\"product_id\": \"\", \"name\": false}";
-    private static final String MALFORMED_JSON_SCHEMA = "{\"type\": \"object\",\n" +
-            "  \"properties\": {\n" +
-            "    \"product_id\": {\"type\": \"integer\"},\n" +
-            "    \"name\": {\"type\": \"string\"}\n" +
-            "  }";
-    private static final String MALFORMED_JSON = "{\"product_id\": \"\",";
-
     @Test
     public void escape_ReturnsValidEscapedString() {
         assertEquals(ESCAPED, JsonUtils.escape(UNESCAPED));
@@ -65,25 +51,5 @@ public class JsonUtilsTest {
 
         assertFalse(JsonUtils.isJson(" "));
         assertFalse(JsonUtils.isJson("<test></test>"));
-    }
-
-    @Test
-    public void validate_ValidJson_DoesNotThrow() {
-        assertDoesNotThrow(() -> JsonUtils.validate(VALID_JSON, JSON_SCHEMA));
-    }
-
-    @Test
-    public void validate_InvalidJson_ThrowsException() {
-        assertThrows(JsonValidationException.class, () -> JsonUtils.validate(INVALID_JSON, JSON_SCHEMA));
-    }
-
-    @Test
-    public void validate_MalformedJson_ThrowsException() {
-        assertThrows(JsonValidationException.class, () -> JsonUtils.validate(MALFORMED_JSON, JSON_SCHEMA));
-    }
-
-    @Test
-    public void validate_MalformedJsonSchema_ThrowsException() {
-        assertThrows(JsonValidationException.class, () -> JsonUtils.validate(VALID_JSON, MALFORMED_JSON_SCHEMA));
     }
 }

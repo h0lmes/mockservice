@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.mockservice.domain.Route;
+import com.mockservice.producer.JsonFromSchemaProducer;
 import com.mockservice.util.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -25,8 +27,11 @@ public class OpenApiServiceImplTest {
 
     private static final String PATH = "/v1/test";
 
+    @Mock
+    private JsonFromSchemaProducer jsonFromSchemaProducer;
+
     private OpenApiService createOpenApiService() {
-        return new OpenApiServiceImpl(getJsonMapper());
+        return new OpenApiServiceImpl(getJsonMapper(), jsonFromSchemaProducer);
     }
 
     private ObjectMapper getJsonMapper() {

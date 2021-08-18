@@ -29,7 +29,7 @@ public class MapUtils {
     }
 
     public static Map<String, Object> jsonToMap(String json, ObjectMapper mapper) throws JsonProcessingException {
-        if (json.isEmpty()) {
+        if (json == null || json.isEmpty()) {
             return new HashMap<>();
         }
         return mapper.readValue(json, Map.class);

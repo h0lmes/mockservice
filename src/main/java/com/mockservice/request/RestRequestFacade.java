@@ -32,12 +32,10 @@ public class RestRequestFacade extends AbstractRequestFacade {
 
     private Map<String, String> getBodyAsVariables() {
         String body = getBody();
-        if (body != null && !body.isEmpty()) {
-            try {
-                return MapUtils.flattenMap(MapUtils.jsonToMap(body, jsonMapper));
-            } catch (JsonProcessingException e) {
-                log.warn("Invalid JSON:\n{}", body);
-            }
+        try {
+            return MapUtils.flattenMap(MapUtils.jsonToMap(body, jsonMapper));
+        } catch (JsonProcessingException e) {
+            log.warn("Invalid JSON:\n{}", body);
         }
         return new HashMap<>();
     }

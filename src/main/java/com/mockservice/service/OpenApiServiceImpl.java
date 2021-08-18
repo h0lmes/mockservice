@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
-import com.mockservice.util.JsonFromSchemaGenerator;
+import com.mockservice.producer.JsonFromSchemaProducer;
 import com.mockservice.util.JsonUtils;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -44,9 +44,12 @@ public class OpenApiServiceImpl implements OpenApiService {
     private static final String URL_PARTS_REGEX = "(https?:\\/\\/)?(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\b(\\/.*)";
 
     private final ObjectMapper jsonMapper;
+    private final JsonFromSchemaProducer jsonFromSchemaProducer;
 
-    public OpenApiServiceImpl(@Qualifier("jsonMapper") ObjectMapper jsonMapper) {
+    public OpenApiServiceImpl(@Qualifier("jsonMapper") ObjectMapper jsonMapper,
+                              JsonFromSchemaProducer jsonFromSchemaProducer) {
         this.jsonMapper = jsonMapper;
+        this.jsonFromSchemaProducer = jsonFromSchemaProducer;
     }
 
     @Override
@@ -182,7 +185,7 @@ public class OpenApiServiceImpl implements OpenApiService {
             try {
                 String jsonSchema = schemaFromMediaType(mediaType);
                 Map<String, Object> jsonSchemaMap = jsonMapper.readValue(jsonSchema, Map.class);
-                response = JsonFromSchemaGenerator.jsonFromSchema(jsonSchemaMap);
+                response = jsonFromSchemaProducer.jsonFromSchema(jsonSchemaMap);
             } catch (JsonProcessingException e) {
                 //
             }

@@ -1,23 +1,27 @@
-package com.mockservice.util;
+package com.mockservice.producer;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JsonGeneratorTest {
+public class JsonProducerImplTest {
 
     private static final String NULL = "null";
 
+    private JsonProducer producer() {
+        return new JsonProducerImpl(new ValueProducerImpl());
+    }
+
     @Test
     public void generate_WithoutParameters_GeneratesRandomJson() {
-        String json = JsonGenerator.generate();
+        String json = producer().generate();
 
         assertFalse(json.isEmpty());
     }
 
     @Test
     public void generate_Array_GeneratesArray() {
-        String json = JsonGenerator.generate(JsonGenerator.JsonValueType.ARRAY);
+        String json = producer().generate(JsonValueType.ARRAY);
 
         assertFalse(json.isEmpty());
         assertTrue(json.equals(NULL)
@@ -27,7 +31,7 @@ public class JsonGeneratorTest {
 
     @Test
     public void generate_Object_GeneratesObject() {
-        String json = JsonGenerator.generate(JsonGenerator.JsonValueType.OBJECT);
+        String json = producer().generate(JsonValueType.OBJECT);
 
         assertFalse(json.isEmpty());
         assertTrue(json.equals(NULL)
@@ -37,15 +41,15 @@ public class JsonGeneratorTest {
 
     @Test
     public void generate_Boolean_GeneratesBoolean() {
-        String json = JsonGenerator.generate(JsonGenerator.JsonValueType.BOOLEAN);
+        String json = producer().generate(JsonValueType.BOOLEAN);
 
         assertFalse(json.isEmpty());
-        assertTrue(json.equals("true") || json.equals("false"));
+        assertDoesNotThrow(() -> Boolean.parseBoolean(json));
     }
 
     @Test
     public void generate_Integer_GeneratesInteger() {
-        String json = JsonGenerator.generate(JsonGenerator.JsonValueType.INTEGER);
+        String json = producer().generate(JsonValueType.INTEGER);
 
         assertFalse(json.isEmpty());
         assertDoesNotThrow(() -> Integer.parseInt(json));
@@ -53,7 +57,7 @@ public class JsonGeneratorTest {
 
     @Test
     public void generate_Number_GeneratesNumber() {
-        String json = JsonGenerator.generate(JsonGenerator.JsonValueType.NUMBER);
+        String json = producer().generate(JsonValueType.NUMBER);
 
         assertFalse(json.isEmpty());
         assertDoesNotThrow(() -> Double.parseDouble(json));
@@ -61,14 +65,14 @@ public class JsonGeneratorTest {
 
     @Test
     public void generate_String_GeneratesString() {
-        String json = JsonGenerator.generate(JsonGenerator.JsonValueType.STRING);
+        String json = producer().generate(JsonValueType.STRING);
 
         assertFalse(json.isEmpty());
     }
 
     @Test
     public void generate_Null_GeneratesNull() {
-        String json = JsonGenerator.generate(JsonGenerator.JsonValueType.NULL);
+        String json = producer().generate(JsonValueType.NULL);
 
         assertEquals(NULL, json);
     }

@@ -1,23 +1,28 @@
-package com.mockservice.util;
+package com.mockservice.producer;
+
+import com.mockservice.util.RandomUtils;
 
 import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("unchecked")
-public class JsonFromSchemaGenerator {
+public class JsonFromSchemaProducerImpl implements JsonFromSchemaProducer {
 
     private static final int MIN_NUMBER_OF_ELEMENTS = 1;
     private static final int MAX_NUMBER_OF_ELEMENTS = 3;
 
-    private JsonFromSchemaGenerator() {
-        /* hidden */
+    private final ValueProducer valueProducer;
+
+    public JsonFromSchemaProducerImpl(ValueProducer valueProducer) {
+        this.valueProducer = valueProducer;
     }
 
-    public static String jsonFromSchema(Map<String, Object> map) {
+    @Override
+    public String jsonFromSchema(Map<String, Object> map) {
         return jsonFromSchema(map, 0);
     }
 
-    private static String jsonFromSchema(Map<String, Object> map, int level) {
+    private String jsonFromSchema(Map<String, Object> map, int level) {
         String type = getJsonSchemaType(map);
         switch (type) {
             case "array":
@@ -25,13 +30,13 @@ public class JsonFromSchemaGenerator {
             case "object":
                 return makeObject(map, level);
             case "number":
-                return ValueGenerator.randomNumberString();
+                return valueProducer.randomNumberString();
             case "integer":
-                return ValueGenerator.randomIntegerString();
+                return valueProducer.randomIntegerString();
             case "string":
                 return makeString(map);
             case "boolean":
-                return ValueGenerator.randomBooleanString();
+                return valueProducer.randomBooleanString();
             case "enum":
                 return makeEnum(map);
             default:
@@ -39,19 +44,19 @@ public class JsonFromSchemaGenerator {
         }
     }
 
-    private static String getJsonSchemaType(Map<String, Object> map) {
+    private String getJsonSchemaType(Map<String, Object> map) {
         String type = String.valueOf(map.get("type"));
         if (map.containsKey("enum")) type = "enum";
         return type;
     }
 
-    private static String padWithSpaces(int level) {
+    private String padWithSpaces(int level) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < level; i++) builder.append("    ");
         return builder.toString();
     }
 
-    private static String makeArray(Map<String, Object> map, int level) {
+    private String makeArray(Map<String, Object> map, int level) {
         Map<String, Object> items = (Map) map.get("items");
         int numberOfElements = RandomUtils.rnd(MIN_NUMBER_OF_ELEMENTS, MAX_NUMBER_OF_ELEMENTS);
 
@@ -65,7 +70,7 @@ public class JsonFromSchemaGenerator {
         return sb.append("]").toString();
     }
 
-    private static String makeObject(Map<String, Object> map, int level) {
+    private String makeObject(Map<String, Object> map, int level) {
         StringBuilder sb = new StringBuilder("{");
         String delimiter = "";
 
@@ -86,7 +91,7 @@ public class JsonFromSchemaGenerator {
                 .toString();
     }
 
-    private static String makeObjectKey(String key, Object value, int level) {
+    private String makeObjectKey(String key, Object value, int level) {
         return padWithSpaces(level)
                 + "\""
                 + key
@@ -94,17 +99,17 @@ public class JsonFromSchemaGenerator {
                 + jsonFromSchema((Map) value, level);
     }
 
-    private static String makeString(Map<String, Object> map) {
+    private String makeString(Map<String, Object> map) {
         if (map.containsKey("example")) return makeStringFromExample(map);
         if (map.containsKey("format")) return makeStringFromFormat(map);
-        return "\"" + ValueGenerator.randomString() + "\"";
+        return "\"" + valueProducer.randomString() + "\"";
     }
 
-    private static String makeStringFromExample(Map<String, Object> map) {
+    private String makeStringFromExample(Map<String, Object> map) {
         return "\"" + map.get("example").toString() + "\"";
     }
 
-    private static String makeStringFromFormat(Map<String, Object> map) {
+    private String makeStringFromFormat(Map<String, Object> map) {
         String format = String.valueOf(map.get("format"));
         switch (format) {
             case "date-time":
@@ -128,13 +133,13 @@ public class JsonFromSchemaGenerator {
         }
     }
 
-    private static String makeEnum(Map<String, Object> map) {
+    private String makeEnum(Map<String, Object> map) {
         List<Object> enumList = (List) map.get("enum");
         if (enumList != null) return getRandomItem(enumList);
         return "null";
     }
 
-    private static String getRandomItem(List<Object> enumList) {
+    private String getRandomItem(List<Object> enumList) {
         int index = RandomUtils.rnd(enumList.size());
         Object item = enumList.get(index);
         String quote = item instanceof String ? "\"" : "";
