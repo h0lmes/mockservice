@@ -31,4 +31,32 @@ public class MapUtilsTest {
         Map<String, Object> objectMap = MapUtils.jsonToMap("");
         assertTrue(objectMap.isEmpty());
     }
+
+    @Test
+    public void jsonToMap_NullString_ReturnsEmptyMap() throws IOException {
+        Map<String, Object> objectMap = MapUtils.jsonToMap(null);
+        assertTrue(objectMap.isEmpty());
+    }
+
+    @Test
+    public void xmlToMap_ValidSoapEnvelope_MapAsExpected() throws IOException {
+        String xml = IOUtils.asString("soap_envelope_valid.xml");
+        Map<String, Object> objectMap = MapUtils.xmlToMap(xml);
+        Map<String, String> map = MapUtils.flattenMap(objectMap);
+
+        assertEquals("${enum:TEST1:TEST2}", map.get("NumberToDollarsResponse.NumberToDollarsResult"));
+        assertEquals("${NumberToDollarsRequest.Value:DEFAULT_VALUE}", map.get("NumberToDollarsResponse.Result"));
+    }
+
+    @Test
+    public void xmlToMap_EmptyString_ReturnsEmptyMap() {
+        Map<String, Object> objectMap = MapUtils.xmlToMap("");
+        assertTrue(objectMap.isEmpty());
+    }
+
+    @Test
+    public void xmlToMap_NullString_ReturnsEmptyMap() {
+        Map<String, Object> objectMap = MapUtils.xmlToMap(null);
+        assertTrue(objectMap.isEmpty());
+    }
 }

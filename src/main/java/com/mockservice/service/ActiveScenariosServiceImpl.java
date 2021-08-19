@@ -102,8 +102,8 @@ public class ActiveScenariosServiceImpl implements ActiveScenariosService, Confi
     public void onScenarioUpdated(String oldAlias, String newAlias) {
         if (scenarioIsActive(oldAlias)) {
             deactivateScenarioInternal(oldAlias);
+            findByAlias(newAlias).ifPresent(this::activateScenarioInternal);
         }
-        findByAlias(newAlias).ifPresent(this::activateScenarioInternal);
     }
 
     private boolean scenarioIsActive(String alias) {

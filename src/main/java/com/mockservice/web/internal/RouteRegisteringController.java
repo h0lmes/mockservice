@@ -27,7 +27,7 @@ public interface RouteRegisteringController {
         int regCount = Math.max(0, registeredRoutes.getOrDefault(key, 0));
         registeredRoutes.put(key, regCount + 1);
         if (regCount > 0) {
-            log.info("Register route (skip):    {} ", route);
+            log.info("Register route (skip - exist): {}", route);
             return;
         }
 
@@ -54,13 +54,13 @@ public interface RouteRegisteringController {
         String key = routeRegistrationKey(route);
         int regCount = Math.max(0, registeredRoutes.getOrDefault(key, 0));
         if (regCount <= 0) {
-            log.info("Unregister route (skip - no registration): {} ", route);
+            log.info("Unregister route (skip - not exist): {}", route);
             return;
         }
         regCount--;
         registeredRoutes.put(key, regCount);
         if (regCount > 0) {
-            log.info("Unregister route (skip - more): {} ", route);
+            log.info("Unregister route (skip - more): {}", route);
             return;
         }
 

@@ -83,10 +83,6 @@ public class JsonProducerImpl implements JsonProducer {
         return "[" + content + "]";
     }
 
-    private JsonValueType getRandomJsonValueType(JsonValueType[] valueTypes) {
-        return valueTypes[RandomUtils.rnd(valueTypes.length)];
-    }
-
     private boolean stopAtLevel(int level) {
         int percent = 95 - level * 30;
         return percent < 10 || RandomUtils.withChance(100 - percent);
@@ -94,6 +90,10 @@ public class JsonProducerImpl implements JsonProducer {
 
     private int getRandomNumberOfElements() {
         return RandomUtils.rnd(MAX_NUMBER_OF_ELEMENTS + 1);
+    }
+
+    private JsonValueType getRandomJsonValueType(JsonValueType[] valueTypes) {
+        return valueTypes[RandomUtils.rnd(valueTypes.length)];
     }
 
     private String createArrayElements(JsonValueType elementType,

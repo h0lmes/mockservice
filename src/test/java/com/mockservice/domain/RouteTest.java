@@ -112,6 +112,13 @@ public class RouteTest {
     }
 
     @Test
+    public void hashCode_EqualsForEqualObjects() {
+        Route route1 = new Route().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
+        Route route2 = new Route(route1);
+        assertEquals(route1.hashCode(), route2.hashCode());
+    }
+
+    @Test
     public void compareTo_Equal() {
         Route route1 = new Route()
                 .setGroup(STR_1).setType(RouteType.REST).setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);

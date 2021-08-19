@@ -149,16 +149,20 @@
                 }
             },
             save() {
-                this.editing = false;
                 this.$nuxt.$loading.start();
                 this.saveScenario([{...this.scenario, data: ''}, this.editingScenario])
-                    .then(() => this.$nuxt.$loading.finish());
+                    .then(() => {
+                        this.$nuxt.$loading.finish();
+                        this.editing = false;
+                    });
             },
             saveAsCopy() {
-                this.editing = false;
                 this.$nuxt.$loading.start();
                 this.saveScenario([{}, this.editingScenario])
-                    .then(() => this.$nuxt.$loading.finish());
+                    .then(() => {
+                        this.$nuxt.$loading.finish();
+                        this.editing = false;
+                    });
             },
             add(route) {
                 this.editingScenario.data += '\n' + route.method + ';' + route.path + ';' + route.alt;

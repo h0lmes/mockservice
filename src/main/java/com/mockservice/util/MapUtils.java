@@ -35,8 +35,11 @@ public class MapUtils {
         return mapper.readValue(json, Map.class);
     }
 
-    public static Map<String, Object> xmlToMap(String body) {
-        Map<String, Object> map = U.fromXmlWithoutNamespaces(body);
+    public static Map<String, Object> xmlToMap(String data) {
+        if (data == null || data.isEmpty()) {
+            return new HashMap<>();
+        }
+        Map<String, Object> map = U.fromXmlWithoutNamespaces(data);
         map = getXmlMapKeyAsMap(map, "envelope");
         return getXmlMapKeyAsMap(map, "body");
     }

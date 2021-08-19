@@ -108,7 +108,7 @@ routes:
   type: REST
   alt: ""
   responseCode: 202
-  response: "HTTP/1.1\nExtra: extra-value\n\n{\"name\": \"Johnny 5\"}\n---\nGET localhost:8081/api/robot HTTP/1.1\nMock-Alt: api-robot/R2D2\n\n{}"
+  response: "HTTP/1.1\nExtra: extra-value\n\n{\"name\": \"Johnny 5\"}\n---\nGET http://localhost:8081/api/robot HTTP/1.1\nMock-Alt: api-robot/R2D2\n\n{}"
   requestBodySchema: ""
   disabled: false
 - group: robot

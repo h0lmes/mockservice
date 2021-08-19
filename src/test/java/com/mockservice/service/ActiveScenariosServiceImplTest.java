@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -196,6 +197,17 @@ public class ActiveScenariosServiceImplTest {
         ((ScenariosChangedListener) service).onScenarioUpdated(ALIAS, ALIAS);
 
         assertTrue(service.getActiveScenarios().contains(ALIAS));
+    }
+
+    @Test
+    public void onScenarioUpdated_ExistingInactiveScenario_ScenarioNotActive() {
+        Scenario scenario = new Scenario().setAlias(ALIAS);
+        lenient().when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
+
+        ActiveScenariosService service = createActiveScenariosService();
+        ((ScenariosChangedListener) service).onScenarioUpdated(ALIAS, ALIAS);
+
+        assertFalse(service.getActiveScenarios().contains(ALIAS));
     }
 
     @Test

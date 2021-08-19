@@ -276,14 +276,14 @@ public class MockServiceImplTest {
                 .thenReturn(Optional.of(route))
                 .thenReturn(Optional.of(route400));
 
-        when(request.getBody()).thenReturn(INVALID_JSON);
-        when(request.getRequestMethod()).thenReturn(GET_METHOD);
-        when(request.getEndpoint()).thenReturn(PATH);
-        when(request.getAlt()).thenReturn(Optional.empty());
-
         Settings settings = new Settings();
         settings.setAlt400OnFailedRequestValidation(true);
         when(configRepository.getSettings()).thenReturn(settings);
+
+        when(dataValidator.applicable(any())).thenReturn(true);
+        doAnswer(invocation -> {
+            throw new DataValidationException();
+        }).when(dataValidator).validate(any(), any());
 
         MockService mockService = createMockService();
         assertDoesNotThrow(() -> mockService.mock(request));

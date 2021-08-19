@@ -1,84 +1,74 @@
 ![Coverage](.github/badges/jacoco.svg)
 ![Branches](.github/badges/branches.svg)
-![License](.github/badges/license.svg)
+[![License](.github/badges/license.svg)](/LICENSE)
 
 ### Mock Service
 
 An easy to use service to mock REST and SOAP endpoints.
 Suitable for integration/e2e testing.
-Supports importing routes from OpenAPI3/Swagger2 YAML files.
+Supports importing routes from OpenAPI 3/Swagger 2 YAML files.
 
-> Note: SOAP support is very simplistic and limited.
-It requires you to provide a valid SOAP envelope as a response.
+> Note. SOAP support is very simplistic and limited.
+You are required to provide a valid SOAP envelope as a response
+(see an example later in this README).
 There is NO support for WSDL/XSD.
 
-This project is licensed under the MIT License - see the [LICENSE](/LICENSE) file for details
+This project is licensed under the MIT License -
+see the [LICENSE](/LICENSE) file for details
 
 #
 ### Where to start
 
-Refer to [README](/src/main/webapp/README.md) in `src/main/webapp` for instructions on how to build web application.
+1. Grab latest release binary.
+2. Run it (Java 11 or higher required).
+3. Navigate to `http://your_ip:8081`.
+4. If you find UI unintuitive - contact me 🙃.
+
+Refer to [README](/src/main/webapp/README.md) in `src/main/webapp`
+for instructions on how to build application yourself.
 
 #
 ### Route Response
 
-Response can contain:
-- response in textual format with or without HTTP head
-(JSON or XML body)
-- request in textual format **with** HTTP head
-(JSON or XML body)
+Response field may contain:
+- **response** (JSON or XML body) with or without HTTP head
+- **callback request** (JSON or XML body) strictly **with** HTTP head
 
-> See HTTP request and response formats here
+> See HTTP request and response format at
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages
 
-**RESPONSE**
+Response part MUST go first.
 
-Response MUST go first.
+Optional `---` may go between response and callback request
+for the sake of convenience.
 
-If parser sees `HTTP/1.1` at the beginning of a line
-it knows there are headers (are optional) in response.
-After headers an empty line should go indicating end of HTTP head.
-Then goes body if not blank.
-> Anything that goes before HTTP head start
-(before `HTTP/1.1`, or if head is not there at all)
-is considered a response body as well.
+If callback request is present it would be executed asynchronously
+2 seconds after response is sent back.
 
-**REQUEST** (optional)
+**EXAMPLES**
 
-Optional `---` may go between response and request for the sake of convenience.
-
-Parser looks for `HTTP/1.1` at the end of a line
-to start reading request.
-Then headers may go (optional).
-Then an empty line should go indicating head ended
-(head is mandatory for request part).
-Then goes body if not blank.
-
-If request is present it would be executed asynchronously
-after the response was sent.
-
-**RESPONSE EXAMPLE** (body only)
+Response (body only):
 
     {"id": 1, name": "Johnny 5"}
 
-**RESPONSE EXAMPLE** (with head)
+Response with head:
 
     HTTP/1.1
     Cache-Control: no-cache
         
     {"code": "E000394", "message": "Internal error"}
 
-**RESPONSE EXAMPLE** (head + body + request head + request body)
+Response head + body + callback request head + body:
 
     HTTP/1.1
-    Extra-Header: some data
+    Extra-Header: arbitrary header value
     
     {
         "status": "PROCESSING",
         "id": "${item_id}"
     }
     ---
-    POST /store/cart/item/${item_id} HTTP/1.1
+    POST https://backend.cool-store.com/store/cart/item/${item_id} HTTP/1.1
     Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5...
     
     {
@@ -89,7 +79,7 @@ after the response was sent.
 #
 ### Request Validation
 
-You can define **Request Body Schema** (in JSON format) for any Route
+You can define **Request Body Schema** (in JSON format) for any route
 to have request body validated against the schema.
 
 > See JSON schema homepage
@@ -100,24 +90,24 @@ for imported routes.
 Presence of schema would be indicated at import page.
 
 If validation fails you would receive:
-- a Route marked with Alt = '400' (this is the default option in Settings).
+- a route marked with Alt = '400' (this is the default option in Settings).
 A special variable with error message would be available
 to use in response (see Settings).
-- or Error description (with `type` and `message` fields)
+- or error description (with `type` and `message` fields)
 
 #
 ### Route Alt (Alternative)
 
-Alt allow you to create alternative responses for the same path.
+Alt allow you to create alternative responses
+for the same mapping (method + path).
+By default alt is empty.
 
-To select an Alt:
+To select specific alt:
 - send **Mock-Alt** header in HTTP request
-- enable **Random Alt** in **Settings**
-- or even **Go Quantum** 😄
 - or use **Scenarios**.
 
 Multiple **Mock-Alt** headers supported per HTTP request.
-Each header should define exactly one alternative.
+One header should define exactly one alt.
 The first header whose path equals route path would be used.
 
 Header format:
@@ -129,15 +119,16 @@ Example:
     Mock-Alt: api-v1-item-{id}/invalid_format
 
 In the example above if you call an endpoint `/api/v1/item/{id}`
-then the Route with the `invalid_format` Alt would match.
+then the route with alt = `invalid_format` would match.
+
+> You may also try enabling **Random Alt** in **Settings** as well
+or dare **Go Quantum**. 😄
 
 #
 ### Predefined variables
 
 You can use predefined variables in Response, those would be substituted
-with their values each time an endpoint is fetched.
-
-List of predefined variables:
+with their values each time an endpoint is fetched:
 
 - `${sequence}` - sequence of integers starting from 1
 - `${random_int}` - random integer between 1 and 10_000
@@ -154,7 +145,7 @@ List of predefined variables:
 - `${enum:str1:str2:...}` - a random one of given arguments (may be useful to represent enum values)
 
 #
-### Provided variables
+### Request variables
 
 You can use variables which are provided on a per-request basis.
 
@@ -163,20 +154,24 @@ Format:
     ${var_name}
     ${var_name:default_value}
 
-Variables are collected from the following sources:
+Variables are collected from multiple sources into one Map.
+Order is specified below.
 
-1. Path variables (`/api/v1/account/{id}`).
-2. Request parameters (`/api/v1/account?id=1`).
-3. Authorization JWT token. All fields of the payload JSON
-would be collected as variables (preserving hierarchy).
-4. Request payload (JSON). All fields of the JSON would be collected
-as variables (preserving hierarchy).
-5. Request payload (SOAP). All fields of the SOAP envelope Body tag
-would be collected as variables
-(without namespace, preserving hierarchy).
-6. **Mock-Variable** header (see section below).
+1. **Bearer JWT** in `Authorization` header - all fields of token payload.
+2. **Request payload**.
+For REST routes - all fields of the JSON.
+For SOAP routes - all fields of the SOAP envelope `Body` tag (without namespace).
+Both JSON and SOAP are "flattened" preserving hierarchy. See examples.
+3. **Path variables** (`/api/v1/account/{id}`).
+4. **Request parameters** (`/api/v1/account?id=1`).
+5. **Mock-Variable** header (see section below).
 
-Example of request payload (JSON):
+> For example, variables passed via **Mock-Variable** header have the
+  highest precedence and would replace any variables with the same name
+  from other sources.  
+
+
+Example of JSON payload (body):
 
     {
         "key1": "value 1",
@@ -190,9 +185,10 @@ The following variables would be available:
     ${key1}
     ${key2.key1}
 
-Example of request payload (SOAP):
+Example of SOAP payload (body):
 
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://www.dataaccess.com/webservicesserver/">
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+            xmlns:web="http://www.dataaccess.com/webservicesserver/">
         <soapenv:Header/>
         <soapenv:Body>
             <web:NumberToDollarsRequest>
@@ -209,7 +205,7 @@ The following variables would be available:
 ### Mock-Variable header
 
 Multiple **Mock-Variable** headers supported per HTTP request.
-Each header defines exactly one variable.
+Each header should define exactly one variable.
 
 Header format:
 

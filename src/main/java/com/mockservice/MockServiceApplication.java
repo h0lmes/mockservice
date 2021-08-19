@@ -22,10 +22,7 @@ public class MockServiceApplication {
     }
 
     private static void logStartup(Environment env) {
-        String protocol = "http";
-        if (env.getProperty("server.ssl.key-store") != null) {
-            protocol = "https";
-        }
+        String appName = env.getProperty("spring.application.name");
         String serverPort = env.getProperty("server.port");
         String contextPath = env.getProperty("server.servlet.context-path");
         if (contextPath == null || contextPath.isEmpty()) {
@@ -38,16 +35,8 @@ public class MockServiceApplication {
             // ignore
         }
 
-        String msg = String.format(
-                "%s is running at: %s://localhost:%s%s and %s://%s:%s%s",
-                env.getProperty("spring.application.name"),
-                protocol,
-                serverPort,
-                contextPath,
-                protocol,
-                hostAddress,
-                serverPort,
-                contextPath);
+        String msg = String.format("%s is running at: http://localhost:%s%s and http://%s:%s%s (dev mode UI http://localhost:3000%s)",
+                appName, serverPort, contextPath, hostAddress, serverPort, contextPath, contextPath);
         String line = repeat('-', msg.length());
         log.info("\n{}\n{}\n{}", line, msg, line);
     }

@@ -148,9 +148,11 @@
                 }
             },
             save() {
-                this.editing = false;
                 this.$nuxt.$loading.start();
-                this.saveRoute(this.editingRoute).then(() => this.$nuxt.$loading.finish());
+                this.saveRoute(this.editingRoute).then(() => {
+                    this.$nuxt.$loading.finish();
+                    this.editing = false;
+                });
             },
         }
     }

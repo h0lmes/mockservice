@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
@@ -224,5 +225,14 @@ public class ConfigBasedRestControllerTest {
         controller.onAfterConfigChanged();
 
         verify(requestMappingHandlerMapping, times(1)).registerMapping(any(), any(), any());
+    }
+
+    @Test
+    public void handleException_ReturnsBadRequest() {
+        ConfigBasedRestController controller = controller();
+
+        ResponseEntity<String> responseEntity = controller.handleException(new Throwable());
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
     }
 }

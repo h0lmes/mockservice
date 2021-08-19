@@ -25,6 +25,16 @@ public class JsonDataValidatorTest {
     }
 
     @Test
+    public void applicable_EmptyObject_ReturnsTrue() {
+        assertTrue(validator().applicable("{}"));
+    }
+
+    @Test
+    public void applicable_EmptyArray_ReturnsTrue() {
+        assertTrue(validator().applicable("[]"));
+    }
+
+    @Test
     public void applicable_ValidJson_ReturnsTrue() {
         assertTrue(validator().applicable(VALID_JSON));
     }

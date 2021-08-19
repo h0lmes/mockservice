@@ -57,6 +57,13 @@ public class ScenarioTest {
     }
 
     @Test
+    public void hashCode_EqualsForEqualObjects() {
+        Scenario scenario1 = new Scenario().setGroup(STR_1).setAlias(STR_1);
+        Scenario scenario2 = new Scenario().setGroup(STR_1).setAlias(STR_1);
+        assertEquals(scenario1.hashCode(), scenario2.hashCode());
+    }
+
+    @Test
     public void compareTo_Equal() {
         Scenario scenario1 = new Scenario().setGroup(STR_1).setAlias(STR_1);
         Scenario scenario2 = new Scenario().setGroup(STR_1).setAlias(STR_1);

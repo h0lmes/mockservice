@@ -173,6 +173,6 @@
     }
 
     .nav-dummy {
-        height: 3rem;
+        height: 3.3rem;
     }
 </style>
