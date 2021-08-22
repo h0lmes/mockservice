@@ -164,8 +164,6 @@
                     <excludes>
                         <exclude>**/aop/logging/*</exclude>
                         <exclude>**/config/*</exclude>
-                        <exclude>com/mockservice</exclude>
-                        <exclude>com/mockservice/MockServiceApplication.java</exclude>
                     </excludes>
                 </configuration>
                 <executions>

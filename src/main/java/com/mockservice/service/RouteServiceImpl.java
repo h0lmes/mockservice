@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -49,7 +49,7 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public List<Route> getRoutesAsList() {
-        return Collections.unmodifiableList(configRepository.findAllRoutes());
+        return new ArrayList<>(configRepository.findAllRoutes());
     }
 
     @Override

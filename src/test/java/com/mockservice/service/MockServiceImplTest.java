@@ -51,7 +51,7 @@ public class MockServiceImplTest {
     @Mock
     private RouteService routeService;
     @Mock
-    private ActiveScenariosService activeScenariosService;
+    private ScenarioService scenarioService;
     @Mock
     private ConfigRepository configRepository;
     @Mock
@@ -65,14 +65,14 @@ public class MockServiceImplTest {
 
     private MockService createMockService() {
         return new MockServiceImpl(
-                2, templateEngine, routeService, activeScenariosService, configRepository, requestService,
+                2, templateEngine, routeService, scenarioService, configRepository, requestService,
                 List.of(quantumTheory), List.of(dataValidator));
     }
 
     @BeforeEach
     public void common() {
         lenient().when(templateEngine.getFunctions()).thenReturn(new HashMap<>());
-        lenient().when(activeScenariosService.getAltFor(any(), any())).thenReturn(Optional.empty());
+        lenient().when(scenarioService.getAltFor(any(), any())).thenReturn(Optional.empty());
         lenient().when(configRepository.getSettings()).thenReturn(new Settings());
     }
 
@@ -144,9 +144,7 @@ public class MockServiceImplTest {
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
 
         MockService mockService = createMockService();
-        ResponseEntity<String> responseEntity = mockService.mock(request);
-
-        //assertEquals(INVALID_JSON, responseEntity.getBody());
+        mockService.mock(request);
 
         ArgumentCaptor<Route> argument = ArgumentCaptor.forClass(Route.class);
         verify(routeService).getEnabledRoute(argument.capture());

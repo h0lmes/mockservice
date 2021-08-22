@@ -20,10 +20,10 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     private static final Logger log = LoggerFactory.getLogger(ConfigRepositoryImpl.class);
 
+    private Config config;
     private final String fileConfigPath;
     private final String fileConfigBackupPath;
     private final ObjectMapper yamlMapper;
-    private Config config;
     private final List<ConfigChangedListener> configChangedListeners = new ArrayList<>();
     private final List<RoutesChangedListener> routesChangedListeners = new ArrayList<>();
     private final List<ScenariosChangedListener> scenariosChangedListeners = new ArrayList<>();
@@ -31,7 +31,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     public ConfigRepositoryImpl(@Value("${application.config-filename}") String fileConfigPath,
                                 @Value("${application.config-backup-filename}") String fileConfigBackupPath,
-                                @Qualifier("yamlMapper") ObjectMapper yamlMapper) {
+                                @Qualifier("configYamlMapper") ObjectMapper yamlMapper) {
         this.fileConfigPath = fileConfigPath;
         this.fileConfigBackupPath = fileConfigBackupPath;
         this.yamlMapper = yamlMapper;
@@ -78,6 +78,10 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
     }
 
+    private String saveConfigToString() throws JsonProcessingException {
+        return yamlMapper.writeValueAsString(config);
+    }
+
     private File getConfigFile() {
         return new File(fileConfigPath);
     }
@@ -94,7 +98,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     @Override
     public synchronized String getConfigData() throws JsonProcessingException {
-        return yamlMapper.writeValueAsString(config);
+        return saveConfigToString();
     }
 
     @Override
@@ -176,21 +180,37 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     private boolean putRouteInternal(Route route, boolean overwrite) {
-        Route existingRoute = findRoute(route).orElse(null);
+        Route existingById = findRouteById(route.getId()).orElse(null);
+        Route existingByEquals = findRoute(route).orElse(null);
 
-        if (existingRoute == null) {
+        if (existingById == null) {
+            if (existingByEquals != null) {
+                throw new RouteAlreadyExistsException(route);
+            }
+
             config.getRoutes().add(route);
             notifyRouteCreated(route);
             return true;
-        } else {
-            if (overwrite) {
-                notifyRouteDeleted(existingRoute);
-                existingRoute.assignFrom(route);
-                notifyRouteCreated(route);
-                return true;
+        } else if (overwrite) {
+            if (existingByEquals != null && !existingByEquals.getId().equals(route.getId())) {
+                throw new RouteAlreadyExistsException(route);
             }
+
+            notifyRouteDeleted(existingById);
+            existingById.assignFrom(route);
+            notifyRouteCreated(existingById);
+            return true;
         }
         return false;
+    }
+
+    private Optional<Route> findRouteById(String id) {
+        if (id.isEmpty()) {
+            return Optional.empty();
+        }
+        return findAllRoutes().stream()
+                .filter(r -> id.equals(r.getId()))
+                .findFirst();
     }
 
     @Override
@@ -222,38 +242,51 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     @Override
     public Optional<Scenario> findScenario(Scenario scenario) {
-        return config.getScenarios().stream()
+        return findAllScenarios().stream()
                 .filter(scenario::equals)
                 .findFirst();
     }
 
     @Override
-    public void putScenario(Scenario scenario, Scenario replacement) throws IOException {
-        // do not allow duplicates
-        if (!scenario.equals(replacement)) {
-            Scenario maybeScenario = findScenario(replacement).orElse(null);
-            if (maybeScenario != null) {
-                throw new ScenarioAlreadyExistsException(replacement);
-            }
-        }
-
-        boolean updated = false;
-        Scenario maybeScenario = findScenario(scenario).orElse(null);
-        if (maybeScenario == null) {
-            config.getScenarios().add(replacement);
-        } else {
-            maybeScenario.assignFrom(replacement);
-            updated = true;
-        }
+    public void putScenario(Scenario scenario) throws IOException {
+        putScenarioInternal(scenario, true);
 
         config.getScenarios().sort(Scenario::compareTo);
-
-        if (updated) {
-            notifyScenarioUpdated(scenario.getAlias(), replacement.getAlias());
-        } else {
-            notifyScenarioUpdated("", replacement.getAlias());
-        }
         trySaveConfigToFile();
+    }
+
+    private boolean putScenarioInternal(Scenario scenario, boolean overwrite) {
+        Scenario existingById = findScenarioById(scenario.getId()).orElse(null);
+        Scenario existingByEquals = findScenario(scenario).orElse(null);
+
+        if (existingById == null) {
+            if (existingByEquals != null) {
+                throw new ScenarioAlreadyExistsException(scenario);
+            }
+
+            config.getScenarios().add(scenario);
+            notifyScenarioUpdated("", scenario.getAlias());
+            return true;
+        } else if (overwrite) {
+            if (existingByEquals != null && !existingByEquals.getId().equals(scenario.getId())) {
+                throw new ScenarioAlreadyExistsException(scenario);
+            }
+
+            String old = existingById.getAlias();
+            existingById.assignFrom(scenario);
+            notifyScenarioUpdated(old, existingById.getAlias());
+            return true;
+        }
+        return false;
+    }
+
+    private Optional<Scenario> findScenarioById(String id) {
+        if (id.isEmpty()) {
+            return Optional.empty();
+        }
+        return findAllScenarios().stream()
+                .filter(s -> id.equals(s.getId()))
+                .findFirst();
     }
 
     @Override

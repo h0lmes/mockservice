@@ -4,9 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class Route implements Comparable<Route> {
 
+    public abstract static class MixInIgnoreId {
+        @JsonIgnore
+        abstract String getId();
+    }
+
+    private String id = "";
     private String group = "";
     private String path = "";
     private RequestMethod method = RequestMethod.GET;
@@ -21,13 +28,26 @@ public class Route implements Comparable<Route> {
         // default
     }
 
-    public Route(String method, String path) {
+    public Route(String method, String path, String alt) {
         this.method = RequestMethod.valueOf(method);
         this.path = path;
+        this.alt = alt;
     }
 
     public Route(Route route) {
         assignFrom(route);
+    }
+
+    public String getId() {
+        if (id.isEmpty()) {
+            id = UUID.randomUUID().toString();
+        }
+        return id;
+    }
+
+    public Route setId(String id) {
+        this.id = id == null ? "" : id;
+        return this;
     }
 
     public String getGroup() {

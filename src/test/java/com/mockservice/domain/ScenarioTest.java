@@ -2,6 +2,7 @@ package com.mockservice.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -82,5 +83,40 @@ public class ScenarioTest {
         Scenario scenario1 = new Scenario().setGroup(STR_1).setAlias(STR_1);
         Scenario scenario2 = new Scenario().setGroup(STR_1).setAlias(STR_2);
         assertTrue(0 > scenario1.compareTo(scenario2));
+    }
+
+    private static final String METHOD = "GET";
+    private static final String PATH = "/test";
+    private static final String ALT = "400";
+    private static final String SCENARIO_WITH_ALT = METHOD + ";/test;" + ALT;
+    private static final String SCENARIO_WITH_EMPTY_ALT = METHOD + ";" + PATH;
+    private static final String SCENARIO_WITH_EMPTY_LINES = "\n\n" + METHOD + ";" + PATH + ";\"" + ALT + "\n";
+    private static final String SCENARIO_WITH_ONE_PARAMETER = METHOD;
+
+    @Test
+    public void create_ValidScenario_RouteExists() {
+        Scenario activeScenario = new Scenario().setData(SCENARIO_WITH_ALT).setActive(true);
+        assertTrue(activeScenario.getActive());
+        assertTrue(activeScenario.getAltFor(RequestMethod.valueOf(METHOD), PATH).isPresent());
+    }
+
+    @Test
+    public void create_ValidScenarioWithEmptyAlt_ParsedSuccessfullyAndRouteExists() {
+        Scenario activeScenario = new Scenario().setData(SCENARIO_WITH_EMPTY_ALT).setActive(true);
+        assertTrue(activeScenario.getActive());
+        assertTrue(activeScenario.getAltFor(RequestMethod.valueOf(METHOD), PATH).isPresent());
+    }
+
+    @Test
+    public void create_ValidScenarioWithEmptyLine_RouteExists() {
+        Scenario activeScenario = new Scenario().setData(SCENARIO_WITH_EMPTY_LINES).setActive(true);
+        assertTrue(activeScenario.getActive());
+        assertTrue(activeScenario.getAltFor(RequestMethod.valueOf(METHOD), PATH).isPresent());
+    }
+
+    @Test
+    public void create_InvalidScenarioWithOneParameter_RouteExists() {
+        Scenario scenario = new Scenario().setData(SCENARIO_WITH_ONE_PARAMETER);
+        assertThrows(ScenarioParseException.class, () -> scenario.setActive(true));
     }
 }

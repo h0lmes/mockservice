@@ -15,11 +15,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @RunWith(JUnitPlatform.class)
@@ -67,7 +66,6 @@ public class RouteServiceImplTest {
         RouteService service = createRouteService();
 
         assertTrue(service.getRoutesAsList().contains(route));
-        assertThrows(UnsupportedOperationException.class, () -> service.getRoutesAsList().add(route));
     }
 
     @Test
@@ -80,7 +78,6 @@ public class RouteServiceImplTest {
 
         verify(configRepository, times(1)).putRoute(route);
         assertTrue(routes.contains(route));
-        assertThrows(UnsupportedOperationException.class, () -> routes.add(route));
     }
 
     @Test
@@ -94,7 +91,6 @@ public class RouteServiceImplTest {
 
         verify(configRepository, times(1)).putRoutes(inRoutes, true);
         assertTrue(routes.contains(route));
-        assertThrows(UnsupportedOperationException.class, () -> routes.add(route));
     }
 
     @Test
@@ -104,11 +100,9 @@ public class RouteServiceImplTest {
 
         RouteService service = createRouteService();
         List<Route> inRoutes = List.of(route);
-        List<Route> routes = service.deleteRoutes(inRoutes);
+        service.deleteRoutes(inRoutes);
 
         verify(configRepository, times(1)).deleteRoutes(inRoutes);
-        assertTrue(routes.contains(route));
-        assertThrows(UnsupportedOperationException.class, () -> routes.add(route));
     }
 
     // --- random alt -----------------------------------------------------

@@ -29,7 +29,7 @@ public class JsonDataValidator implements DataValidator {
             nodeSchema = JsonLoader.fromString(schema);
             nodeJson = JsonLoader.fromString(data);
         } catch (IOException e) {
-            throw new DataValidationException(e);
+            throw new DataValidationException("Error loading data or schema.", e);
         }
         final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
         final JsonSchema jsonSchema;

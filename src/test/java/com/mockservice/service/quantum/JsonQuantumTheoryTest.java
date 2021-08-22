@@ -35,7 +35,7 @@ public class JsonQuantumTheoryTest {
         assertFalse(theory().applicable(NOT_A_JSON));
     }
 
-    @RepeatedTest(10)
+    @RepeatedTest(50)
     public void apply_ToValidJson_ReturnsDeserializableJson() {
         String json = theory().apply(VALID_JSON);
         ObjectMapper mapper = new ObjectMapper();

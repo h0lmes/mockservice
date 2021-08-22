@@ -29,7 +29,7 @@ public class MockServiceImpl implements MockService {
 
     private final TemplateEngine templateEngine;
     private final RouteService routeService;
-    private final ActiveScenariosService activeScenariosService;
+    private final ScenarioService scenarioService;
     private final ConfigRepository configRepository;
     private final RequestService requestService;
     private final List<QuantumTheory> quantumTheories;
@@ -39,14 +39,14 @@ public class MockServiceImpl implements MockService {
     public MockServiceImpl(@Value("${application.mock-service.cache-size}") int cacheSize,
                            TemplateEngine templateEngine,
                            RouteService routeService,
-                           ActiveScenariosService activeScenariosService,
+                           ScenarioService scenarioService,
                            ConfigRepository configRepository,
                            RequestService requestService,
                            List<QuantumTheory> quantumTheories,
                            List<DataValidator> dataValidators) {
         this.templateEngine = templateEngine;
         this.routeService = routeService;
-        this.activeScenariosService = activeScenariosService;
+        this.scenarioService = scenarioService;
         this.configRepository = configRepository;
         this.requestService = requestService;
         this.quantumTheories = quantumTheories;
@@ -91,7 +91,7 @@ public class MockServiceImpl implements MockService {
 
     private Route findRouteForRequest(RequestFacade request) {
         String alt = request.getAlt()
-                .or(() -> activeScenariosService.getAltFor(request.getRequestMethod(), request.getEndpoint()))
+                .or(() -> scenarioService.getAltFor(request.getRequestMethod(), request.getEndpoint()))
                 .or(() -> maybeGetRandomAltFor(request.getRequestMethod(), request.getEndpoint()))
                 .orElse("");
 

@@ -1,5 +1,6 @@
 package com.mockservice;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
@@ -16,5 +17,7 @@ class MockServiceApplicationTest {
 
     @Test
     public void test() {
+        MockServiceApplication.main(new String[]{});
+        Assertions.assertNull(null);
     }
 }

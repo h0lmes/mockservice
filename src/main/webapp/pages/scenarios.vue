@@ -12,10 +12,7 @@
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="add">Add scenario</button>
         </div>
 
-        <Scenarios :scenarios="filtered"
-                   :activeScenarios="activeScenarios"
-                   @filter="setFilter($event)"
-        ></Scenarios>
+        <Scenarios :scenarios="filtered" @filter="setFilter($event)"></Scenarios>
 
         <div class="color-secondary mt-4 smaller">(middle-click to edit, Esc on any field to cancel)</div>
         <div class="color-secondary mt-2 smaller">MAP: search all routes by METHOD + PATH, return ALT from the first match or empty if not found.</div>
@@ -40,15 +37,12 @@
             }
         },
         async fetch() {
-            return this.fetchScenarios().then(this.fetchActiveScenarios);
+            return this.fetchScenarios();
         },
         fetchDelay: 0,
         computed: {
             scenarios() {
                 return this.$store.state.scenarios.scenarios
-            },
-            activeScenarios() {
-                return this.$store.state.scenarios.activeScenarios
             },
             filtered() {
                 if (!this.query.trim())
@@ -65,7 +59,6 @@
             ...mapActions({
                 fetchScenarios: 'scenarios/fetch',
                 add: 'scenarios/add',
-                fetchActiveScenarios: 'scenarios/fetchActive',
             }),
             debounce(value) {
                 clearTimeout(this.timeout);

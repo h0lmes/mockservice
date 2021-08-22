@@ -10,12 +10,12 @@
                         <span class="nav-label">Routes</span>
                     </NuxtLink>
                 </li>
-                <li class="nav-item">
-                    <NuxtLink to="/scenarios">
-                        <FontAwesomeIcon icon="receipt" class="nav-icon icon-width-fix"/>
-                        <span class="nav-label">Scenarios</span>
-                    </NuxtLink>
-                </li>
+                <!--<li class="nav-item">-->
+                    <!--<NuxtLink to="/scenarios">-->
+                        <!--<FontAwesomeIcon icon="receipt" class="nav-icon icon-width-fix"/>-->
+                        <!--<span class="nav-label">Scenarios</span>-->
+                    <!--</NuxtLink>-->
+                <!--</li>-->
                 <li class="nav-item">
                     <NuxtLink to="/import">
                         <FontAwesomeIcon icon="file-import" class="nav-icon icon-width-fix"/>
@@ -79,6 +79,7 @@
                 <li class="nav-block">
                     <button type="button" class="btn monospace mt-5" @click="nav">OK</button>
                 </li>
+                <li class="nav-block nav-dummy"></li>
             </ul>
 
             <div class="nav-footer">

@@ -1,12 +1,9 @@
 package com.mockservice.web.webapp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mockservice.domain.Route;
 import com.mockservice.domain.Scenario;
 import com.mockservice.domain.ScenarioAlreadyExistsException;
 import com.mockservice.domain.ScenarioParseException;
-import com.mockservice.service.ActiveScenariosService;
-import com.mockservice.service.RouteService;
 import com.mockservice.service.ScenarioService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,8 +47,6 @@ public class WebApiScenariosControllerTest {
     private MockMvc mvc;
     @MockBean
     private ScenarioService scenarioService;
-    @MockBean
-    private ActiveScenariosService activeScenariosService;
 
     @Autowired
     @Qualifier("jsonMapper")
@@ -86,12 +81,12 @@ public class WebApiScenariosControllerTest {
     @Test
     public void putScenario() throws Exception {
         Scenario scenario = new Scenario().setAlias(ALIAS);
-        when(scenarioService.putScenario(any(), any())).thenReturn(List.of(scenario));
+        when(scenarioService.putScenario(any())).thenReturn(List.of(scenario));
 
         mvc.perform(
                 put(WEB_API_SCENARIOS)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.writeValueAsBytes(List.of(scenario, scenario)))
+                        .content(jsonMapper.writeValueAsBytes(scenario))
         )
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -101,28 +96,14 @@ public class WebApiScenariosControllerTest {
     }
 
     @Test
-    public void putScenario_NotExactly2Scenarios_BadRequest() throws Exception {
-        Scenario scenario = new Scenario().setAlias(ALIAS);
-        when(scenarioService.putScenario(any(), any())).thenReturn(List.of(scenario));
-
-        mvc.perform(
-                put(WEB_API_SCENARIOS)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.writeValueAsBytes(List.of(scenario)))
-        )
-                .andDo(print())
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     public void putScenario_ScenarioAlreadyExistsExceptionThrown_BadRequest() throws Exception {
         Scenario scenario = new Scenario().setAlias(ALIAS);
-        when(scenarioService.putScenario(any(), any())).thenThrow(ScenarioAlreadyExistsException.class);
+        when(scenarioService.putScenario(any())).thenThrow(ScenarioAlreadyExistsException.class);
 
         mvc.perform(
                 put(WEB_API_SCENARIOS)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.writeValueAsBytes(List.of(scenario)))
+                        .content(jsonMapper.writeValueAsBytes(scenario))
         )
                 .andDo(print())
                 .andExpect(status().isBadRequest());
@@ -131,12 +112,12 @@ public class WebApiScenariosControllerTest {
     @Test
     public void putScenario_ScenarioParseExceptionThrown_BadRequest() throws Exception {
         Scenario scenario = new Scenario().setAlias(ALIAS);
-        when(scenarioService.putScenario(any(), any())).thenThrow(ScenarioParseException.class);
+        when(scenarioService.putScenario(any())).thenThrow(ScenarioParseException.class);
 
         mvc.perform(
                 put(WEB_API_SCENARIOS)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.writeValueAsBytes(List.of(scenario)))
+                        .content(jsonMapper.writeValueAsBytes(scenario))
         )
                 .andDo(print())
                 .andExpect(status().isBadRequest());
@@ -160,22 +141,8 @@ public class WebApiScenariosControllerTest {
     }
 
     @Test
-    public void getActiveScenarios() throws Exception {
-        when(activeScenariosService.getActiveScenarios()).thenReturn(Set.of(ALIAS));
-
-        mvc.perform(
-                get(WEB_API_SCENARIOS_ACTIVE).contentType(MediaType.APPLICATION_JSON)
-        )
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))))
-                .andExpect(jsonPath("$[0]", is(ALIAS)));
-    }
-
-    @Test
     public void putActiveScenario() throws Exception {
-        when(activeScenariosService.activateScenario(any())).thenReturn(Set.of(ALIAS));
+        when(scenarioService.activateScenario(any())).thenReturn(Set.of(ALIAS));
 
         mvc.perform(
                 put(WEB_API_SCENARIOS_ACTIVE)
@@ -191,7 +158,7 @@ public class WebApiScenariosControllerTest {
 
     @Test
     public void deleteActiveScenario() throws Exception {
-        when(activeScenariosService.deactivateScenario(any())).thenReturn(Set.of(ALIAS));
+        when(scenarioService.deactivateScenario(any())).thenReturn(Set.of(ALIAS));
 
         mvc.perform(
                 delete(WEB_API_SCENARIOS_ACTIVE)

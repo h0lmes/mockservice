@@ -29,9 +29,9 @@ export default {
         height: '.7rem',
         continuous: true
     },
-    plugins: [{
-        src: '~/plugins/onload.js',
-        ssr: false
-    }],
+    // plugins: [{
+    //     src: '~/plugins/onload.js',
+    //     ssr: false
+    // }],
     ssr: false
 }

@@ -1,13 +1,29 @@
 package com.mockservice.domain;
 
-import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Scenario implements Comparable<Scenario> {
 
+    public abstract static class MixInIgnoreIdActive {
+        @JsonIgnore
+        abstract String getId();
+        @JsonIgnore
+        abstract boolean getActive();
+    }
+
+    private String id = "";
     private String group = "";
     private String alias = "";
     private ScenarioType type = ScenarioType.MAP;
     private String data = "";
+
+    private boolean active = false;
+    private final List<Route> routes = new ArrayList<>();
 
     public Scenario() {
         // default
@@ -15,6 +31,18 @@ public class Scenario implements Comparable<Scenario> {
 
     public Scenario(Scenario scenario) {
         assignFrom(scenario);
+    }
+
+    public String getId() {
+        if (id.isEmpty()) {
+            id = UUID.randomUUID().toString();
+        }
+        return id;
+    }
+
+    public Scenario setId(String id) {
+        this.id = id == null ? "" : id;
+        return this;
     }
 
     public String getGroup() {
@@ -84,5 +112,49 @@ public class Scenario implements Comparable<Scenario> {
         if (c != 0) return c;
         c = this.alias.compareTo(o.getAlias());
         return c;
+    }
+
+    //-----------------------------------------------------------------------------
+    //
+    //   active
+    //
+    //-----------------------------------------------------------------------------
+
+    public boolean getActive() {
+        return active;
+    }
+
+    public Scenario setActive(boolean active) {
+        if (active) {
+            routes.clear();
+            parse();
+        } else {
+            routes.clear();
+        }
+        this.active = active;
+        return this;
+    }
+
+    private void parse() {
+        List<String> list = data.lines().collect(Collectors.toList());
+        for (int i = 0; i < list.size(); i++) {
+            parseLine(routes, list.get(i), i);
+        }
+    }
+
+    private void parseLine(List<Route> routes, String s, int i) {
+        if (!s.trim().isEmpty()) {
+            String[] parts = s.split(";");
+            if (parts.length < 2) {
+                throw new ScenarioParseException("Error parsing scenario line " + i + " [" + s + "]", null);
+            }
+
+            routes.add(new Route(parts[0], parts[1], parts.length > 2 ? parts[2] : ""));
+        }
+    }
+
+    public Optional<String> getAltFor(RequestMethod method, String path) {
+        Predicate<Route> condition = r -> method.equals(r.getMethod()) && path.equals(r.getPath());
+        return type.getStrategy().apply(routes, condition);
     }
 }

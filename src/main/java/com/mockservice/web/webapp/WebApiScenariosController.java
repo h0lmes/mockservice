@@ -3,7 +3,6 @@ package com.mockservice.web.webapp;
 import com.mockservice.domain.Scenario;
 import com.mockservice.domain.ScenarioAlreadyExistsException;
 import com.mockservice.domain.ScenarioParseException;
-import com.mockservice.service.ActiveScenariosService;
 import com.mockservice.service.ScenarioService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +21,9 @@ public class WebApiScenariosController {
     private static final Logger log = LoggerFactory.getLogger(WebApiScenariosController.class);
 
     private final ScenarioService scenarioService;
-    private final ActiveScenariosService activeScenariosService;
 
-    public WebApiScenariosController(ScenarioService scenarioService, ActiveScenariosService activeScenariosService) {
+    public WebApiScenariosController(ScenarioService scenarioService) {
         this.scenarioService = scenarioService;
-        this.activeScenariosService = activeScenariosService;
     }
 
     @GetMapping("scenarios")
@@ -35,11 +32,8 @@ public class WebApiScenariosController {
     }
 
     @PutMapping("scenarios")
-    public List<Scenario> putScenario(@RequestBody List<Scenario> scenarios) throws IOException {
-        if (scenarios.size() != 2) {
-            throw new IllegalArgumentException("There must be exactly 2 scenarios, the old and the new one.");
-        }
-        return scenarioService.putScenario(scenarios.get(0), scenarios.get(1));
+    public List<Scenario> putScenario(@RequestBody Scenario scenario) throws IOException {
+        return scenarioService.putScenario(scenario);
     }
 
     @DeleteMapping("scenarios")
@@ -47,19 +41,14 @@ public class WebApiScenariosController {
         return scenarioService.deleteScenario(scenario);
     }
 
-    @GetMapping("scenarios/active")
-    public Set<String> scenariosActive() {
-        return activeScenariosService.getActiveScenarios();
-    }
-
     @PutMapping("scenarios/active")
     public Set<String> activateScenario(@RequestBody String alias) {
-        return activeScenariosService.activateScenario(alias);
+        return scenarioService.activateScenario(alias);
     }
 
     @DeleteMapping("scenarios/active")
     public Set<String> deactivateScenario(@RequestBody String alias) {
-        return activeScenariosService.deactivateScenario(alias);
+        return scenarioService.deactivateScenario(alias);
     }
 
     @ExceptionHandler({ScenarioAlreadyExistsException.class, ScenarioParseException.class})

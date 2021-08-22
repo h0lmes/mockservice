@@ -82,6 +82,7 @@
 
         <div v-show="editing" class="mock-col w-fixed-auto">
             <button type="button" class="btn btn-sm btn-primary" @click="save">SAVE</button>
+            <button type="button" class="btn btn-sm btn-default" @click="saveAsCopy">SAVE AS COPY</button>
             <button type="button" class="btn btn-sm btn-default" @click="cancel">CANCEL</button>
         </div>
 
@@ -99,7 +100,7 @@
 
     export default {
         name: "Route",
-        components: {AutoSizeTextArea, RouteTester, ToggleSwitch, RouteMethod},
+        components: {AutoSizeTextArea, RouteTester, RouteMethod, ToggleSwitch},
         data() {
             return {
                 editing: false,
@@ -110,6 +111,11 @@
         },
         props: {
             route: {type: Object},
+        },
+        mounted() {
+            if (!!this.route._new) {
+                this.edit();
+            }
         },
         computed: {
             open() {
@@ -128,16 +134,21 @@
                 this.testing = false;
                 this.editingRoute = {...this.route};
                 this.showRequestBodySchema = !!this.editingRoute.requestBodySchema;
-                this.editing = !this.editing;
+                if (!this.editing) this.editing = true;
+                else this.cancel();
                 if (this.editing) this.$nextTick(() => this.$refs.response.focus());
+            },
+            cancel() {
+                if (!!this.route._new) {
+                    this.deleteRoutes([this.route]);
+                } else {
+                    this.editing = false;
+                    this.editingRoute = {};
+                }
             },
             test() {
                 this.cancel();
                 this.testing = !this.testing;
-            },
-            cancel() {
-                this.editing = false;
-                this.editingRoute = {};
             },
             del() {
                 if (!!this.route._new) {
@@ -149,6 +160,14 @@
             },
             save() {
                 this.$nuxt.$loading.start();
+                this.saveRoute(this.editingRoute).then(() => {
+                    this.$nuxt.$loading.finish();
+                    this.editing = false;
+                });
+            },
+            saveAsCopy() {
+                this.$nuxt.$loading.start();
+                this.editingRoute.id = '';
                 this.saveRoute(this.editingRoute).then(() => {
                     this.$nuxt.$loading.finish();
                     this.editing = false;

@@ -4,19 +4,19 @@
          @click.middle.stop.prevent="edit"
          @keydown.esc.exact="cancel">
 
-        <div class="mock-col">
+        <div class="mock-col w2">
             <div class="mock-col-header">GROUP</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.group)">{{ scenario.group }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingScenario.group"/>
         </div>
 
-        <div class="mock-col">
+        <div class="mock-col w3">
             <div class="mock-col-header">ALIAS</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.alias)">{{ scenario.alias }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingScenario.alias"/>
         </div>
 
-        <div class="mock-col">
+        <div class="mock-col w2">
             <div class="mock-col-header">TYPE</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.type)">{{ scenario.type }}</div>
             <select v-show="editing" class="form-control form-control-sm" v-model="editingScenario.type">
@@ -26,7 +26,7 @@
             </select>
         </div>
 
-        <div class="mock-col text-center">
+        <div class="mock-col w3 text-center">
             <div v-show="editing" class="mock-col-header"></div>
             <ToggleSwitch v-model="activeSwitch" @toggle="activeToggled()">Active</ToggleSwitch>
         </div>
@@ -40,8 +40,10 @@
         </div>
 
         <div v-show="editing" class="mock-col w100">
-            <div class="mock-col-header">SCENARIO (ROUTES)</div>
             <AutoSizeTextArea v-model="editingScenario.data"
+                              placeholder="SCENARIO (ROUTES)"
+                              :min-rows="1"
+                              :max-rows="256"
                               ref="data"
             ></AutoSizeTextArea>
         </div>
@@ -80,7 +82,6 @@
         },
         props: {
             scenario: {type: Object},
-            active: {type: Boolean},
         },
         computed: {
             routes() {
@@ -89,13 +90,16 @@
             open() {
                 return this.editing || this.testing;
             },
+            active() {
+                return this.scenario.active;
+            }
         },
         created() {
             this.activeSwitch = this.active;
         },
-        watch: {
-            active() {
-                this.activeSwitch = this.active;
+        mounted() {
+            if (!!this.scenario._new) {
+                this.edit();
             }
         },
         methods: {
@@ -130,12 +134,17 @@
             },
             edit() {
                 this.editingScenario = {...this.scenario};
-                this.editing = !this.editing;
+                if (!this.editing) this.editing = true;
+                else this.cancel();
                 if (this.editing) this.$nextTick(() => this.$refs.data.focus());
             },
             cancel() {
-                this.editing = false;
-                this.editingScenario = {};
+                if (!!this.scenario._new) {
+                    this.deleteScenario(this.scenario);
+                } else {
+                    this.editing = false;
+                    this.editingScenario = {};
+                }
             },
             del() {
                 if (!!this.scenario._new) {
@@ -150,7 +159,7 @@
             },
             save() {
                 this.$nuxt.$loading.start();
-                this.saveScenario([{...this.scenario, data: ''}, this.editingScenario])
+                this.saveScenario(this.editingScenario)
                     .then(() => {
                         this.$nuxt.$loading.finish();
                         this.editing = false;
@@ -158,14 +167,18 @@
             },
             saveAsCopy() {
                 this.$nuxt.$loading.start();
-                this.saveScenario([{}, this.editingScenario])
+                this.editingScenario.id = '';
+                this.saveScenario(this.editingScenario)
                     .then(() => {
                         this.$nuxt.$loading.finish();
                         this.editing = false;
                     });
             },
             add(route) {
-                this.editingScenario.data += '\n' + route.method + ';' + route.path + ';' + route.alt;
+                this.editingScenario.data = this.editingScenario.data || '';
+                if (!!this.editingScenario.data) this.editingScenario.data += '\n';
+                this.editingScenario.data += route.method + ';' + route.path + ';' + route.alt;
+                this.$refs.data.focus();
             },
         }
     }

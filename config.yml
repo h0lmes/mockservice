@@ -148,17 +148,25 @@ routes:
   requestBodySchema: ""
   disabled: false
 scenarios:
-- group: Default
+- group: default
+  alias: New Alias 1
+  type: MAP
+  data: ""
+- group: default
+  alias: New Alias 2
+  type: MAP
+  data: ""
+- group: entity
   alias: entity 400
   type: MAP
   data: GET;/api/v2/entity;400
-- group: Default
+- group: entity
   alias: entity alt 400
   type: CIRCULAR_QUEUE
   data: |-
-    GET;/api/v2/entity;400
     GET;/api/v2/entity
-- group: Default
+    GET;/api/v2/entity;400
+- group: robot
   alias: robot sequence
   type: QUEUE
   data: |-

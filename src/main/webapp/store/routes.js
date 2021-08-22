@@ -75,6 +75,6 @@ export const actions = {
         }
     },
     add({commit}) {
-        commit('add', {group: 'default', type: 'REST', method: 'GET', path: '/', alt: '', disabled: false, _new: true});
+        commit('add', {id: '', group: '', type: 'REST', method: 'GET', path: '/', alt: '', disabled: false, _new: true});
     },
 };

@@ -3,9 +3,7 @@
         <p v-if="scenarios.length === 0">No scenarios</p>
         <div v-for="(scenario, index) in scenarios" :key="scenario.alias">
             <div v-if="groupStart(scenario, index)" class="component-row-group-boundary"></div>
-            <Scenario :scenario="scenario"
-                      :active="activeScenarios.includes(scenario.alias)"
-                      @filter="$emit('filter', $event)"></Scenario>
+            <Scenario :scenario="scenario" @filter="$emit('filter', $event)"></Scenario>
         </div>
     </div>
 </template>
@@ -20,7 +18,6 @@
         components: {Scenario},
         props: {
             scenarios: {type: Array},
-            activeScenarios: {type: Array},
         },
         methods: {
             groupStart(scenario, index) {

@@ -26,7 +26,7 @@ public interface ConfigRepository {
 
     List<Scenario> findAllScenarios();
     Optional<Scenario> findScenario(Scenario scenario);
-    void putScenario(Scenario scenario, Scenario replacement) throws IOException;
+    void putScenario(Scenario scenario) throws IOException;
     void deleteScenario(Scenario scenario) throws IOException;
 
     void registerConfigChangedListener(ConfigChangedListener listener);

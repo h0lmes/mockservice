@@ -1,6 +1,5 @@
 export const state = () => ({
     scenarios: [],
-    activeScenarios: [],
 });
 
 export const mutations = {
@@ -10,8 +9,19 @@ export const mutations = {
     add(state, payload) {
         state.scenarios.unshift(payload);
     },
-    active(state, payload) {
-        state.activeScenarios = payload;
+    activate(state, alias) {
+        for (let i = 0; i < state.scenarios.length; i++) {
+            if (state.scenarios[i].alias === alias) {
+                state.scenarios[i].active = true;
+            }
+        }
+    },
+    deactivate(state, alias) {
+        for (let i = 0; i < state.scenarios.length; i++) {
+            if (state.scenarios[i].alias === alias) {
+                state.scenarios[i].active = false;
+            }
+        }
     },
 };
 
@@ -29,13 +39,13 @@ export const actions = {
             commit('setLastError', err, {root: true});
         }
     },
-    async save({commit, rootState}, scenarios) {
+    async save({commit, rootState}, scenario) {
         try {
             const url = rootState.BASE_URL + '/web-api/scenarios';
             const params = {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(scenarios)
+                body: JSON.stringify(scenario)
             };
             const res = await fetch(url, params);
             await handleError(res);
@@ -62,18 +72,7 @@ export const actions = {
         }
     },
     add({commit}) {
-        commit('add', {group: 'Default', alias: 'New Alias', type: 'MAP', _new: true});
-    },
-    async fetchActive({commit, rootState}) {
-        try {
-            const url = rootState.BASE_URL + '/web-api/scenarios/active';
-            const res = await fetch(url);
-            await handleError(res);
-            const data = await res.json();
-            commit('active', data);
-        } catch (err) {
-            commit('setLastError', err, {root: true});
-        }
+        commit('add', {id: '', group: '', alias: 'New Alias', type: 'MAP', data: '', _new: true});
     },
     async activate({commit, rootState}, alias) {
         try {
@@ -82,7 +81,9 @@ export const actions = {
             const res = await fetch(url, params);
             await handleError(res);
             const data = await res.json();
-            commit('active', data);
+            if (data.includes(alias)) {
+                commit('activate', alias);
+            }
         } catch (err) {
             commit('setLastError', err, {root: true});
         }
@@ -94,7 +95,9 @@ export const actions = {
             const res = await fetch(url, params);
             await handleError(res);
             const data = await res.json();
-            commit('active', data);
+            if (!data.includes(alias)) {
+                commit('deactivate', alias);
+            }
         } catch (err) {
             commit('setLastError', err, {root: true});
         }
