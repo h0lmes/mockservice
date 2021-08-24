@@ -29,19 +29,19 @@ public class WebApiRoutesController {
         return routeService.getRoutesAsList();
     }
 
-    @ApiOperation(value = "Creates a route or updates it if exists", tags = "routes")
+    @ApiOperation(value = "Creates new route or updates existing", tags = "routes")
     @PatchMapping
     public List<Route> patchRoute(@RequestBody Route route) throws IOException {
         return routeService.putRoute(route);
     }
 
-    @ApiOperation(value = "Creates listed routes and updates already existing", tags = "routes")
+    @ApiOperation(value = "Creates routes and updates already existing", tags = "routes")
     @PutMapping
     public List<Route> putRoutes(@RequestBody List<Route> routes) throws IOException {
         return routeService.putRoutes(routes, true);
     }
 
-    @ApiOperation(value = "Creates listed routes skipping already existing", tags = "routes")
+    @ApiOperation(value = "Creates routes skipping already existing", tags = "routes")
     @PostMapping
     public List<Route> postRoutes(@RequestBody List<Route> routes) throws IOException {
         return routeService.putRoutes(routes, false);

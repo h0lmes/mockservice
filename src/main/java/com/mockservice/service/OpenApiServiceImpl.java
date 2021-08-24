@@ -54,39 +54,36 @@ public class OpenApiServiceImpl implements OpenApiService {
 
     @Override
     public List<Route> routesFromYaml(String yaml) {
-        List<Route> routes = new ArrayList<>();
-
         if (yaml == null || yaml.trim().isEmpty()) {
-            return routes;
+            return new ArrayList<>();
         }
 
         ParseOptions parseOptions = new ParseOptions();
         parseOptions.setResolve(true);
         parseOptions.setResolveFully(true);
         SwaggerParseResult result = new OpenAPIParser().readContents(yaml, null, parseOptions);
-        //
         if (result.getMessages() != null) {
             result.getMessages().forEach(log::warn);
         }
         OpenAPI openApi = result.getOpenAPI();
         if (openApi == null) {
-            return routes;
+            return new ArrayList<>();
         }
 
-        routesFromOpenApi(routes, openApi);
+        List<Route> routes = routesFromOpenApi(openApi);
         Set<String> paths = serversFromOpenApi(openApi);
-        if (paths.isEmpty()) {
-            return routes;
-        }
         return multiply(routes, paths);
     }
 
     private List<Route> multiply(List<Route> routes, Set<String> paths) {
+        if (paths.isEmpty()) {
+            return routes;
+        }
+
         List<Route> result = new ArrayList<>();
         for (String basePath : paths) {
             for (Route route : routes) {
-                String path = basePath + route.getPath();
-                result.add(new Route(route).setPath(path));
+                result.add(new Route(route).setPath(basePath + route.getPath()));
             }
         }
         return result;
@@ -107,13 +104,15 @@ public class OpenApiServiceImpl implements OpenApiService {
         return paths;
     }
 
-    private void routesFromOpenApi(List<Route> routes, OpenAPI openApi) {
+    private List<Route> routesFromOpenApi(OpenAPI openApi) {
+        List<Route> routes = new ArrayList<>();
         Paths paths = openApi.getPaths();
         Objects.requireNonNull(paths, "routesFromOpenApi(): paths MUST NOT be null!");
 
         for (Map.Entry<String, PathItem> e : paths.entrySet()) {
             routesFromPath(routes, e.getKey(), e.getValue());
         }
+        return routes;
     }
 
     private void routesFromPath(List<Route> routes, String path, PathItem pathItem) {

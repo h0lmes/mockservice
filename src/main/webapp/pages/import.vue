@@ -3,15 +3,15 @@
         <input type="file" ref="file" id="file_file" @change="openFile()"/>
         <div class="component-toolbar mb-4">
             <div>{{ fileName }}</div>
-            <button type="button" class="btn btn-primary" @click="selectFile()">Import OpenAPI file</button>
-            <button type="button" class="btn btn-default" @click="addAll()">Add all Routes</button>
+            <button type="button" class="btn btn-primary" @click="selectFile()">Select Open API file</button>
+            <button type="button" class="btn btn-default" @click="addAll()">Add all routes</button>
             <ToggleSwitch v-model="overwrite">Overwrite existing routes</ToggleSwitch>
         </div>
         <ImportedRoutes :imported-routes="importedRoutes"
                         :existing-routes="existingRoutes"
                         @add="add($event)"
         ></ImportedRoutes>
-        <div class="color-secondary mt-4 smaller">(click Route to expand)</div>
+        <div class="color-secondary mt-4 smaller">(click route to expand)</div>
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
 </template>
@@ -28,7 +28,7 @@
             return {
                 value: '',
                 overwrite: false,
-                fileName: 'Select a file'
+                fileName: ''
             }
         },
         computed: {
@@ -66,7 +66,7 @@
                 }
             },
             selectFile() {
-                this.fileName = 'Select a file';
+                this.fileName = '';
                 this.$refs.file.value = null;
                 this.$refs.file.click()
             },

@@ -5,6 +5,10 @@ export const state = () => ({
 export const mutations = {
     store(state, payload) {
         state.routes = payload;
+
+        state.routes.forEach(function(part, index, arr) {
+            arr[index].id = '';
+        });
     },
 };
 

@@ -45,9 +45,9 @@
 
                     c = compare(a.type, b.type);
                     if (c !== 0) return c;
-                    c = compare(a.method, b.method);
-                    if (c !== 0) return c;
                     c = compare(a.path, b.path);
+                    if (c !== 0) return c;
+                    c = compare(a.method, b.method);
                     if (c !== 0) return c;
                     return compare(a.alt, b.alt);
                 });

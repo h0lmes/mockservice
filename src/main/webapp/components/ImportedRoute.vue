@@ -24,11 +24,10 @@
             <div class="mock-col-value link" :class="{'color-accent-one' : more}">{{ moreLabel }}</div>
         </div>
         <div class="mock-col w100" v-show="open" @click.stop>
-            <AutoSizeTextArea v-model="route.response"></AutoSizeTextArea>
+            <AutoSizeTextArea v-model="route.response" placeholder="NO RESPONSE" :min-rows="1"></AutoSizeTextArea>
         </div>
-        <div class="mock-col w100" v-show="open && !!route.requestBodySchema" @click.stop>
-            <div class="mock-col-header">REQUEST BODY SCHEMA</div>
-            <AutoSizeTextArea v-model="route.requestBodySchema"></AutoSizeTextArea>
+        <div class="mock-col w100" v-show="open" @click.stop>
+            <AutoSizeTextArea v-model="route.requestBodySchema" placeholder="NO REQUEST BODY SCHEMA" :min-rows="1"></AutoSizeTextArea>
         </div>
     </div>
 </template>
