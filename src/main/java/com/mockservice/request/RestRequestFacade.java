@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class RestRequestFacade extends AbstractRequestFacade {
 
@@ -20,8 +21,9 @@ public class RestRequestFacade extends AbstractRequestFacade {
     }
 
     @Override
-    public Map<String, String> getVariables() {
+    public Map<String, String> getVariables(Optional<Map<String, String>> baseVariables) {
         Map<String, String> vars = new HashMap<>();
+        baseVariables.ifPresent(vars::putAll);
         vars.putAll(getAuthorizationAsVariables());
         vars.putAll(getBodyAsVariables());
         vars.putAll(getPathVariables());

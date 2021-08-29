@@ -35,16 +35,16 @@ public class WebApiRoutesController {
         return routeService.putRoute(route);
     }
 
-    @ApiOperation(value = "Creates routes and updates already existing", tags = "routes")
-    @PutMapping
-    public List<Route> putRoutes(@RequestBody List<Route> routes) throws IOException {
-        return routeService.putRoutes(routes, true);
-    }
-
     @ApiOperation(value = "Creates routes skipping already existing", tags = "routes")
     @PostMapping
     public List<Route> postRoutes(@RequestBody List<Route> routes) throws IOException {
         return routeService.putRoutes(routes, false);
+    }
+
+    @ApiOperation(value = "Creates routes and updates already existing", tags = "routes")
+    @PutMapping
+    public List<Route> putRoutes(@RequestBody List<Route> routes) throws IOException {
+        return routeService.putRoutes(routes, true);
     }
 
     @ApiOperation(value = "Deletes listed routes", tags = "routes")

@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
-import com.mockservice.repository.ConfigChangedListener;
+import com.mockservice.repository.ConfigObserver;
 import com.mockservice.repository.ConfigRepository;
-import com.mockservice.repository.RoutesChangedListener;
+import com.mockservice.repository.RouteObserver;
 import com.mockservice.request.RestRequestFacade;
 import com.mockservice.service.MockService;
 import com.mockservice.web.webapp.ErrorInfo;
@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 
 @RestController
-public class ConfigBasedRestController implements RouteRegisteringController, ConfigChangedListener, RoutesChangedListener {
+public class ConfigBasedRestController implements RouteRegisteringController, ConfigObserver, RouteObserver {
 
     private static final Logger log = LoggerFactory.getLogger(ConfigBasedRestController.class);
 
@@ -75,8 +75,8 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
 
     private void register() {
         configRepository.findAllRoutes().forEach(this::registerRoute);
-        configRepository.registerRoutesChangedListener(this);
-        configRepository.registerConfigChangedListener(this);
+        configRepository.registerRouteObserver(this);
+        configRepository.registerConfigObserver(this);
     }
 
     @Override

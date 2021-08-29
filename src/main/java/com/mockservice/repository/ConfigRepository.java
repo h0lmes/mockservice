@@ -29,7 +29,7 @@ public interface ConfigRepository {
     void putScenario(Scenario scenario) throws IOException;
     void deleteScenario(Scenario scenario) throws IOException;
 
-    void registerConfigChangedListener(ConfigChangedListener listener);
-    void registerRoutesChangedListener(RoutesChangedListener listener);
-    void registerScenariosChangedListener(ScenariosChangedListener listener);
+    void registerConfigObserver(ConfigObserver listener);
+    void registerRouteObserver(RouteObserver listener);
+    void registerScenarioObserver(ScenarioObserver listener);
 }

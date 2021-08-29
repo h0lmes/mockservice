@@ -1,9 +1,9 @@
 package com.mockservice.service;
 
 import com.mockservice.domain.Scenario;
-import com.mockservice.repository.ConfigChangedListener;
+import com.mockservice.repository.ConfigObserver;
 import com.mockservice.repository.ConfigRepository;
-import com.mockservice.repository.ScenariosChangedListener;
+import com.mockservice.repository.ScenarioObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
-public class ScenarioServiceImpl implements ScenarioService, ConfigChangedListener, ScenariosChangedListener {
+public class ScenarioServiceImpl implements ScenarioService, ConfigObserver, ScenarioObserver {
 
     private static final Logger log = LoggerFactory.getLogger(ScenarioServiceImpl.class);
 
@@ -24,8 +24,8 @@ public class ScenarioServiceImpl implements ScenarioService, ConfigChangedListen
 
     public ScenarioServiceImpl(ConfigRepository configRepository) {
         this.configRepository = configRepository;
-        configRepository.registerConfigChangedListener(this);
-        configRepository.registerScenariosChangedListener(this);
+        configRepository.registerConfigObserver(this);
+        configRepository.registerScenarioObserver(this);
     }
 
     @Override

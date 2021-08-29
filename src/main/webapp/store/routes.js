@@ -41,14 +41,14 @@ export const actions = {
             commit('setLastError', err, {root: true});
         }
     },
-    async saveAll({commit, rootState}, routes, overwrite) {
+    async saveAll({commit, rootState}, payload) {
         try {
             const url = rootState.BASE_URL + '/web-api/routes';
-            const method = overwrite ? 'PUT' : 'POST';
+            const method = payload.overwrite ? 'PUT' : 'POST';
             const params = {
                 method,
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(routes)
+                body: JSON.stringify(payload.routes)
             };
             const res = await fetch(url, params);
             await handleError(res);

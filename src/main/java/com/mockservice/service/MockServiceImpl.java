@@ -20,7 +20,9 @@ import org.springframework.util.ConcurrentLruCache;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class MockServiceImpl implements MockService {
@@ -35,6 +37,7 @@ public class MockServiceImpl implements MockService {
     private final List<QuantumTheory> quantumTheories;
     private final List<DataValidator> dataValidators;
     private final ConcurrentLruCache<Route, MockResponse> responseCache;
+    private final Map<String, String> globalVariables = new ConcurrentHashMap<>();
 
     public MockServiceImpl(@Value("${application.mock-service.cache-size}") int cacheSize,
                            TemplateEngine templateEngine,
@@ -78,7 +81,7 @@ public class MockServiceImpl implements MockService {
 
         MockResponse response = responseCache.get(route);
 
-        response.setVariables(request.getVariables(), templateEngine.getFunctions());
+        response.setVariables(request.getVariables(Optional.of(globalVariables)), templateEngine.getFunctions());
         validationResult.ifError(response::addVariables);
 
         ResponseEntity<String> responseEntity = responseEntityFromResponse(response);
@@ -87,6 +90,23 @@ public class MockServiceImpl implements MockService {
         response.ifHasRequest(requestService::schedule);
 
         return responseEntity;
+    }
+
+    @Override
+    public Map<String, String> getGlobalVariables() {
+        return globalVariables;
+    }
+
+    @Override
+    public Map<String, String> putGlobalVariables(Optional<Map<String, String>> variables) {
+        variables.ifPresent(globalVariables::putAll);
+        return getGlobalVariables();
+    }
+
+    @Override
+    public Map<String, String> removeGlobalVariables(Optional<List<String>> keys) {
+        keys.ifPresent(list -> list.forEach(globalVariables::remove));
+        return getGlobalVariables();
     }
 
     private Route findRouteForRequest(RequestFacade request) {

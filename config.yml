@@ -66,42 +66,6 @@ routes:
   response: "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:web=\"http://www.dataaccess.com/webservicesserver/\">\n  <soapenv:Header/>\n  <soapenv:Body>\n    <web:NumberToDollarsResponse>\n      <web:NumberToDollarsResult>${enum:TEST1:TEST2}</web:NumberToDollarsResult>\n      <web:Result>${NumberToDollarsRequest.Value:DEFAULT_VALUE}</web:Result>\n    </web:NumberToDollarsResponse>\n  </soapenv:Body>\n</soapenv:Envelope>"
   requestBodySchema: ""
   disabled: false
-- group: pet
-  path: /v2/pet/findByStatus
-  method: GET
-  type: REST
-  alt: ""
-  responseCode: 200
-  response: "[{\n        \"id\": 1,\n        \"category\": {\n            \"id\": 9119923556,\n            \"name\": \"einsteins less\"\n        },\n        \"name\": \"doggie\",\n        \"photoUrls\": [\"gs SYTVMjB\", \"the space-time bits\"],\n        \"tags\": [{\n                \"id\": 1,\n                \"name\": \"in obvious\"\n            }],\n        \"status\": \"pending\"\n    }]"
-  requestBodySchema: ""
-  disabled: false
-- group: pet
-  path: /v2/pet/findByStatus
-  method: GET
-  type: REST
-  alt: 400
-  responseCode: 400
-  response: ""
-  requestBodySchema: ""
-  disabled: false
-- group: pet
-  path: /v2/pet/findByTags
-  method: GET
-  type: REST
-  alt: ""
-  responseCode: 200
-  response: "[{\n        \"id\": 8420797081,\n        \"category\": {\n            \"id\": 2049,\n            \"name\": \"separate\"\n        },\n        \"name\": \"doggie\",\n        \"photoUrls\": [\"practitioners\", \"researchers the\"],\n        \"tags\": [{\n                \"id\": 6755,\n                \"name\": \"background implies has\"\n            }, {\n                \"id\": 85450312,\n                \"name\": \"how\"\n            }],\n        \"status\": \"pending\"\n    }]"
-  requestBodySchema: ""
-  disabled: false
-- group: pet
-  path: /v2/pet/findByTags
-  method: GET
-  type: REST
-  alt: 400
-  responseCode: 400
-  response: ""
-  requestBodySchema: ""
-  disabled: false
 - group: robot
   path: /api/robot
   method: GET

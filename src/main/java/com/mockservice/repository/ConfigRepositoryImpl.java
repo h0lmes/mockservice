@@ -12,10 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ConfigRepositoryImpl implements ConfigRepository {
@@ -26,17 +23,17 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     private final String fileConfigPath;
     private final String fileConfigBackupPath;
     private final ObjectMapper yamlMapper;
-    private final List<ConfigChangedListener> configChangedListeners = new ArrayList<>();
-    private final List<RoutesChangedListener> routesChangedListeners = new ArrayList<>();
-    private final List<ScenariosChangedListener> scenariosChangedListeners = new ArrayList<>();
+    private final List<ConfigObserver> configObservers = new ArrayList<>();
+    private final List<RouteObserver> routeObservers = new ArrayList<>();
+    private final List<ScenarioObserver> scenarioObservers = new ArrayList<>();
 
 
     public ConfigRepositoryImpl(@Value("${application.config-filename}") String fileConfigPath,
                                 @Value("${application.config-backup-filename}") String fileConfigBackupPath,
-                                @Qualifier("configYamlMapper") ObjectMapper yamlMapper) {
+                                @Qualifier("yamlMapper") ObjectMapper yamlMapper) {
         this.fileConfigPath = fileConfigPath;
         this.fileConfigBackupPath = fileConfigBackupPath;
-        this.yamlMapper = yamlMapper;
+        this.yamlMapper = yamlMapper.copy().setMixIns(getMixIns());
 
         try {
             readConfigFromFile();
@@ -44,6 +41,13 @@ public class ConfigRepositoryImpl implements ConfigRepository {
             log.warn("Could not read config file {}. Using empty config.", this.fileConfigPath);
             config = new Config();
         }
+    }
+
+    private Map<Class<?>, Class<?>> getMixIns() {
+        Map<Class<?>, Class<?>> mixins = new HashMap<>();
+        mixins.put(Route.class, Route.MixInIgnoreId.class);
+        mixins.put(Scenario.class, Scenario.MixInIgnoreIdActive.class);
+        return mixins;
     }
 
     private void readConfigFromFile() throws IOException {
@@ -342,46 +346,46 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     //----------------------------------------------------------------------
     //
-    //   Listeners
+    //   Observers
     //
     //----------------------------------------------------------------------
 
+    @Override
+    public void registerConfigObserver(ConfigObserver observer) {
+        configObservers.add(observer);
+    }
+
     private void notifyBeforeConfigChanged() {
-        configChangedListeners.forEach(ConfigChangedListener::onBeforeConfigChanged);
+        configObservers.forEach(ConfigObserver::onBeforeConfigChanged);
     }
 
     private void notifyAfterConfigChanged() {
-        configChangedListeners.forEach(ConfigChangedListener::onAfterConfigChanged);
+        configObservers.forEach(ConfigObserver::onAfterConfigChanged);
     }
 
     @Override
-    public void registerConfigChangedListener(ConfigChangedListener listener) {
-        configChangedListeners.add(listener);
+    public void registerRouteObserver(RouteObserver observer) {
+        routeObservers.add(observer);
     }
 
     private void notifyRouteCreated(Route route) {
-        routesChangedListeners.forEach(l -> l.onRouteCreated(route));
+        routeObservers.forEach(o -> o.onRouteCreated(route));
     }
 
     private void notifyRouteDeleted(Route route) {
-        routesChangedListeners.forEach(l -> l.onRouteDeleted(route));
+        routeObservers.forEach(o -> o.onRouteDeleted(route));
     }
 
     @Override
-    public void registerRoutesChangedListener(RoutesChangedListener listener) {
-        routesChangedListeners.add(listener);
+    public void registerScenarioObserver(ScenarioObserver observer) {
+        scenarioObservers.add(observer);
     }
 
     private void notifyScenarioUpdated(String oldAlias, String newAlias) {
-        scenariosChangedListeners.forEach(l -> l.onScenarioUpdated(oldAlias, newAlias));
+        scenarioObservers.forEach(o -> o.onScenarioUpdated(oldAlias, newAlias));
     }
 
     private void notifyScenarioDeleted(String alias) {
-        scenariosChangedListeners.forEach(l -> l.onScenarioDeleted(alias));
-    }
-
-    @Override
-    public void registerScenariosChangedListener(ScenariosChangedListener listener) {
-        scenariosChangedListeners.add(listener);
+        scenarioObservers.forEach(o -> o.onScenarioDeleted(alias));
     }
 }

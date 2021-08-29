@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class SoapRequestFacade extends AbstractRequestFacade {
 
@@ -18,8 +19,9 @@ public class SoapRequestFacade extends AbstractRequestFacade {
     }
 
     @Override
-    public Map<String, String> getVariables() {
+    public Map<String, String> getVariables(Optional<Map<String, String>> baseVariables) {
         Map<String, String> vars = new HashMap<>();
+        baseVariables.ifPresent(vars::putAll);
         vars.putAll(getBodyAsVariables());
         vars.putAll(getHeaderVariables());
         return vars;

@@ -143,10 +143,10 @@ public class RestRequestFacadeTest {
 
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
 
-        assertEquals("42", facade.getVariables().get("id"));
-        assertEquals("42 42", facade.getVariables().get("headerVariable"));
-        assertEquals("42", facade.getVariables().get("pathVariable"));
-        assertEquals("42 42 42", facade.getVariables().get("parameterVariable"));
-        assertEquals(JWT_SUB, facade.getVariables().get("sub"));
+        assertEquals("42", facade.getVariables(Optional.empty()).get("id"));
+        assertEquals("42 42", facade.getVariables(Optional.empty()).get("headerVariable"));
+        assertEquals("42", facade.getVariables(Optional.empty()).get("pathVariable"));
+        assertEquals("42 42 42", facade.getVariables(Optional.empty()).get("parameterVariable"));
+        assertEquals(JWT_SUB, facade.getVariables(Optional.empty()).get("sub"));
     }
 }

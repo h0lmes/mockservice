@@ -2,7 +2,7 @@
     <div class="monospace">
         <input type="file" ref="file" id="file_file" @change="openFile()"/>
         <div class="component-toolbar mb-4">
-            <div>{{ fileName }}</div>
+            <div v-show="fileName">{{ fileName }}</div>
             <button type="button" class="btn btn-primary" @click="selectFile()">Select Open API file</button>
             <button type="button" class="btn btn-default" @click="addAll()">Add all routes</button>
             <ToggleSwitch v-model="overwrite">Overwrite existing routes</ToggleSwitch>
@@ -50,18 +50,23 @@
             ...mapActions({
                 import: 'import/import',
                 fetchRoutes: 'routes/fetch',
-                saveRoute: 'routes/save',
                 saveAllRoutes: 'routes/saveAll',
             }),
             add(route) {
                 this.$nuxt.$loading.start();
-                this.saveRoute(route)
+                this.saveAllRoutes({
+                    routes: [route],
+                    overwrite: true
+                })
                     .then(() => this.$nuxt.$loading.finish());
             },
             addAll() {
                 if (this.importedRoutes) {
                     this.$nuxt.$loading.start();
-                    this.saveAllRoutes(this.importedRoutes, this.overwrite)
+                    this.saveAllRoutes({
+                        routes: this.importedRoutes,
+                        overwrite: this.overwrite
+                    })
                         .then(() => this.$nuxt.$loading.finish());
                 }
             },

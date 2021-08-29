@@ -1,6 +1,6 @@
 package com.mockservice.repository;
 
-public interface ConfigChangedListener {
+public interface ConfigObserver {
     void onBeforeConfigChanged();
     void onAfterConfigChanged();
 }

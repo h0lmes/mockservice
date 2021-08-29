@@ -38,11 +38,11 @@ public class ConfigRepositoryImplTest {
     private static final String NEW_ALIAS = "new";
 
     @Mock
-    ConfigChangedListener configChangedListener;
+    ConfigObserver configObserver;
     @Mock
-    RoutesChangedListener routesChangedListener;
+    RouteObserver routeObserver;
     @Mock
-    ScenariosChangedListener scenariosChangedListener;
+    ScenarioObserver scenarioObserver;
 
     @TempDir
     File folder; // must not be private
@@ -53,9 +53,9 @@ public class ConfigRepositoryImplTest {
                 getTempFile("backup.yml"),
                 getYamlMapper());
 
-        configRepository.registerConfigChangedListener(configChangedListener);
-        configRepository.registerRoutesChangedListener(routesChangedListener);
-        configRepository.registerScenariosChangedListener(scenariosChangedListener);
+        configRepository.registerConfigObserver(configObserver);
+        configRepository.registerRouteObserver(routeObserver);
+        configRepository.registerScenarioObserver(scenarioObserver);
 
         return configRepository;
     }
@@ -90,8 +90,8 @@ public class ConfigRepositoryImplTest {
         String configData = configRepository.getConfigData();
         configRepository.writeConfigData(configData);
 
-        verify(configChangedListener, times(1)).onBeforeConfigChanged();
-        verify(configChangedListener, times(1)).onAfterConfigChanged();
+        verify(configObserver, times(1)).onBeforeConfigChanged();
+        verify(configObserver, times(1)).onAfterConfigChanged();
     }
 
     @Test
@@ -116,8 +116,8 @@ public class ConfigRepositoryImplTest {
         configRepository.backup();
         configRepository.restore();
 
-        verify(configChangedListener, times(1)).onBeforeConfigChanged();
-        verify(configChangedListener, times(1)).onAfterConfigChanged();
+        verify(configObserver, times(1)).onBeforeConfigChanged();
+        verify(configObserver, times(1)).onAfterConfigChanged();
     }
 
     //----------------------------------------------------------------------
@@ -170,7 +170,7 @@ public class ConfigRepositoryImplTest {
         Route route = new Route().setPath(ROUTE_PATH);
         configRepository.putRoute(route);
 
-        verify(routesChangedListener, times(1)).onRouteCreated(any());
+        verify(routeObserver, times(1)).onRouteCreated(any());
     }
 
     @Test
@@ -196,12 +196,12 @@ public class ConfigRepositoryImplTest {
         Route route2 = new Route().setId("1").setPath(ROUTE_PATH).setResponse(NEW_RESPONSE);
 
         configRepository.putRoute(route1);
-        verify(routesChangedListener, times(1)).onRouteCreated(any());
-        verify(routesChangedListener, never()).onRouteDeleted(any());
+        verify(routeObserver, times(1)).onRouteCreated(any());
+        verify(routeObserver, never()).onRouteDeleted(any());
 
         configRepository.putRoute(route2);
-        verify(routesChangedListener, times(2)).onRouteCreated(any());
-        verify(routesChangedListener, times(1)).onRouteDeleted(any());
+        verify(routeObserver, times(2)).onRouteCreated(any());
+        verify(routeObserver, times(1)).onRouteDeleted(any());
     }
 
     @Test
@@ -224,7 +224,7 @@ public class ConfigRepositoryImplTest {
         Route route2 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.POST);
         configRepository.putRoutes(List.of(route1, route2), true);
 
-        verify(routesChangedListener, times(2)).onRouteCreated(any());
+        verify(routeObserver, times(2)).onRouteCreated(any());
     }
 
     @Test
@@ -322,7 +322,7 @@ public class ConfigRepositoryImplTest {
         Route route2 = new Route(route1);
         configRepository.deleteRoutes(List.of(route2));
 
-        verify(routesChangedListener, times(1)).onRouteDeleted(any());
+        verify(routeObserver, times(1)).onRouteDeleted(any());
     }
 
     @Test
@@ -406,7 +406,7 @@ public class ConfigRepositoryImplTest {
         Scenario scenario2 = new Scenario(scenario1);
         configRepository.deleteScenario(scenario2);
 
-        verify(scenariosChangedListener, times(1)).onScenarioDeleted(any());
+        verify(scenarioObserver, times(1)).onScenarioDeleted(any());
     }
 
     @Test

@@ -131,7 +131,7 @@ public class SoapRequestFacadeTest {
 
         RequestFacade facade = new SoapRequestFacade(request, new ObjectMapper());
 
-        Map<String, String> variables = facade.getVariables();
+        Map<String, String> variables = facade.getVariables(Optional.empty());
         assertEquals("${NumberToDollarsRequest.Value:DEFAULT_VALUE}",
                 variables.get("NumberToDollarsResponse.Result"));
         assertEquals("42 42", variables.get("headerVariable"));

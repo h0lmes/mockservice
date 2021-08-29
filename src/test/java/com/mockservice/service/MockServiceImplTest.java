@@ -99,7 +99,7 @@ public class MockServiceImplTest {
 
         Map<String, String> variables = new HashMap<>();
         variables.put(variableName, variableValue);
-        when(request.getVariables()).thenReturn(variables);
+        when(request.getVariables(any())).thenReturn(variables);
 
         MockService mockService = createMockService();
         ResponseEntity<String> responseEntity = mockService.mock(request);

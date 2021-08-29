@@ -2,9 +2,9 @@ package com.mockservice.service;
 
 import com.mockservice.domain.Scenario;
 import com.mockservice.domain.ScenarioType;
-import com.mockservice.repository.ConfigChangedListener;
+import com.mockservice.repository.ConfigObserver;
 import com.mockservice.repository.ConfigRepository;
-import com.mockservice.repository.ScenariosChangedListener;
+import com.mockservice.repository.ScenarioObserver;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
@@ -200,7 +200,7 @@ public class ScenarioServiceImplTest {
 
         ScenarioService service = service();
         service.activateScenario(ALIAS);
-        ((ConfigChangedListener) service).onBeforeConfigChanged();
+        ((ConfigObserver) service).onBeforeConfigChanged();
 
         assertTrue(scenario.getActive());
     }
@@ -212,14 +212,14 @@ public class ScenarioServiceImplTest {
 
         ScenarioService service = service();
         service.activateScenario(ALIAS);
-        ((ConfigChangedListener) service).onAfterConfigChanged();
+        ((ConfigObserver) service).onAfterConfigChanged();
 
         assertTrue(scenario.getActive());
     }
 
     @Test
     public void onScenarioUpdated_NotExistingScenario_NotTrows() {
-        ScenariosChangedListener service = (ScenariosChangedListener) service();
+        ScenarioObserver service = (ScenarioObserver) service();
 
         assertDoesNotThrow(() -> service.onScenarioUpdated(NOT_EXISTING_ALIAS, ALIAS));
     }
@@ -231,7 +231,7 @@ public class ScenarioServiceImplTest {
 
         ScenarioService service = service();
         service.activateScenario(ALIAS);
-        ((ScenariosChangedListener) service).onScenarioUpdated(ALIAS, ALIAS);
+        ((ScenarioObserver) service).onScenarioUpdated(ALIAS, ALIAS);
 
         assertTrue(scenario.getActive());
     }
@@ -242,7 +242,7 @@ public class ScenarioServiceImplTest {
         lenient().when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
 
         ScenarioService service = service();
-        ((ScenariosChangedListener) service).onScenarioUpdated(ALIAS, ALIAS);
+        ((ScenarioObserver) service).onScenarioUpdated(ALIAS, ALIAS);
 
         assertFalse(scenario.getActive());
     }
@@ -260,7 +260,7 @@ public class ScenarioServiceImplTest {
         assertTrue(scenario1.getActive());
         assertTrue(scenario2.getActive());
 
-        ((ScenariosChangedListener) service).onScenarioDeleted(ALIAS);
+        ((ScenarioObserver) service).onScenarioDeleted(ALIAS);
 
         assertFalse(scenario1.getActive());
         assertTrue(scenario2.getActive());
