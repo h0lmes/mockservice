@@ -40,12 +40,6 @@ public class WebApiGenerateControllerTest {
     @Autowired
     private MockMvc mvc;
     @MockBean
-    @Qualifier("jsonMapper")
-    private ObjectMapper jsonMapper;
-    @MockBean
-    @Qualifier("yamlMapper")
-    private ObjectMapper yamlMapper;
-    @MockBean
     private JsonProducer jsonProducer;
     @MockBean
     private JsonFromSchemaProducer jsonFromSchemaProducer;
