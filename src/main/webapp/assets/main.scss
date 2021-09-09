@@ -376,7 +376,7 @@ pre {
     text-decoration: underline;
   }
 
-  .component-row.disabled & {
+  .component-row:not(.open).disabled & {
     color: var(--color-disabled);
   }
 }

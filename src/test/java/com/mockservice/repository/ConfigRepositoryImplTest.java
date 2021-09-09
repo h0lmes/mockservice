@@ -1,5 +1,15 @@
 package com.mockservice.repository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -7,6 +17,11 @@ import com.mockservice.domain.Route;
 import com.mockservice.domain.Scenario;
 import com.mockservice.domain.ScenarioAlreadyExistsException;
 import com.mockservice.domain.Settings;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,16 +31,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @RunWith(JUnitPlatform.class)
@@ -38,11 +43,11 @@ public class ConfigRepositoryImplTest {
     private static final String NEW_ALIAS = "new";
 
     @Mock
-    ConfigObserver configObserver;
+    private ConfigObserver configObserver;
     @Mock
-    RouteObserver routeObserver;
+    private RouteObserver routeObserver;
     @Mock
-    ScenarioObserver scenarioObserver;
+    private ScenarioObserver scenarioObserver;
 
     @TempDir
     File folder; // must not be private
@@ -53,9 +58,9 @@ public class ConfigRepositoryImplTest {
                 getTempFile("backup.yml"),
                 getYamlMapper());
 
-        configRepository.registerConfigObserver(configObserver);
-        configRepository.registerRouteObserver(routeObserver);
-        configRepository.registerScenarioObserver(scenarioObserver);
+        configRepository.setConfigObservers(List.of(configObserver));
+        configRepository.setRouteObservers(List.of(routeObserver));
+        configRepository.setScenarioObservers(List.of(scenarioObserver));
 
         return configRepository;
     }

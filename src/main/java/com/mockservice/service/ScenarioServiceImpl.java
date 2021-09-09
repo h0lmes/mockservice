@@ -4,15 +4,19 @@ import com.mockservice.domain.Scenario;
 import com.mockservice.repository.ConfigObserver;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.repository.ScenarioObserver;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Service
 public class ScenarioServiceImpl implements ScenarioService, ConfigObserver, ScenarioObserver {
@@ -24,8 +28,6 @@ public class ScenarioServiceImpl implements ScenarioService, ConfigObserver, Sce
 
     public ScenarioServiceImpl(ConfigRepository configRepository) {
         this.configRepository = configRepository;
-        configRepository.registerConfigObserver(this);
-        configRepository.registerScenarioObserver(this);
     }
 
     @Override

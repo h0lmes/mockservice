@@ -76,6 +76,11 @@ public class TokenParser {
         }
     }
 
+    /**
+     * @param token assumes a valid token as input.
+     * @return an array of token arguments (arguments are character sequences separated by TOKEN_ARGS_SPLIT_CHAR)
+     * with respect that an argument may be a valid token itself (token nesting)
+     */
     public static String[] parseToken(String token) {
         token = token.substring(TOKEN_START_LEN, token.length() - TOKEN_END_LEN);
 
@@ -90,7 +95,7 @@ public class TokenParser {
             if (ch == CLOSING_BRACKET_CHAR) {
                 brackets--;
                 if (brackets < 0) {
-                    throw new IllegalArgumentException("Invalid token " + token);
+                    throw new IllegalArgumentException("Invalid token (unexpected token closing char): " + token);
                 }
             }
 
@@ -101,9 +106,10 @@ public class TokenParser {
                 argument.append(ch);
             }
         }
+
         arguments.add(argument.toString());
         if (brackets > 0) {
-            throw new IllegalArgumentException("Invalid token " + token);
+            throw new IllegalArgumentException("Invalid token (unbalanced open/closing chars): " + token);
         }
 
         String[] args = arguments.toArray(new String[]{});

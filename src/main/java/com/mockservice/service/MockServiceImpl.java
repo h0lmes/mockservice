@@ -8,9 +8,13 @@ import com.mockservice.response.MockResponse;
 import com.mockservice.response.RestMockResponse;
 import com.mockservice.response.SoapMockResponse;
 import com.mockservice.service.quantum.QuantumTheory;
+import com.mockservice.service.route.RouteService;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.validate.DataValidationException;
 import com.mockservice.validate.DataValidator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,11 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class MockServiceImpl implements MockService {
@@ -37,7 +36,6 @@ public class MockServiceImpl implements MockService {
     private final List<QuantumTheory> quantumTheories;
     private final List<DataValidator> dataValidators;
     private final ConcurrentLruCache<Route, MockResponse> responseCache;
-    private final Map<String, String> globalVariables = new ConcurrentHashMap<>();
 
     public MockServiceImpl(@Value("${application.mock-service.cache-size}") int cacheSize,
                            TemplateEngine templateEngine,
@@ -81,7 +79,8 @@ public class MockServiceImpl implements MockService {
 
         MockResponse response = responseCache.get(route);
 
-        response.setVariables(request.getVariables(Optional.of(globalVariables)), templateEngine.getFunctions());
+        Map<String, String> variables = request.getVariables(Optional.ofNullable(routeService.getRouteVariables(route)));
+        response.setVariables(variables, templateEngine.getFunctions());
         validationResult.ifError(response::addVariables);
 
         ResponseEntity<String> responseEntity = responseEntityFromResponse(response);
@@ -90,23 +89,6 @@ public class MockServiceImpl implements MockService {
         response.ifHasRequest(requestService::schedule);
 
         return responseEntity;
-    }
-
-    @Override
-    public Map<String, String> getGlobalVariables() {
-        return globalVariables;
-    }
-
-    @Override
-    public Map<String, String> putGlobalVariables(Optional<Map<String, String>> variables) {
-        variables.ifPresent(globalVariables::putAll);
-        return getGlobalVariables();
-    }
-
-    @Override
-    public Map<String, String> removeGlobalVariables(Optional<List<String>> keys) {
-        keys.ifPresent(list -> list.forEach(globalVariables::remove));
-        return getGlobalVariables();
     }
 
     private Route findRouteForRequest(RequestFacade request) {

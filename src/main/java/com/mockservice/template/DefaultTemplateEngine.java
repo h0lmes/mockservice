@@ -1,7 +1,5 @@
 package com.mockservice.template;
 
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -14,6 +12,7 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import org.springframework.stereotype.Component;
 
 @Component
 public class DefaultTemplateEngine implements TemplateEngine {
@@ -38,6 +37,11 @@ public class DefaultTemplateEngine implements TemplateEngine {
         Map<String, Function<String[], String>> functions = new HashMap<>();
         suppliers.forEach((name, supplier) -> functions.put(name, supplier.get()));
         return functions;
+    }
+
+    @Override
+    public boolean isFunction(String arg0) {
+        return suppliers.containsKey(arg0);
     }
 
     private static String randomInt(String[] args) {

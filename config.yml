@@ -4,108 +4,108 @@ settings:
   alt400OnFailedRequestValidation: true
 routes:
 - group: default
-  path: /jwt
-  method: GET
   type: REST
+  method: GET
+  path: /jwt
   alt: ""
   responseCode: 200
   response: "{\n  \"sub\": \"${sub:DEFAULT}\",\n  \"name\": \"${name:DEFAULT}\",\n  \"iat\": ${iat:0}\n}"
   requestBodySchema: ""
   disabled: false
 - group: entity
-  path: /api/v2/entity
-  method: GET
   type: REST
+  method: GET
+  path: /api/v2/entity
   alt: ""
   responseCode: 200
   response: "[\n  {\"id\": ${sequence}, \"name\": \"${random_string}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${lang:${enum:Java:C++:Python:JavaScript}}\"}\n]"
   requestBodySchema: ""
   disabled: false
 - group: entity
-  path: /api/v2/entity
-  method: GET
   type: REST
+  method: GET
+  path: /api/v2/entity
   alt: 400
   responseCode: 400
   response: "[]"
   requestBodySchema: ""
   disabled: false
 - group: entity
-  path: "/api/v2/entity/{id}"
-  method: GET
   type: REST
+  method: GET
+  path: "/api/v2/entity/{id}"
   alt: ""
   responseCode: 200
   response: "{\"id\": ${id}, \"name\": \"entity name\"}"
   requestBodySchema: ""
   disabled: true
 - group: entity
-  path: /api/v2/entity
-  method: PUT
   type: REST
+  method: PUT
+  path: /api/v2/entity
   alt: ""
   responseCode: 201
   response: "{\"id\": ${random_int}, \"name\": \"${name:default name}\"}"
   requestBodySchema: ""
   disabled: false
 - group: entity
-  path: "/api/v2/entity/{id}"
-  method: DELETE
   type: REST
+  method: DELETE
+  path: "/api/v2/entity/{id}"
   alt: ""
   responseCode: 200
   response: "{\"id\": ${random_int}, \"name\": \"${name:default name}\"}"
   requestBodySchema: ""
   disabled: false
 - group: number conversion
-  path: /mockNumberConversion
-  method: POST
   type: SOAP
+  method: POST
+  path: /mockNumberConversion
   alt: ""
   responseCode: 200
   response: "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:web=\"http://www.dataaccess.com/webservicesserver/\">\n  <soapenv:Header/>\n  <soapenv:Body>\n    <web:NumberToDollarsResponse>\n      <web:NumberToDollarsResult>${enum:TEST1:TEST2}</web:NumberToDollarsResult>\n      <web:Result>${NumberToDollarsRequest.Value:DEFAULT_VALUE}</web:Result>\n    </web:NumberToDollarsResponse>\n  </soapenv:Body>\n</soapenv:Envelope>"
   requestBodySchema: ""
   disabled: false
 - group: robot
-  path: /api/robot
-  method: GET
   type: REST
+  method: GET
+  path: /api/robot
   alt: ""
   responseCode: 202
   response: "HTTP/1.1\nExtra: extra-value\n\n{\"name\": \"Johnny 5\"}\n---\nGET http://localhost:8081/api/robot HTTP/1.1\nMock-Alt: api-robot/R2D2\n\n{}"
   requestBodySchema: ""
   disabled: false
 - group: robot
-  path: /api/robot
-  method: GET
   type: REST
+  method: GET
+  path: /api/robot
   alt: R2D2
   responseCode: 200
   response: "{\"name\": \"R2D2\"}"
   requestBodySchema: ""
   disabled: false
 - group: robot
-  path: /api/robot
-  method: GET
   type: REST
+  method: GET
+  path: /api/robot
   alt: terminator
   responseCode: 200
   response: "{\"name\": \"terminator\"}"
   requestBodySchema: ""
   disabled: false
 - group: store
-  path: /v2/store/order
-  method: POST
   type: REST
+  method: POST
+  path: /v2/store/order
   alt: ""
   responseCode: 200
   response: "{\n    \"id\": 9585378182,\n    \"petId\": 793835,\n    \"quantity\": 79463074,\n    \"shipDate\": \"2018-11-13T20:20:39+00:00\",\n    \"status\": \"placed\",\n    \"complete\": true\n}"
   requestBodySchema: "{\r\n  \"type\" : \"object\",\r\n  \"properties\" : {\r\n    \"id\" : {\r\n      \"type\" : \"integer\",\r\n      \"format\" : \"int64\"\r\n    },\r\n    \"petId\" : {\r\n      \"type\" : \"integer\",\r\n      \"format\" : \"int64\"\r\n    },\r\n    \"quantity\" : {\r\n      \"type\" : \"integer\",\r\n      \"format\" : \"int32\"\r\n    },\r\n    \"shipDate\" : {\r\n      \"type\" : \"string\",\r\n      \"format\" : \"date-time\"\r\n    },\r\n    \"status\" : {\r\n      \"type\" : \"string\",\r\n      \"description\" : \"Order Status\",\r\n      \"enum\" : [ \"placed\", \"approved\", \"delivered\" ]\r\n    },\r\n    \"complete\" : {\r\n      \"type\" : \"boolean\",\r\n      \"default\" : false\r\n    }\r\n  }\r\n}"
   disabled: false
 - group: store
-  path: /v2/store/order
-  method: POST
   type: REST
+  method: POST
+  path: /v2/store/order
   alt: 400
   responseCode: 400
   response: "{\n    \"id\": 9585378182,\n    \"petId\": 793835,\n    \"quantity\": 79463074,\n    \"shipDate\": \"2018-11-13T20:20:39+00:00\",\n    \"status\": \"placed\",\n    \"complete\": true,\n    \"errorMessage\": \"${requestBodyValidationErrorMessage:}\"\n}"

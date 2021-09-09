@@ -1,10 +1,9 @@
 package com.mockservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.web.bind.annotation.RequestMethod;
-
 import java.util.Objects;
 import java.util.UUID;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 public class Route implements Comparable<Route> {
 
@@ -15,9 +14,9 @@ public class Route implements Comparable<Route> {
 
     private String id = "";
     private String group = "";
-    private String path = "";
-    private RequestMethod method = RequestMethod.GET;
     private RouteType type = RouteType.REST;
+    private RequestMethod method = RequestMethod.GET;
+    private String path = "";
     private String alt = "";
     private int responseCode = 200;
     private String response = "";
@@ -29,9 +28,13 @@ public class Route implements Comparable<Route> {
     }
 
     public Route(String method, String path, String alt) {
-        this.method = RequestMethod.valueOf(method);
-        this.path = path;
-        this.alt = alt;
+        setMethod(RequestMethod.valueOf(method)).setPath(path).setAlt(alt);
+    }
+
+    public Route(RequestMethod method, String path, String alt) {
+        setMethod(method);
+        setPath(path);
+        setAlt(alt);
     }
 
     public Route(Route route) {
@@ -59,12 +62,12 @@ public class Route implements Comparable<Route> {
         return this;
     }
 
-    public String getPath() {
-        return path;
+    public RouteType getType() {
+        return type;
     }
 
-    public Route setPath(String path) {
-        this.path = path == null ? "" : path;
+    public Route setType(RouteType type) {
+        this.type = type == null ? RouteType.REST : type;
         return this;
     }
 
@@ -77,12 +80,12 @@ public class Route implements Comparable<Route> {
         return this;
     }
 
-    public RouteType getType() {
-        return type;
+    public String getPath() {
+        return path;
     }
 
-    public Route setType(RouteType type) {
-        this.type = type == null ? RouteType.REST : type;
+    public Route setPath(String path) {
+        this.path = path == null ? "" : path;
         return this;
     }
 
@@ -178,7 +181,7 @@ public class Route implements Comparable<Route> {
 
     @Override
     public String toString() {
-        return String.format("(group=%s, type=%s, method=%s, path=%s, alt=%s, disabled=%s)", group, type, method, path, alt, disabled);
+        return String.format("(method=%s, path=%s, alt=%s)", method, path, alt);
     }
 
     @Override

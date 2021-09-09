@@ -1,15 +1,24 @@
 package com.mockservice.web.webapp;
 
-import com.mockservice.domain.Route;
-import com.mockservice.service.RouteService;
+import com.mockservice.service.route.RouteDto;
+import com.mockservice.service.route.RouteService;
+import com.mockservice.service.route.RouteVariableDto;
 import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.List;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("web-api/routes")
@@ -24,40 +33,56 @@ public class WebApiRoutesController {
         this.routeService = routeService;
     }
 
-    @GetMapping
-    public List<Route> routes() {
-        return routeService.getRoutesAsList();
-    }
-
-    @ApiOperation(value = "Creates new route or updates existing", tags = "routes")
-    @PatchMapping
-    public List<Route> patchRoute(@RequestBody Route route) throws IOException {
-        return routeService.putRoute(route);
-    }
-
-    @ApiOperation(value = "Creates routes skipping already existing", tags = "routes")
-    @PostMapping
-    public List<Route> postRoutes(@RequestBody List<Route> routes) throws IOException {
-        return routeService.putRoutes(routes, false);
-    }
-
-    @ApiOperation(value = "Creates routes and updates already existing", tags = "routes")
-    @PutMapping
-    public List<Route> putRoutes(@RequestBody List<Route> routes) throws IOException {
-        return routeService.putRoutes(routes, true);
-    }
-
-    @ApiOperation(value = "Deletes listed routes", tags = "routes")
-    @DeleteMapping
-    public List<Route> deleteRoutes(@RequestBody List<Route> routes) throws IOException {
-        return routeService.deleteRoutes(routes);
-    }
-
     @ExceptionHandler
     protected ResponseEntity<ErrorInfo> handleException(Exception e) {
         log.error("", e);
-        return ResponseEntity
-                .badRequest()
-                .body(new ErrorInfo(e));
+        return ResponseEntity.badRequest().body(new ErrorInfo(e));
+    }
+
+    //-----------------------------------------------------------------------------------
+
+    @GetMapping
+    public List<RouteDto> routes() {
+        return routeService.getRoutes();
+    }
+
+    @ApiOperation(value = "Create new route or update existing one", tags = "routes")
+    @PatchMapping
+    public List<RouteDto> patchRoute(@RequestBody RouteDto route) throws IOException {
+        routeService.putRoute(route);
+        return routeService.getRoutes();
+    }
+
+    @ApiOperation(value = "Create routes skipping existing ones", tags = "routes")
+    @PostMapping
+    public List<RouteDto> postRoutes(@RequestBody List<RouteDto> routes) throws IOException {
+        routeService.putRoutes(routes, false);
+        return routeService.getRoutes();
+    }
+
+    @ApiOperation(value = "Create routes and update existing ones", tags = "routes")
+    @PutMapping
+    public List<RouteDto> putRoutes(@RequestBody List<RouteDto> routes) throws IOException {
+        routeService.putRoutes(routes, true);
+        return routeService.getRoutes();
+    }
+
+    @ApiOperation(value = "Delete routes", tags = "routes")
+    @DeleteMapping
+    public List<RouteDto> deleteRoutes(@RequestBody List<RouteDto> routes) throws IOException {
+        routeService.deleteRoutes(routes);
+        return routeService.getRoutes();
+    }
+
+    @ApiOperation(value = "Set specific variable for the specified route", tags = "routes")
+    @PutMapping("variables")
+    public RouteVariableDto setVariable(@RequestBody RouteVariableDto variable) {
+        return routeService.setRouteVariable(variable);
+    }
+
+    @ApiOperation(value = "Clear specific variable for the specified route", tags = "routes")
+    @DeleteMapping("variables")
+    public RouteVariableDto clearVariable(@RequestBody RouteVariableDto variable) {
+        return routeService.clearRouteVariable(variable);
     }
 }

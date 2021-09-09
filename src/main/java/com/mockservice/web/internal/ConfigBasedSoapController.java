@@ -10,6 +10,12 @@ import com.mockservice.request.RequestFacade;
 import com.mockservice.request.SoapRequestFacade;
 import com.mockservice.service.MockService;
 import com.mockservice.util.IOUtils;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,13 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 public class ConfigBasedSoapController implements RouteRegisteringController, ConfigObserver, RouteObserver {
@@ -84,8 +83,6 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
 
     private void register() {
         configRepository.findAllRoutes().forEach(this::registerRoute);
-        configRepository.registerRouteObserver(this);
-        configRepository.registerConfigObserver(this);
     }
 
     @Override

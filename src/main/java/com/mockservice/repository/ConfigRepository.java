@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.Scenario;
 import com.mockservice.domain.Settings;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -28,8 +27,4 @@ public interface ConfigRepository {
     Optional<Scenario> findScenario(Scenario scenario);
     void putScenario(Scenario scenario) throws IOException;
     void deleteScenario(Scenario scenario) throws IOException;
-
-    void registerConfigObserver(ConfigObserver listener);
-    void registerRouteObserver(RouteObserver listener);
-    void registerScenarioObserver(ScenarioObserver listener);
 }

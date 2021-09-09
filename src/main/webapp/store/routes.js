@@ -75,6 +75,50 @@ export const actions = {
         }
     },
     add({commit}) {
-        commit('add', {id: '', group: '', type: 'REST', method: 'GET', path: '/', alt: '', disabled: false, _new: true});
+        const route = {
+            id: '',
+            group: '',
+            type: 'REST',
+            method: 'GET',
+            path: '/',
+            alt: '',
+            response: '',
+            disabled: false,
+            variables: null,
+            _new: true,
+        };
+        commit('add', route);
+    },
+    async setVariable({commit, rootState}, variable) {
+        try {
+            const url = rootState.BASE_URL + '/web-api/routes/variables';
+            const params = {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(variable)
+            };
+            const res = await fetch(url, params);
+            await handleError(res);
+            const data = await res.json();
+            commit('set', data);
+        } catch (err) {
+            commit('setLastError', err, {root: true});
+        }
+    },
+    async clearVariable({commit, rootState}, variable) {
+        try {
+            const url = rootState.BASE_URL + '/web-api/routes/variables';
+            const params = {
+                method: 'DELETE',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(variable)
+            };
+            const res = await fetch(url, params);
+            await handleError(res);
+            const data = await res.json();
+            commit('clear', data);
+        } catch (err) {
+            commit('setLastError', err, {root: true});
+        }
     },
 };

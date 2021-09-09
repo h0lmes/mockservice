@@ -2,17 +2,26 @@ package com.mockservice.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mockservice.domain.*;
+import com.mockservice.domain.Config;
+import com.mockservice.domain.Route;
+import com.mockservice.domain.RouteAlreadyExistsException;
+import com.mockservice.domain.Scenario;
+import com.mockservice.domain.ScenarioAlreadyExistsException;
+import com.mockservice.domain.Settings;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Nonnull;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 
 @Service
 public class ConfigRepositoryImpl implements ConfigRepository {
@@ -23,10 +32,9 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     private final String fileConfigPath;
     private final String fileConfigBackupPath;
     private final ObjectMapper yamlMapper;
-    private final List<ConfigObserver> configObservers = new ArrayList<>();
-    private final List<RouteObserver> routeObservers = new ArrayList<>();
-    private final List<ScenarioObserver> scenarioObservers = new ArrayList<>();
-
+    private List<ConfigObserver> configObservers;
+    private List<RouteObserver> routeObservers;
+    private List<ScenarioObserver> scenarioObservers;
 
     public ConfigRepositoryImpl(@Value("${application.config-filename}") String fileConfigPath,
                                 @Value("${application.config-backup-filename}") String fileConfigBackupPath,
@@ -41,6 +49,21 @@ public class ConfigRepositoryImpl implements ConfigRepository {
             log.warn("Could not read config file {}. Using empty config.", this.fileConfigPath);
             config = new Config();
         }
+    }
+
+    @Autowired(required = false)
+    public void setConfigObservers(List<ConfigObserver> configObservers) {
+        this.configObservers = configObservers;
+    }
+
+    @Autowired(required = false)
+    public void setRouteObservers(List<RouteObserver> routeObservers) {
+        this.routeObservers = routeObservers;
+    }
+
+    @Autowired(required = false)
+    public void setScenarioObservers(List<ScenarioObserver> scenarioObservers) {
+        this.scenarioObservers = scenarioObservers;
     }
 
     private Map<Class<?>, Class<?>> getMixIns() {
@@ -350,42 +373,39 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     //
     //----------------------------------------------------------------------
 
-    @Override
-    public void registerConfigObserver(ConfigObserver observer) {
-        configObservers.add(observer);
-    }
-
     private void notifyBeforeConfigChanged() {
-        configObservers.forEach(ConfigObserver::onBeforeConfigChanged);
+        if (configObservers != null) {
+            configObservers.forEach(ConfigObserver::onBeforeConfigChanged);
+        }
     }
 
     private void notifyAfterConfigChanged() {
-        configObservers.forEach(ConfigObserver::onAfterConfigChanged);
-    }
-
-    @Override
-    public void registerRouteObserver(RouteObserver observer) {
-        routeObservers.add(observer);
+        if (configObservers != null) {
+            configObservers.forEach(ConfigObserver::onAfterConfigChanged);
+        }
     }
 
     private void notifyRouteCreated(Route route) {
-        routeObservers.forEach(o -> o.onRouteCreated(route));
+        if (routeObservers != null) {
+            routeObservers.forEach(o -> o.onRouteCreated(route));
+        }
     }
 
     private void notifyRouteDeleted(Route route) {
-        routeObservers.forEach(o -> o.onRouteDeleted(route));
-    }
-
-    @Override
-    public void registerScenarioObserver(ScenarioObserver observer) {
-        scenarioObservers.add(observer);
+        if (routeObservers != null) {
+            routeObservers.forEach(o -> o.onRouteDeleted(route));
+        }
     }
 
     private void notifyScenarioUpdated(String oldAlias, String newAlias) {
-        scenarioObservers.forEach(o -> o.onScenarioUpdated(oldAlias, newAlias));
+        if (scenarioObservers != null) {
+            scenarioObservers.forEach(o -> o.onScenarioUpdated(oldAlias, newAlias));
+        }
     }
 
     private void notifyScenarioDeleted(String alias) {
-        scenarioObservers.forEach(o -> o.onScenarioDeleted(alias));
+        if (scenarioObservers != null) {
+            scenarioObservers.forEach(o -> o.onScenarioDeleted(alias));
+        }
     }
 }

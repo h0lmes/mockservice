@@ -10,6 +10,12 @@ import com.mockservice.repository.RouteObserver;
 import com.mockservice.request.RestRequestFacade;
 import com.mockservice.service.MockService;
 import com.mockservice.web.webapp.ErrorInfo;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,13 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-
-import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ForkJoinPool;
 
 @RestController
 public class ConfigBasedRestController implements RouteRegisteringController, ConfigObserver, RouteObserver {
@@ -75,8 +74,6 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
 
     private void register() {
         configRepository.findAllRoutes().forEach(this::registerRoute);
-        configRepository.registerRouteObserver(this);
-        configRepository.registerConfigObserver(this);
     }
 
     @Override
