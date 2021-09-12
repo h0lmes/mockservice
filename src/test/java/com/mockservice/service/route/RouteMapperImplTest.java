@@ -23,7 +23,6 @@ public class RouteMapperImplTest {
 
     private Route route() {
         return new Route()
-            .setId(STR)
             .setGroup(STR)
             .setType(RouteType.SOAP)
             .setMethod(METHOD)
@@ -37,7 +36,6 @@ public class RouteMapperImplTest {
 
     private RouteDto routeDto() {
         return new RouteDto()
-            .setId(STR)
             .setGroup(STR)
             .setType(RouteType.SOAP)
             .setMethod(METHOD)
@@ -56,7 +54,6 @@ public class RouteMapperImplTest {
         RouteDto routeDto = mapper.toDto(route, null);
 
         assertAll(() -> {
-            assertEquals(route.getId(), routeDto.getId());
             assertEquals(route.getGroup(), routeDto.getGroup());
             assertEquals(route.getType(), routeDto.getType());
             assertEquals(route.getMethod(), routeDto.getMethod());
@@ -83,7 +80,6 @@ public class RouteMapperImplTest {
 
         assertAll(() -> {
             assertEquals(route, routes[0]);
-            assertEquals(route.getId(), routeDto.getId());
             assertEquals(route.getGroup(), routeDto.getGroup());
             assertEquals(route.getType(), routeDto.getType());
             assertEquals(route.getMethod(), routeDto.getMethod());
@@ -106,7 +102,6 @@ public class RouteMapperImplTest {
 
         RouteDto routeDto = routeDtos.get(0);
         assertAll(() -> {
-            assertEquals(route.getId(), routeDto.getId());
             assertEquals(route.getGroup(), routeDto.getGroup());
             assertEquals(route.getType(), routeDto.getType());
             assertEquals(route.getMethod(), routeDto.getMethod());
@@ -133,7 +128,6 @@ public class RouteMapperImplTest {
 
         assertAll(() -> {
             assertEquals(route, routes[0]);
-            assertEquals(route.getId(), routeDto.getId());
             assertEquals(route.getGroup(), routeDto.getGroup());
             assertEquals(route.getType(), routeDto.getType());
             assertEquals(route.getMethod(), routeDto.getMethod());
@@ -153,7 +147,6 @@ public class RouteMapperImplTest {
         Route route = mapper.fromDto(routeDto);
 
         assertAll(() -> {
-            assertEquals(routeDto.getId(), route.getId());
             assertEquals(routeDto.getGroup(), route.getGroup());
             assertEquals(routeDto.getType(), route.getType());
             assertEquals(routeDto.getMethod(), route.getMethod());
@@ -176,7 +169,6 @@ public class RouteMapperImplTest {
 
         Route route = routes.get(0);
         assertAll(() -> {
-            assertEquals(routeDto.getId(), route.getId());
             assertEquals(routeDto.getGroup(), route.getGroup());
             assertEquals(routeDto.getType(), route.getType());
             assertEquals(routeDto.getMethod(), route.getMethod());

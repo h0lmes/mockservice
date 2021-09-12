@@ -6,7 +6,6 @@ import com.mockservice.domain.Config;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteAlreadyExistsException;
 import com.mockservice.domain.Scenario;
-import com.mockservice.domain.ScenarioAlreadyExistsException;
 import com.mockservice.domain.Settings;
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +68,6 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     private Map<Class<?>, Class<?>> getMixIns() {
         Map<Class<?>, Class<?>> mixins = new HashMap<>();
-        mixins.put(Route.class, Route.MixInIgnoreId.class);
         mixins.put(Scenario.class, Scenario.MixInIgnoreIdActive.class);
         return mixins;
     }
@@ -182,15 +181,40 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     @Override
     public Optional<Route> findRoute(Route route) {
         return findAllRoutes().stream()
-                .filter(route::equals)
-                .findFirst();
+            .filter(route::equals)
+            .findFirst();
     }
 
     @Override
-    public void putRoute(Route route) throws IOException {
-        putRouteInternal(route, false, false);
+    public void putRoute(@Nullable Route reference, @Nonnull Route route) throws IOException {
+        Objects.requireNonNull(route, "Route could not be null.");
+
+        putRouteInternal(reference, route);
         config.getRoutes().sort(Route::compareTo);
         trySaveConfigToFile();
+    }
+
+    private void putRouteInternal(Route reference, Route route) {
+        Route existingReference = null;
+        if (reference != null) {
+            existingReference = findRoute(reference).orElse(null);
+        }
+        Route existingRoute = findRoute(route).orElse(null);
+
+        if (existingReference == null) {
+            if (existingRoute != null) {
+                throw new RouteAlreadyExistsException(route);
+            }
+            config.getRoutes().add(route);
+            notifyRouteCreated(route);
+        } else {
+            if (existingRoute != null && !existingReference.equals(existingRoute)) {
+                throw new RouteAlreadyExistsException(route);
+            }
+            notifyRouteDeleted(existingReference);
+            existingReference.assignFrom(route);
+            notifyRouteCreated(existingReference);
+        }
     }
 
     @Override
@@ -198,7 +222,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         boolean modified = false;
 
         for (Route route : routes) {
-            modified |= putRouteInternal(route, overwrite, true);
+            modified |= putRouteInternal(route, overwrite);
         }
 
         if (modified) {
@@ -207,84 +231,32 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
     }
 
-    /**
-     * Saves the {@code route} in the repository.
-     *
-     * @param route the {@code route} to be written to the repository
-     * @param overwrite If {@code true} overwrites existing route.
-     *                  If a {@code route} is NOT in the repository yet (looking by its {@code id})
-     *                  but there is an {@code existingRoute} so that {@code route.equals(existingRoute)}
-     *                  then {@code existingRoute} contents (all fields except {@code id})
-     *                  will be replaced with those of the {@code route}.
-     *
-     *                  If a {@code route} IS in the repository (looking by its {@code id})
-     *                  and there is an {@code existingRoute} so that {@code route.equals(existingRoute)}
-     *                  and not {@code route.getId().equals(existingRoute.getId())}
-     *                  then {@code route} contents (all fields except {@code id})
-     *                  will be updated instead of throwing an exception.
-     *                  This may potentially create a full copy of a route.
-     * @param silent If {@code true} silences all exceptions.
-     * @return {@code true} when route has been written, {@code false} otherwise
-     */
-    private boolean putRouteInternal(@Nonnull Route route, boolean overwrite, boolean silent) {
+    private boolean putRouteInternal(@Nonnull Route route, boolean overwrite) {
         Objects.requireNonNull(route, "Route could not be null.");
 
-        Route existing = findRouteById(route.getId()).orElse(null);
+        Route existing = findRoute(route).orElse(null);
+
         if (existing == null) {
-            return putNewRouteInternal(route, overwrite, silent);
+            return putNewRoute(route);
         } else {
-            return putExistingRouteInternal(existing, route, overwrite, silent);
+            return putExistingRoute(existing, route, overwrite);
         }
     }
 
-    private boolean putNewRouteInternal(@Nonnull Route route, boolean overwrite, boolean silent) {
-        Objects.requireNonNull(route, "Route could not be null.");
-
-        Route existingByEquals = findRoute(route).orElse(null);
-
-        if (existingByEquals == null) {
-            config.getRoutes().add(route);
-            notifyRouteCreated(route);
-        } else {
-            if (!overwrite) {
-                if (silent) {
-                    return false;
-                }
-                throw new RouteAlreadyExistsException(route);
-            }
-            notifyRouteDeleted(existingByEquals);
-            existingByEquals.assignFrom(route);
-            notifyRouteCreated(existingByEquals);
-        }
+    private boolean putNewRoute(Route route) {
+        config.getRoutes().add(route);
+        notifyRouteCreated(route);
         return true;
     }
 
-    private boolean putExistingRouteInternal(@Nonnull Route existing, Route route, boolean overwrite, boolean silent) {
-        Objects.requireNonNull(existing, "Existing route could not be null.");
-
-        if (!overwrite) {
-            Route existingByEquals = findRoute(route).orElse(null);
-            if (existingByEquals != null && !existingByEquals.getId().equals(route.getId())) {
-                if (silent) {
-                    return false;
-                }
-                throw new RouteAlreadyExistsException(route);
-            }
+    private boolean putExistingRoute(Route existing, Route route, boolean overwrite) {
+        if (overwrite) {
+            notifyRouteDeleted(existing);
+            existing.assignFrom(route);
+            notifyRouteCreated(existing);
+            return true;
         }
-
-        notifyRouteDeleted(existing);
-        existing.assignFrom(route);
-        notifyRouteCreated(existing);
-        return true;
-    }
-
-    private Optional<Route> findRouteById(String id) {
-        if (id.isEmpty()) {
-            return Optional.empty();
-        }
-        return findAllRoutes().stream()
-                .filter(r -> id.equals(r.getId()))
-                .findFirst();
+        return false;
     }
 
     @Override
@@ -317,8 +289,8 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     @Override
     public Optional<Scenario> findScenario(Scenario scenario) {
         return findAllScenarios().stream()
-                .filter(scenario::equals)
-                .findFirst();
+            .filter(scenario::equals)
+            .findFirst();
     }
 
     @Override
@@ -329,34 +301,15 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     private void putScenarioInternal(Scenario scenario) {
-        Scenario existingById = findScenarioById(scenario.getId()).orElse(null);
-        Scenario existingByEquals = findScenario(scenario).orElse(null);
-
-        if (existingById == null) {
-            if (existingByEquals != null) {
-                throw new ScenarioAlreadyExistsException(scenario);
-            }
-
+        Scenario existing = findScenario(scenario).orElse(null);
+        if (existing == null) {
             config.getScenarios().add(scenario);
             notifyScenarioUpdated("", scenario.getAlias());
         } else {
-            if (existingByEquals != null && !existingByEquals.getId().equals(scenario.getId())) {
-                throw new ScenarioAlreadyExistsException(scenario);
-            }
-
-            String oldAlias = existingById.getAlias();
-            existingById.assignFrom(scenario);
-            notifyScenarioUpdated(oldAlias, existingById.getAlias());
+            String oldAlias = existing.getAlias();
+            existing.assignFrom(scenario);
+            notifyScenarioUpdated(oldAlias, existing.getAlias());
         }
-    }
-
-    private Optional<Scenario> findScenarioById(String id) {
-        if (id.isEmpty()) {
-            return Optional.empty();
-        }
-        return findAllScenarios().stream()
-                .filter(s -> id.equals(s.getId()))
-                .findFirst();
     }
 
     @Override

@@ -19,7 +19,7 @@ public interface ConfigRepository {
 
     List<Route> findAllRoutes();
     Optional<Route> findRoute(Route route);
-    void putRoute(Route route) throws IOException;
+    void putRoute(Route reference, Route route) throws IOException;
     void putRoutes(List<Route> routes, boolean overwrite) throws IOException;
     void deleteRoutes(List<Route> routes) throws IOException;
 

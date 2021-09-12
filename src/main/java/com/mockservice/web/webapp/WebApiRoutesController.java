@@ -48,8 +48,8 @@ public class WebApiRoutesController {
 
     @ApiOperation(value = "Create new route or update existing one", tags = "routes")
     @PatchMapping
-    public List<RouteDto> patchRoute(@RequestBody RouteDto route) throws IOException {
-        routeService.putRoute(route);
+    public List<RouteDto> patchRoute(@RequestBody List<RouteDto> routes) throws IOException {
+        routeService.putRoute(routes.get(0), routes.get(1));
         return routeService.getRoutes();
     }
 

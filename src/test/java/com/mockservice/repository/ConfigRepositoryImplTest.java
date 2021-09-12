@@ -1,5 +1,6 @@
 package com.mockservice.repository;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -14,14 +15,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.mockservice.domain.Route;
+import com.mockservice.domain.RouteAlreadyExistsException;
 import com.mockservice.domain.Scenario;
-import com.mockservice.domain.ScenarioAlreadyExistsException;
 import com.mockservice.domain.Settings;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -103,7 +103,7 @@ public class ConfigRepositoryImplTest {
     public void backupAndRestore_NonDefaultConfig_ConfigRestored() throws IOException {
         ConfigRepository configRepository = repository();
         Route route = new Route().setPath(ROUTE_PATH);
-        configRepository.putRoute(route);
+        configRepository.putRoute(null, route);
 
         String configData = configRepository.getConfigData();
 
@@ -159,9 +159,8 @@ public class ConfigRepositoryImplTest {
     @Test
     public void putRoute_NonExisting_RouteAdded() throws IOException {
         ConfigRepository configRepository = repository();
-
         Route route = new Route().setPath(ROUTE_PATH);
-        configRepository.putRoute(route);
+        configRepository.putRoute(null, route);
 
         List<Route> allRoutes = configRepository.findAllRoutes();
         assertEquals(1, allRoutes.size());
@@ -171,21 +170,20 @@ public class ConfigRepositoryImplTest {
     @Test
     public void putRoute_NonExisting_ListenerCalled() throws IOException {
         ConfigRepository configRepository = repository();
-
         Route route = new Route().setPath(ROUTE_PATH);
-        configRepository.putRoute(route);
+        configRepository.putRoute(null, route);
 
         verify(routeObserver, times(1)).onRouteCreated(any());
     }
 
+    @DisplayName("Update existing route [1] with contents of [2], updates")
     @Test
-    public void putRoute_Existing_RouteUpdated() throws IOException {
+    public void putRoute_UpdateExisting_RouteUpdated() throws IOException {
         ConfigRepository configRepository = repository();
-
-        Route route1 = new Route().setId("1").setPath(ROUTE_PATH).setResponse(OLD_RESPONSE);
-        Route route2 = new Route().setId("1").setPath(ROUTE_PATH).setResponse(NEW_RESPONSE);
-        configRepository.putRoute(route1);
-        configRepository.putRoute(route2);
+        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(OLD_RESPONSE);
+        Route route2 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(NEW_RESPONSE);
+        configRepository.putRoute(null, route1);
+        configRepository.putRoute(route1, route2);
 
         Route routeSearch = new Route().setPath(ROUTE_PATH);
         Optional<Route> routeOptional = configRepository.findRoute(routeSearch);
@@ -193,27 +191,50 @@ public class ConfigRepositoryImplTest {
         assertEquals(NEW_RESPONSE, routeOptional.get().getResponse());
     }
 
+    @DisplayName("Update existing route [1] with contents of [2], calls listener")
     @Test
-    public void putRoute_Existing_ListenersCalled() throws IOException {
+    public void putRoute_UpdateExisting_ListenersCalled() throws IOException {
         ConfigRepository configRepository = repository();
 
-        Route route1 = new Route().setId("1").setPath(ROUTE_PATH).setResponse(OLD_RESPONSE);
-        Route route2 = new Route().setId("1").setPath(ROUTE_PATH).setResponse(NEW_RESPONSE);
+        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(OLD_RESPONSE);
+        Route route2 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(NEW_RESPONSE);
 
-        configRepository.putRoute(route1);
+        configRepository.putRoute(null, route1);
         verify(routeObserver, times(1)).onRouteCreated(any());
         verify(routeObserver, never()).onRouteDeleted(any());
 
-        configRepository.putRoute(route2);
+        configRepository.putRoute(route1, route2);
         verify(routeObserver, times(2)).onRouteCreated(any());
         verify(routeObserver, times(1)).onRouteDeleted(any());
+    }
+
+    @DisplayName("Try to create new route [2] that equals already existing route [1] -> throws (do not allow duplicates)")
+    @Test
+    public void putRoute_NewExistsByEquals_Throws() throws IOException {
+        ConfigRepository configRepository = repository();
+        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(OLD_RESPONSE);
+        Route route2 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(NEW_RESPONSE);
+        configRepository.putRoute(null, route1);
+        assertThrows(RouteAlreadyExistsException.class, () -> configRepository.putRoute(null, route2));
+    }
+
+    @DisplayName("Update existing route [1] with contents of [3] which equals other existing route [2] -> throws (do not allow duplicates)")
+    @Test
+    public void putRoute_ReferenceExistsAndNewExistsAndReferenceNotEqualsNew_Throws() throws IOException {
+        ConfigRepository configRepository = repository();
+        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(OLD_RESPONSE);
+        Route route2 = new Route().setMethod(RequestMethod.POST).setPath(ROUTE_PATH).setResponse(OLD_RESPONSE);
+        Route route3 = new Route().setMethod(RequestMethod.POST).setPath(ROUTE_PATH).setResponse(NEW_RESPONSE);
+        configRepository.putRoute(null, route1);
+        configRepository.putRoute(null, route2);
+        assertThrows(RouteAlreadyExistsException.class, () -> configRepository.putRoute(route1, route3));
     }
 
     @Test
     public void putRoutes_NonExisting_RoutesAdded() throws IOException {
         ConfigRepository configRepository = repository();
 
-        Route route1 = new Route().setPath(ROUTE_PATH);
+        Route route1 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.GET);
         Route route2 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.POST);
         configRepository.putRoutes(List.of(route1, route2), true);
 
@@ -225,7 +246,7 @@ public class ConfigRepositoryImplTest {
     public void putRoutes_NonExisting_ListenerCalled() throws IOException {
         ConfigRepository configRepository = repository();
 
-        Route route1 = new Route().setPath(ROUTE_PATH);
+        Route route1 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.GET);
         Route route2 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.POST);
         configRepository.putRoutes(List.of(route1, route2), true);
 
@@ -233,28 +254,10 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void putRoutes_OneOfTwoExists_OverwriteFalse_OneRouteAddedAndOtherNotModified() throws IOException {
-        ConfigRepository repository = repository();
-
-        Route route1 = new Route().setPath(ROUTE_PATH);
-        Route route2 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.POST).setResponse(OLD_RESPONSE);
-        repository.putRoutes(List.of(route1, route2), false);
-
-        Route route3 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.DELETE);
-        Route route4 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.PATCH).setResponse(NEW_RESPONSE);
-        repository.findRoute(route2).ifPresent(r -> route4.setId(r.getId()));
-
-        repository.putRoutes(List.of(route3, route4), false);
-
-        assertEquals(3, repository.findAllRoutes().size());
-        assertEquals(NEW_RESPONSE, repository.findRoute(route2).get().getResponse());
-    }
-
-    @Test
-    public void putRoutes_OneOfTwoExists_OverwriteTrue_OneRouteAddedAndOtherModified() throws IOException {
+    public void putRoutes_OneOfTwoExists_OverwriteTrue_OneRouteAddedOtherRouteModified() throws IOException {
         ConfigRepository configRepository = repository();
 
-        Route route1 = new Route().setPath(ROUTE_PATH);
+        Route route1 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.GET);
         Route route2 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.POST).setResponse(OLD_RESPONSE);
         configRepository.putRoutes(List.of(route1, route2), true);
 
@@ -262,8 +265,7 @@ public class ConfigRepositoryImplTest {
         assertNotNull(routeFound);
 
         Route route3 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.DELETE);
-        Route route4 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.PATCH).setResponse(NEW_RESPONSE);
-        route4.setId(routeFound.getId());
+        Route route4 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.POST).setResponse(NEW_RESPONSE);
         configRepository.putRoutes(List.of(route3, route4), true);
 
         assertEquals(3, configRepository.findAllRoutes().size());
@@ -272,32 +274,19 @@ public class ConfigRepositoryImplTest {
         assertEquals(NEW_RESPONSE, route4Found.getResponse());
     }
 
-    @DisplayName("4.id = 2.id and 4.equals(1) => 2 is being rewritten by 4, thus 2.equals(1)")
     @Test
-    public void putRoutes_OneOfTwoExistsByIdAndKeyFields_OverwriteTrue_Throws() throws IOException {
-        ConfigRepository repository = repository();
-
-        Route route1 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.GET);
+    public void putRoutes_RouteExists_OverwriteFalse_RouteNotModified_DoesNotThrow() throws IOException {
+        ConfigRepository configRepository = repository();
         Route route2 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.POST).setResponse(OLD_RESPONSE);
-        repository.putRoutes(List.of(route1, route2), true);
+        configRepository.putRoutes(List.of(route2), true);
+        Route route4 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.POST).setResponse(NEW_RESPONSE);
 
-        Route routeFound = repository.findRoute(route2).orElse(null);
-        assertNotNull(routeFound);
+        assertDoesNotThrow(() -> configRepository.putRoutes(List.of(route4), false));
 
-        Route route3 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.DELETE);
-        Route route4 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.GET).setResponse(NEW_RESPONSE);
-        route4.setId(routeFound.getId());
+        Route route4Found = configRepository.findRoute(route4).orElse(null);
 
-        repository.putRoutes(List.of(route3, route4), true);
-
-        List<Route> allRoutes = repository.findAllRoutes();
-        assertEquals(3, allRoutes.size());
-
-        Stream<Route> equalRoutes = allRoutes.stream()
-                .filter(r -> r.getMethod().equals(route4.getMethod())
-                        && r.getPath().equals(route4.getPath())
-                        && r.getAlt().equals(route4.getAlt()));
-        assertEquals(2, equalRoutes.count());
+        assertNotNull(route4Found);
+        assertEquals(OLD_RESPONSE, route4Found.getResponse());
     }
 
     @Test
@@ -305,7 +294,7 @@ public class ConfigRepositoryImplTest {
         ConfigRepository configRepository = repository();
 
         Route route1 = new Route().setPath(ROUTE_PATH);
-        configRepository.putRoute(route1);
+        configRepository.putRoute(null, route1);
 
         assertEquals(1, configRepository.findAllRoutes().size());
 
@@ -320,7 +309,7 @@ public class ConfigRepositoryImplTest {
         ConfigRepository configRepository = repository();
 
         Route route1 = new Route().setPath(ROUTE_PATH);
-        configRepository.putRoute(route1);
+        configRepository.putRoute(null, route1);
 
         assertEquals(1, configRepository.findAllRoutes().size());
 
@@ -335,7 +324,7 @@ public class ConfigRepositoryImplTest {
         ConfigRepository configRepository = repository();
 
         Route route1 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.GET);
-        configRepository.putRoute(route1);
+        configRepository.putRoute(null, route1);
 
         assertEquals(1, configRepository.findAllRoutes().size());
 
@@ -362,30 +351,16 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void putScenario_Existing_Throws() throws IOException {
+    public void putScenario_Existing_UpdatesScenario() throws IOException {
         ConfigRepository configRepository = repository();
-
-        Scenario scenario = new Scenario().setAlias(ALIAS);
-        configRepository.putScenario(scenario);
-
-        Scenario scenario2 = new Scenario().setAlias(ALIAS);
-
-        assertThrows(ScenarioAlreadyExistsException.class,
-                () -> configRepository.putScenario(scenario2));
-    }
-
-    @Test
-    public void putScenario_ReplaceExistingById_ScenarioUpdated() throws IOException {
-        ConfigRepository configRepository = repository();
-
-        Scenario scenario1 = new Scenario().setAlias(ALIAS);
+        Scenario scenario1 = new Scenario().setAlias(ALIAS).setData(OLD_RESPONSE);
+        Scenario scenario2 = new Scenario().setAlias(ALIAS).setData(NEW_RESPONSE);
         configRepository.putScenario(scenario1);
+        configRepository.putScenario(scenario2);
+        List<Scenario> scenarios = configRepository.findAllScenarios();
 
-        scenario1.setAlias(NEW_ALIAS);
-        configRepository.putScenario(scenario1);
-
-        assertEquals(1, configRepository.findAllScenarios().size());
-        assertEquals(NEW_ALIAS, configRepository.findAllScenarios().get(0).getAlias());
+        assertEquals(1, scenarios.size());
+        assertEquals(NEW_RESPONSE, scenarios.get(0).getData());
     }
 
     @Test

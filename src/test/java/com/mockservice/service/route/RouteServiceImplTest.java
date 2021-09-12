@@ -145,9 +145,9 @@ public class RouteServiceImplTest {
     @Test
     public void putRoute_RouteDtoAsInput_CallsRepositoryMethod() throws IOException {
         RouteService service = service();
-        service.putRoute(new RouteDto());
+        service.putRoute(new RouteDto(), new RouteDto());
 
-        verify(configRepository, times(1)).putRoute(any());
+        verify(configRepository, times(1)).putRoute(any(), any());
     }
 
     @Test

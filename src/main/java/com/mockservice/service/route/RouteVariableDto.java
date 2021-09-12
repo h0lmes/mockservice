@@ -4,13 +4,15 @@ import java.util.Objects;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 public class RouteVariableDto implements Comparable<RouteVariableDto> {
+
     private RequestMethod method = RequestMethod.GET;
     private String path = "";
     private String alt = "";
-    private String name;
+    private String name = "";
     private String value;
 
     public RouteVariableDto() {
+        // default
     }
 
     public RequestMethod getMethod() {
@@ -65,9 +67,14 @@ public class RouteVariableDto implements Comparable<RouteVariableDto> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof RouteVariableDto)) return false;
+        if (!(o instanceof RouteVariableDto)) {
+            return false;
+        }
         RouteVariableDto other = (RouteVariableDto) o;
-        return name.equals(other.getName());
+        return method.equals(other.getMethod())
+            && path.equals(other.getPath())
+            && alt.equals(other.getAlt())
+            && name.equals(other.getName());
     }
 
     @Override
@@ -77,6 +84,14 @@ public class RouteVariableDto implements Comparable<RouteVariableDto> {
 
     @Override
     public int compareTo(RouteVariableDto o) {
-        return this.name.compareTo(o.getName());
+        int c;
+        c = this.method.compareTo(o.getMethod());
+        if (c != 0) return c;
+        c = this.path.compareTo(o.getPath());
+        if (c != 0) return c;
+        c = this.alt.compareTo(o.getAlt());
+        if (c != 0) return c;
+        c = this.name.compareTo(o.getName());
+        return c;
     }
 }

@@ -113,11 +113,7 @@ routes:
   disabled: false
 scenarios:
 - group: default
-  alias: New Alias 1
-  type: MAP
-  data: ""
-- group: default
-  alias: New Alias 2
+  alias: jwt
   type: MAP
   data: ""
 - group: entity

@@ -1,22 +1,21 @@
 package com.mockservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.web.bind.annotation.RequestMethod;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 public class Scenario implements Comparable<Scenario> {
 
     public abstract static class MixInIgnoreIdActive {
         @JsonIgnore
-        abstract String getId();
-        @JsonIgnore
         abstract boolean getActive();
     }
 
-    private String id = "";
     private String group = "";
     private String alias = "";
     private ScenarioType type = ScenarioType.MAP;
@@ -31,18 +30,6 @@ public class Scenario implements Comparable<Scenario> {
 
     public Scenario(Scenario scenario) {
         assignFrom(scenario);
-    }
-
-    public String getId() {
-        if (id.isEmpty()) {
-            id = UUID.randomUUID().toString();
-        }
-        return id;
-    }
-
-    public Scenario setId(String id) {
-        this.id = id == null ? "" : id;
-        return this;
     }
 
     public String getGroup() {

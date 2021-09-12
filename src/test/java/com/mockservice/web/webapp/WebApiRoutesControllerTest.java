@@ -80,13 +80,14 @@ public class WebApiRoutesControllerTest {
 
     @Test
     public void patchRoutes() throws Exception {
+        RouteDto empty = new RouteDto();
         RouteDto dto = new RouteDto().setPath(PATH);
         when(service.getRoutes()).thenReturn(List.of(dto));
 
         mvc.perform(
                 patch(WEB_API_ROUTES)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.writeValueAsBytes(dto))
+                        .content(jsonMapper.writeValueAsBytes(List.of(empty, dto)))
         )
                 .andDo(print())
                 .andExpect(status().isOk())

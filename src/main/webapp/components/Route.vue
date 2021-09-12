@@ -134,8 +134,7 @@
                 this.testing = false;
                 this.editingRoute = {...this.route};
                 this.showRequestBodySchema = !!this.editingRoute.requestBodySchema;
-                if (!this.editing) this.editing = true;
-                else this.cancel();
+                if (!this.editing) this.editing = true; else this.cancel();
                 if (this.editing) this.$nextTick(() => this.$refs.response.focus());
             },
             cancel() {
@@ -160,15 +159,14 @@
             },
             save() {
                 this.$nuxt.$loading.start();
-                this.saveRoute(this.editingRoute).then(() => {
+                this.saveRoute([this.route, this.editingRoute]).then(() => {
                     this.$nuxt.$loading.finish();
                     this.editing = false;
                 });
             },
             saveAsCopy() {
                 this.$nuxt.$loading.start();
-                this.editingRoute.id = '';
-                this.saveRoute(this.editingRoute).then(() => {
+                this.saveRoute([{}, this.editingRoute]).then(() => {
                     this.$nuxt.$loading.finish();
                     this.editing = false;
                 });

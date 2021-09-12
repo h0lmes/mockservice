@@ -1,15 +1,15 @@
 package com.mockservice;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.concurrent.ForkJoinPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Arrays;
 
 @SpringBootApplication
 public class MockServiceApplication {
@@ -18,6 +18,9 @@ public class MockServiceApplication {
 
     public static void main(String[] args) {
         ConfigurableEnvironment environment = SpringApplication.run(MockServiceApplication.class, args).getEnvironment();
+        log.info("ForkJoinPool parallelism = {}, poolSize = {}",
+            ForkJoinPool.commonPool().getParallelism(),
+            ForkJoinPool.commonPool().getPoolSize());
         logStartup(environment);
     }
 

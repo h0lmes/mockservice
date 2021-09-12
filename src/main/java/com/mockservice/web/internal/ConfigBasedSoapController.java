@@ -64,11 +64,7 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
             errorBody = "<code>" + FAULT_CODE_PLACEHOLDER + "</code>\n<message>" + FAULT_MESSAGE_PLACEHOLDER + "</message>";
         }
 
-        try {
-            register();
-        } catch (Exception e) {
-            log.error("Failed to register configured routes.", e);
-        }
+        register();
     }
 
     public CompletableFuture<ResponseEntity<String>> mock() {

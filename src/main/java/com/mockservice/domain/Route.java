@@ -2,17 +2,10 @@ package com.mockservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Objects;
-import java.util.UUID;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 public class Route implements Comparable<Route> {
 
-    public abstract static class MixInIgnoreId {
-        @JsonIgnore
-        abstract String getId();
-    }
-
-    private String id = "";
     private String group = "";
     private RouteType type = RouteType.REST;
     private RequestMethod method = RequestMethod.GET;
@@ -39,18 +32,6 @@ public class Route implements Comparable<Route> {
 
     public Route(Route route) {
         assignFrom(route);
-    }
-
-    public String getId() {
-        if (id.isEmpty()) {
-            id = UUID.randomUUID().toString();
-        }
-        return id;
-    }
-
-    public Route setId(String id) {
-        this.id = id == null ? "" : id;
-        return this;
     }
 
     public String getGroup() {

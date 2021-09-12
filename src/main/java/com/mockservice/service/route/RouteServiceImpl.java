@@ -92,9 +92,10 @@ public class RouteServiceImpl implements RouteService, ConfigObserver, RouteObse
     }
 
     @Override
-    public synchronized void putRoute(RouteDto dto) throws IOException {
-        Route route = routeMapper.fromDto(dto);
-        configRepository.putRoute(route);
+    public synchronized void putRoute(RouteDto reference, RouteDto route) throws IOException {
+        Route referenceRoute = routeMapper.fromDto(reference);
+        Route newRoute = routeMapper.fromDto(route);
+        configRepository.putRoute(referenceRoute, newRoute);
     }
 
     @Override

@@ -14,7 +14,6 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ForkJoinPool;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,17 +48,9 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
         this.configRepository = configRepository;
         this.jsonMapper = jsonMapper;
 
-        log.info("ForkJoinPool parallelism = {}, poolSize = {}",
-                ForkJoinPool.commonPool().getParallelism(),
-                ForkJoinPool.commonPool().getPoolSize());
-
         mockMethod = this.getClass().getMethod("mock");
 
-        try {
-            register();
-        } catch (Exception e) {
-            log.error("Failed to register configured routes.", e);
-        }
+        register();
     }
 
     public CompletableFuture<ResponseEntity<String>> mock() {

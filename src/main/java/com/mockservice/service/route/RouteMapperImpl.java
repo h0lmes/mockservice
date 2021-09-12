@@ -13,7 +13,6 @@ public class RouteMapperImpl implements RouteMapper {
     @Override
     public RouteDto toDto(Route route, @Nullable BiConsumer<Route, RouteDto> postProcess) {
         RouteDto dto = new RouteDto()
-            .setId(route.getId())
             .setGroup(route.getGroup())
             .setType(route.getType())
             .setMethod(route.getMethod())
@@ -32,7 +31,6 @@ public class RouteMapperImpl implements RouteMapper {
     @Override
     public Route fromDto(RouteDto dto) {
         return new Route()
-            .setId(dto.getId())
             .setGroup(dto.getGroup())
             .setType(dto.getType())
             .setMethod(dto.getMethod())

@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 public class RouteDto {
 
-    private String id = "";
     private String group = "";
     private RouteType type = RouteType.REST;
     private RequestMethod method = RequestMethod.GET;
@@ -21,15 +20,6 @@ public class RouteDto {
 
     public RouteDto() {
         // default
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public RouteDto setId(String id) {
-        this.id = id;
-        return this;
     }
 
     public String getGroup() {
