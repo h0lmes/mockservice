@@ -9,6 +9,7 @@ public class RouteVariable implements Comparable<RouteVariable> {
     private String value;
 
     public RouteVariable() {
+        // default
     }
 
     public String getName() {

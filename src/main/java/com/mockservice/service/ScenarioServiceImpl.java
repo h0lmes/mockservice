@@ -4,19 +4,17 @@ import com.mockservice.domain.Scenario;
 import com.mockservice.repository.ConfigObserver;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.repository.ScenarioObserver;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ScenarioServiceImpl implements ScenarioService, ConfigObserver, ScenarioObserver {
@@ -24,7 +22,7 @@ public class ScenarioServiceImpl implements ScenarioService, ConfigObserver, Sce
     private static final Logger log = LoggerFactory.getLogger(ScenarioServiceImpl.class);
 
     private final ConfigRepository configRepository;
-    private final Map<String, Scenario> activeScenarios = new ConcurrentHashMap<>();
+    private Set<String> active;
 
     public ScenarioServiceImpl(ConfigRepository configRepository) {
         this.configRepository = configRepository;
@@ -36,8 +34,8 @@ public class ScenarioServiceImpl implements ScenarioService, ConfigObserver, Sce
     }
 
     @Override
-    public synchronized List<Scenario> putScenario(Scenario scenario) throws IOException {
-        configRepository.putScenario(scenario);
+    public synchronized List<Scenario> putScenario(@Nullable Scenario originalScenario, @Nonnull Scenario scenario) throws IOException {
+        configRepository.putScenario(originalScenario, scenario);
         return getScenariosAsList();
     }
 
@@ -51,7 +49,14 @@ public class ScenarioServiceImpl implements ScenarioService, ConfigObserver, Sce
 
     @Override
     public Set<String> getActiveScenarios() {
-        return new HashSet<>(activeScenarios.keySet());
+        return getActiveScenariosStream()
+                .map(Scenario::getAlias)
+                .collect(Collectors.toSet());
+    }
+
+    private Stream<Scenario> getActiveScenariosStream() {
+        return configRepository.findAllScenarios().stream()
+                .filter(Scenario::getActive);
     }
 
     @Override
@@ -64,7 +69,7 @@ public class ScenarioServiceImpl implements ScenarioService, ConfigObserver, Sce
     }
 
     private void activateScenarioInternal(Scenario scenario) {
-        activeScenarios.put(scenario.getAlias(), scenario.setActive(true));
+        scenario.setActive(true);
     }
 
     @Override
@@ -78,13 +83,12 @@ public class ScenarioServiceImpl implements ScenarioService, ConfigObserver, Sce
 
     private void deactivateScenarioInternal(Scenario scenario) {
         scenario.setActive(false);
-        activeScenarios.remove(scenario.getAlias());
     }
 
     @Override
     public Optional<String> getAltFor(RequestMethod method, String path) {
-        return activeScenarios.values().stream()
-                .map(activeScenario -> activeScenario.getAltFor(method, path))
+        return getActiveScenariosStream()
+                .map(s -> s.getAltFor(method, path))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .findFirst();
@@ -97,6 +101,9 @@ public class ScenarioServiceImpl implements ScenarioService, ConfigObserver, Sce
     }
 
     private List<Scenario> findByAliases(Set<String> aliases) {
+        if (aliases == null) {
+            return List.of();
+        }
         return configRepository.findAllScenarios()
                 .stream()
                 .filter(s -> aliases.contains(s.getAlias()))
@@ -107,35 +114,22 @@ public class ScenarioServiceImpl implements ScenarioService, ConfigObserver, Sce
 
     @Override
     public void onBeforeConfigChanged() {
-        // do nothing
+        active = getActiveScenarios();
     }
 
     @Override
     public void onAfterConfigChanged() {
-        Set<String> active = getActiveScenarios();
-        deactivateAllScenarios();
         List<Scenario> scenarios = findByAliases(active);
         scenarios.forEach(this::activateScenarioInternal);
     }
 
-    private void deactivateAllScenarios() {
-        activeScenarios.clear();
+    @Override
+    public void onScenarioCreated(Scenario scenario) {
+        // ignore
     }
 
     @Override
-    public void onScenarioUpdated(String oldAlias, String newAlias) {
-        if (scenarioIsActive(oldAlias)) {
-            findByAlias(oldAlias).ifPresent(this::deactivateScenarioInternal);
-            findByAlias(newAlias).ifPresent(this::activateScenarioInternal);
-        }
-    }
-
-    private boolean scenarioIsActive(String alias) {
-        return activeScenarios.containsKey(alias);
-    }
-
-    @Override
-    public void onScenarioDeleted(String alias) {
-        findByAlias(alias).ifPresent(this::deactivateScenarioInternal);
+    public void onScenarioDeleted(Scenario scenario) {
+        // ignore
     }
 }

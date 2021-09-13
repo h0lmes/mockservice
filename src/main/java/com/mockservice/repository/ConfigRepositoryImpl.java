@@ -2,26 +2,19 @@ package com.mockservice.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mockservice.domain.Config;
-import com.mockservice.domain.Route;
-import com.mockservice.domain.RouteAlreadyExistsException;
-import com.mockservice.domain.Scenario;
-import com.mockservice.domain.Settings;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import com.mockservice.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 @Service
 public class ConfigRepositoryImpl implements ConfigRepository {
@@ -81,24 +74,36 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         if (config == null) {
             throw new IOException("Mapper returned null Config.");
         }
+        sortRoutes();
+        sortScenarios();
     }
 
-    private void readConfigFromString(String yaml) throws IOException {
+    private void sortRoutes() {
+        config.getRoutes().sort(Route::compareTo);
+    }
+
+    private void sortScenarios() {
+        config.getScenarios().sort(Scenario::compareTo);
+    }
+
+    private void configFromString(String yaml) throws IOException {
         try {
             config = yamlMapper.readValue(yaml, Config.class);
             if (config == null) {
                 throw new IOException("Mapper returned null Config.");
             }
+            sortRoutes();
+            sortScenarios();
         } catch (IOException e) {
             throw new IOException("Could not deserialize config. " + e.getMessage(), e);
         }
     }
 
-    private void trySaveConfigToFile() throws IOException {
-        trySaveConfigToFile(getConfigFile());
+    private void tryPersistConfig() throws IOException {
+        tryPersistConfig(getConfigFile());
     }
 
-    private void trySaveConfigToFile(File file) throws IOException {
+    private void tryPersistConfig(File file) throws IOException {
         try {
             yamlMapper.writeValue(file, config);
         } catch (IOException e) {
@@ -106,7 +111,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
     }
 
-    private String saveConfigToString() throws JsonProcessingException {
+    private String configToString() throws JsonProcessingException {
         return yamlMapper.writeValueAsString(config);
     }
 
@@ -126,20 +131,20 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     @Override
     public synchronized String getConfigData() throws JsonProcessingException {
-        return saveConfigToString();
+        return configToString();
     }
 
     @Override
     public synchronized void writeConfigData(String data) throws IOException {
         notifyBeforeConfigChanged();
-        readConfigFromString(data);
+        configFromString(data);
         notifyAfterConfigChanged();
-        trySaveConfigToFile();
+        tryPersistConfig();
     }
 
     @Override
     public synchronized void backup() throws IOException {
-        trySaveConfigToFile(getConfigBackupFile());
+        tryPersistConfig(getConfigBackupFile());
     }
 
     @Override
@@ -147,7 +152,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         notifyBeforeConfigChanged();
         readConfigFromFile(getConfigBackupFile());
         notifyAfterConfigChanged();
-        trySaveConfigToFile();
+        tryPersistConfig();
     }
 
     //----------------------------------------------------------------------
@@ -164,7 +169,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     @Override
     public synchronized void setSettings(Settings settings) throws IOException {
         config.setSettings(settings);
-        trySaveConfigToFile();
+        tryPersistConfig();
     }
 
     //----------------------------------------------------------------------
@@ -179,42 +184,49 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     @Override
-    public Optional<Route> findRoute(Route route) {
+    public Optional<Route> findRoute(@Nullable Route route) {
+        if (route == null) {
+            return Optional.empty();
+        }
         return findAllRoutes().stream()
-            .filter(route::equals)
-            .findFirst();
+                .filter(route::equals)
+                .findFirst();
     }
 
     @Override
-    public void putRoute(@Nullable Route reference, @Nonnull Route route) throws IOException {
+    public void putRoute(@Nullable Route originalRoute, @Nonnull Route route) throws IOException {
         Objects.requireNonNull(route, "Route could not be null.");
-
-        putRouteInternal(reference, route);
-        config.getRoutes().sort(Route::compareTo);
-        trySaveConfigToFile();
+        putRouteToConfig(originalRoute, route);
+        sortRoutes();
+        tryPersistConfig();
     }
 
-    private void putRouteInternal(Route reference, Route route) {
-        Route existingReference = null;
-        if (reference != null) {
-            existingReference = findRoute(reference).orElse(null);
-        }
-        Route existingRoute = findRoute(route).orElse(null);
-
-        if (existingReference == null) {
-            if (existingRoute != null) {
-                throw new RouteAlreadyExistsException(route);
-            }
-            config.getRoutes().add(route);
-            notifyRouteCreated(route);
+    private void putRouteToConfig(Route originalRoute, Route route) {
+        Route existingOriginal = findRoute(originalRoute).orElse(null);
+        if (existingOriginal == null) {
+            putRouteNew(route);
         } else {
-            if (existingRoute != null && !existingReference.equals(existingRoute)) {
-                throw new RouteAlreadyExistsException(route);
-            }
-            notifyRouteDeleted(existingReference);
-            existingReference.assignFrom(route);
-            notifyRouteCreated(existingReference);
+            putRouteExisting(route, existingOriginal);
         }
+    }
+
+    private void putRouteNew(Route route) {
+        Route existing = findRoute(route).orElse(null);
+        if (existing != null) {
+            throw new RouteAlreadyExistsException(route);
+        }
+        config.getRoutes().add(route);
+        notifyRouteCreated(route);
+    }
+
+    private void putRouteExisting(Route route, Route existingOriginal) {
+        Route existingRoute = findRoute(route).orElse(null);
+        if (existingRoute != null && !existingOriginal.equals(existingRoute)) {
+            throw new RouteAlreadyExistsException(route);
+        }
+        notifyRouteDeleted(existingOriginal);
+        existingOriginal.assignFrom(route);
+        notifyRouteCreated(existingOriginal);
     }
 
     @Override
@@ -226,37 +238,33 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
 
         if (modified) {
-            config.getRoutes().sort(Route::compareTo);
-            trySaveConfigToFile();
+            sortRoutes();
+            tryPersistConfig();
         }
     }
 
     private boolean putRouteInternal(@Nonnull Route route, boolean overwrite) {
         Objects.requireNonNull(route, "Route could not be null.");
-
         Route existing = findRoute(route).orElse(null);
-
         if (existing == null) {
-            return putNewRoute(route);
-        } else {
-            return putExistingRoute(existing, route, overwrite);
-        }
-    }
-
-    private boolean putNewRoute(Route route) {
-        config.getRoutes().add(route);
-        notifyRouteCreated(route);
-        return true;
-    }
-
-    private boolean putExistingRoute(Route existing, Route route, boolean overwrite) {
-        if (overwrite) {
-            notifyRouteDeleted(existing);
-            existing.assignFrom(route);
-            notifyRouteCreated(existing);
+            putNewRoute(route);
+            return true;
+        } else if (overwrite) {
+            putExistingRoute(existing, route);
             return true;
         }
         return false;
+    }
+
+    private void putNewRoute(Route route) {
+        config.getRoutes().add(route);
+        notifyRouteCreated(route);
+    }
+
+    private void putExistingRoute(Route existing, Route route) {
+        notifyRouteDeleted(existing);
+        existing.assignFrom(route);
+        notifyRouteCreated(existing);
     }
 
     @Override
@@ -271,7 +279,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
 
         if (modified) {
-            trySaveConfigToFile();
+            tryPersistConfig();
         }
     }
 
@@ -287,36 +295,56 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     @Override
-    public Optional<Scenario> findScenario(Scenario scenario) {
+    public Optional<Scenario> findScenario(@Nullable Scenario scenario) {
+        if (scenario == null) {
+            return Optional.empty();
+        }
         return findAllScenarios().stream()
-            .filter(scenario::equals)
-            .findFirst();
+                .filter(scenario::equals)
+                .findFirst();
     }
 
     @Override
-    public void putScenario(Scenario scenario) throws IOException {
-        putScenarioInternal(scenario);
-        config.getScenarios().sort(Scenario::compareTo);
-        trySaveConfigToFile();
+    public void putScenario(@Nullable Scenario originalScenario, @Nonnull Scenario scenario) throws IOException {
+        Objects.requireNonNull(scenario, "Scenario could not be null.");
+        putScenarioToConfig(originalScenario, scenario);
+        sortScenarios();
+        tryPersistConfig();
     }
 
-    private void putScenarioInternal(Scenario scenario) {
-        Scenario existing = findScenario(scenario).orElse(null);
-        if (existing == null) {
-            config.getScenarios().add(scenario);
-            notifyScenarioUpdated("", scenario.getAlias());
+    private void putScenarioToConfig(Scenario originalScenario, Scenario scenario) {
+        Scenario existingOriginal = findScenario(originalScenario).orElse(null);
+        if (existingOriginal == null) {
+            putScenarioNew(scenario);
         } else {
-            String oldAlias = existing.getAlias();
-            existing.assignFrom(scenario);
-            notifyScenarioUpdated(oldAlias, existing.getAlias());
+            putScenarioExisting(scenario, existingOriginal);
         }
+    }
+
+    private void putScenarioNew(Scenario scenario) {
+        Scenario existing = findScenario(scenario).orElse(null);
+        if (existing != null) {
+            throw new ScenarioAlreadyExistsException(scenario);
+        }
+        config.getScenarios().add(scenario);
+        notifyScenarioCreated(scenario);
+    }
+
+    private void putScenarioExisting(Scenario scenario, Scenario existingOriginal) {
+        Scenario existingScenario = findScenario(scenario).orElse(null);
+        if (existingScenario != null && !existingOriginal.equals(existingScenario)) {
+            throw new ScenarioAlreadyExistsException(scenario);
+        }
+        notifyScenarioDeleted(existingOriginal);
+        existingOriginal.assignFrom(scenario);
+        notifyScenarioCreated(existingOriginal);
     }
 
     @Override
     public void deleteScenario(Scenario scenario) throws IOException {
         if (config.getScenarios().remove(scenario)) {
-            notifyScenarioDeleted(scenario.getAlias());
-            trySaveConfigToFile();
+            notifyScenarioDeleted(scenario);
+            tryPersistConfig();
         }
     }
 
@@ -350,15 +378,15 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
     }
 
-    private void notifyScenarioUpdated(String oldAlias, String newAlias) {
+    private void notifyScenarioCreated(Scenario scenario) {
         if (scenarioObservers != null) {
-            scenarioObservers.forEach(o -> o.onScenarioUpdated(oldAlias, newAlias));
+            scenarioObservers.forEach(o -> o.onScenarioCreated(scenario));
         }
     }
 
-    private void notifyScenarioDeleted(String alias) {
+    private void notifyScenarioDeleted(Scenario scenario) {
         if (scenarioObservers != null) {
-            scenarioObservers.forEach(o -> o.onScenarioDeleted(alias));
+            scenarioObservers.forEach(o -> o.onScenarioDeleted(scenario));
         }
     }
 }

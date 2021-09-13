@@ -39,13 +39,13 @@ export const actions = {
             commit('setLastError', err, {root: true});
         }
     },
-    async save({commit, rootState}, scenario) {
+    async save({commit, rootState}, scenarios) {
         try {
             const url = rootState.BASE_URL + '/web-api/scenarios';
             const params = {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(scenario)
+                body: JSON.stringify(scenarios)
             };
             const res = await fetch(url, params);
             await handleError(res);
@@ -72,7 +72,14 @@ export const actions = {
         }
     },
     add({commit}) {
-        commit('add', {id: '', group: '', alias: 'New Alias', type: 'MAP', data: '', _new: true});
+        const scenario = {
+            group: '',
+            alias: 'New Alias',
+            type: 'MAP',
+            data: '',
+            _new: true
+        };
+        commit('add', scenario);
     },
     async activate({commit, rootState}, alias) {
         try {

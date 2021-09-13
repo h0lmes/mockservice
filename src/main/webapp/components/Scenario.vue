@@ -98,7 +98,7 @@
             this.activeSwitch = this.active;
         },
         mounted() {
-            if (!!this.scenario._new) {
+            if (this.scenario._new) {
                 this.edit();
             }
         },
@@ -134,8 +134,7 @@
             },
             edit() {
                 this.editingScenario = {...this.scenario};
-                if (!this.editing) this.editing = true;
-                else this.cancel();
+                if (!this.editing) this.editing = true; else this.cancel();
                 if (this.editing) this.$nextTick(() => this.$refs.data.focus());
             },
             cancel() {
@@ -159,7 +158,7 @@
             },
             save() {
                 this.$nuxt.$loading.start();
-                this.saveScenario(this.editingScenario)
+                this.saveScenario([this.scenario, this.editingScenario])
                     .then(() => {
                         this.$nuxt.$loading.finish();
                         this.editing = false;
@@ -168,7 +167,7 @@
             saveAsCopy() {
                 this.$nuxt.$loading.start();
                 this.editingScenario.id = '';
-                this.saveScenario(this.editingScenario)
+                this.saveScenario([{}, this.editingScenario])
                     .then(() => {
                         this.$nuxt.$loading.finish();
                         this.editing = false;

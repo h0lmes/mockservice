@@ -93,13 +93,14 @@ public class WebApiScenariosControllerTest {
 
     @Test
     public void putScenario() throws Exception {
+        Scenario empty = new Scenario();
         Scenario scenario = new Scenario().setAlias(ALIAS);
-        when(scenarioService.putScenario(any())).thenReturn(List.of(scenario));
+        when(scenarioService.putScenario(any(), any())).thenReturn(List.of(scenario));
 
         mvc.perform(
                 put(WEB_API_SCENARIOS)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.writeValueAsBytes(scenario))
+                        .content(jsonMapper.writeValueAsBytes(List.of(empty, scenario)))
         )
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -110,13 +111,14 @@ public class WebApiScenariosControllerTest {
 
     @Test
     public void putScenario_ScenarioAlreadyExistsExceptionThrown_BadRequest() throws Exception {
+        Scenario empty = new Scenario();
         Scenario scenario = new Scenario().setAlias(ALIAS);
-        when(scenarioService.putScenario(any())).thenThrow(ScenarioAlreadyExistsException.class);
+        when(scenarioService.putScenario(any(), any())).thenThrow(ScenarioAlreadyExistsException.class);
 
         mvc.perform(
                 put(WEB_API_SCENARIOS)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.writeValueAsBytes(scenario))
+                        .content(jsonMapper.writeValueAsBytes(List.of(empty, scenario)))
         )
                 .andDo(print())
                 .andExpect(status().isBadRequest());
@@ -124,13 +126,14 @@ public class WebApiScenariosControllerTest {
 
     @Test
     public void putScenario_ScenarioParseExceptionThrown_BadRequest() throws Exception {
+        Scenario empty = new Scenario();
         Scenario scenario = new Scenario().setAlias(ALIAS);
-        when(scenarioService.putScenario(any())).thenThrow(ScenarioParseException.class);
+        when(scenarioService.putScenario(any(), any())).thenThrow(ScenarioParseException.class);
 
         mvc.perform(
                 put(WEB_API_SCENARIOS)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.writeValueAsBytes(scenario))
+                        .content(jsonMapper.writeValueAsBytes(List.of(empty, scenario)))
         )
                 .andDo(print())
                 .andExpect(status().isBadRequest());

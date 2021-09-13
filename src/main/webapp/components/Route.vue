@@ -112,15 +112,15 @@
         props: {
             route: {type: Object},
         },
-        mounted() {
-            if (!!this.route._new) {
-                this.edit();
-            }
-        },
         computed: {
             open() {
                 return this.editing || this.testing;
             },
+        },
+        mounted() {
+            if (this.route._new) {
+                this.edit();
+            }
         },
         methods: {
             ...mapActions({

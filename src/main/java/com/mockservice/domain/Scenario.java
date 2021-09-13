@@ -28,10 +28,6 @@ public class Scenario implements Comparable<Scenario> {
         // default
     }
 
-    public Scenario(Scenario scenario) {
-        assignFrom(scenario);
-    }
-
     public String getGroup() {
         return group;
     }
@@ -73,6 +69,11 @@ public class Scenario implements Comparable<Scenario> {
         setAlias(source.getAlias());
         setType(source.getType());
         setData(source.getData());
+
+        if (getActive()) {
+            setActive(false);
+            setActive(true);
+        }
     }
 
     @Override

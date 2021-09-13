@@ -94,29 +94,38 @@ public class ScenarioTest {
     private static final String SCENARIO_WITH_ONE_PARAMETER = METHOD;
 
     @Test
-    public void create_ValidScenario_RouteExists() {
+    public void create_ActivateValidScenario_ParsedSuccessfully() {
         Scenario activeScenario = new Scenario().setData(SCENARIO_WITH_ALT).setActive(true);
         assertTrue(activeScenario.getActive());
         assertTrue(activeScenario.getAltFor(RequestMethod.valueOf(METHOD), PATH).isPresent());
     }
 
     @Test
-    public void create_ValidScenarioWithEmptyAlt_ParsedSuccessfullyAndRouteExists() {
+    public void create_ActivateValidScenarioWithEmptyAlt_ParsedSuccessfully() {
         Scenario activeScenario = new Scenario().setData(SCENARIO_WITH_EMPTY_ALT).setActive(true);
         assertTrue(activeScenario.getActive());
         assertTrue(activeScenario.getAltFor(RequestMethod.valueOf(METHOD), PATH).isPresent());
     }
 
     @Test
-    public void create_ValidScenarioWithEmptyLine_RouteExists() {
+    public void create_ActivateValidScenarioWithEmptyLine_ParsedSuccessfully() {
         Scenario activeScenario = new Scenario().setData(SCENARIO_WITH_EMPTY_LINES).setActive(true);
         assertTrue(activeScenario.getActive());
         assertTrue(activeScenario.getAltFor(RequestMethod.valueOf(METHOD), PATH).isPresent());
     }
 
     @Test
-    public void create_InvalidScenarioWithOneParameter_RouteExists() {
+    public void create_ActivateInvalidScenarioWithOneParameter_RouteExists() {
         Scenario scenario = new Scenario().setData(SCENARIO_WITH_ONE_PARAMETER);
         assertThrows(ScenarioParseException.class, () -> scenario.setActive(true));
+    }
+
+    @Test
+    public void create_AssignToActiveScenario_ScenarioActive() {
+        Scenario activeScenario = new Scenario().setData(SCENARIO_WITH_ALT).setActive(true);
+        Scenario scenario2 = new Scenario().setData(SCENARIO_WITH_EMPTY_ALT);
+        activeScenario.assignFrom(scenario2);
+        assertTrue(activeScenario.getActive());
+        assertTrue(activeScenario.getAltFor(RequestMethod.valueOf(METHOD), PATH).isPresent());
     }
 }

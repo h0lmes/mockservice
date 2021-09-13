@@ -1,6 +1,8 @@
 package com.mockservice.repository;
 
+import com.mockservice.domain.Scenario;
+
 public interface ScenarioObserver {
-    void onScenarioUpdated(String oldAlias, String newAlias);
-    void onScenarioDeleted(String alias);
+    void onScenarioCreated(Scenario scenario);
+    void onScenarioDeleted(Scenario scenario);
 }

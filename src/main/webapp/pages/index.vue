@@ -1,6 +1,6 @@
 <template>
     <div ref="routes" class="monospace">
-        <div class="component-toolbar mb-5">
+        <div class="component-toolbar mb-3">
             <div class="toolbar-item">
                 <input ref="search"
                        type="search"
@@ -12,6 +12,12 @@
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRoute">Add route</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addScenario">Add scenario</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger" @click="deleteVisibleRoutes">Delete visible routes</button>
+        </div>
+
+        <div class="component-toolbar mb-5">
+            <ViewSelector class="toolbar-item toolbar-item-w-fixed-auto"></ViewSelector>
+            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRoutes">Show routes</ToggleSwitch>
+            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showScenarios">Show scenarios</ToggleSwitch>
         </div>
 
         <Routes :routes="filteredRoutes"
@@ -36,15 +42,19 @@
     import {mapActions} from 'vuex';
     import Routes from "../components/Routes";
     import Loading from "../components/Loading";
+    import ViewSelector from "../components/ViewSelector";
+    import ToggleSwitch from "../components/ToggleSwitch";
 
     export default {
         name: "index",
-        components: {Routes, Loading},
+        components: {Routes, Loading, ViewSelector, ToggleSwitch},
         data() {
             return {
                 query: '',
                 queryApplied: '',
-                timeout: null
+                timeout: null,
+                showRoutes: true,
+                showScenarios: true,
             }
         },
         async fetch() {
@@ -60,8 +70,13 @@
                 return this.$store.state.scenarios.scenarios
             },
             filteredRoutes() {
-                if (!this.query.trim())
+                if (!this.showRoutes) {
+                    return [];
+                }
+
+                if (!this.query.trim()) {
                     return this.routes;
+                }
 
                 if (this.query.startsWith(':')) {
                     if (this.query === ':enabled') {
@@ -85,8 +100,13 @@
                 );
             },
             filteredScenarios() {
-                if (!this.query.trim())
+                if (!this.showScenarios) {
+                    return [];
+                }
+
+                if (!this.query.trim()) {
                     return this.scenarios;
+                }
 
                 return this.scenarios.filter(
                     v => v.group.toLowerCase().includes(this.query)

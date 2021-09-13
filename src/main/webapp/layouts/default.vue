@@ -10,12 +10,6 @@
                         <span class="nav-label">Routes</span>
                     </NuxtLink>
                 </li>
-                <!--<li class="nav-item">-->
-                    <!--<NuxtLink to="/scenarios">-->
-                        <!--<FontAwesomeIcon icon="receipt" class="nav-icon icon-width-fix"/>-->
-                        <!--<span class="nav-label">Scenarios</span>-->
-                    <!--</NuxtLink>-->
-                <!--</li>-->
                 <li class="nav-item">
                     <NuxtLink to="/import">
                         <FontAwesomeIcon icon="file-import" class="nav-icon icon-width-fix"/>
@@ -64,10 +58,6 @@
             </ul>
 
             <ul class="nav nav-hidden" ref="settings">
-                <li class="nav-group">VIEW</li>
-                <li class="nav-block">
-                    <ViewSelector class="mt-2 mb-2"></ViewSelector>
-                </li>
                 <li class="nav-group">COLOR THEME</li>
                 <li class="nav-block">
                     <ColorModePicker></ColorModePicker>
@@ -107,10 +97,9 @@
     import ColorAccentPicker from "../components/ColorAccentPicker";
     import ErrorPanel from "../components/ErrorPanel";
     import Loading from "../components/Loading";
-    import ViewSelector from "../components/ViewSelector";
 
     export default {
-        components: {ErrorPanel, Loading, ViewSelector, ColorModePicker, ColorAccentPicker},
+        components: {ErrorPanel, Loading, ColorModePicker, ColorAccentPicker},
         data() {
             return {
                 isOpen: true,

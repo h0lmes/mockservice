@@ -3,6 +3,8 @@ package com.mockservice.service;
 import com.mockservice.domain.Scenario;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +12,7 @@ import java.util.Set;
 
 public interface ScenarioService {
     List<Scenario> getScenariosAsList();
-    List<Scenario> putScenario(Scenario scenario) throws IOException;
+    List<Scenario> putScenario(@Nullable Scenario originalScenario, @Nonnull Scenario scenario) throws IOException;
     List<Scenario> deleteScenario(Scenario scenario) throws IOException;
 
     Set<String> getActiveScenarios();

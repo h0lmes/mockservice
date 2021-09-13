@@ -28,6 +28,22 @@
       "type" : "string",
       "format" : "email"
     },
+    "hostname" : {
+      "type" : "string",
+      "format" : "hostname"
+    },
+    "ipv4" : {
+      "type" : "string",
+      "format" : "ipv4"
+    },
+    "ipv6" : {
+      "type" : "string",
+      "format" : "ipv6"
+    },
+    "uri" : {
+      "type" : "string",
+      "format" : "uri"
+    },
     "tags" : {
       "type" : "array",
       "items" : {
@@ -47,6 +63,11 @@
       "type" : "string",
       "description" : "Order Status",
       "enum" : [ "placed", "approved", "delivered" ]
+    },
+    "intStatus" : {
+      "type" : "integer",
+      "description" : "Order Status",
+      "enum" : [ 1, 2, 5 ]
     },
     "complete" : {
       "type" : "boolean",

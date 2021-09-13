@@ -25,11 +25,8 @@ import static org.mockito.Mockito.*;
 public class ScenarioServiceImplTest {
 
     private static final String STR_1 = "line 1";
-
     private static final String ALIAS = "alias";
-    private static final String ALIAS2 = "alias2";
     private static final String NOT_EXISTING_ALIAS = "not-existing-alias";
-
     private static final RequestMethod METHOD = RequestMethod.POST;
     private static final String PATH = "/test";
     private static final String ALT1 = "400";
@@ -60,9 +57,9 @@ public class ScenarioServiceImplTest {
         when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
 
         ScenarioService service = service();
-        List<Scenario> scenarios = service.putScenario(scenario);
+        List<Scenario> scenarios = service.putScenario(null, scenario);
 
-        verify(configRepository, times(1)).putScenario(scenario);
+        verify(configRepository, times(1)).putScenario(null, scenario);
         assertTrue(scenarios.contains(scenario));
     }
 
@@ -218,51 +215,8 @@ public class ScenarioServiceImplTest {
     }
 
     @Test
-    public void onScenarioUpdated_NotExistingScenario_NotTrows() {
+    public void onScenarioCreated_NotExistingScenario_DoesNotThrow() {
         ScenarioObserver service = (ScenarioObserver) service();
-
-        assertDoesNotThrow(() -> service.onScenarioUpdated(NOT_EXISTING_ALIAS, ALIAS));
-    }
-
-    @Test
-    public void onScenarioUpdated_ExistingActiveScenario_SameScenarioActive() {
-        Scenario scenario = new Scenario().setAlias(ALIAS);
-        when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
-
-        ScenarioService service = service();
-        service.activateScenario(ALIAS);
-        ((ScenarioObserver) service).onScenarioUpdated(ALIAS, ALIAS);
-
-        assertTrue(scenario.getActive());
-    }
-
-    @Test
-    public void onScenarioUpdated_ExistingInactiveScenario_ScenarioNotActive() {
-        Scenario scenario = new Scenario().setAlias(ALIAS);
-        lenient().when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
-
-        ScenarioService service = service();
-        ((ScenarioObserver) service).onScenarioUpdated(ALIAS, ALIAS);
-
-        assertFalse(scenario.getActive());
-    }
-
-    @Test
-    public void onScenarioDeleted_ActiveScenarioExist_ScenarioDeactivated() {
-        Scenario scenario1 = new Scenario().setAlias(ALIAS);
-        Scenario scenario2 = new Scenario().setAlias(ALIAS2);
-        when(configRepository.findAllScenarios()).thenReturn(List.of(scenario1, scenario2));
-
-        ScenarioService service = service();
-        service.activateScenario(ALIAS);
-        service.activateScenario(ALIAS2);
-
-        assertTrue(scenario1.getActive());
-        assertTrue(scenario2.getActive());
-
-        ((ScenarioObserver) service).onScenarioDeleted(ALIAS);
-
-        assertFalse(scenario1.getActive());
-        assertTrue(scenario2.getActive());
+        assertDoesNotThrow(() -> service.onScenarioCreated(new Scenario()));
     }
 }

@@ -32,8 +32,8 @@ public class WebApiScenariosController {
     }
 
     @PutMapping("scenarios")
-    public List<Scenario> putScenario(@RequestBody Scenario scenario) throws IOException {
-        return scenarioService.putScenario(scenario);
+    public List<Scenario> putScenario(@RequestBody List<Scenario> scenarios) throws IOException {
+        return scenarioService.putScenario(scenarios.get(0), scenarios.get(1));
     }
 
     @DeleteMapping("scenarios")

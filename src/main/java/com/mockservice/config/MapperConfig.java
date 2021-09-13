@@ -42,6 +42,4 @@ public class MapperConfig {
         mapper.findAndRegisterModules();
         return mapper;
     }
-
-
 }

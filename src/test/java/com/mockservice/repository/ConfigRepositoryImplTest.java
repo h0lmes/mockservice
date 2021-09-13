@@ -14,10 +14,8 @@ import static org.mockito.Mockito.verify;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.mockservice.domain.Route;
-import com.mockservice.domain.RouteAlreadyExistsException;
-import com.mockservice.domain.Scenario;
-import com.mockservice.domain.Settings;
+import com.mockservice.domain.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -37,10 +35,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class ConfigRepositoryImplTest {
 
     private static final String ROUTE_PATH = "/api/path";
-    private static final String OLD_RESPONSE = "old";
-    private static final String NEW_RESPONSE = "new";
-    private static final String ALIAS = "default";
-    private static final String NEW_ALIAS = "new";
+    private static final String STR1 = "AAA";
+    private static final String STR2 = "BBB";
 
     @Mock
     private ConfigObserver configObserver;
@@ -78,7 +74,11 @@ public class ConfigRepositoryImplTest {
 
     //----------------------------------------------------------------------
     //
+    //
+    //
     //   Config
+    //
+    //
     //
     //----------------------------------------------------------------------
 
@@ -127,7 +127,11 @@ public class ConfigRepositoryImplTest {
 
     //----------------------------------------------------------------------
     //
+    //
+    //
     //   Settings
+    //
+    //
     //
     //----------------------------------------------------------------------
 
@@ -142,17 +146,20 @@ public class ConfigRepositoryImplTest {
         ConfigRepository configRepository = repository();
 
         Settings settings = new Settings();
-        settings.setQuantum(!settings.getQuantum());
+        boolean expected = !settings.getQuantum();
+        settings.setQuantum(expected);
         configRepository.setSettings(settings);
 
-        Settings expected = new Settings();
-        expected.setQuantum(!expected.getQuantum());
-        assertEquals(expected, configRepository.getSettings());
+        assertEquals(expected, configRepository.getSettings().getQuantum());
     }
 
     //----------------------------------------------------------------------
     //
+    //
+    //
     //   Routes
+    //
+    //
     //
     //----------------------------------------------------------------------
 
@@ -180,15 +187,15 @@ public class ConfigRepositoryImplTest {
     @Test
     public void putRoute_UpdateExisting_RouteUpdated() throws IOException {
         ConfigRepository configRepository = repository();
-        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(OLD_RESPONSE);
-        Route route2 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(NEW_RESPONSE);
+        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(STR1);
+        Route route2 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(STR2);
         configRepository.putRoute(null, route1);
         configRepository.putRoute(route1, route2);
 
         Route routeSearch = new Route().setPath(ROUTE_PATH);
         Optional<Route> routeOptional = configRepository.findRoute(routeSearch);
         assertTrue(routeOptional.isPresent());
-        assertEquals(NEW_RESPONSE, routeOptional.get().getResponse());
+        assertEquals(STR2, routeOptional.get().getResponse());
     }
 
     @DisplayName("Update existing route [1] with contents of [2], calls listener")
@@ -196,8 +203,8 @@ public class ConfigRepositoryImplTest {
     public void putRoute_UpdateExisting_ListenersCalled() throws IOException {
         ConfigRepository configRepository = repository();
 
-        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(OLD_RESPONSE);
-        Route route2 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(NEW_RESPONSE);
+        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(STR1);
+        Route route2 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(STR2);
 
         configRepository.putRoute(null, route1);
         verify(routeObserver, times(1)).onRouteCreated(any());
@@ -212,8 +219,8 @@ public class ConfigRepositoryImplTest {
     @Test
     public void putRoute_NewExistsByEquals_Throws() throws IOException {
         ConfigRepository configRepository = repository();
-        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(OLD_RESPONSE);
-        Route route2 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(NEW_RESPONSE);
+        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(STR1);
+        Route route2 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(STR2);
         configRepository.putRoute(null, route1);
         assertThrows(RouteAlreadyExistsException.class, () -> configRepository.putRoute(null, route2));
     }
@@ -222,9 +229,9 @@ public class ConfigRepositoryImplTest {
     @Test
     public void putRoute_ReferenceExistsAndNewExistsAndReferenceNotEqualsNew_Throws() throws IOException {
         ConfigRepository configRepository = repository();
-        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(OLD_RESPONSE);
-        Route route2 = new Route().setMethod(RequestMethod.POST).setPath(ROUTE_PATH).setResponse(OLD_RESPONSE);
-        Route route3 = new Route().setMethod(RequestMethod.POST).setPath(ROUTE_PATH).setResponse(NEW_RESPONSE);
+        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(STR1);
+        Route route2 = new Route().setMethod(RequestMethod.POST).setPath(ROUTE_PATH).setResponse(STR1);
+        Route route3 = new Route().setMethod(RequestMethod.POST).setPath(ROUTE_PATH).setResponse(STR2);
         configRepository.putRoute(null, route1);
         configRepository.putRoute(null, route2);
         assertThrows(RouteAlreadyExistsException.class, () -> configRepository.putRoute(route1, route3));
@@ -258,35 +265,35 @@ public class ConfigRepositoryImplTest {
         ConfigRepository configRepository = repository();
 
         Route route1 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.GET);
-        Route route2 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.POST).setResponse(OLD_RESPONSE);
+        Route route2 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.POST).setResponse(STR1);
         configRepository.putRoutes(List.of(route1, route2), true);
 
         Route routeFound = configRepository.findRoute(route2).orElse(null);
         assertNotNull(routeFound);
 
         Route route3 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.DELETE);
-        Route route4 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.POST).setResponse(NEW_RESPONSE);
+        Route route4 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.POST).setResponse(STR2);
         configRepository.putRoutes(List.of(route3, route4), true);
 
         assertEquals(3, configRepository.findAllRoutes().size());
         Route route4Found = configRepository.findRoute(route4).orElse(null);
         assertNotNull(route4Found);
-        assertEquals(NEW_RESPONSE, route4Found.getResponse());
+        assertEquals(STR2, route4Found.getResponse());
     }
 
     @Test
     public void putRoutes_RouteExists_OverwriteFalse_RouteNotModified_DoesNotThrow() throws IOException {
         ConfigRepository configRepository = repository();
-        Route route2 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.POST).setResponse(OLD_RESPONSE);
+        Route route2 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.POST).setResponse(STR1);
         configRepository.putRoutes(List.of(route2), true);
-        Route route4 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.POST).setResponse(NEW_RESPONSE);
+        Route route4 = new Route().setPath(ROUTE_PATH).setMethod(RequestMethod.POST).setResponse(STR2);
 
         assertDoesNotThrow(() -> configRepository.putRoutes(List.of(route4), false));
 
         Route route4Found = configRepository.findRoute(route4).orElse(null);
 
         assertNotNull(route4Found);
-        assertEquals(OLD_RESPONSE, route4Found.getResponse());
+        assertEquals(STR1, route4Found.getResponse());
     }
 
     @Test
@@ -336,7 +343,11 @@ public class ConfigRepositoryImplTest {
 
     //----------------------------------------------------------------------
     //
+    //
+    //
     //   Scenarios
+    //
+    //
     //
     //----------------------------------------------------------------------
 
@@ -344,34 +355,52 @@ public class ConfigRepositoryImplTest {
     public void putScenario_NotExisting_Success() throws IOException {
         ConfigRepository configRepository = repository();
 
-        Scenario scenario = new Scenario().setAlias(ALIAS);
-        configRepository.putScenario(scenario);
+        Scenario scenario = new Scenario().setAlias(STR1);
+        configRepository.putScenario(null, scenario);
 
         assertEquals(1, configRepository.findAllScenarios().size());
     }
 
     @Test
-    public void putScenario_Existing_UpdatesScenario() throws IOException {
+    public void putScenario_UpdateExisting_UpdatesScenario() throws IOException {
         ConfigRepository configRepository = repository();
-        Scenario scenario1 = new Scenario().setAlias(ALIAS).setData(OLD_RESPONSE);
-        Scenario scenario2 = new Scenario().setAlias(ALIAS).setData(NEW_RESPONSE);
-        configRepository.putScenario(scenario1);
-        configRepository.putScenario(scenario2);
+        Scenario scenario1 = new Scenario().setAlias(STR1).setData(STR1);
+        Scenario scenario2 = new Scenario().setAlias(STR1).setData(STR2);
+        configRepository.putScenario(null, scenario1);
+        configRepository.putScenario(scenario1, scenario2);
         List<Scenario> scenarios = configRepository.findAllScenarios();
 
         assertEquals(1, scenarios.size());
-        assertEquals(NEW_RESPONSE, scenarios.get(0).getData());
+        assertEquals(STR2, scenarios.get(0).getData());
+    }
+
+    @Test
+    public void putScenario_NoOriginalAndTryCreatingCopy_Throws() throws IOException {
+        ConfigRepository configRepository = repository();
+        Scenario scenario1 = new Scenario().setAlias(STR1).setData(STR1);
+        Scenario scenario2 = new Scenario().setAlias(STR1).setData(STR2);
+        configRepository.putScenario(null, scenario1);
+        assertThrows(ScenarioAlreadyExistsException.class, () -> configRepository.putScenario(null, scenario2));
+    }
+
+    @Test
+    public void putScenario_OriginalProvidedAndTryCreatingCopy_Throws() throws IOException {
+        ConfigRepository configRepository = repository();
+        Scenario scenario1 = new Scenario().setAlias(STR1);
+        Scenario scenario2 = new Scenario().setAlias(STR2);
+        Scenario scenario3 = new Scenario().setAlias(STR2);
+        configRepository.putScenario(null, scenario1);
+        configRepository.putScenario(null, scenario2);
+        assertThrows(ScenarioAlreadyExistsException.class, () -> configRepository.putScenario(scenario1, scenario3));
     }
 
     @Test
     public void deleteScenario_AddThenDeleteSameScenario_NoScenariosFound() throws IOException {
         ConfigRepository configRepository = repository();
 
-        Scenario scenario1 = new Scenario().setAlias(ALIAS);
-        configRepository.putScenario(scenario1);
-
-        Scenario scenario2 = new Scenario().setAlias(ALIAS);
-        configRepository.deleteScenario(scenario2);
+        Scenario scenario1 = new Scenario().setAlias(STR1);
+        configRepository.putScenario(null, scenario1);
+        configRepository.deleteScenario(scenario1);
 
         assertEquals(0, configRepository.findAllScenarios().size());
     }
@@ -380,11 +409,9 @@ public class ConfigRepositoryImplTest {
     public void deleteScenario_AddThenDeleteSameScenario_ListenerCalled() throws IOException {
         ConfigRepository configRepository = repository();
 
-        Scenario scenario1 = new Scenario().setAlias(ALIAS);
-        configRepository.putScenario(scenario1);
-
-        Scenario scenario2 = new Scenario(scenario1);
-        configRepository.deleteScenario(scenario2);
+        Scenario scenario1 = new Scenario().setAlias(STR1);
+        configRepository.putScenario(null, scenario1);
+        configRepository.deleteScenario(scenario1);
 
         verify(scenarioObserver, times(1)).onScenarioDeleted(any());
     }
@@ -393,10 +420,10 @@ public class ConfigRepositoryImplTest {
     public void deleteScenario_AddThenDeleteDifferentScenario_OneScenarioFound() throws IOException {
         ConfigRepository configRepository = repository();
 
-        Scenario scenario1 = new Scenario().setAlias(ALIAS);
-        configRepository.putScenario(scenario1);
+        Scenario scenario1 = new Scenario().setAlias(STR1);
+        configRepository.putScenario(null, scenario1);
 
-        Scenario scenario2 = new Scenario().setAlias(NEW_ALIAS);
+        Scenario scenario2 = new Scenario().setAlias(STR2);
         configRepository.deleteScenario(scenario2);
 
         assertEquals(1, configRepository.findAllScenarios().size());

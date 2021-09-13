@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.Scenario;
 import com.mockservice.domain.Settings;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -19,12 +22,12 @@ public interface ConfigRepository {
 
     List<Route> findAllRoutes();
     Optional<Route> findRoute(Route route);
-    void putRoute(Route reference, Route route) throws IOException;
+    void putRoute(@Nullable Route reference, @Nonnull Route route) throws IOException;
     void putRoutes(List<Route> routes, boolean overwrite) throws IOException;
     void deleteRoutes(List<Route> routes) throws IOException;
 
     List<Scenario> findAllScenarios();
     Optional<Scenario> findScenario(Scenario scenario);
-    void putScenario(Scenario scenario) throws IOException;
+    void putScenario(@Nullable Scenario reference, @Nonnull Scenario scenario) throws IOException;
     void deleteScenario(Scenario scenario) throws IOException;
 }
