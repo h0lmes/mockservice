@@ -34,15 +34,9 @@
   & .btn-primary {
     --btn-color: #bbb;
     --btn-color-focus: #eee;
-    //--btn-bg: #187356;
-    //--btn-bg-focus: #1b805e;
   }
 
   & .btn-danger {
-    //--btn-color: #999;
-    //--btn-color-focus: #ddd;
-    //--btn-bg: #6f222c;
-    //--btn-bg-focus: #802833;
     --btn-color: #b32453;
     --btn-color-focus: #d62b64;
     --btn-bg: #2e2e2e;
@@ -55,11 +49,6 @@
   --btn-color-focus: #ddd;
   --btn-bg: #3e4957;
   --btn-bg-focus: #475566;
-
-  & .btn-primary {
-    //--btn-bg: #245e80;
-    //--btn-bg-focus: #2e7aa6;
-  }
 
   & .btn-danger {
     --btn-bg: #803820;
@@ -94,7 +83,7 @@
     text-decoration: none;
   }
 
-  &:focus {
+  &:focus:not(.disabled) {
     background-color: var(--btn-bg-focus);
   }
 
@@ -105,11 +94,12 @@
     box-shadow: inset 0 3px 5px rgba(0, 0, 0, .18);
   }
 
-  &.disabled,
-  &[disabled] {
-    cursor: none;
-    opacity: .65;
+  &.disabled {
+    color: var(--btn-bg);
+    cursor: initial;
+    opacity: .25;
     box-shadow: none;
+    pointer-events: none;
   }
 
   a& {

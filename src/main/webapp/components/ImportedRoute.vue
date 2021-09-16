@@ -33,7 +33,7 @@
 </template>
 <script>
     import AutoSizeTextArea from "./AutoSizeTextArea";
-    import RouteMethod from "./RouteMethod";
+    import RouteMethod from "./route/RouteMethod";
 
     export default {
         name: "ImportedRoute",

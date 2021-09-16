@@ -14,10 +14,10 @@
             <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger" @click="deleteVisibleRoutes">Delete visible routes</button>
         </div>
 
-        <div class="component-toolbar mb-5">
+        <div class="component-toolbar mb-3">
             <ViewSelector class="toolbar-item toolbar-item-w-fixed-auto"></ViewSelector>
-            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRoutes">Show routes</ToggleSwitch>
-            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showScenarios">Show scenarios</ToggleSwitch>
+            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRoutes">Routes</ToggleSwitch>
+            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showScenarios">Scenarios</ToggleSwitch>
         </div>
 
         <Routes :routes="filteredRoutes"
@@ -40,7 +40,7 @@
 </template>
 <script>
     import {mapActions} from 'vuex';
-    import Routes from "../components/Routes";
+    import Routes from "../components/route/Routes";
     import Loading from "../components/Loading";
     import ViewSelector from "../components/ViewSelector";
     import ToggleSwitch from "../components/ToggleSwitch";

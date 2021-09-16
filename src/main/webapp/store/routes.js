@@ -9,6 +9,20 @@ export const mutations = {
     add(state, payload) {
         state.routes.unshift(payload);
     },
+    variable(state, payload) {
+        let route = state.routes.find(
+            r => r.method === payload.method
+                && r.path === payload.path
+                && r.alt === payload.alt
+        );
+
+        if (route && route.variables) {
+            let variable = route.variables.find(v => v.name === payload.name);
+            if (variable) {
+                variable.value = payload.value;
+            }
+        }
+    },
 };
 
 import {handleError} from "../js/common";
@@ -99,7 +113,7 @@ export const actions = {
             const res = await fetch(url, params);
             await handleError(res);
             const data = await res.json();
-            commit('set', data);
+            commit('variable', data);
         } catch (err) {
             commit('setLastError', err, {root: true});
         }
@@ -115,7 +129,7 @@ export const actions = {
             const res = await fetch(url, params);
             await handleError(res);
             const data = await res.json();
-            commit('clear', data);
+            commit('variable', data);
         } catch (err) {
             commit('setLastError', err, {root: true});
         }

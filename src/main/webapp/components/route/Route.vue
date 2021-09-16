@@ -10,7 +10,7 @@
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingRoute.group"/>
         </div>
 
-        <div class="mock-col">
+        <div class="mock-col w1">
             <div class="mock-col-header">TYPE</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(route.type)">{{ route.type }}</div>
             <select v-show="editing" class="form-control form-control-sm" v-model="editingRoute.type">
@@ -19,7 +19,7 @@
             </select>
         </div>
 
-        <div class="mock-col">
+        <div class="mock-col w1">
             <div class="mock-col-header">METHOD</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(route.method)">
                 <route-method :value="route.method" :disabled="route.disabled"></route-method>
@@ -53,6 +53,7 @@
         <div class="mock-col w-fixed-auto">
             <div v-show="editing" class="mock-col-header"></div>
             <div class="mock-col-value">
+                <button type="button" class="btn btn-sm btn-default" :class="{'disabled' : !hasVariables}" @click="vars">vars</button>
                 <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
                 <button type="button" class="btn btn-sm btn-default" @click="test">test</button>
                 <button type="button" class="btn btn-sm btn-danger" @click="del">delete</button>
@@ -89,24 +90,30 @@
         <div v-if="testing" class="mock-col w100">
             <RouteTester :route="route" @close="testing = false"></RouteTester>
         </div>
+
+        <div v-if="showVariables" class="mock-col w100 mt-2">
+            <RouteVariables :route="route"></RouteVariables>
+        </div>
     </div>
 </template>
 <script>
     import {mapActions} from 'vuex';
     import RouteTester from "./RouteTester";
-    import ToggleSwitch from "./ToggleSwitch";
-    import AutoSizeTextArea from "./AutoSizeTextArea";
+    import ToggleSwitch from "../ToggleSwitch";
+    import AutoSizeTextArea from "../AutoSizeTextArea";
     import RouteMethod from "./RouteMethod";
+    import RouteVariables from "./RouteVariables";
 
     export default {
         name: "Route",
-        components: {AutoSizeTextArea, RouteTester, RouteMethod, ToggleSwitch},
+        components: {AutoSizeTextArea, RouteTester, RouteMethod, ToggleSwitch, RouteVariables},
         data() {
             return {
                 editing: false,
                 editingRoute: {},
                 testing: false,
                 showRequestBodySchema: false,
+                showVariables: false,
             }
         },
         props: {
@@ -115,6 +122,9 @@
         computed: {
             open() {
                 return this.editing || this.testing;
+            },
+            hasVariables() {
+                return this.route.variables && this.route.variables.length > 0;
             },
         },
         mounted() {
@@ -129,6 +139,9 @@
             }),
             filter(value) {
                 this.$emit('filter', value);
+            },
+            vars() {
+                this.showVariables = !this.showVariables;
             },
             edit() {
                 this.testing = false;

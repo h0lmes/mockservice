@@ -10,7 +10,7 @@
     </div>
 </template>
 <script>
-    import RouteToAdd from "../components/RouteToAdd";
+    import RouteToAdd from "./RouteToAdd";
 
     export default {
         name: "RoutesToAdd",

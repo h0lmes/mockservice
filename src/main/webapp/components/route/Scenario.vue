@@ -10,12 +10,6 @@
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingScenario.group"/>
         </div>
 
-        <div class="mock-col w3">
-            <div class="mock-col-header">ALIAS</div>
-            <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.alias)">{{ scenario.alias }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingScenario.alias"/>
-        </div>
-
         <div class="mock-col w2">
             <div class="mock-col-header">TYPE</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.type)">{{ scenario.type }}</div>
@@ -26,7 +20,13 @@
             </select>
         </div>
 
-        <div class="mock-col w3 text-center">
+        <div class="mock-col w3">
+            <div class="mock-col-header">ALIAS</div>
+            <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.alias)">{{ scenario.alias }}</div>
+            <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingScenario.alias"/>
+        </div>
+
+        <div class="mock-col w2 text-center">
             <div v-show="editing" class="mock-col-header"></div>
             <ToggleSwitch v-model="activeSwitch" @toggle="activeToggled()">Active</ToggleSwitch>
         </div>
@@ -34,7 +34,9 @@
         <div class="mock-col w-fixed-auto">
             <div v-show="editing" class="mock-col-header"></div>
             <div class="mock-col-value">
+                <button type="button" class="btn btn-sm disabled">&#xA0;&#xA0;&#xA0;&#xA0;</button>
                 <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
+                <button type="button" class="btn btn-sm disabled">&#xA0;&#xA0;&#xA0;&#xA0;</button>
                 <button type="button" class="btn btn-sm btn-danger" @click="del">delete</button>
             </div>
         </div>
@@ -65,9 +67,9 @@
 </template>
 <script>
     import {mapActions} from 'vuex';
-    import RoutesToAdd from "../components/RoutesToAdd";
-    import ToggleSwitch from "./ToggleSwitch";
-    import AutoSizeTextArea from "./AutoSizeTextArea";
+    import RoutesToAdd from "./RoutesToAdd";
+    import ToggleSwitch from "../ToggleSwitch";
+    import AutoSizeTextArea from "../AutoSizeTextArea";
 
     export default {
         name: "Scenario",

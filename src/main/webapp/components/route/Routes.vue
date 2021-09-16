@@ -1,18 +1,26 @@
 <template>
     <div>
         <p v-if="entities.length === 0">
-            Nothing here yet ¯\_(ツ)_/¯
+            Nothing here ¯\_(ツ)_/¯
         </p>
         <div v-for="(entity, index) in entities" :key="entityKey(entity)">
             <div v-if="groupStart(entities, entity, index)" class="component-row-group-boundary"></div>
-            <Route v-if="isRoute(entity)" :route="entity" @filter="$emit('filter', $event)"></Route>
-            <Scenario v-else :scenario="entity" @filter="$emit('filter', $event)"></Scenario>
+            <Route
+                    v-if="isRoute(entity)"
+                    :route="entity"
+                    @filter="$emit('filter', $event)"
+            ></Route>
+            <Scenario
+                    v-else
+                    :scenario="entity"
+                    @filter="$emit('filter', $event)"
+            ></Scenario>
         </div>
     </div>
 </template>
 <script>
-    import Route from "../components/Route";
-    import Scenario from "../components/Scenario";
+    import Route from "./Route";
+    import Scenario from "./Scenario";
 
     export default {
         name: "Routes",
