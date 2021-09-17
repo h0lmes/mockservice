@@ -11,7 +11,7 @@
         components: {ToggleSwitch},
         data() {
             return {
-                label: 'Compact view',
+                label: 'Compact',
                 storageKey: 'CompactView',
                 cssClass: 'compact-view',
                 value: false,

@@ -1,14 +1,15 @@
 <template>
-    <div ref="routes" class="monospace">
+    <div class="monospace">
         <div class="component-toolbar mb-3">
             <div class="toolbar-item">
                 <input ref="search"
-                       type="search"
+                       type="text"
                        class="form-control monospace"
                        placeholder="search here or click on values"
-                       @input="debounce($event.target.value)"/>
+                       @keydown.enter.exact.stop="setFilter($event.target.value)"/>
             </div>
-            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="setFilter('')">Clear filter</button>
+            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="jsSearch" @toggle="setFilter('')">JS</ToggleSwitch>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="setFilter('')">Clear search</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRoute">Add route</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addScenario">Add scenario</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger" @click="deleteVisibleRoutes">Delete visible routes</button>
@@ -20,19 +21,31 @@
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showScenarios">Scenarios</ToggleSwitch>
         </div>
 
-        <Routes :routes="filteredRoutes"
-                :scenarios="filteredScenarios"
-                @filter="setFilter($event)"></Routes>
+        <Routes :entities="filteredEntities" @filter="setFilter($event)"></Routes>
 
-        <div class="color-secondary mt-4 smaller">(middle-click to edit, Esc on any field to cancel)</div>
-        <div class="color-secondary mt-2 smaller">
-            MAP: searches all routes by METHOD + PATH, returns ALT from the first match or empty if not found.
+        <div class="color-secondary mt-4">
+            <div class="mt-2 bold">Legend</div>
+            <div class="mt-2">
+                MAP scenario: searches all routes by METHOD + PATH, returns ALT from the first match or empty if not found.
+            </div>
+            <div class="mt-2">
+                QUEUE scenario: same as MAP but tries to match only the topmost route, removes matched route from the queue.
+            </div>
+            <div class="mt-2">
+                CIRCULAR_QUEUE scenario: same as QUEUE plus auto-restarts when queue gets depleted.
+            </div>
         </div>
-        <div class="color-secondary mt-2 smaller">
-            QUEUE: same as MAP but tries to match only the topmost route, removes matched route from the queue.
-        </div>
-        <div class="color-secondary mt-2 smaller">
-            CIRCULAR QUEUE: same as QUEUE plus auto-restarts when queue gets depleted.
+        <div class="color-secondary mt-4">
+            <div class="mt-2 bold">Tips</div>
+            <div class="mt-2">
+                Middle-click route or scenario to edit, press Esc in any field to cancel.
+            </div>
+            <div class="mt-2">
+                For more precise filtering enable 'JS' and write Javascript expression (example: e.group=='default' && !e.disabled).
+            </div>
+            <div class="mt-2">
+                If you want to alter multiple routes or scenarios (f.e. alter paths) consider navigating to Config page and editing it as plain text.
+            </div>
         </div>
 
         <Loading v-if="$fetchState.pending"></Loading>
@@ -51,10 +64,10 @@
         data() {
             return {
                 query: '',
-                queryApplied: '',
                 timeout: null,
                 showRoutes: true,
                 showScenarios: true,
+                jsSearch: false,
             }
         },
         async fetch() {
@@ -64,73 +77,57 @@
         fetchDelay: 0,
         computed: {
             routes() {
-                return this.$store.state.routes.routes
+                return this.showRoutes ? this.$store.state.routes.routes : [];
             },
             scenarios() {
-                return this.$store.state.scenarios.scenarios
+                return this.showScenarios ? this.$store.state.scenarios.scenarios : [];
+            },
+            entities() {
+                return [...this.routes, ...this.scenarios];
+            },
+            filteredEntities() {
+                if (!this.query) {
+                    return this.entities;
+                }
+
+                let searchFn;
+                if (this.jsSearch) {
+                    searchFn = Function("e", "return " + this.query + ";");
+                } else {
+                    const query = this.query;
+                    searchFn = function (e) {
+                        if (e.method && e.path) {
+                            return e.group.includes(query)
+                                || e.type.includes(query)
+                                || e.method.includes(query)
+                                || e.path.includes(query)
+                                || e.alt.includes(query);
+                        } else {
+                            return e.group.includes(query)
+                                || e.alias.includes(query)
+                                || e.type.includes(query);
+                        }
+                    }
+                }
+                try {
+                    return this.entities.filter(searchFn);
+                } catch (e) {
+                    console.error(e);
+                    return [];
+                }
             },
             filteredRoutes() {
-                if (!this.showRoutes) {
-                    return [];
-                }
-
-                if (!this.query.trim()) {
-                    return this.routes;
-                }
-
-                if (this.query.startsWith(':')) {
-                    if (this.query === ':enabled') {
-                        return this.routes.filter(
-                            v => !v.disabled
-                        );
-                    }
-                    if (this.query === ':disabled') {
-                        return this.routes.filter(
-                            v => v.disabled
-                        );
-                    }
-                }
-
-                return this.routes.filter(
-                    v => v.group.toLowerCase().includes(this.query)
-                        || v.path.toLowerCase().includes(this.query)
-                        || v.type.toLowerCase().includes(this.query)
-                        || v.method.toLowerCase().includes(this.query)
-                        || v.alt.toLowerCase().includes(this.query)
-                );
-            },
-            filteredScenarios() {
-                if (!this.showScenarios) {
-                    return [];
-                }
-
-                if (!this.query.trim()) {
-                    return this.scenarios;
-                }
-
-                return this.scenarios.filter(
-                    v => v.group.toLowerCase().includes(this.query)
-                        || v.alias.toLowerCase().includes(this.query)
-                        || v.type.toLowerCase().includes(this.query)
-                );
+                return this.filteredEntities.filter(e => e.hasOwnProperty('alt'));
             },
         },
         methods: {
             ...mapActions({
                 fetchRoutes: 'routes/fetch',
-                newRoute: 'routes/add',
+                addRoute: 'routes/add',
                 deleteRoutes: 'routes/delete',
                 fetchScenarios: 'scenarios/fetch',
-                newScenario: 'scenarios/add',
+                addScenario: 'scenarios/add',
             }),
-            addRoute() {
-                this.newRoute();
-                this.scrollToTop();
-            },
-            addScenario() {
-                this.newScenario();
-                this.scrollToTop();
-            },
             deleteVisibleRoutes() {
                 if (confirm('Are you sure you want to delete all visible routes?\n'
                     + 'Note: if filtered you only delete those you see on the screen.')) {
@@ -139,19 +136,9 @@
                         .then(() => this.$nuxt.$loading.finish());
                 }
             },
-            debounce(value) {
-                clearTimeout(this.timeout);
-                let that = this;
-                this.timeout = setTimeout(function () {
-                    that.query = value.toLowerCase();
-                }, 500);
-            },
             setFilter(value) {
-                this.$refs.search.value = value;
-                this.query = value.toLowerCase();
-            },
-            scrollToTop() {
-                this.$refs.routes.scrollTop = 0;
+                this.$refs.search.value = value.trim();
+                this.query = value.trim();
             },
         }
     }

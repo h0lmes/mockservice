@@ -3,8 +3,8 @@
         <p v-if="entities.length === 0">
             Nothing here ¯\_(ツ)_/¯
         </p>
-        <div v-for="(entity, index) in entities" :key="entityKey(entity)">
-            <div v-if="groupStart(entities, entity, index)" class="component-row-group-boundary"></div>
+        <div v-for="(entity, index) in sortedEntities" :key="entityKey(entity)">
+            <div v-if="groupStart(sortedEntities, entity, index)" class="component-row-group-boundary"></div>
             <Route
                     v-if="isRoute(entity)"
                     :route="entity"
@@ -29,29 +29,28 @@
             return {}
         },
         props: {
-            routes: {type: Array},
-            scenarios: {type: Array},
+            entities: {type: Array},
         },
         computed: {
-            entities() {
+            sortedEntities() {
                 let compare = function(a, b) {
                     if (a < b) return -1;
                     else if (a > b) return 1;
                     return 0;
                 };
-                return [...this.routes, ...this.scenarios].sort((a, b) => {
+                return this.entities.sort((a, b) => {
                     let c;
                     c = compare(a._new, b._new);
                     if (c !== 0) return c;
                     c = compare(a.group, b.group);
                     if (c !== 0) return c;
 
-                    let aroute = a.hasOwnProperty('alt');
-                    let broute = b.hasOwnProperty('alt');
-                    c = compare(aroute, broute);
+                    let isRouteA = a.hasOwnProperty('alt');
+                    let isRouteB = b.hasOwnProperty('alt');
+                    c = compare(isRouteA, isRouteB);
                     if (c !== 0) return c;
 
-                    if (!aroute) return 0;
+                    if (!isRouteA) return 0;
 
                     c = compare(a.type, b.type);
                     if (c !== 0) return c;
