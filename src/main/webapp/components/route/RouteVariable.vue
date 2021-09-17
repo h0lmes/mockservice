@@ -9,7 +9,7 @@
             <input type="text"
                    class="form-control form-control-sm"
                    v-model="value"
-                   :placeholder="variable.defaultValue"/>
+                   :placeholder="defaultValue"/>
         </div>
         <div class="var-col w-fixed-auto">
             <button type="button" class="btn btn-sm btn-default" @click="setVar">set</button>
@@ -34,6 +34,11 @@
             route: {type: Object},
             variable: {type: Object},
         },
+        computed: {
+            defaultValue() {
+                return this.variable.value === null ? this.variable.defaultValue : '';
+            },
+        },
         mounted() {
             this.value = this.variable.value;
         },
@@ -57,7 +62,7 @@
                     path: this.route.path,
                     alt: this.route.alt,
                     name: this.variable.name,
-                    value: this.value,
+                    value: this.value ? this.value : '',
                 };
             },
             setVar() {
