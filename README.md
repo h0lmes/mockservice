@@ -2,7 +2,7 @@
 ![Branches](.github/badges/branches.svg)
 [![License](.github/badges/license.svg)](/LICENSE)
 
-### Mock Service ⭐
+### Mock Service 🔸
 
 An easy to use service to mock REST and SOAP endpoints.
 Suitable for integration/e2e testing.
@@ -17,7 +17,7 @@ This project is licensed under the MIT License -
 see the [LICENSE](/LICENSE) file for details
 
 #
-### Where to start ⭐
+### Where to start 🔸
 
 1. Grab latest release binary.
 2. Run it (Java 11 or higher required).
@@ -28,7 +28,7 @@ Refer to [README](/src/main/webapp/README.md) in `src/main/webapp`
 for instructions on how to build application yourself.
 
 #
-### Route Response ⭐
+### Route Response 🔸
 
 Response field may contain:
 - **response** (JSON or XML body) with or without HTTP head
@@ -77,7 +77,7 @@ Response head + body + callback request head + body:
     }
 
 #
-### Request Validation ⭐
+### Request Validation 🔸
 
 You can define **Request Body Schema** (in JSON format) for any route
 to have request body validated against the schema.
@@ -96,7 +96,7 @@ to use in response (see Settings).
 - or error description (with `type` and `message` fields)
 
 #
-### Route Alt (Alternative) ⭐
+### Route Alt (Alternative) 🔸
 
 Alt allow you to create alternative responses
 for the same mapping (method + path).
@@ -125,7 +125,7 @@ then the route with alt = `invalid_format` would match.
 or dare **Go Quantum**. 😄
 
 #
-### Predefined variables ⭐
+### Predefined variables 🔸
 
 You can use predefined variables in Response, those would be substituted
 with their values each time an endpoint is fetched:
@@ -145,7 +145,7 @@ with their values each time an endpoint is fetched:
 - `${enum:str1:str2:...}` - a random one of given arguments (may be useful to represent enum values)
 
 #
-### Request variables ⭐
+### Request variables 🔸
 
 You can use variables which are provided on a per-request basis.
 
@@ -202,7 +202,7 @@ The following variables would be available:
     ${NumberToDollarsRequest.Value}
 
 #
-### Mock-Variable header ⭐
+### Mock-Variable header 🔸
 
 Multiple **Mock-Variable** headers supported per HTTP request.
 Each header should define exactly one variable.
