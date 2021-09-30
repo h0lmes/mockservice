@@ -1,9 +1,10 @@
 package com.mockservice.service.route;
 
 import com.mockservice.domain.RouteType;
+import org.springframework.web.bind.annotation.RequestMethod;
+
 import java.util.List;
 import java.util.Objects;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 public class RouteDto {
 

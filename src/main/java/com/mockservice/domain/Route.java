@@ -1,8 +1,9 @@
 package com.mockservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.Objects;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.Objects;
 
 public class Route implements Comparable<Route> {
 

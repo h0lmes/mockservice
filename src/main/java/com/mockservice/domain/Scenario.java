@@ -1,13 +1,14 @@
 package com.mockservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.web.bind.annotation.RequestMethod;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 public class Scenario implements Comparable<Scenario> {
 

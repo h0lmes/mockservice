@@ -1,5 +1,7 @@
 package com.mockservice.template;
 
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -12,7 +14,6 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import org.springframework.stereotype.Component;
 
 @Component
 public class DefaultTemplateEngine implements TemplateEngine {

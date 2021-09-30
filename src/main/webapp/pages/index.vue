@@ -41,10 +41,10 @@
                 Middle-click route or scenario to edit, press Esc in any field to cancel.
             </div>
             <div class="mt-2">
-                For more precise filtering enable 'JS' and write Javascript expression (example: e.group=='default' && !e.disabled).
+                For more precise filtering enable 'JS' and use Javascript expressions (example: e.group=='default' && !e.disabled).
             </div>
             <div class="mt-2">
-                If you want to alter multiple routes or scenarios (f.e. alter paths) consider navigating to Config page and editing it as plain text.
+                To alter multiple routes or scenarios quickly consider navigating to Config page and editing it as plain text.
             </div>
         </div>
 

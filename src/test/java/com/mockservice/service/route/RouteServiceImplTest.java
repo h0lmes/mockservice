@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
+
+import com.mockservice.util.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
@@ -49,9 +51,11 @@ public class RouteServiceImplTest {
     private TemplateEngine templateEngine;
     @Mock
     private RouteMapper routeMapper;
+    @Mock
+    private RandomUtils randomUtils;
 
     private RouteService service() {
-        return new RouteServiceImpl(configRepository, templateEngine, routeMapper);
+        return new RouteServiceImpl(configRepository, routeMapper, randomUtils, templateEngine);
     }
 
     @Test
@@ -114,6 +118,37 @@ public class RouteServiceImplTest {
             assertEquals("id", var0.getName());
             assertNull(var0.getDefaultValue());
             assertEquals("123", var0.getValue());
+
+            assertEquals("name", var1.getName());
+            assertEquals("default", var1.getDefaultValue());
+            assertNull(var1.getValue());
+        });
+    }
+
+    @Test
+    public void getRoutes_RouteWithVariablesExistsAndVariableValueDoesNotExist_ReturnsDefaults() {
+        Route route = new Route().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
+        when(configRepository.findAllRoutes()).thenReturn(List.of(route));
+
+        RouteDto routeDto = new RouteDto().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
+        doAnswer(ans -> {
+            BiConsumer<Route, RouteDto> postProcess = (BiConsumer<Route, RouteDto>) ans.getArguments()[1];
+            postProcess.accept(route, routeDto);
+            return List.of(routeDto);
+        }).when(routeMapper).toDto(anyList(), any());
+
+        RouteService service = service();
+        List<RouteDto> routes = service.getRoutes();
+
+        assertEquals(1, routes.size());
+        assertEquals(2, routes.get(0).getVariables().size());
+
+        RouteVariable var0 = routes.get(0).getVariables().get(0);
+        RouteVariable var1 = routes.get(0).getVariables().get(1);
+        assertAll(() -> {
+            assertEquals("id", var0.getName());
+            assertNull(var0.getDefaultValue());
+            assertNull(var0.getValue());
 
             assertEquals("name", var1.getName());
             assertEquals("default", var1.getDefaultValue());

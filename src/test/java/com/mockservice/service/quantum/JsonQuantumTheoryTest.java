@@ -3,11 +3,12 @@ package com.mockservice.service.quantum;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.producer.JsonProducerImpl;
 import com.mockservice.producer.ValueProducerImpl;
-import org.junit.jupiter.api.RepeatedTest;
+import com.mockservice.util.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,9 +21,13 @@ public class JsonQuantumTheoryTest {
     private static final String EMPTY_OBJECT_JSON = "{}";
     private static final String NOT_A_JSON = "<test>test</test>";
 
+    @Mock
+    private RandomUtils randomUtils;
+
     private QuantumTheory theory() {
-        ValueProducerImpl valueProducer = new ValueProducerImpl();
-        return new JsonQuantumTheory(valueProducer, new JsonProducerImpl(valueProducer));
+        ValueProducerImpl valueProducer = new ValueProducerImpl(randomUtils);
+        JsonProducerImpl jsonProducer = new JsonProducerImpl(valueProducer, randomUtils);
+        return new JsonQuantumTheory(valueProducer, jsonProducer, randomUtils);
     }
 
     @Test
@@ -35,7 +40,7 @@ public class JsonQuantumTheoryTest {
         assertFalse(theory().applicable(NOT_A_JSON));
     }
 
-    @RepeatedTest(50)
+    @Test
     public void apply_ToValidJson_ReturnsDeserializableJson() {
         String json = theory().apply(VALID_JSON);
         ObjectMapper mapper = new ObjectMapper();

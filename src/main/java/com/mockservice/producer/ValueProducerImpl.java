@@ -17,7 +17,10 @@ public class ValueProducerImpl implements ValueProducer {
     private static final int[] stringLengths = {1, 1, 1, 2, 2, 3};
     private static final String[] booleans = {"false", "true"};
 
-    public ValueProducerImpl() {
+    private final RandomUtils randomUtils;
+
+    public ValueProducerImpl(RandomUtils randomUtils) {
+        this.randomUtils = randomUtils;
         vocabulary = ARTICLE
                 .replaceAll("[^A-Za-z\\-\\s]", "")
                 .toLowerCase()
@@ -26,10 +29,10 @@ public class ValueProducerImpl implements ValueProducer {
 
     @Override
     public String randomString() {
-        if (RandomUtils.withChance(20)) {
+        if (randomUtils.withChance(20)) {
             return randomChars();
         }
-        return randomWords(stringLengths[RandomUtils.rnd(stringLengths.length)]);
+        return randomWords(stringLengths[randomUtils.rnd(stringLengths.length)]);
     }
 
     @Override
@@ -59,7 +62,7 @@ public class ValueProducerImpl implements ValueProducer {
 
     @Override
     public String randomIntegerString() {
-        int len = RandomUtils.rnd(8) + 1;
+        int len = randomUtils.rnd(8) + 1;
         String number = ThreadLocalRandom.current()
                 .ints(0, 9)
                 .limit(len)
@@ -73,8 +76,8 @@ public class ValueProducerImpl implements ValueProducer {
         return str.replaceFirst("^0+(?!$)", "");
     }
 
-    private static String maybeFloatify(String number) {
-        if (RandomUtils.withChance(75)) {
+    private String maybeFloatify(String number) {
+        if (randomUtils.withChance(75)) {
             if (number.length() >= 2) {
                 int pointPosition = ThreadLocalRandom.current().nextInt(1, number.length());
                 number = number.substring(0, pointPosition) + "." + number.substring(pointPosition);
@@ -87,6 +90,6 @@ public class ValueProducerImpl implements ValueProducer {
 
     @Override
     public String randomBooleanString() {
-        return booleans[RandomUtils.rnd(2)];
+        return booleans[randomUtils.rnd(2)];
     }
 }

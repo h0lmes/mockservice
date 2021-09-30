@@ -42,13 +42,6 @@ public class IOUtils {
         }
     }
 
-    public static void writeFile(File file, String data) throws IOException {
-        try (FileOutputStream outputStream = new FileOutputStream(file)) {
-            byte[] strToBytes = data.getBytes();
-            outputStream.write(strToBytes);
-        }
-    }
-
     public static List<String> toList(String resource) {
         try (BufferedReader reader = new BufferedReader(new StringReader(resource))) {
             return reader.lines().collect(Collectors.toList());

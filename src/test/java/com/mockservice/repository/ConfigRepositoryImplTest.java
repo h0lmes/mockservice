@@ -61,6 +61,13 @@ public class ConfigRepositoryImplTest {
         return configRepository;
     }
 
+    private ConfigRepository repositoryWithNoObservers() {
+        return new ConfigRepositoryImpl(
+                getTempFile("config.yml"),
+                getTempFile("backup.yml"),
+                getYamlMapper());
+    }
+
     private String getTempFile(String fileName) {
         return new File(folder, fileName).getAbsolutePath();
     }
@@ -100,6 +107,14 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
+    public void writeConfigData_NoObservers_DoesNotThrow() throws IOException {
+        ConfigRepository configRepository = repositoryWithNoObservers();
+        String configData = configRepository.getConfigData();
+
+        assertDoesNotThrow(() -> configRepository.writeConfigData(configData));
+    }
+
+    @Test
     public void backupAndRestore_NonDefaultConfig_ConfigRestored() throws IOException {
         ConfigRepository configRepository = repository();
         Route route = new Route().setPath(ROUTE_PATH);
@@ -123,6 +138,26 @@ public class ConfigRepositoryImplTest {
 
         verify(configObserver, times(1)).onBeforeConfigChanged();
         verify(configObserver, times(1)).onAfterConfigChanged();
+    }
+
+    @Test
+    public void writeConfigData_WritePreviouslyReadData_ConfigRestored() throws IOException {
+        ConfigRepository configRepository = repository();
+        Route route = new Route().setPath(ROUTE_PATH);
+        configRepository.putRoute(null, route);
+        String configData = configRepository.getConfigData();
+
+        configRepository = repository();
+        configRepository.writeConfigData(configData);
+
+        assertTrue(configRepository.findRoute(route).isPresent());
+    }
+
+    @Test
+    public void writeConfigData_EmptyString_Throws() {
+        ConfigRepository configRepository = repository();
+
+        assertThrows(IOException.class, () -> configRepository.writeConfigData(""));
     }
 
     //----------------------------------------------------------------------
@@ -213,6 +248,17 @@ public class ConfigRepositoryImplTest {
         configRepository.putRoute(route1, route2);
         verify(routeObserver, times(2)).onRouteCreated(any());
         verify(routeObserver, times(1)).onRouteDeleted(any());
+    }
+
+    @Test
+    public void putRoute_WithNoObservers_DoesNotThrow() {
+        ConfigRepository configRepository = repositoryWithNoObservers();
+
+        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(STR1);
+        Route route2 = new Route().setMethod(RequestMethod.GET).setPath(ROUTE_PATH).setResponse(STR2);
+
+        assertDoesNotThrow(() -> configRepository.putRoute(null, route1));
+        assertDoesNotThrow(() -> configRepository.putRoute(route1, route2));
     }
 
     @DisplayName("Try to create new route [2] that equals already existing route [1] -> throws (do not allow duplicates)")
@@ -414,6 +460,15 @@ public class ConfigRepositoryImplTest {
         configRepository.deleteScenario(scenario1);
 
         verify(scenarioObserver, times(1)).onScenarioDeleted(any());
+    }
+
+    @Test
+    public void deleteScenario_WithNoObservers_DoesNotThrow() throws IOException {
+        ConfigRepository configRepository = repositoryWithNoObservers();
+
+        Scenario scenario1 = new Scenario().setAlias(STR1);
+        assertDoesNotThrow(() -> configRepository.putScenario(null, scenario1));
+        assertDoesNotThrow(() -> configRepository.deleteScenario(scenario1));
     }
 
     @Test

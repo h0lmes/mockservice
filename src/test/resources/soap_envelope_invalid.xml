@@ -1,0 +1,8 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://www.dataaccess.com/webservicesserver/">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <web:NumberToDollarsResponse>
+            <web:NumberToDollarsResult>${enum:TEST1:TEST2}</web:NumberToDollarsResult>
+            <web:Result>${NumberToDollarsRequest.Value:DEFAULT_VALUE}</web:Result>
+    </soapenv:Body>
+</soapenv:Envelope>

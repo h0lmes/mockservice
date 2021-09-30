@@ -100,4 +100,11 @@ public class RouteVariableDtoTest {
         RouteVariableDto route2 = new RouteVariableDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_2);
         assertTrue(0 > route1.compareTo(route2));
     }
+
+    @Test
+    public void toString_EqualForEqualObjects() {
+        RouteVariableDto route1 = new RouteVariableDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
+        RouteVariableDto route2 = new RouteVariableDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
+        assertEquals(route1.toString(), route2.toString());
+    }
 }

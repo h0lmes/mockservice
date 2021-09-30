@@ -1,16 +1,5 @@
 package com.mockservice.service;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
 import com.mockservice.domain.Settings;
@@ -21,10 +10,6 @@ import com.mockservice.service.route.RouteService;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.validate.DataValidationException;
 import com.mockservice.validate.DataValidator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,9 +17,19 @@ import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @RunWith(JUnitPlatform.class)
@@ -68,12 +63,14 @@ public class MockServiceImplTest {
     @Mock
     private QuantumTheory quantumTheory;
     @Mock
+    private QuantumTheory quantumTheoryNonApplicable;
+    @Mock
     private DataValidator dataValidator;
 
     private MockService createMockService() {
         return new MockServiceImpl(
                 2, templateEngine, routeService, scenarioService, configRepository, requestService,
-                List.of(quantumTheory), List.of(dataValidator));
+                List.of(quantumTheoryNonApplicable, quantumTheory), List.of(dataValidator));
     }
 
     @BeforeEach
@@ -245,16 +242,14 @@ public class MockServiceImplTest {
         when(configRepository.getSettings()).thenReturn(settings);
 
         when(dataValidator.applicable(any())).thenReturn(true);
-        doAnswer(invocation -> {
-            throw new DataValidationException();
-        }).when(dataValidator).validate(any(), any());
+        Mockito.doThrow(DataValidationException.class).when(dataValidator).validate(any(), any());
 
         MockService mockService = createMockService();
         assertThrows(RuntimeException.class, () -> mockService.mock(request));
     }
 
     @Test
-    public void mock_RouteHasRequestBodySchema_InvalidJson_Alt400Enabled_NoRoute400_ExceptionThrown() {
+    public void mock_RouteHasRequestBodySchema_InvalidJson_Alt400EnabledButNoRoute400_ExceptionThrown() {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setRequestBodySchema(JSON_SCHEMA);
         when(routeService.getEnabledRoute(any()))
                 .thenReturn(Optional.of(route))
@@ -265,16 +260,14 @@ public class MockServiceImplTest {
         when(configRepository.getSettings()).thenReturn(settings);
 
         when(dataValidator.applicable(any())).thenReturn(true);
-        doAnswer(invocation -> {
-            throw new DataValidationException();
-        }).when(dataValidator).validate(any(), any());
+        Mockito.doThrow(DataValidationException.class).when(dataValidator).validate(any(), any());
 
         MockService mockService = createMockService();
         assertThrows(RuntimeException.class, () -> mockService.mock(request));
     }
 
     @Test
-    public void mock_RouteHasRequestBodySchema_InvalidJson_Alt400Enabled_Route400Exists_NoExceptionThrown() {
+    public void mock_RouteHasRequestBodySchema_InvalidJson_Alt400EnabledAndRoute400Exists_NoExceptionThrown() {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setRequestBodySchema(JSON_SCHEMA);
         Route route400 = new Route(route).setAlt(ALT_400);
         when(routeService.getEnabledRoute(any()))
@@ -286,9 +279,7 @@ public class MockServiceImplTest {
         when(configRepository.getSettings()).thenReturn(settings);
 
         when(dataValidator.applicable(any())).thenReturn(true);
-        doAnswer(invocation -> {
-            throw new DataValidationException();
-        }).when(dataValidator).validate(any(), any());
+        Mockito.doThrow(DataValidationException.class).when(dataValidator).validate(any(), any());
 
         MockService mockService = createMockService();
         assertDoesNotThrow(() -> mockService.mock(request));

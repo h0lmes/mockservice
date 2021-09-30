@@ -52,9 +52,7 @@ public class WebApiSettingsControllerTest {
         )
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.randomAlt", is(false)))
-                .andExpect(jsonPath("$.quantum", is(false)));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
     @Test

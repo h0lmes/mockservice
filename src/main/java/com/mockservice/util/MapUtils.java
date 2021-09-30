@@ -19,6 +19,10 @@ public class MapUtils {
         /* hidden */
     }
 
+    public static boolean isEmpty(Map<?, ?> map) {
+        return map == null || map.isEmpty();
+    }
+
     public static Map<String, Object> jsonToMap(String json) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());

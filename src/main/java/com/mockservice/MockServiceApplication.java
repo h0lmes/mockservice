@@ -1,15 +1,17 @@
 package com.mockservice;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.concurrent.ForkJoinPool;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.concurrent.ForkJoinPool;
 
 @SpringBootApplication
 public class MockServiceApplication {
@@ -27,10 +29,7 @@ public class MockServiceApplication {
     private static void logStartup(Environment env) {
         String appName = env.getProperty("spring.application.name");
         String serverPort = env.getProperty("server.port");
-        String contextPath = env.getProperty("server.servlet.context-path");
-        if (contextPath == null || contextPath.isEmpty()) {
-            contextPath = "/";
-        }
+        String contextPath = StringUtils.defaultIfEmpty(env.getProperty("server.servlet.context-path"), "/");
         String hostAddress = "localhost";
         try {
             hostAddress = InetAddress.getLocalHost().getHostAddress();

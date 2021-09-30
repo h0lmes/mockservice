@@ -14,7 +14,6 @@ import org.springframework.web.servlet.HandlerMapping;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.*;
 
@@ -33,7 +32,7 @@ public class SoapRequestFacadeTest {
     @Mock
     private HttpServletRequest request;
 
-    private BufferedReader asBufferedReader(String str) {
+    private BufferedReader asReader(String str) {
         return new BufferedReader(new StringReader(str));
     }
 
@@ -55,7 +54,7 @@ public class SoapRequestFacadeTest {
 
     @Test
     public void getBody_ValidBody_ReturnsBody() throws IOException {
-        when(request.getReader()).thenReturn(asBufferedReader(BODY));
+        when(request.getReader()).thenReturn(asReader(BODY));
         RequestFacade facade = new SoapRequestFacade(request, new ObjectMapper());
 
         assertEquals(BODY, facade.getBody());
@@ -127,13 +126,33 @@ public class SoapRequestFacadeTest {
         lenient().when(request.getHeaders(eq("Mock-Variable"))).thenReturn(headers);
 
         String body = IOUtils.asString("soap_envelope_valid.xml");
-        when(request.getReader()).thenReturn(asBufferedReader(body));
+        when(request.getReader()).thenReturn(asReader(body));
 
         RequestFacade facade = new SoapRequestFacade(request, new ObjectMapper());
-
         Map<String, String> variables = facade.getVariables(Optional.empty());
+
         assertEquals("${NumberToDollarsRequest.Value:DEFAULT_VALUE}",
                 variables.get("NumberToDollarsResponse.Result"));
         assertEquals("42 42", variables.get("headerVariable"));
+    }
+
+    @Test
+    public void getVariables_InvalidXmlInBody_ReturnsNoVariables() throws IOException {
+        String body = IOUtils.asString("soap_envelope_invalid.xml");
+        when(request.getReader()).thenReturn(asReader(body));
+
+        RequestFacade facade = new SoapRequestFacade(request, new ObjectMapper());
+        Map<String, String> variables = facade.getVariables(Optional.empty());
+
+        assertTrue(variables.isEmpty());
+    }
+
+    @Test
+    public void getVariables_EmptyBody_ReturnsNoVariables() throws IOException {
+        when(request.getReader()).thenReturn(asReader(""));
+        RequestFacade facade = new SoapRequestFacade(request, new ObjectMapper());
+        Map<String, String> variables = facade.getVariables(Optional.empty());
+
+        assertTrue(variables.isEmpty());
     }
 }

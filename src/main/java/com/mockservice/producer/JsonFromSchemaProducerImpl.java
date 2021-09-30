@@ -12,9 +12,11 @@ public class JsonFromSchemaProducerImpl implements JsonFromSchemaProducer {
     private static final int MAX_NUMBER_OF_ELEMENTS = 3;
 
     private final ValueProducer valueProducer;
+    private final RandomUtils randomUtils;
 
-    public JsonFromSchemaProducerImpl(ValueProducer valueProducer) {
+    public JsonFromSchemaProducerImpl(ValueProducer valueProducer, RandomUtils randomUtils) {
         this.valueProducer = valueProducer;
+        this.randomUtils = randomUtils;
     }
 
     @Override
@@ -58,7 +60,7 @@ public class JsonFromSchemaProducerImpl implements JsonFromSchemaProducer {
 
     private String makeArray(Map<String, Object> map, int level) {
         Map<String, Object> items = (Map) map.get("items");
-        int numberOfElements = RandomUtils.rnd(MIN_NUMBER_OF_ELEMENTS, MAX_NUMBER_OF_ELEMENTS);
+        int numberOfElements = randomUtils.rnd(MIN_NUMBER_OF_ELEMENTS, MAX_NUMBER_OF_ELEMENTS);
 
         StringBuilder sb = new StringBuilder("[");
         String delimiter = "";
@@ -140,7 +142,7 @@ public class JsonFromSchemaProducerImpl implements JsonFromSchemaProducer {
     }
 
     private String getRandomItem(List<Object> enumList) {
-        int index = RandomUtils.rnd(enumList.size());
+        int index = randomUtils.rnd(enumList.size());
         Object item = enumList.get(index);
         String quote = item instanceof String ? "\"" : "";
         return quote + item.toString() + quote;

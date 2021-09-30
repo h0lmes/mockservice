@@ -29,12 +29,10 @@ public class SoapRequestFacade extends AbstractRequestFacade {
 
     private Map<String, String> getBodyAsVariables() {
         String body = getBody();
-        if (body != null && !body.isEmpty()) {
-            try {
-                return MapUtils.flattenMap(MapUtils.xmlToMap(body));
-            } catch (Exception e) {
-                log.warn("Not a valid XML:\n{}", body);
-            }
+        try {
+            return MapUtils.flattenMap(MapUtils.xmlToMap(body));
+        } catch (Exception e) {
+            log.warn("Not a valid XML:\n{}", body);
         }
         return new HashMap<>();
     }

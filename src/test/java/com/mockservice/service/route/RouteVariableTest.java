@@ -63,4 +63,11 @@ public class RouteVariableTest {
         RouteVariable route2 = new RouteVariable().setName(STR_2);
         assertTrue(0 > route1.compareTo(route2));
     }
+
+    @Test
+    public void toString_EqualsForEqualObjects() {
+        RouteVariable route1 = new RouteVariable().setName(STR_1);
+        RouteVariable route2 = new RouteVariable().setName(STR_1);
+        assertEquals(route1.toString(), route2.toString());
+    }
 }

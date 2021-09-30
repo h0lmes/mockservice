@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class OpenApiServiceImplTest {
 
     private static final String PATH = "/v1/test";
+    private static final String PATH_NO_SERVERS = "/test";
 
     @Mock
     private JsonFromSchemaProducer jsonFromSchemaProducer;
@@ -50,7 +51,7 @@ public class OpenApiServiceImplTest {
 
         List<Route> routes = openApiService.routesFromYaml(yaml);
 
-        assertEquals(5, routes.size());
+        assertEquals(6, routes.size());
         assertTrue(routes.stream()
                         .anyMatch(route -> RequestMethod.GET.equals(route.getMethod())
                                 && PATH.equals(route.getPath())
@@ -75,6 +76,13 @@ public class OpenApiServiceImplTest {
         assertTrue(routes.stream()
                         .anyMatch(route -> RequestMethod.POST.equals(route.getMethod())
                                 && PATH.equals(route.getPath())
+                                && "205".equals(route.getAlt())
+                        ),
+                "POST 205"
+        );
+        assertTrue(routes.stream()
+                        .anyMatch(route -> RequestMethod.POST.equals(route.getMethod())
+                                && PATH.equals(route.getPath())
                                 && "400".equals(route.getAlt())
                         ),
                 "POST 400"
@@ -86,6 +94,32 @@ public class OpenApiServiceImplTest {
                         ),
                 "POST 404"
         );
+    }
+
+    @Test
+    public void routesFromYaml_WithNoServers() throws IOException {
+        OpenApiService openApiService = createOpenApiService();
+        String yaml = IOUtils.asString("openapi_no_servers_test.yml");
+
+        List<Route> routes = openApiService.routesFromYaml(yaml);
+
+        assertEquals(1, routes.size());
+        assertTrue(routes.stream()
+                        .anyMatch(route -> RequestMethod.GET.equals(route.getMethod())
+                                && PATH_NO_SERVERS.equals(route.getPath())
+                                && "".equals(route.getAlt())
+                        ),
+                "GET"
+        );
+    }
+
+    @Test
+    public void routesFromYaml_NotOpenApiYaml_ReturnsNoRoutes() throws IOException {
+        OpenApiService openApiService = createOpenApiService();
+
+        List<Route> routes = openApiService.routesFromYaml("key: value");
+
+        assertEquals(0, routes.size());
     }
 
     @Test

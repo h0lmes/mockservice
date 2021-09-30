@@ -47,6 +47,9 @@ paths:
                   $ref: '#/components/schemas/Test'
         '204':
           description: no content
+        '205':
+          description: no content media types
+          content:
         '400':
           description: successful operation
           content:

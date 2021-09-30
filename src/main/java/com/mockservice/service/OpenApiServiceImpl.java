@@ -12,6 +12,7 @@ import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
 import com.mockservice.producer.JsonFromSchemaProducer;
 import com.mockservice.util.JsonUtils;
+import com.mockservice.util.MapUtils;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -92,13 +93,11 @@ public class OpenApiServiceImpl implements OpenApiService {
     private Set<String> serversFromOpenApi(OpenAPI openApi) {
         Set<String> paths = new HashSet<>();
         List<Server> servers = openApi.getServers();
-        if (servers != null) {
-            Pattern pattern = Pattern.compile(URL_PARTS_REGEX, Pattern.CASE_INSENSITIVE + Pattern.UNICODE_CASE);
-            for (Server server : servers) {
-                Matcher matcher = pattern.matcher(server.getUrl());
-                if (matcher.find() && matcher.groupCount() >= 3) {
-                    paths.add(matcher.group(3));
-                }
+        Pattern pattern = Pattern.compile(URL_PARTS_REGEX, Pattern.CASE_INSENSITIVE + Pattern.UNICODE_CASE);
+        for (Server server : servers) {
+            Matcher matcher = pattern.matcher(server.getUrl());
+            if (matcher.find()) {
+                paths.add(matcher.group(3));
             }
         }
         return paths;
@@ -206,8 +205,8 @@ public class OpenApiServiceImpl implements OpenApiService {
     private MediaType mediaTypeFromContent(Content content) {
         if (content != null && !content.isEmpty()) {
             MediaType mediaType = content.get("application/json");
-            if (mediaType == null && content.keySet().iterator().hasNext()) {
-                mediaType = content.get(content.keySet().iterator().next());
+            if (mediaType == null && !content.isEmpty()) {
+                mediaType = content.values().iterator().next();
             }
             return mediaType;
         }
@@ -217,7 +216,7 @@ public class OpenApiServiceImpl implements OpenApiService {
     private String exampleFromMediaType(MediaType mediaType) {
         if (mediaType != null) {
             Map<String, Example> examples = mediaType.getExamples();
-            if (examples != null && examples.values().iterator().hasNext()) {
+            if (!MapUtils.isEmpty(examples)) {
                 Example example1 = examples.values().iterator().next();
                 try {
                     return jsonMapper.writeValueAsString(example1.getValue());

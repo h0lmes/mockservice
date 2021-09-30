@@ -1,0 +1,42 @@
+openapi: 3.0.1
+info:
+  title: Test
+  version: 1.0.0
+tags:
+- name: default
+paths:
+  /test:
+    get:
+      tags:
+      summary: Test
+      operationId: testGet
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Test'
+components:
+  schemas:
+    Test:
+      required:
+      - id
+      - name
+      - status
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          example: example name
+        status:
+          type: string
+          enum:
+          - new
+          - done
+          - cancelled

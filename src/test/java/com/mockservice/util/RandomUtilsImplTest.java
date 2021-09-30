@@ -1,23 +1,23 @@
 package com.mockservice.util;
 
-import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RandomUtilsTest {
+public class RandomUtilsImplTest {
 
     private static final int MIN = 5;
     private static final int MAX = 10;
 
-    @RepeatedTest(10)
+    @Test
     public void rnd_NumberOfAlternatives_ReturnsNumberNotLessThanZeroAndLessThanNumberOfAlternatives() {
-        int result = RandomUtils.rnd(MIN);
+        int result = new RandomUtilsImpl().rnd(MIN);
         assertTrue(0 <= result && result < MIN);
     }
 
-    @RepeatedTest(10)
+    @Test
     public void rnd_MinMax_ReturnsNumberNotLessThanMinAndNotGreaterThanMax() {
-        int result = RandomUtils.rnd(MIN, MAX);
+        int result = new RandomUtilsImpl().rnd(MIN, MAX);
         assertTrue(MIN <= result && result <= MAX);
     }
 }

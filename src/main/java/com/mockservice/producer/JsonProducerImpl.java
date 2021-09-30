@@ -32,9 +32,11 @@ public class JsonProducerImpl implements JsonProducer {
     };
 
     private final ValueProducer valueProducer;
+    private final RandomUtils randomUtils;
 
-    public JsonProducerImpl(ValueProducer valueProducer) {
+    public JsonProducerImpl(ValueProducer valueProducer, RandomUtils randomUtils) {
         this.valueProducer = valueProducer;
+        this.randomUtils = randomUtils;
     }
 
     @Override
@@ -58,7 +60,7 @@ public class JsonProducerImpl implements JsonProducer {
             case BOOLEAN:
                 return valueProducer.randomBooleanString();
             case ARRAY:
-                return generateArrayValue(level);
+                return generateArray(level);
             case OBJECT:
                 return generateObjectValue(level);
             default:
@@ -66,13 +68,17 @@ public class JsonProducerImpl implements JsonProducer {
         }
     }
 
-    private String generateArrayValue(int level) {
+    private String generateArray(int level) {
+        int numberOfElements = getRandomNumberOfElements();
+        JsonValueType elementType = getRandomJsonValueType(valueTypes);
+        return generateArray(level, numberOfElements, elementType);
+    }
+
+    @Override
+    public String generateArray(int level, int numberOfElements, JsonValueType elementType) {
         if (stopAtLevel(level)) {
             return "null";
         }
-
-        int numberOfElements = getRandomNumberOfElements();
-        JsonValueType elementType = getRandomJsonValueType(valueTypes);
 
         if (JsonValueType.OBJECT.equals(elementType) || JsonValueType.ARRAY.equals(elementType)) {
             String content = createArrayElements(elementType, numberOfElements, level + 1, ",\n");
@@ -85,15 +91,15 @@ public class JsonProducerImpl implements JsonProducer {
 
     private boolean stopAtLevel(int level) {
         int percent = 95 - level * 30;
-        return percent < 10 || RandomUtils.withChance(100 - percent);
+        return percent < 10 || randomUtils.withChance(100 - percent);
     }
 
     private int getRandomNumberOfElements() {
-        return RandomUtils.rnd(MAX_NUMBER_OF_ELEMENTS + 1);
+        return randomUtils.rnd(MAX_NUMBER_OF_ELEMENTS + 1);
     }
 
     private JsonValueType getRandomJsonValueType(JsonValueType[] valueTypes) {
-        return valueTypes[RandomUtils.rnd(valueTypes.length)];
+        return valueTypes[randomUtils.rnd(valueTypes.length)];
     }
 
     private String createArrayElements(JsonValueType elementType,

@@ -1,9 +1,10 @@
 package com.mockservice.service.route;
 
 import com.mockservice.domain.Route;
+
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.BiConsumer;
-import javax.annotation.Nullable;
 
 public interface RouteMapper {
     RouteDto toDto(Route route, @Nullable BiConsumer<Route, RouteDto> postProcess);

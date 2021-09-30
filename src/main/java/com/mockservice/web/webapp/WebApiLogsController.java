@@ -10,13 +10,13 @@ import java.io.File;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("web-api")
+@RequestMapping("web-api/log")
 @CrossOrigin(origins = "*")
 public class WebApiLogsController {
 
     private static final Logger log = LoggerFactory.getLogger(WebApiLogsController.class);
 
-    @GetMapping("log")
+    @GetMapping
     public String getLog() throws IOException {
         return IOUtils.asString(new File("./logs/mockservice.log"));
     }

@@ -1,7 +1,8 @@
 package com.mockservice.service.route;
 
-import java.util.Objects;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.Objects;
 
 public class RouteVariableDto implements Comparable<RouteVariableDto> {
 

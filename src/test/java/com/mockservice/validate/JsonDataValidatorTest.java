@@ -1,5 +1,6 @@
 package com.mockservice.validate;
 
+import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,7 +22,7 @@ public class JsonDataValidatorTest {
     private static final String MALFORMED_JSON = "{\"product_id\": \"\",";
 
     private DataValidator validator() {
-        return new JsonDataValidator();
+        return new JsonDataValidator(JsonSchemaFactory.byDefault());
     }
 
     @Test

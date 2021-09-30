@@ -11,6 +11,12 @@ import java.io.IOException;
 
 public class JsonDataValidator implements DataValidator {
 
+    private final JsonSchemaFactory jsonSchemaFactory;
+
+    public JsonDataValidator(JsonSchemaFactory jsonSchemaFactory) {
+        this.jsonSchemaFactory = jsonSchemaFactory;
+    }
+
     @Override
     public boolean applicable(String data) {
         try {
@@ -31,10 +37,9 @@ public class JsonDataValidator implements DataValidator {
         } catch (IOException e) {
             throw new DataValidationException("Error loading data or schema.", e);
         }
-        final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
         final JsonSchema jsonSchema;
         try {
-            jsonSchema = factory.getJsonSchema(nodeSchema);
+            jsonSchema = jsonSchemaFactory.getJsonSchema(nodeSchema);
         } catch (ProcessingException e) {
             throw new DataValidationException(e);
         }

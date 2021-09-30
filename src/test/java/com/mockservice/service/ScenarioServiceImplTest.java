@@ -191,24 +191,13 @@ public class ScenarioServiceImplTest {
     // --- listeners ----------------------------------------------------------------
 
     @Test
-    public void onBeforeConfigChanged_DoesNothing() {
+    public void onBeforeAfterConfigChanged_ActiveScenarioExists_ScenarioRemainsActive() {
         Scenario scenario = new Scenario().setAlias(ALIAS);
         when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
 
         ScenarioService service = service();
         service.activateScenario(ALIAS);
         ((ConfigObserver) service).onBeforeConfigChanged();
-
-        assertTrue(scenario.getActive());
-    }
-
-    @Test
-    public void onAfterConfigChanged_ActiveScenariosExist_SameScenariosAreActive() {
-        Scenario scenario = new Scenario().setAlias(ALIAS);
-        when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
-
-        ScenarioService service = service();
-        service.activateScenario(ALIAS);
         ((ConfigObserver) service).onAfterConfigChanged();
 
         assertTrue(scenario.getActive());
@@ -218,5 +207,11 @@ public class ScenarioServiceImplTest {
     public void onScenarioCreated_NotExistingScenario_DoesNotThrow() {
         ScenarioObserver service = (ScenarioObserver) service();
         assertDoesNotThrow(() -> service.onScenarioCreated(new Scenario()));
+    }
+
+    @Test
+    public void onScenarioDeleted_NotExistingScenario_DoesNotThrow() {
+        ScenarioObserver service = (ScenarioObserver) service();
+        assertDoesNotThrow(() -> service.onScenarioDeleted(new Scenario()));
     }
 }

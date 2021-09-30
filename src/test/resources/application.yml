@@ -1,0 +1,22 @@
+server:
+  port: 8082
+
+logging:
+  level:
+    ROOT: ${ROOT_LOGGING_LEVEL:INFO}
+    com.mockservice: ${LOGGING_LEVEL:INFO}
+    org.springframework.boot.SpringApplication: INFO
+
+spring:
+  application:
+    name: MockService
+
+  main:
+    banner-mode: LOG
+
+application:
+  config-filename: ${CONFIG_FILENAME:.\config.yml}
+  config-backup-filename: ${CONFIG_BACKUP_FILENAME:.\config-backup.yml}
+  soap-error-data-file: soapFault.xml
+  mock-service:
+    cache-size: 256

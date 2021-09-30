@@ -9,6 +9,9 @@ import com.mockservice.template.TokenParser;
 import com.mockservice.util.Cache;
 import com.mockservice.util.HashMapCache;
 import com.mockservice.util.RandomUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMethod;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -16,26 +19,31 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 @Service
 public class RouteServiceImpl implements RouteService, ConfigObserver, RouteObserver {
 
     private final ConfigRepository configRepository;
     private final RouteMapper routeMapper;
+    private final RandomUtils randomUtils;
+
     private final Cache<Route, List<RouteVariable>> routeVariablesCache;
     private final Map<Route, Map<String, String>> routesVariablesValues = new ConcurrentHashMap<>();
 
-    public RouteServiceImpl(ConfigRepository configRepository, TemplateEngine templateEngine, RouteMapper routeMapper) {
+    public RouteServiceImpl(ConfigRepository configRepository,
+                            RouteMapper routeMapper,
+                            RandomUtils randomUtils,
+                            TemplateEngine templateEngine
+    ) {
         this.configRepository = configRepository;
         this.routeMapper = routeMapper;
+        this.randomUtils = randomUtils;
 
         routeVariablesCache = new HashMapCache<>(r ->
             TokenParser.tokenize(r.getResponse()).stream()
                 .filter(TokenParser::isToken)
                 .map(TokenParser::parseToken)
-                .filter(args -> templateEngine != null && !templateEngine.isFunction(args[0]))
+                .filter(args -> !templateEngine.isFunction(args[0]))
                 .map(args -> {
                     RouteVariable variable = new RouteVariable().setName(args[0]);
                     if (args.length > 1) {
@@ -69,7 +77,7 @@ public class RouteServiceImpl implements RouteService, ConfigObserver, RouteObse
         if (alts.size() == 1) {
             return Optional.of(alts.get(0));
         }
-        return Optional.of(alts.get(RandomUtils.rnd(alts.size())));
+        return Optional.of(alts.get(randomUtils.rnd(alts.size())));
     }
 
     //----------------------------------------------------------------------------------

@@ -1,11 +1,12 @@
 package com.mockservice.service.route;
 
 import com.mockservice.domain.Route;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
-import org.springframework.stereotype.Component;
 
 @Component
 public class RouteMapperImpl implements RouteMapper {

@@ -1,11 +1,12 @@
 package com.mockservice.service.route;
 
 import com.mockservice.domain.Route;
+import org.springframework.web.bind.annotation.RequestMethod;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 public interface RouteService {
     Optional<Route> getEnabledRoute(Route route);

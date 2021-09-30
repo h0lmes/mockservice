@@ -72,4 +72,11 @@ public class RouteDtoTest {
         RouteDto route2 = new RouteDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
         assertEquals(route1.hashCode(), route2.hashCode());
     }
+
+    @Test
+    public void toString_EqualsForEqualObjects() {
+        RouteDto route1 = new RouteDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
+        RouteDto route2 = new RouteDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
+        assertEquals(route1.toString(), route2.toString());
+    }
 }
