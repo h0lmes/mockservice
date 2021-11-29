@@ -15,19 +15,21 @@
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@nuxtjs/fontawesome": "^1.1.2",
     "@nuxtjs/style-resources": "^1.0.0",
-    "nuxt": "^2.15.6"
+    "nuxt": "^2.15.8",
+    "vue": "^2.6.14",
+    "vue-template-compiler": "^2.6.14"
   },
   "devDependencies": {
     "@nuxtjs/color-mode": "^2.0.8",
     "@nuxtjs/svg": "^0.1.12",
     "cpx": "^1.5.0",
     "css-loader": "^5.2.5",
-    "sass": "^1.32.6",
-    "sass-loader": "10.1.1",
     "less": "^3",
     "less-loader": "^7.3.0",
     "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.2",
+    "sass": "^1.32.6",
+    "sass-loader": "10.1.1",
     "vue-style-loader": "^4.1.3"
   }
 }
