@@ -20,6 +20,7 @@
     "vue-template-compiler": "^2.6.14"
   },
   "devDependencies": {
+    "@nuxt/types": "~2.15.0",
     "@nuxtjs/color-mode": "^2.0.8",
     "@nuxtjs/svg": "^0.1.12",
     "cpx": "^1.5.0",
