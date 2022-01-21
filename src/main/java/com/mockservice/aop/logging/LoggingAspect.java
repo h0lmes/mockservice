@@ -32,7 +32,6 @@ public class LoggingAspect {
     @Pointcut("within(@org.springframework.stereotype.Service *)" +
             " || within(@org.springframework.web.bind.annotation.RestController *)")
     public void springBeanPointcut() {
-        // Method is empty as this is just a Pointcut, the implementations are in the advices.
     }
 
     /**
@@ -41,14 +40,10 @@ public class LoggingAspect {
     @Pointcut("within(com.mockservice.service..*)" +
             " || within(com.mockservice.web..*)")
     public void applicationPackagePointcut() {
-        // Method is empty as this is just a Pointcut, the implementations are in the advices.
     }
 
     /**
      * Advice that logs methods throwing exceptions.
-     *
-     * @param joinPoint join point for advice.
-     * @param e         exception.
      */
     @AfterThrowing(pointcut = "applicationPackagePointcut() && springBeanPointcut()", throwing = "e")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {
@@ -69,10 +64,6 @@ public class LoggingAspect {
 
     /**
      * Advice that logs when a method is entered and exited.
-     *
-     * @param joinPoint join point for advice.
-     * @return result.
-     * @throws Throwable throws {@link IllegalArgumentException}.
      */
     @Around("applicationPackagePointcut() && springBeanPointcut()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
