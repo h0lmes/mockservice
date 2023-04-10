@@ -3,6 +3,11 @@ package com.mockservice.repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.domain.*;
+import com.mockservice.service.route.RouteVariable;
+import com.mockservice.template.TemplateEngine;
+import com.mockservice.template.TokenParser;
+import com.mockservice.util.Cache;
+import com.mockservice.util.ConcurrentHashMapCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +20,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ConfigRepositoryImpl implements ConfigRepository {
@@ -27,14 +33,34 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     private final ObjectMapper yamlMapper;
     private List<ConfigObserver> configObservers;
     private List<RouteObserver> routeObservers;
-    private List<ScenarioObserver> scenarioObservers;
+    private final Cache<Route, List<RouteVariable>> routeVariablesCache;
 
     public ConfigRepositoryImpl(@Value("${application.config-filename}") String fileConfigPath,
                                 @Value("${application.config-backup-filename}") String fileConfigBackupPath,
-                                @Qualifier("yamlMapper") ObjectMapper yamlMapper) {
+                                @Qualifier("yamlMapper") ObjectMapper yamlMapper,
+                                TemplateEngine templateEngine
+    ) {
         this.fileConfigPath = fileConfigPath;
         this.fileConfigBackupPath = fileConfigBackupPath;
         this.yamlMapper = yamlMapper.copy().setMixIns(getMixIns());
+
+        routeVariablesCache = new ConcurrentHashMapCache<>(r ->
+                TokenParser
+                        .tokenize(r.getResponse())
+                        .stream()
+                        .filter(TokenParser::isToken)
+                        .map(TokenParser::parseToken)
+                        .filter(args -> !templateEngine.isFunction(args[0]))
+                        .map(args -> {
+                            RouteVariable variable = new RouteVariable().setName(args[0]);
+                            if (args.length > 1) {
+                                variable.setDefaultValue(args[1]);
+                            }
+                            return variable;
+                        })
+                        .distinct()
+                        .collect(Collectors.toList())
+        );
 
         try {
             readConfigFromFile();
@@ -52,11 +78,6 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     @Autowired(required = false)
     public void setRouteObservers(List<RouteObserver> routeObservers) {
         this.routeObservers = routeObservers;
-    }
-
-    @Autowired(required = false)
-    public void setScenarioObservers(List<ScenarioObserver> scenarioObservers) {
-        this.scenarioObservers = scenarioObservers;
     }
 
     private Map<Class<?>, Class<?>> getMixIns() {
@@ -194,6 +215,11 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     @Override
+    public List<RouteVariable> getRouteVariables(Route route) {
+        return routeVariablesCache.get(route);
+    }
+
+    @Override
     public void putRoute(@Nullable Route originalRoute, @Nonnull Route route) throws IOException {
         Objects.requireNonNull(route, "Route could not be null.");
         putRouteToConfig(originalRoute, route);
@@ -327,7 +353,6 @@ public class ConfigRepositoryImpl implements ConfigRepository {
             throw new ScenarioAlreadyExistsException(scenario);
         }
         config.getScenarios().add(scenario);
-        notifyScenarioCreated(scenario);
     }
 
     private void putScenarioExisting(Scenario scenario, Scenario existingOriginal) {
@@ -335,15 +360,12 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         if (existingScenario != null && !existingOriginal.equals(existingScenario)) {
             throw new ScenarioAlreadyExistsException(scenario);
         }
-        notifyScenarioDeleted(existingOriginal);
         existingOriginal.assignFrom(scenario);
-        notifyScenarioCreated(existingOriginal);
     }
 
     @Override
     public void deleteScenario(Scenario scenario) throws IOException {
         if (config.getScenarios().remove(scenario)) {
-            notifyScenarioDeleted(scenario);
             tryPersistConfig();
         }
     }
@@ -355,6 +377,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     //----------------------------------------------------------------------
 
     private void notifyBeforeConfigChanged() {
+        routeVariablesCache.invalidate();
         if (configObservers != null) {
             configObservers.forEach(ConfigObserver::onBeforeConfigChanged);
         }
@@ -373,20 +396,9 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     private void notifyRouteDeleted(Route route) {
+        routeVariablesCache.evict(route);
         if (routeObservers != null) {
             routeObservers.forEach(o -> o.onRouteDeleted(route));
-        }
-    }
-
-    private void notifyScenarioCreated(Scenario scenario) {
-        if (scenarioObservers != null) {
-            scenarioObservers.forEach(o -> o.onScenarioCreated(scenario));
-        }
-    }
-
-    private void notifyScenarioDeleted(Scenario scenario) {
-        if (scenarioObservers != null) {
-            scenarioObservers.forEach(o -> o.onScenarioDeleted(scenario));
         }
     }
 }

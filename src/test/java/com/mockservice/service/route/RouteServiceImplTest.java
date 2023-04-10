@@ -1,28 +1,7 @@
 package com.mockservice.service.route;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.anyBoolean;
-import static org.mockito.Mockito.anyList;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.mockservice.domain.Route;
 import com.mockservice.repository.ConfigRepository;
-import com.mockservice.template.TemplateEngine;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.BiConsumer;
-
 import com.mockservice.util.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +11,17 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.BiConsumer;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @RunWith(JUnitPlatform.class)
@@ -48,14 +38,12 @@ public class RouteServiceImplTest {
     @Mock
     private ConfigRepository configRepository;
     @Mock
-    private TemplateEngine templateEngine;
-    @Mock
     private RouteMapper routeMapper;
     @Mock
     private RandomUtils randomUtils;
 
     private RouteService service() {
-        return new RouteServiceImpl(configRepository, routeMapper, randomUtils, templateEngine);
+        return new RouteServiceImpl(configRepository, routeMapper, randomUtils);
     }
 
     @Test
@@ -97,6 +85,10 @@ public class RouteServiceImplTest {
     public void getRoutes_RouteWithVariablesExistsAndVariableValueExists_ReturnsVariables() {
         Route route = new Route().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route));
+        when(configRepository.getRouteVariables(any())).thenReturn(List.of(
+                new RouteVariable().setName("id"),
+                new RouteVariable().setName("name").setDefaultValue("default")
+        ));
 
         RouteDto routeDto = new RouteDto().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
         doAnswer(ans -> {
@@ -129,6 +121,10 @@ public class RouteServiceImplTest {
     public void getRoutes_RouteWithVariablesExistsAndVariableValueDoesNotExist_ReturnsDefaults() {
         Route route = new Route().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route));
+        when(configRepository.getRouteVariables(any())).thenReturn(List.of(
+                new RouteVariable().setName("id"),
+                new RouteVariable().setName("name").setDefaultValue("default")
+        ));
 
         RouteDto routeDto = new RouteDto().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
         doAnswer(ans -> {
@@ -160,7 +156,6 @@ public class RouteServiceImplTest {
     public void getRoutes_RouteWithFunctionsExists_ReturnsNoVariables() {
         Route route = new Route().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route));
-        when(templateEngine.isFunction(any())).thenReturn(true);
 
         RouteDto routeDto = new RouteDto().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
         doAnswer(ans -> {

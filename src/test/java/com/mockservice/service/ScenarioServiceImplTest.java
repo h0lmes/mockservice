@@ -4,7 +4,6 @@ import com.mockservice.domain.Scenario;
 import com.mockservice.domain.ScenarioType;
 import com.mockservice.repository.ConfigObserver;
 import com.mockservice.repository.ConfigRepository;
-import com.mockservice.repository.ScenarioObserver;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
@@ -201,17 +200,5 @@ public class ScenarioServiceImplTest {
         ((ConfigObserver) service).onAfterConfigChanged();
 
         assertTrue(scenario.getActive());
-    }
-
-    @Test
-    public void onScenarioCreated_NotExistingScenario_DoesNotThrow() {
-        ScenarioObserver service = (ScenarioObserver) service();
-        assertDoesNotThrow(() -> service.onScenarioCreated(new Scenario()));
-    }
-
-    @Test
-    public void onScenarioDeleted_NotExistingScenario_DoesNotThrow() {
-        ScenarioObserver service = (ScenarioObserver) service();
-        assertDoesNotThrow(() -> service.onScenarioDeleted(new Scenario()));
     }
 }

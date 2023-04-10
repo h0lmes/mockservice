@@ -85,7 +85,7 @@ public class MockServiceImpl implements MockService {
         validationResult.ifError(response::addVariables);
 
         ResponseEntity<String> responseEntity = responseEntityFromResponse(response);
-        responseEntity = applyQuantumTheoryIfSetSo(responseEntity);
+        responseEntity = maybeApplyQuantumTheory(responseEntity);
 
         response.ifHasRequest(requestService::schedule);
 
@@ -157,7 +157,7 @@ public class MockServiceImpl implements MockService {
                 .body(response.getResponseBody());
     }
 
-    private ResponseEntity<String> applyQuantumTheoryIfSetSo(ResponseEntity<String> responseEntity) {
+    private ResponseEntity<String> maybeApplyQuantumTheory(ResponseEntity<String> responseEntity) {
         if (configRepository.getSettings().getQuantum()) {
             String body = responseEntity.getBody();
             for (QuantumTheory theory : quantumTheories) {

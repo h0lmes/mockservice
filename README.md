@@ -2,11 +2,11 @@
 ![Branches](.github/badges/branches.svg)
 [![License](.github/badges/license.svg)](/LICENSE)
 
-### Mock Service 🔸
+# Mock Service
 
-An easy to use service to mock REST and SOAP endpoints.
-Suitable for integration/e2e testing.
-Supports importing routes from OpenAPI 3/Swagger 2 YAML files.
+An easy-to-use service to mock REST and SOAP endpoints.
+Suitable for integration and e2e testing.
+Can import OpenAPI 3 and Swagger 2 formats (YAML).
 
 > Note. SOAP support is very simplistic and limited.
 You are required to provide a valid SOAP envelope as a response
@@ -16,19 +16,31 @@ There is NO support for WSDL/XSD.
 This project is licensed under the MIT License -
 see the [LICENSE](/LICENSE) file for details
 
-#
-### Where to start 🔸
+# Where to start
 
 1. Grab latest release binary.
-2. Run it (Java 11 or higher required).
+2. Run it (Java 17+).
 3. Navigate to `http://your_ip:8081`.
 4. If you find UI unintuitive - contact me 🙃.
 
-Refer to [README](/src/main/webapp/README.md) in `src/main/webapp`
-for instructions on how to build application yourself.
+For build instructions refer to [README](/src/main/webapp/README.md).
 
-#
-### Route Response 🔸
+# Development
+
+To run the app
+
+> $ ./mvnw
+
+To build the app (given frontend app has been built)
+
+> $ ./mvnw clean package
+
+Generate code coverage report
+
+> $ ./mvnw surefire-report:report
+
+
+# Route Response
 
 Response field may contain:
 - **response** (JSON or XML body) with or without HTTP head
@@ -76,8 +88,7 @@ Response head + body + callback request head + body:
         "id": "${item_id}"
     }
 
-#
-### Request Validation 🔸
+# Request Validation
 
 You can define **Request Body Schema** (in JSON format) for any route
 to have request body validated against the schema.
@@ -95,8 +106,7 @@ A special variable with error message would be available
 to use in response (see Settings).
 - or error description (with `type` and `message` fields)
 
-#
-### Route Alt (Alternative) 🔸
+# Route Alt (Alternative)
 
 Alt allow you to create alternative responses
 for the same mapping (method + path).
@@ -124,8 +134,7 @@ then the route with alt = `invalid_format` would match.
 > You may also try enabling **Random Alt** in **Settings** as well
 or dare **Go Quantum**. 😄
 
-#
-### Predefined variables 🔸
+# Predefined variables
 
 You can use predefined variables in Response, those would be substituted
 with their values each time an endpoint is fetched:
@@ -144,8 +153,7 @@ with their values each time an endpoint is fetched:
 - `${current_timestamp}` - current timestamp in yyyy-MM-dd HH:mm:ss.SSS format.
 - `${enum:str1:str2:...}` - a random one of given arguments (may be useful to represent enum values)
 
-#
-### Request variables 🔸
+# Request variables
 
 You can use variables which are provided on a per-request basis.
 
@@ -201,8 +209,7 @@ The following variables would be available:
 
     ${NumberToDollarsRequest.Value}
 
-#
-### Mock-Variable header 🔸
+# Mock-Variable header
 
 Multiple **Mock-Variable** headers supported per HTTP request.
 Each header should define exactly one variable.

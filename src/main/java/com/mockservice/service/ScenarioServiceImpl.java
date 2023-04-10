@@ -3,7 +3,6 @@ package com.mockservice.service;
 import com.mockservice.domain.Scenario;
 import com.mockservice.repository.ConfigObserver;
 import com.mockservice.repository.ConfigRepository;
-import com.mockservice.repository.ScenarioObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class ScenarioServiceImpl implements ScenarioService, ConfigObserver, ScenarioObserver {
+public class ScenarioServiceImpl implements ScenarioService, ConfigObserver {
 
     private static final Logger log = LoggerFactory.getLogger(ScenarioServiceImpl.class);
 
@@ -124,15 +123,5 @@ public class ScenarioServiceImpl implements ScenarioService, ConfigObserver, Sce
     public void onAfterConfigChanged() {
         List<Scenario> scenarios = findByAliases(active);
         scenarios.forEach(this::activateScenarioInternal);
-    }
-
-    @Override
-    public void onScenarioCreated(Scenario scenario) {
-        // ignore
-    }
-
-    @Override
-    public void onScenarioDeleted(Scenario scenario) {
-        // ignore
     }
 }

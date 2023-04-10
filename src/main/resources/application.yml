@@ -13,6 +13,7 @@ spring:
 
   main:
     banner-mode: LOG
+    allow-circular-references: true
 
   thymeleaf:
     cache: false

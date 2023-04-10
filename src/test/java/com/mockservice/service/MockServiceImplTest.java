@@ -19,6 +19,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -31,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 @RunWith(JUnitPlatform.class)
 public class MockServiceImplTest {
 
@@ -214,6 +216,26 @@ public class MockServiceImplTest {
         mockService.cacheRemove(route);
         responseEntity = mockService.mock(request);
         assertEquals(VALID_JSON, responseEntity.getBody());
+    }
+
+    @Test
+    public void cacheRemove_RouteExists_LogsEviction(CapturedOutput output) {
+        Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(INVALID_JSON);
+        when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
+        MockService mockService = createMockService();
+
+        mockService.mock(request);
+        mockService.cacheRemove(route);
+        assertTrue(output.getOut().contains("evicted"));
+    }
+
+    @Test
+    public void cacheRemove_RouteNotExists_LogsNothing(CapturedOutput output) {
+        Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(INVALID_JSON);
+        MockService mockService = createMockService();
+
+        mockService.cacheRemove(route);
+        assertFalse(output.getOut().contains("evicted"));
     }
 
     //----------------------------------------------------------------------

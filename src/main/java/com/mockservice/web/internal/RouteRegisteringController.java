@@ -18,6 +18,7 @@ public interface RouteRegisteringController {
                                   Map<String, Integer> registeredRoutes,
                                   Method mockMethod,
                                   RequestMappingHandlerMapping requestMappingHandlerMapping,
+                                  RequestMappingInfo.BuilderConfiguration options,
                                   Logger log) {
         if (route.getDisabled() || !this.getType().equals(route.getType())) {
             return;
@@ -34,6 +35,7 @@ public interface RouteRegisteringController {
         RequestMappingInfo mappingInfo = RequestMappingInfo
                 .paths(route.getPath())
                 .methods(route.getMethod())
+                .options(options)
                 .build();
         requestMappingHandlerMapping.registerMapping(mappingInfo, this, mockMethod);
 
@@ -43,6 +45,7 @@ public interface RouteRegisteringController {
     default void unregisterRouteInt(Route route,
                                     Map<String, Integer> registeredRoutes,
                                     RequestMappingHandlerMapping requestMappingHandlerMapping,
+                                    RequestMappingInfo.BuilderConfiguration options,
                                     MockService mockService,
                                     Logger log) {
         if (route.getDisabled() || !getType().equals(route.getType())) {
@@ -67,6 +70,7 @@ public interface RouteRegisteringController {
         RequestMappingInfo mappingInfo = RequestMappingInfo
                 .paths(route.getPath())
                 .methods(route.getMethod())
+                .options(options)
                 .build();
         requestMappingHandlerMapping.unregisterMapping(mappingInfo);
 

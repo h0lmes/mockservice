@@ -17,9 +17,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.util.pattern.PathPatternParser;
+
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -37,6 +40,7 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
     private final Method mockMethod;
     private final ObjectMapper jsonMapper;
     private final Map<String, Integer> registeredRoutes = new ConcurrentHashMap<>();
+    private final RequestMappingInfo.BuilderConfiguration options;
 
     public ConfigBasedRestController(HttpServletRequest request,
                                      MockService mockService,
@@ -50,6 +54,9 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
         this.jsonMapper = jsonMapper;
 
         mockMethod = this.getClass().getMethod("mock");
+
+        options = new RequestMappingInfo.BuilderConfiguration();
+        options.setPatternParser(new PathPatternParser());
 
         register();
     }
@@ -89,11 +96,11 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
     }
 
     private void registerRoute(Route route) {
-        this.registerRouteInt(route, registeredRoutes, mockMethod, requestMappingHandlerMapping, log);
+        this.registerRouteInt(route, registeredRoutes, mockMethod, requestMappingHandlerMapping, options, log);
     }
 
     private void unregisterRoute(Route route) {
-        this.unregisterRouteInt(route, registeredRoutes, requestMappingHandlerMapping, mockService, log);
+        this.unregisterRouteInt(route, registeredRoutes, requestMappingHandlerMapping, options, mockService, log);
     }
 
     @ExceptionHandler

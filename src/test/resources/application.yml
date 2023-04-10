@@ -13,6 +13,7 @@ spring:
 
   main:
     banner-mode: LOG
+    allow-circular-references: true
 
 application:
   config-filename: ${CONFIG_FILENAME:.\config.yml}

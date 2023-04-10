@@ -1,15 +1,15 @@
 package com.mockservice.util;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public class HashMapCache<K, V> implements Cache<K, V> {
+public class ConcurrentHashMapCache<K, V> implements Cache<K, V> {
 
-    private final Map<K, V> cache = new HashMap<>();
+    private final Map<K, V> cache = new ConcurrentHashMap<>();
     private final Function<K, V> generator;
 
-    public HashMapCache(Function<K, V> generator) {
+    public ConcurrentHashMapCache(Function<K, V> generator) {
         this.generator = generator;
     }
 

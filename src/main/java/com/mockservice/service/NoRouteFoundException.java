@@ -12,6 +12,6 @@ public class NoRouteFoundException extends RuntimeException {
 
     @Override
     public String toString() {
-        return route != null ? route.toString() : super.toString();
+        return route != null ? route.toString() : "";
     }
 }

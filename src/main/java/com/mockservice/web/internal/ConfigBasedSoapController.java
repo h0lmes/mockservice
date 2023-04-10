@@ -18,9 +18,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.util.pattern.PathPatternParser;
+
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -43,6 +46,7 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
     private final ObjectMapper jsonMapper;
     private final Map<String, Integer> registeredRoutes = new ConcurrentHashMap<>();
     private String errorBody;
+    private final RequestMappingInfo.BuilderConfiguration options;
 
     public ConfigBasedSoapController(@Value("${application.soap-error-data-file}") String soapErrorDataFile,
                                      HttpServletRequest request,
@@ -57,6 +61,9 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
         this.jsonMapper = jsonMapper;
 
         mockMethod = this.getClass().getMethod("mock");
+
+        options = new RequestMappingInfo.BuilderConfiguration();
+        options.setPatternParser(new PathPatternParser());
 
         try {
             errorBody = IOUtils.asString(soapErrorDataFile);
@@ -103,11 +110,11 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
     }
 
     private void registerRoute(Route route) {
-        this.registerRouteInt(route, registeredRoutes, mockMethod, requestMappingHandlerMapping, log);
+        this.registerRouteInt(route, registeredRoutes, mockMethod, requestMappingHandlerMapping, options, log);
     }
 
     private void unregisterRoute(Route route) {
-        this.unregisterRouteInt(route, registeredRoutes, requestMappingHandlerMapping, mockService, log);
+        this.unregisterRouteInt(route, registeredRoutes, requestMappingHandlerMapping, options, mockService, log);
     }
 
     @ExceptionHandler

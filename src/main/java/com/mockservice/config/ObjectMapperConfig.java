@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Primary;
 public class ObjectMapperConfig {
 
     @Bean
-    @Qualifier("jsonMapper")
     @Primary
+    @Qualifier("jsonMapper")
     public ObjectMapper jsonMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);

@@ -1,13 +1,7 @@
 package com.mockservice.service.route;
 
 import com.mockservice.domain.Route;
-import com.mockservice.repository.ConfigObserver;
 import com.mockservice.repository.ConfigRepository;
-import com.mockservice.repository.RouteObserver;
-import com.mockservice.template.TemplateEngine;
-import com.mockservice.template.TokenParser;
-import com.mockservice.util.Cache;
-import com.mockservice.util.HashMapCache;
 import com.mockservice.util.RandomUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,39 +15,21 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @Service
-public class RouteServiceImpl implements RouteService, ConfigObserver, RouteObserver {
+public class RouteServiceImpl implements RouteService {
 
     private final ConfigRepository configRepository;
     private final RouteMapper routeMapper;
     private final RandomUtils randomUtils;
 
-    private final Cache<Route, List<RouteVariable>> routeVariablesCache;
     private final Map<Route, Map<String, String>> routesVariablesValues = new ConcurrentHashMap<>();
 
     public RouteServiceImpl(ConfigRepository configRepository,
                             RouteMapper routeMapper,
-                            RandomUtils randomUtils,
-                            TemplateEngine templateEngine
+                            RandomUtils randomUtils
     ) {
         this.configRepository = configRepository;
         this.routeMapper = routeMapper;
         this.randomUtils = randomUtils;
-
-        routeVariablesCache = new HashMapCache<>(r ->
-            TokenParser.tokenize(r.getResponse()).stream()
-                .filter(TokenParser::isToken)
-                .map(TokenParser::parseToken)
-                .filter(args -> !templateEngine.isFunction(args[0]))
-                .map(args -> {
-                    RouteVariable variable = new RouteVariable().setName(args[0]);
-                    if (args.length > 1) {
-                        variable.setDefaultValue(args[1]);
-                    }
-                    return variable;
-                })
-                .distinct()
-                .collect(Collectors.toList())
-        );
     }
 
     @Override
@@ -89,7 +65,7 @@ public class RouteServiceImpl implements RouteService, ConfigObserver, RouteObse
     }
 
     private List<RouteVariable> variablesFromRoute(Route route) {
-        List<RouteVariable> routeVariables = routeVariablesCache.get(route);
+        List<RouteVariable> routeVariables = configRepository.getRouteVariables(route);
         routeVariables.forEach(v -> {
             Map<String, String> routeVariablesValues = routesVariablesValues.get(route);
             if (routeVariablesValues != null) {
@@ -142,27 +118,5 @@ public class RouteServiceImpl implements RouteService, ConfigObserver, RouteObse
     @Override
     public Map<String, String> getRouteVariables(Route route) {
         return routesVariablesValues.get(route);
-    }
-
-    //----------------------------------------------------------------------------------
-
-    @Override
-    public void onBeforeConfigChanged() {
-        routeVariablesCache.invalidate();
-    }
-
-    @Override
-    public void onAfterConfigChanged() {
-        // ignore
-    }
-
-    @Override
-    public void onRouteCreated(Route route) {
-        // ignore
-    }
-
-    @Override
-    public void onRouteDeleted(Route route) {
-        routeVariablesCache.evict(route);
     }
 }

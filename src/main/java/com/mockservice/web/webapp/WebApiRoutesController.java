@@ -34,7 +34,7 @@ public class WebApiRoutesController {
     //-----------------------------------------------------------------------------------
 
     @GetMapping
-    public List<RouteDto> routes() {
+    public List<RouteDto> getRoutes() {
         return routeService.getRoutes();
     }
 

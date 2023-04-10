@@ -19,7 +19,6 @@ import com.mockservice.domain.ScenarioAlreadyExistsException;
 import com.mockservice.domain.ScenarioParseException;
 import com.mockservice.repository.ConfigObserver;
 import com.mockservice.repository.RouteObserver;
-import com.mockservice.repository.ScenarioObserver;
 import com.mockservice.service.ScenarioService;
 import java.util.List;
 import java.util.Set;
@@ -58,8 +57,6 @@ public class WebApiScenariosControllerTest {
     private List<ConfigObserver> configObservers;
     @MockBean
     private List<RouteObserver> routeObservers;
-    @MockBean
-    private List<ScenarioObserver> scenarioObservers;
 
     @Autowired
     @Qualifier("jsonMapper")

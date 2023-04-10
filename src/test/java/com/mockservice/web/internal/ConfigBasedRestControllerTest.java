@@ -18,8 +18,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.util.pattern.PathPattern;
+
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -83,8 +86,9 @@ public class ConfigBasedRestControllerTest {
         ArgumentCaptor<RequestMappingInfo> argument = ArgumentCaptor.forClass(RequestMappingInfo.class);
         verify(requestMappingHandlerMapping).registerMapping(argument.capture(), any(), any());
         assertTrue(argument.getValue().getMethodsCondition().getMethods().contains(route.getMethod()));
-        assertNotNull(argument.getValue().getPatternsCondition());
-        assertTrue(argument.getValue().getPatternsCondition().getPatterns().contains(route.getPath()));
+        assertNotNull(argument.getValue().getPathPatternsCondition());
+        Set<PathPattern> patterns = argument.getValue().getPathPatternsCondition().getPatterns();
+        assertEquals(1, patterns.size());
     }
 
     @Test
@@ -136,8 +140,9 @@ public class ConfigBasedRestControllerTest {
         ArgumentCaptor<RequestMappingInfo> argument = ArgumentCaptor.forClass(RequestMappingInfo.class);
         verify(requestMappingHandlerMapping).registerMapping(argument.capture(), any(), any());
         assertTrue(argument.getValue().getMethodsCondition().getMethods().contains(route.getMethod()));
-        assertNotNull(argument.getValue().getPatternsCondition());
-        assertTrue(argument.getValue().getPatternsCondition().getPatterns().contains(route.getPath()));
+        assertNotNull(argument.getValue().getPathPatternsCondition());
+        Set<PathPattern> patterns = argument.getValue().getPathPatternsCondition().getPatterns();
+        assertEquals(1, patterns.size());
     }
 
     @Test
@@ -153,8 +158,9 @@ public class ConfigBasedRestControllerTest {
         ArgumentCaptor<RequestMappingInfo> argument = ArgumentCaptor.forClass(RequestMappingInfo.class);
         verify(requestMappingHandlerMapping).unregisterMapping(argument.capture());
         assertTrue(argument.getValue().getMethodsCondition().getMethods().contains(route.getMethod()));
-        assertNotNull(argument.getValue().getPatternsCondition());
-        assertTrue(argument.getValue().getPatternsCondition().getPatterns().contains(route.getPath()));
+        assertNotNull(argument.getValue().getPathPatternsCondition());
+        Set<PathPattern> patterns = argument.getValue().getPathPatternsCondition().getPatterns();
+        assertEquals(1, patterns.size());
     }
 
     @Test

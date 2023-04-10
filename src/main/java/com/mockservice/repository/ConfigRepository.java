@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.Scenario;
 import com.mockservice.domain.Settings;
+import com.mockservice.service.route.RouteVariable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,6 +23,7 @@ public interface ConfigRepository {
 
     List<Route> findAllRoutes();
     Optional<Route> findRoute(Route route);
+    List<RouteVariable> getRouteVariables(Route route);
     void putRoute(@Nullable Route reference, @Nonnull Route route) throws IOException;
     void putRoutes(List<Route> routes, boolean overwrite) throws IOException;
     void deleteRoutes(List<Route> routes) throws IOException;
