@@ -1,11 +1,11 @@
 package com.mockservice.service.route;
 
 import com.mockservice.domain.Route;
+import com.mockservice.template.MockVariables;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public interface RouteService {
@@ -17,5 +17,5 @@ public interface RouteService {
     void deleteRoutes(List<RouteDto> dtos) throws IOException;
     RouteVariableDto setRouteVariable(RouteVariableDto variable);
     RouteVariableDto clearRouteVariable(RouteVariableDto variable);
-    Map<String, String> getRouteVariables(Route route);
+    MockVariables getRouteVariables(Route route);
 }

@@ -107,14 +107,15 @@ public class TokenParser {
             }
         }
 
-        arguments.add(argument.toString());
         if (brackets > 0) {
-            throw new IllegalArgumentException("Invalid token (unbalanced open/closing chars): " + token);
+            throw new IllegalArgumentException("Invalid token (not closed): " + token);
         }
+
+        arguments.add(argument.toString());
 
         String[] args = arguments.toArray(new String[]{});
         if (args[0].isEmpty()) {
-            throw new IllegalArgumentException(String.format("Token arg[0] must not be empty: %s", token));
+            throw new IllegalArgumentException("Token arg[0] must not be empty: " + token);
         }
 
         return args;

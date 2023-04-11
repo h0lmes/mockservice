@@ -1,13 +1,12 @@
 package com.mockservice.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mockservice.template.MockVariables;
 import com.mockservice.util.MapUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public class SoapRequestFacade extends AbstractRequestFacade {
@@ -19,21 +18,23 @@ public class SoapRequestFacade extends AbstractRequestFacade {
     }
 
     @Override
-    public Map<String, String> getVariables(Optional<Map<String, String>> baseVariables) {
-        Map<String, String> vars = new HashMap<>();
+    public MockVariables getVariables(Optional<MockVariables> baseVariables) {
+        MockVariables vars = new MockVariables();
         baseVariables.ifPresent(vars::putAll);
-        vars.putAll(getBodyAsVariables());
+        getBodyAsVariables().ifPresent(vars::putAll);
         vars.putAll(getHeaderVariables());
         return vars;
     }
 
-    private Map<String, String> getBodyAsVariables() {
+    private Optional<MockVariables> getBodyAsVariables() {
         String body = getBody();
         try {
-            return MapUtils.flattenMap(MapUtils.xmlToMap(body));
+            MockVariables vars = new MockVariables();
+            vars.putAll(MapUtils.flattenMap(MapUtils.xmlToMap(body)));
+            return Optional.of(vars);
         } catch (Exception e) {
             log.warn("Not a valid XML:\n{}", body);
         }
-        return new HashMap<>();
+        return Optional.empty();
     }
 }

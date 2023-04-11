@@ -1,8 +1,10 @@
-package com.mockservice.service.quantum;
+package com.mockservice.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.producer.JsonProducerImpl;
 import com.mockservice.producer.ValueProducerImpl;
+import com.mockservice.service.JsonQuantumTheory;
+import com.mockservice.service.QuantumTheory;
 import com.mockservice.util.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +30,18 @@ public class JsonQuantumTheoryTest {
         ValueProducerImpl valueProducer = new ValueProducerImpl(randomUtils);
         JsonProducerImpl jsonProducer = new JsonProducerImpl(valueProducer, randomUtils);
         return new JsonQuantumTheory(valueProducer, jsonProducer, randomUtils);
+    }
+
+    @Test
+    public void apply_ReturnsRandomResponseCode() {
+        int code = theory().apply(200);
+        assertTrue(200 <= code && code <= 599);
+    }
+
+    @Test
+    public void apply_ReturnsRandomString() {
+        String result = theory().apply("test");
+        assertNotNull(result);
     }
 
     @Test

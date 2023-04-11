@@ -2,6 +2,7 @@ package com.mockservice.service.route;
 
 import com.mockservice.domain.Route;
 import com.mockservice.repository.ConfigRepository;
+import com.mockservice.template.MockVariables;
 import com.mockservice.util.RandomUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,7 +22,7 @@ public class RouteServiceImpl implements RouteService {
     private final RouteMapper routeMapper;
     private final RandomUtils randomUtils;
 
-    private final Map<Route, Map<String, String>> routesVariablesValues = new ConcurrentHashMap<>();
+    private final Map<Route, MockVariables> routesVariablesValues = new ConcurrentHashMap<>();
 
     public RouteServiceImpl(ConfigRepository configRepository,
                             RouteMapper routeMapper,
@@ -67,7 +68,7 @@ public class RouteServiceImpl implements RouteService {
     private List<RouteVariable> variablesFromRoute(Route route) {
         List<RouteVariable> routeVariables = configRepository.getRouteVariables(route);
         routeVariables.forEach(v -> {
-            Map<String, String> routeVariablesValues = routesVariablesValues.get(route);
+            MockVariables routeVariablesValues = routesVariablesValues.get(route);
             if (routeVariablesValues != null) {
                 v.setValue(routeVariablesValues.get(v.getName()));
             }
@@ -97,7 +98,7 @@ public class RouteServiceImpl implements RouteService {
     @Override
     public RouteVariableDto setRouteVariable(RouteVariableDto variable) {
         Route route = new Route(variable.getMethod(), variable.getPath(), variable.getAlt());
-        Map<String, String> values = routesVariablesValues.computeIfAbsent(route, r -> new ConcurrentHashMap<>());
+        MockVariables values = routesVariablesValues.computeIfAbsent(route, r -> new MockVariables());
         values.put(variable.getName(), variable.getValue());
         return variable;
     }
@@ -105,7 +106,7 @@ public class RouteServiceImpl implements RouteService {
     @Override
     public RouteVariableDto clearRouteVariable(RouteVariableDto variable) {
         Route route = new Route(variable.getMethod(), variable.getPath(), variable.getAlt());
-        Map<String, String> values = routesVariablesValues.get(route);
+        MockVariables values = routesVariablesValues.get(route);
         if (values != null) {
             values.remove(variable.getName());
             if (values.isEmpty()) {
@@ -116,7 +117,7 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
-    public Map<String, String> getRouteVariables(Route route) {
+    public MockVariables getRouteVariables(Route route) {
         return routesVariablesValues.get(route);
     }
 }

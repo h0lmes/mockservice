@@ -2,8 +2,6 @@ package com.mockservice.template;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 
 /**
  * The {@code StringTemplate} class represents parsed template.
@@ -25,10 +23,11 @@ public class StringTemplate {
     }
 
     /**
-     * Internal list holds data in the following way:
-     * - each line holds a text only (with possible line breaks) or a token only
-     * - one token per line
-     * - there could be no consecutive text lines, though could be consecutive lines holding tokens
+     * Internal list of strings holds data in the following way:
+     * - a line can contain text (line breaks allowed)
+     * - a line can contain a token (exactly one)
+     * - there could be no consecutive text lines
+     * - there could be consecutive lines with tokens
      */
     private final List<String> strings = new ArrayList<>();
     private State state = State.EMPTY;
@@ -63,7 +62,7 @@ public class StringTemplate {
 
     // builder
 
-    public String toString(Map<String, String> variables, Map<String, Function<String[], String>> functions) {
+    public String toString(MockVariables variables, MockFunctions functions) {
         StringBuilder builder = new StringBuilder();
         for (String s : strings) {
             String value = map(s, variables, functions);
@@ -75,7 +74,7 @@ public class StringTemplate {
         return builder.toString();
     }
 
-    private static String map(String token, Map<String, String> variables, Map<String, Function<String[], String>> functions) {
+    private static String map(String token, MockVariables variables, MockFunctions functions) {
         if (TokenParser.isToken(token)) {
             String[] args = TokenParser.parseToken(token);
 

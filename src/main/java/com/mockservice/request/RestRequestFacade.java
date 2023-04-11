@@ -2,14 +2,13 @@ package com.mockservice.request;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mockservice.template.MockVariables;
 import com.mockservice.util.MapUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public class RestRequestFacade extends AbstractRequestFacade {
@@ -21,28 +20,30 @@ public class RestRequestFacade extends AbstractRequestFacade {
     }
 
     @Override
-    public Map<String, String> getVariables(Optional<Map<String, String>> baseVariables) {
-        Map<String, String> vars = new HashMap<>();
+    public MockVariables getVariables(Optional<MockVariables> baseVariables) {
+        MockVariables vars = new MockVariables();
         baseVariables.ifPresent(vars::putAll);
-        vars.putAll(getAuthorizationAsVariables());
-        vars.putAll(getBodyAsVariables());
+        getAuthorizationAsVariables().ifPresent(vars::putAll);
+        getBodyAsVariables().ifPresent(vars::putAll);
         vars.putAll(getPathVariables());
         vars.putAll(getRequestParams());
         vars.putAll(getHeaderVariables());
         return vars;
     }
 
-    private Map<String, String> getBodyAsVariables() {
+    private Optional<MockVariables> getBodyAsVariables() {
         String body = getBody();
         try {
-            return MapUtils.flattenMap(MapUtils.jsonToMap(body, jsonMapper));
+            MockVariables vars = new MockVariables();
+            vars.putAll(MapUtils.flattenMap(MapUtils.jsonToMap(body, jsonMapper)));
+            return Optional.of(vars);
         } catch (JsonProcessingException e) {
             log.warn("Invalid JSON:\n{}", body);
         }
-        return new HashMap<>();
+        return Optional.empty();
     }
 
-    private Map<String, String> getAuthorizationAsVariables() {
+    private Optional<MockVariables> getAuthorizationAsVariables() {
         if (!authHeaders.isEmpty()) {
             String token = authHeaders.get(0)[0];
             if ("bearer".equalsIgnoreCase(token.substring(0, 6))) {
@@ -52,13 +53,15 @@ public class RestRequestFacade extends AbstractRequestFacade {
                     Base64.Decoder decoder = Base64.getDecoder();
                     String payload = new String(decoder.decode(chunks[1]));
                     try {
-                        return MapUtils.flattenMap(MapUtils.jsonToMap(payload, jsonMapper));
+                        MockVariables vars = new MockVariables();
+                        vars.putAll(MapUtils.flattenMap(MapUtils.jsonToMap(payload, jsonMapper)));
+                        return Optional.of(vars);
                     } catch (JsonProcessingException e) {
                         log.warn("Invalid JWT payload:\n{}", payload);
                     }
                 }
             }
         }
-        return new HashMap<>();
+        return Optional.empty();
     }
 }

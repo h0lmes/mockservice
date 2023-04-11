@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -26,8 +25,7 @@ public class DefaultTemplateEngineTest {
     @Test
     public void getFunctions_Sequence() {
         TemplateEngine engine = new DefaultTemplateEngine();
-        Map<String, Function<String[], String>> functions = engine.getFunctions();
-        Function<String[], String> fn = functions.get("sequence");
+        Function<String[], String> fn = engine.getFunctions().get("sequence");
 
         assertEquals("1", fn.apply(EMPTY_ARGS));
         assertEquals("2", fn.apply(EMPTY_ARGS));
@@ -37,8 +35,7 @@ public class DefaultTemplateEngineTest {
     @Test
     public void getFunctions_RandomInt() {
         TemplateEngine engine = new DefaultTemplateEngine();
-        Map<String, Function<String[], String>> functions = engine.getFunctions();
-        Function<String[], String> fn = functions.get("random_int");
+        Function<String[], String> fn = engine.getFunctions().get("random_int");
 
         assertDoesNotThrow(() -> Integer.parseInt(fn.apply(EMPTY_ARGS)));
     }
@@ -46,8 +43,7 @@ public class DefaultTemplateEngineTest {
     @Test
     public void getFunctions_RandomIntInRange() {
         TemplateEngine engine = new DefaultTemplateEngine();
-        Map<String, Function<String[], String>> functions = engine.getFunctions();
-        Function<String[], String> fn = functions.get("random_int");
+        Function<String[], String> fn = engine.getFunctions().get("random_int");
 
         assertDoesNotThrow(() -> Integer.parseInt(fn.apply(NUMERIC_ARGS)));
         int val = Integer.parseInt(fn.apply(NUMERIC_ARGS));
@@ -57,8 +53,7 @@ public class DefaultTemplateEngineTest {
     @Test
     public void getFunctions_RandomLong() {
         TemplateEngine engine = new DefaultTemplateEngine();
-        Map<String, Function<String[], String>> functions = engine.getFunctions();
-        Function<String[], String> fn = functions.get("random_long");
+        Function<String[], String> fn = engine.getFunctions().get("random_long");
 
         assertDoesNotThrow(() -> Long.parseLong(fn.apply(EMPTY_ARGS)));
     }
@@ -66,8 +61,7 @@ public class DefaultTemplateEngineTest {
     @Test
     public void getFunctions_RandomLongInRange() {
         TemplateEngine engine = new DefaultTemplateEngine();
-        Map<String, Function<String[], String>> functions = engine.getFunctions();
-        Function<String[], String> fn = functions.get("random_long");
+        Function<String[], String> fn = engine.getFunctions().get("random_long");
 
         assertDoesNotThrow(() -> Long.parseLong(fn.apply(NUMERIC_ARGS)));
         long val = Long.parseLong(fn.apply(NUMERIC_ARGS));
@@ -77,8 +71,7 @@ public class DefaultTemplateEngineTest {
     @Test
     public void getFunctions_RandomUuid() {
         TemplateEngine engine = new DefaultTemplateEngine();
-        Map<String, Function<String[], String>> functions = engine.getFunctions();
-        Function<String[], String> fn = functions.get("random_uuid");
+        Function<String[], String> fn = engine.getFunctions().get("random_uuid");
 
         Pattern pattern = Pattern.compile(REGEX_UUID);
         Matcher matcher = pattern.matcher(fn.apply(EMPTY_ARGS));
@@ -88,8 +81,7 @@ public class DefaultTemplateEngineTest {
     @Test
     public void getFunctions_RandomString() {
         TemplateEngine engine = new DefaultTemplateEngine();
-        Map<String, Function<String[], String>> functions = engine.getFunctions();
-        Function<String[], String> fn = functions.get("random_string");
+        Function<String[], String> fn = engine.getFunctions().get("random_string");
 
         assertFalse(fn.apply(EMPTY_ARGS).isEmpty());
     }
@@ -97,8 +89,7 @@ public class DefaultTemplateEngineTest {
     @Test
     public void getFunctions_Enum() {
         TemplateEngine engine = new DefaultTemplateEngine();
-        Map<String, Function<String[], String>> functions = engine.getFunctions();
-        Function<String[], String> fn = functions.get("enum");
+        Function<String[], String> fn = engine.getFunctions().get("enum");
 
         assertTrue(Set.of(ENUM_VALUE1, ENUM_VALUE2).contains(fn.apply(ENUM_ARGS)));
     }
@@ -106,8 +97,7 @@ public class DefaultTemplateEngineTest {
     @Test
     public void getFunctions_RandomDate() {
         TemplateEngine engine = new DefaultTemplateEngine();
-        Map<String, Function<String[], String>> functions = engine.getFunctions();
-        Function<String[], String> fn = functions.get("random_date");
+        Function<String[], String> fn = engine.getFunctions().get("random_date");
 
         assertDoesNotThrow(
                 () -> LocalDate.parse(fn.apply(ENUM_ARGS),
@@ -118,8 +108,7 @@ public class DefaultTemplateEngineTest {
     @Test
     public void getFunctions_RandomTimestamp() {
         TemplateEngine engine = new DefaultTemplateEngine();
-        Map<String, Function<String[], String>> functions = engine.getFunctions();
-        Function<String[], String> fn = functions.get("random_timestamp");
+        Function<String[], String> fn = engine.getFunctions().get("random_timestamp");
 
         assertDoesNotThrow(
                 () -> LocalDateTime.parse(fn.apply(ENUM_ARGS),
@@ -130,8 +119,7 @@ public class DefaultTemplateEngineTest {
     @Test
     public void getFunctions_CurrentDate() {
         TemplateEngine engine = new DefaultTemplateEngine();
-        Map<String, Function<String[], String>> functions = engine.getFunctions();
-        Function<String[], String> fn = functions.get("current_date");
+        Function<String[], String> fn = engine.getFunctions().get("current_date");
 
         assertDoesNotThrow(
                 () -> LocalDate.parse(fn.apply(ENUM_ARGS),
@@ -150,8 +138,7 @@ public class DefaultTemplateEngineTest {
     @Test
     public void getFunctions_CurrentTimestamp() {
         TemplateEngine engine = new DefaultTemplateEngine();
-        Map<String, Function<String[], String>> functions = engine.getFunctions();
-        Function<String[], String> fn = functions.get("current_timestamp");
+        Function<String[], String> fn = engine.getFunctions().get("current_timestamp");
 
         assertDoesNotThrow(
                 () -> LocalDateTime.parse(fn.apply(ENUM_ARGS),

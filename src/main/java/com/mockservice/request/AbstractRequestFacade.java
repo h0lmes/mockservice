@@ -1,6 +1,7 @@
 package com.mockservice.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mockservice.template.MockVariables;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +26,8 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     private final String endpoint;
     private final String encodedEndpoint;
     private final String requestMethod;
-    private final Map<String, String> pathVariables;
-    private final Map<String, String> requestParams = new HashMap<>();
+    private final MockVariables pathVariables = new MockVariables();
+    private final MockVariables requestParams = new MockVariables();
     private final List<String[]> mockVarHeaders;
     private final List<String[]> mockAltHeaders;
     final List<String[]> authHeaders;
@@ -42,9 +43,7 @@ public abstract class AbstractRequestFacade implements RequestFacade {
 
         Object o = request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         if (o instanceof Map) {
-            pathVariables = (Map<String, String>) o;
-        } else {
-            pathVariables = new HashMap<>();
+            pathVariables.putAll((Map<String, String>) o);
         }
 
         Map<String, String[]> parameterMap = request.getParameterMap();
@@ -111,16 +110,16 @@ public abstract class AbstractRequestFacade implements RequestFacade {
         return body;
     }
 
-    Map<String, String> getPathVariables() {
+    MockVariables getPathVariables() {
         return pathVariables;
     }
 
-    Map<String, String> getRequestParams() {
+    MockVariables getRequestParams() {
         return requestParams;
     }
 
-    Map<String, String> getHeaderVariables() {
-        Map<String, String> result = new HashMap<>();
+    MockVariables getHeaderVariables() {
+        MockVariables result = new MockVariables();
         mockVarHeaders.forEach(parts -> {
             if (parts.length > 2 && encodedEndpoint.equalsIgnoreCase(parts[0])) {
                 result.put(parts[1], parts[2]);

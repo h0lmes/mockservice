@@ -1,13 +1,10 @@
 package com.mockservice.template;
 
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -15,7 +12,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@Component
 public class DefaultTemplateEngine implements TemplateEngine {
 
     private final Map<String, Supplier<Function<String[], String>>> suppliers = new LinkedHashMap<>();
@@ -34,8 +30,8 @@ public class DefaultTemplateEngine implements TemplateEngine {
     }
 
     @Override
-    public Map<String, Function<String[], String>> getFunctions() {
-        Map<String, Function<String[], String>> functions = new HashMap<>();
+    public MockFunctions getFunctions() {
+        MockFunctions functions = new MockFunctions();
         suppliers.forEach((name, supplier) -> functions.put(name, supplier.get()));
         return functions;
     }

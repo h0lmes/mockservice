@@ -1,18 +1,17 @@
 package com.mockservice.response;
 
+import com.mockservice.template.MockFunctions;
+import com.mockservice.template.MockVariables;
 import com.mockservice.template.StringTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class BaseMockResponse implements MockResponse {
 
-    private final Map<String, String> variables = new HashMap<>();
-    private final Map<String, Function<String[], String>> functions = new HashMap<>();
+    private final MockVariables variables = new MockVariables();
+    private final MockFunctions functions = new MockFunctions();
     private final int responseCode;
     final HttpHeaders responseHeaders = new HttpHeaders();
     final StringTemplate responseBody;
@@ -30,7 +29,7 @@ public class BaseMockResponse implements MockResponse {
     }
 
     @Override
-    public MockResponse setVariables(Map<String, String> variables, Map<String, Function<String[], String>> functions) {
+    public MockResponse setVariables(MockVariables variables, MockFunctions functions) {
         this.variables.clear();
         this.variables.putAll(variables);
         this.functions.clear();
@@ -39,7 +38,7 @@ public class BaseMockResponse implements MockResponse {
     }
 
     @Override
-    public MockResponse addVariables(Map<String, String> variables) {
+    public MockResponse addVariables(MockVariables variables) {
         this.variables.putAll(variables);
         return this;
     }

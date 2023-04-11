@@ -1,7 +1,9 @@
 package com.mockservice.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mockservice.template.MockVariables;
 import com.mockservice.util.IOUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
@@ -11,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.HandlerMapping;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -129,7 +130,7 @@ public class SoapRequestFacadeTest {
         when(request.getReader()).thenReturn(asReader(body));
 
         RequestFacade facade = new SoapRequestFacade(request, new ObjectMapper());
-        Map<String, String> variables = facade.getVariables(Optional.empty());
+        MockVariables variables = facade.getVariables(Optional.empty());
 
         assertEquals("${NumberToDollarsRequest.Value:DEFAULT_VALUE}",
                 variables.get("NumberToDollarsResponse.Result"));
@@ -142,7 +143,7 @@ public class SoapRequestFacadeTest {
         when(request.getReader()).thenReturn(asReader(body));
 
         RequestFacade facade = new SoapRequestFacade(request, new ObjectMapper());
-        Map<String, String> variables = facade.getVariables(Optional.empty());
+        MockVariables variables = facade.getVariables(Optional.empty());
 
         assertTrue(variables.isEmpty());
     }
@@ -151,7 +152,7 @@ public class SoapRequestFacadeTest {
     public void getVariables_EmptyBody_ReturnsNoVariables() throws IOException {
         when(request.getReader()).thenReturn(asReader(""));
         RequestFacade facade = new SoapRequestFacade(request, new ObjectMapper());
-        Map<String, String> variables = facade.getVariables(Optional.empty());
+        MockVariables variables = facade.getVariables(Optional.empty());
 
         assertTrue(variables.isEmpty());
     }

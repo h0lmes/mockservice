@@ -2,6 +2,7 @@ package com.mockservice.service.route;
 
 import com.mockservice.domain.Route;
 import com.mockservice.repository.ConfigRepository;
+import com.mockservice.template.MockVariables;
 import com.mockservice.util.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -207,7 +207,7 @@ public class RouteServiceImplTest {
         RouteService service = service();
         service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
         Route route = new Route().setPath(PATH);
-        Map<String, String> routeVariables = service.getRouteVariables(route);
+        MockVariables routeVariables = service.getRouteVariables(route);
 
         assertEquals(1, routeVariables.size());
         assertEquals("123", routeVariables.get("id"));
@@ -219,7 +219,7 @@ public class RouteServiceImplTest {
         service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
         service.clearRouteVariable(new RouteVariableDto().setPath(PATH).setName("id"));
         Route route = new Route().setPath(PATH);
-        Map<String, String> routeVariables = service.getRouteVariables(route);
+        MockVariables routeVariables = service.getRouteVariables(route);
 
         assertNull(routeVariables);
     }
@@ -230,7 +230,7 @@ public class RouteServiceImplTest {
         service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
         service.clearRouteVariable(new RouteVariableDto().setPath(PATH).setName("name"));
         Route route = new Route().setPath(PATH);
-        Map<String, String> routeVariables = service.getRouteVariables(route);
+        MockVariables routeVariables = service.getRouteVariables(route);
 
         assertFalse(routeVariables.isEmpty());
     }
@@ -241,7 +241,7 @@ public class RouteServiceImplTest {
         service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
         service.clearRouteVariable(new RouteVariableDto().setPath(PATH).setMethod(METHOD).setAlt(ALT1).setName("id"));
         Route route = new Route().setPath(PATH);
-        Map<String, String> routeVariables = service.getRouteVariables(route);
+        MockVariables routeVariables = service.getRouteVariables(route);
 
         assertEquals(1, routeVariables.size());
         assertEquals("123", routeVariables.get("id"));

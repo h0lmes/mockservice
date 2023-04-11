@@ -5,8 +5,9 @@ import com.mockservice.domain.RouteType;
 import com.mockservice.domain.Settings;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.request.RequestFacade;
-import com.mockservice.service.quantum.QuantumTheory;
 import com.mockservice.service.route.RouteService;
+import com.mockservice.template.MockFunctions;
+import com.mockservice.template.MockVariables;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.validate.DataValidationException;
 import com.mockservice.validate.DataValidator;
@@ -77,7 +78,7 @@ public class MockServiceImplTest {
 
     @BeforeEach
     public void common() {
-        lenient().when(templateEngine.getFunctions()).thenReturn(new HashMap<>());
+        lenient().when(templateEngine.getFunctions()).thenReturn(new MockFunctions());
         lenient().when(scenarioService.getAltFor(any(), any())).thenReturn(Optional.empty());
         lenient().when(configRepository.getSettings()).thenReturn(new Settings());
     }
@@ -103,7 +104,7 @@ public class MockServiceImplTest {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(bodyWithVariables);
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
 
-        Map<String, String> variables = new HashMap<>();
+        MockVariables variables = new MockVariables();
         variables.put(variableName, variableValue);
         when(request.getVariables(any())).thenReturn(variables);
 

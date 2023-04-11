@@ -2,11 +2,8 @@ package com.mockservice.template;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StringTemplateTest {
 
@@ -15,18 +12,18 @@ public class StringTemplateTest {
     private static final String STR_2 = "two";
     private static final String STR_3 = "three";
 
-    private Map<String, String> variablesEmpty() {
-        return new HashMap<>();
+    private MockVariables variablesEmpty() {
+        return new MockVariables();
     }
 
-    private Map<String, String> variablesOf(String name, String value) {
-        Map<String, String> map = new HashMap<>();
+    private MockVariables variablesOf(String name, String value) {
+        MockVariables map = new MockVariables();
         map.put(name, value);
         return map;
     }
 
-    private Map<String, String> variablesWithInner(String name, String innerVarName, String innerVarValue) {
-        Map<String, String> map = new HashMap<>();
+    private MockVariables variablesWithInner(String name, String innerVarName, String innerVarValue) {
+        MockVariables map = new MockVariables();
         map.put(name, templateVariable(innerVarName));
         map.put(innerVarName, innerVarValue);
         return map;
@@ -40,12 +37,12 @@ public class StringTemplateTest {
         return "${" + name + ":" + def + "}";
     }
 
-    private Map<String, Function<String[], String>> functionsEmpty() {
-        return new HashMap<>();
+    private MockFunctions functionsEmpty() {
+        return new MockFunctions();
     }
 
-    private Map<String, Function<String[], String>> function(String name, String value) {
-        Map<String, Function<String[], String>> map = new HashMap<>();
+    private MockFunctions function(String name, String value) {
+        MockFunctions map = new MockFunctions();
         map.put(name, (args) -> value);
         return map;
     }
@@ -73,7 +70,7 @@ public class StringTemplateTest {
     public void toString_VariableWhichValueIsAnotherVariable_VariableReplacedWithValue() {
         StringTemplate template = new StringTemplate();
         template.add(templateVariable(STR_1));
-        Map<String, String> variables = variablesWithInner(STR_1, STR_2, STR_3);
+        MockVariables variables = variablesWithInner(STR_1, STR_2, STR_3);
         String result = template.toString(variables, functionsEmpty());
 
         assertEquals(STR_3, result);
@@ -83,7 +80,7 @@ public class StringTemplateTest {
     public void toString_VariableWhichDefaultValueIsAnotherVariable_VariableReplacedWithValue() {
         StringTemplate template = new StringTemplate();
         template.add(templateVariable(STR_1, templateVariable(STR_2)));
-        Map<String, String> variables = variablesOf(STR_2, STR_3);
+        MockVariables variables = variablesOf(STR_2, STR_3);
         String result = template.toString(variables, functionsEmpty());
 
         assertEquals(STR_3, result);

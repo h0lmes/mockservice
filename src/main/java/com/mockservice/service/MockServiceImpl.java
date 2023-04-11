@@ -7,8 +7,8 @@ import com.mockservice.request.RequestFacade;
 import com.mockservice.response.MockResponse;
 import com.mockservice.response.RestMockResponse;
 import com.mockservice.response.SoapMockResponse;
-import com.mockservice.service.quantum.QuantumTheory;
 import com.mockservice.service.route.RouteService;
+import com.mockservice.template.MockVariables;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.validate.DataValidationException;
 import com.mockservice.validate.DataValidator;
@@ -21,7 +21,6 @@ import org.springframework.util.ConcurrentLruCache;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -80,7 +79,7 @@ public class MockServiceImpl implements MockService {
 
         MockResponse response = responseCache.get(route);
 
-        Map<String, String> variables = request.getVariables(Optional.ofNullable(routeService.getRouteVariables(route)));
+        MockVariables variables = request.getVariables(Optional.ofNullable(routeService.getRouteVariables(route)));
         response.setVariables(variables, templateEngine.getFunctions());
         validationResult.ifError(response::addVariables);
 

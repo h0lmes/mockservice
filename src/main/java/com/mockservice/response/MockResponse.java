@@ -1,15 +1,15 @@
 package com.mockservice.response;
 
+import com.mockservice.template.MockFunctions;
+import com.mockservice.template.MockVariables;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
-import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public interface MockResponse {
-    MockResponse setVariables(Map<String, String> variables, Map<String, Function<String[], String>> functions);
-    MockResponse addVariables(Map<String, String> variables);
+    MockResponse setVariables(MockVariables variables, MockFunctions functions);
+    MockResponse addVariables(MockVariables variables);
 
     int getResponseCode();
     String getResponseBody();

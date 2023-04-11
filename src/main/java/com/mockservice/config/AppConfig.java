@@ -2,6 +2,8 @@ package com.mockservice.config;
 
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.mockservice.producer.*;
+import com.mockservice.template.DefaultTemplateEngine;
+import com.mockservice.template.TemplateEngine;
 import com.mockservice.util.RandomUtils;
 import com.mockservice.util.RandomUtilsImpl;
 import com.mockservice.validate.DataValidator;
@@ -40,5 +42,10 @@ public class AppConfig {
     @Bean
     public JsonSchemaFactory jsonSchemaFactory() {
         return JsonSchemaFactory.byDefault();
+    }
+
+    @Bean
+    TemplateEngine mockTemplateEngine() {
+        return new DefaultTemplateEngine();
     }
 }

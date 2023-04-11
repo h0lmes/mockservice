@@ -1,4 +1,4 @@
-package com.mockservice.service.quantum;
+package com.mockservice.service;
 
 import com.mockservice.producer.JsonProducer;
 import com.mockservice.producer.ValueProducer;

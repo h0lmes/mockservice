@@ -1,6 +1,7 @@
 package com.mockservice.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mockservice.template.MockVariables;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
@@ -176,7 +177,7 @@ public class RestRequestFacadeTest {
         lenient().when(request.getHeaders(eq("Mock-Variable"))).thenReturn(headers);
 
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
-        Map<String, String> variables = facade.getVariables(Optional.empty());
+        MockVariables variables = facade.getVariables(Optional.empty());
 
         assertFalse(variables.containsKey(HEADER_VARIABLE_NAME));
     }
