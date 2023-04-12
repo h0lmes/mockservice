@@ -16,6 +16,8 @@ public class Route implements Comparable<Route> {
     private String response = "";
     private String requestBodySchema = "";
     private boolean disabled = false;
+    // generated
+    private VariableMatcher matcher;
 
     public Route() {
         // default
@@ -26,9 +28,7 @@ public class Route implements Comparable<Route> {
     }
 
     public Route(RequestMethod method, String path, String alt) {
-        setMethod(method);
-        setPath(path);
-        setAlt(alt);
+        setMethod(method).setPath(path).setAlt(alt);
     }
 
     public Route(Route route) {
@@ -53,6 +53,11 @@ public class Route implements Comparable<Route> {
         return this;
     }
 
+    @JsonIgnore
+    public boolean isRest() {
+        return RouteType.REST.equals(type);
+    }
+
     public RequestMethod getMethod() {
         return method;
     }
@@ -71,18 +76,24 @@ public class Route implements Comparable<Route> {
         return this;
     }
 
-    @JsonIgnore
-    public boolean isRest() {
-        return RouteType.REST.equals(type);
-    }
-
     public String getAlt() {
         return alt;
     }
 
     public Route setAlt(String alt) {
         this.alt = alt == null ? "" : alt;
+        if (matcher != null) {
+            matcher.setCondition(this.alt);
+        }
         return this;
+    }
+
+    @JsonIgnore
+    public VariableMatcher getMatcher() {
+        if (matcher == null) {
+            matcher = new VariableMatcher(this.alt);
+        }
+        return matcher;
     }
 
     public int getResponseCode() {

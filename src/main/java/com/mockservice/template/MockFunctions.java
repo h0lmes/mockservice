@@ -12,12 +12,14 @@ public class MockFunctions {
         // default
     }
 
-    public void clear() {
+    public MockFunctions clear() {
         map.clear();
+        return this;
     }
 
-    public void put(String key, Function<String[], String> value) {
+    public MockFunctions put(String key, Function<String[], String> value) {
         map.put(key, value);
+        return this;
     }
 
     public Function<String[], String> get(String key) {
@@ -32,9 +34,10 @@ public class MockFunctions {
         return map;
     }
 
-    public void putAll(@Nullable MockFunctions functions) {
+    public MockFunctions putAll(@Nullable MockFunctions functions) {
         if (functions != null) {
             map.putAll(functions.getAll());
         }
+        return this;
     }
 }

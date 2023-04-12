@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
@@ -43,8 +44,8 @@ public class RouteServiceImpl implements RouteService {
     @Override
     public Optional<String> getRandomAltFor(RequestMethod method, String path) {
         List<String> alts = configRepository.findAllRoutes().stream()
-            .filter(r -> method.equals(r.getMethod())
-                && path.equals(r.getPath())
+            .filter(r -> Objects.equals(method, r.getMethod())
+                && Objects.equals(path, r.getPath())
                 && !r.getDisabled())
             .map(Route::getAlt)
             .collect(Collectors.toList());
@@ -55,6 +56,18 @@ public class RouteServiceImpl implements RouteService {
             return Optional.of(alts.get(0));
         }
         return Optional.of(alts.get(randomUtils.rnd(alts.size())));
+    }
+
+    @Override
+    public Optional<Route> getRouteForVariables(RequestMethod method, String path, MockVariables variables) {
+        return configRepository
+                .findAllRoutes()
+                .stream()
+                .filter(r -> Objects.equals(method, r.getMethod())
+                        && Objects.equals(path, r.getPath())
+                        && !r.getDisabled())
+                .filter(r -> r.getMatcher().match(variables))
+                .findFirst();
     }
 
     //----------------------------------------------------------------------------------
@@ -84,15 +97,20 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
-    public synchronized void putRoutes(List<RouteDto> dtos, boolean overwrite) throws IOException {
-        List<Route> routes = routeMapper.fromDto(dtos);
+    public synchronized void putRoutes(List<RouteDto> dto, boolean overwrite) throws IOException {
+        List<Route> routes = routeMapper.fromDto(dto);
         configRepository.putRoutes(routes, overwrite);
     }
 
     @Override
-    public synchronized void deleteRoutes(List<RouteDto> dtos) throws IOException {
-        List<Route> routes = routeMapper.fromDto(dtos);
+    public synchronized void deleteRoutes(List<RouteDto> dto) throws IOException {
+        List<Route> routes = routeMapper.fromDto(dto);
         configRepository.deleteRoutes(routes);
+    }
+
+    @Override
+    public MockVariables getRouteVariables(Route route) {
+        return routesVariablesValues.get(route);
     }
 
     @Override
@@ -114,10 +132,5 @@ public class RouteServiceImpl implements RouteService {
             }
         }
         return variable.setValue(null);
-    }
-
-    @Override
-    public MockVariables getRouteVariables(Route route) {
-        return routesVariablesValues.get(route);
     }
 }

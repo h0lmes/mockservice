@@ -11,11 +11,12 @@ import java.util.Optional;
 public interface RouteService {
     Optional<Route> getEnabledRoute(Route route);
     Optional<String> getRandomAltFor(RequestMethod method, String path);
+    Optional<Route> getRouteForVariables(RequestMethod method, String path, MockVariables variables);
     List<RouteDto> getRoutes();
     void putRoute(RouteDto reference, RouteDto route) throws IOException;
-    void putRoutes(List<RouteDto> dtos, boolean overwrite) throws IOException;
-    void deleteRoutes(List<RouteDto> dtos) throws IOException;
+    void putRoutes(List<RouteDto> dto, boolean overwrite) throws IOException;
+    void deleteRoutes(List<RouteDto> dto) throws IOException;
+    MockVariables getRouteVariables(Route route);
     RouteVariableDto setRouteVariable(RouteVariableDto variable);
     RouteVariableDto clearRouteVariable(RouteVariableDto variable);
-    MockVariables getRouteVariables(Route route);
 }

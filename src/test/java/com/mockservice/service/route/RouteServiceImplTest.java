@@ -69,6 +69,48 @@ public class RouteServiceImplTest {
     }
 
     @Test
+    public void getRouteForVariables_RoutesWithMatchingCondition_ReturnsCorrectRoute() {
+        Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt("1");
+        Route route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = \"tes value\"");
+        Route route3 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = \"test value\"");
+        when(configRepository.findAllRoutes()).thenReturn(List.of(route1, route2, route3));
+
+        RouteService service = service();
+        MockVariables variables = new MockVariables().put("var1", "test value");
+        Optional<Route> route = service.getRouteForVariables(METHOD, PATH, variables);
+
+        assertTrue(route.isPresent());
+        assertEquals(route3, route.get());
+    }
+
+    @Test
+    public void getRouteForVariables_RoutesWithNonMatchingCondition_ReturnsEmpty() {
+        Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt("1");
+        Route route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = \"tes value\"");
+        Route route3 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = \"test value\"");
+        when(configRepository.findAllRoutes()).thenReturn(List.of(route1, route2, route3));
+
+        RouteService service = service();
+        MockVariables variables = new MockVariables().put("var2", "test value");
+        Optional<Route> route = service.getRouteForVariables(METHOD, PATH, variables);
+
+        assertFalse(route.isPresent());
+    }
+
+    @Test
+    public void getRouteForVariables_ConditionHasBeenReset_ReturnsEmpty() {
+        Route route3 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = \"test value\"");
+        route3.setAlt("");
+        when(configRepository.findAllRoutes()).thenReturn(List.of(route3));
+
+        RouteService service = service();
+        MockVariables variables = new MockVariables().put("var1", "test value");
+        Optional<Route> route = service.getRouteForVariables(METHOD, PATH, variables);
+
+        assertFalse(route.isPresent());
+    }
+
+    @Test
     public void getRoutes_RouteExists_ReturnsRouteDto() {
         Route route = new Route().setPath(PATH);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route));

@@ -92,6 +92,16 @@ public class MockServiceImpl implements MockService {
     }
 
     private Route findRouteForRequest(RequestFacade request) {
+        Optional<Route> maybeRoute = routeService.getRouteForVariables(
+                request.getRequestMethod(),
+                request.getEndpoint(),
+                request.getVariables(Optional.empty()));
+
+        if (maybeRoute.isPresent()) {
+            log.info("Route requested (defined by variables): {}", maybeRoute.get());
+            return maybeRoute.get();
+        }
+
         String alt = request.getAlt()
                 .or(() -> scenarioService.getAltFor(request.getRequestMethod(), request.getEndpoint()))
                 .or(() -> maybeGetRandomAltFor(request.getRequestMethod(), request.getEndpoint()))

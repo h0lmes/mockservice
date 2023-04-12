@@ -11,12 +11,14 @@ public class MockVariables {
         // default
     }
 
-    public void clear() {
+    public MockVariables clear() {
         map.clear();
+        return this;
     }
 
-    public void put(String key, String value) {
+    public MockVariables put(String key, String value) {
         map.put(key, value);
+        return this;
     }
 
     public String get(String key) {
@@ -43,15 +45,17 @@ public class MockVariables {
         return map;
     }
 
-    public void putAll(@Nullable MockVariables variables) {
+    public MockVariables putAll(@Nullable MockVariables variables) {
         if (variables != null) {
             map.putAll(variables.getAll());
         }
+        return this;
     }
 
-    public void putAll(@Nullable Map<String, String> map) {
+    public MockVariables putAll(@Nullable Map<String, String> map) {
         if (map != null) {
             this.map.putAll(map);
         }
+        return this;
     }
 }

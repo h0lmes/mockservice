@@ -39,7 +39,7 @@
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingRoute.path"/>
         </div>
 
-        <div class="mock-col w2">
+        <div class="mock-col w3">
             <div class="mock-col-header">ALT</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(route.alt)">{{ route.alt }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingRoute.alt"/>

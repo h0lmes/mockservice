@@ -9,7 +9,12 @@ routes:
   path: /jwt
   alt: ""
   responseCode: 200
-  response: "{\n  \"sub\": \"${sub:DEFAULT}\",\n  \"name\": \"${name:DEFAULT}\",\n  \"iat\": ${iat:0}\n}"
+  response: |-
+    {
+      "sub": "${sub:DEFAULT}",
+      "name": "${name:DEFAULT}",
+      "iat": ${iat:0}
+    }
   requestBodySchema: ""
   disabled: false
 - group: entity
@@ -18,7 +23,13 @@ routes:
   path: /api/v2/entity
   alt: ""
   responseCode: 200
-  response: "[\n  {\"id\": ${sequence}, \"name\": \"${random_string}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${enum:Java:C++:Python:JavaScript}\"},\n  {\"id\": ${sequence}, \"name\": \"${lang:${enum:Java:C++:Python:JavaScript}}\"}\n]"
+  response: |-
+    [
+      {"id": ${sequence}, "name": "${random_string}"},
+      {"id": ${sequence}, "name": "${enum:Java:C++:Python:JavaScript}"},
+      {"id": ${sequence}, "name": "${enum:Java:C++:Python:JavaScript}"},
+      {"id": ${sequence}, "name": "${lang:${enum:Java:C++:Python:JavaScript}}"}
+    ]
   requestBodySchema: ""
   disabled: false
 - group: entity
@@ -50,6 +61,15 @@ routes:
   disabled: false
 - group: entity
   type: REST
+  method: PUT
+  path: /api/v2/entity
+  alt: x = 5
+  responseCode: 201
+  response: "{\"id\": ${random_int}, \"name\": \"${name:default name}\", \"second\": \"second\"}"
+  requestBodySchema: ""
+  disabled: false
+- group: entity
+  type: REST
   method: DELETE
   path: "/api/v2/entity/{id}"
   alt: ""
@@ -63,7 +83,16 @@ routes:
   path: /mockNumberConversion
   alt: ""
   responseCode: 200
-  response: "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:web=\"http://www.dataaccess.com/webservicesserver/\">\n  <soapenv:Header/>\n  <soapenv:Body>\n    <web:NumberToDollarsResponse>\n      <web:NumberToDollarsResult>${enum:TEST1:TEST2}</web:NumberToDollarsResult>\n      <web:Result>${NumberToDollarsRequest.Value:DEFAULT_VALUE}</web:Result>\n    </web:NumberToDollarsResponse>\n  </soapenv:Body>\n</soapenv:Envelope>"
+  response: |-
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://www.dataaccess.com/webservicesserver/">
+      <soapenv:Header/>
+      <soapenv:Body>
+        <web:NumberToDollarsResponse>
+          <web:NumberToDollarsResult>${enum:TEST1:TEST2}</web:NumberToDollarsResult>
+          <web:Result>${NumberToDollarsRequest.Value:DEFAULT_VALUE}</web:Result>
+        </web:NumberToDollarsResponse>
+      </soapenv:Body>
+    </soapenv:Envelope>
   requestBodySchema: ""
   disabled: false
 - group: robot
@@ -72,7 +101,16 @@ routes:
   path: /api/robot
   alt: ""
   responseCode: 202
-  response: "HTTP/1.1\nExtra: extra-value\n\n{\"name\": \"Johnny 5\"}\n---\nGET http://localhost:8081/api/robot HTTP/1.1\nMock-Alt: api-robot/R2D2\n\n{}"
+  response: |-
+    HTTP/1.1
+    Extra: extra-value
+
+    {"name": "Johnny 5"}
+    ---
+    GET http://localhost:8081/api/robot HTTP/1.1
+    Mock-Alt: api-robot/R2D2
+
+    {}
   requestBodySchema: ""
   disabled: false
 - group: robot
@@ -99,7 +137,15 @@ routes:
   path: /v2/store/order
   alt: ""
   responseCode: 200
-  response: "{\n    \"id\": 9585378182,\n    \"petId\": 793835,\n    \"quantity\": 79463074,\n    \"shipDate\": \"2018-11-13T20:20:39+00:00\",\n    \"status\": \"placed\",\n    \"complete\": true\n}"
+  response: |-
+    {
+        "id": 9585378182,
+        "petId": 793835,
+        "quantity": 79463074,
+        "shipDate": "2018-11-13T20:20:39+00:00",
+        "status": "placed",
+        "complete": true
+    }
   requestBodySchema: "{\r\n  \"type\" : \"object\",\r\n  \"properties\" : {\r\n    \"id\" : {\r\n      \"type\" : \"integer\",\r\n      \"format\" : \"int64\"\r\n    },\r\n    \"petId\" : {\r\n      \"type\" : \"integer\",\r\n      \"format\" : \"int64\"\r\n    },\r\n    \"quantity\" : {\r\n      \"type\" : \"integer\",\r\n      \"format\" : \"int32\"\r\n    },\r\n    \"shipDate\" : {\r\n      \"type\" : \"string\",\r\n      \"format\" : \"date-time\"\r\n    },\r\n    \"status\" : {\r\n      \"type\" : \"string\",\r\n      \"description\" : \"Order Status\",\r\n      \"enum\" : [ \"placed\", \"approved\", \"delivered\" ]\r\n    },\r\n    \"complete\" : {\r\n      \"type\" : \"boolean\",\r\n      \"default\" : false\r\n    }\r\n  }\r\n}"
   disabled: false
 - group: store
@@ -108,7 +154,16 @@ routes:
   path: /v2/store/order
   alt: 400
   responseCode: 400
-  response: "{\n    \"id\": 9585378182,\n    \"petId\": 793835,\n    \"quantity\": 79463074,\n    \"shipDate\": \"2018-11-13T20:20:39+00:00\",\n    \"status\": \"placed\",\n    \"complete\": true,\n    \"errorMessage\": \"${requestBodyValidationErrorMessage:}\"\n}"
+  response: |-
+    {
+        "id": 9585378182,
+        "petId": 793835,
+        "quantity": 79463074,
+        "shipDate": "2018-11-13T20:20:39+00:00",
+        "status": "placed",
+        "complete": true,
+        "errorMessage": "${requestBodyValidationErrorMessage:}"
+    }
   requestBodySchema: ""
   disabled: false
 scenarios:
