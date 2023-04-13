@@ -123,11 +123,19 @@
         methods: {
             ...mapActions({
                 fetchRoutes: 'routes/fetch',
-                addRoute: 'routes/add',
+                addRouteAction: 'routes/add',
                 deleteRoutes: 'routes/delete',
                 fetchScenarios: 'scenarios/fetch',
-                addScenario: 'scenarios/add',
+                addScenarioAction: 'scenarios/add',
             }),
+            addRoute() {
+                this.showRoutes = true
+                this.addRouteAction()
+            },
+            addScenario() {
+                this.showScenarios = true
+                this.addScenarioAction()
+            },
             deleteVisibleRoutes() {
                 if (confirm('Are you sure you want to delete all visible routes?\n'
                     + 'Note: if filtered you only delete those you see on the screen.')) {
