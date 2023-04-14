@@ -1,10 +1,7 @@
 <template>
     <div class="var-row">
         <FontAwesomeIcon icon="hashtag" class="ml-2"/>
-
-        <div class="var-col">
-            <div class="mock-col-value">{{ variable.name }}</div>
-        </div>
+        <div class="mock-col-value var-name">{{ variable.name }}</div>
         <div class="var-col">
             <input type="text"
                    class="form-control form-control-sm"
@@ -12,11 +9,9 @@
                    :placeholder="defaultValue"/>
         </div>
         <div class="var-col w-fixed-auto">
-            <button type="button" class="btn btn-sm btn-default" @click="setVar">set</button>
+            <button type="button" class="btn btn-sm btn-default" @click="setVar">save</button>
             <button type="button" class="btn btn-sm btn-danger" @click="clearVar">clear</button>
         </div>
-
-        <div class="var-col w3"></div>
     </div>
 </template>
 <script>
@@ -36,7 +31,7 @@
         },
         computed: {
             defaultValue() {
-                return this.variable.value === null ? this.variable.defaultValue : '';
+                return this.variable.defaultValue ? 'default value = "' + this.variable.defaultValue + '"' : '';
             },
         },
         mounted() {
@@ -102,5 +97,9 @@
             flex: 0 1 auto;
             min-width: initial;
         }
+    }
+
+    .var-name {
+        min-width: 7rem;
     }
 </style>

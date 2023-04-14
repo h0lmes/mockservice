@@ -33,21 +33,14 @@
             </select>
         </div>
 
-        <div class="mock-col w3">
+        <div v-show="!editing" class="mock-col w3">
             <div class="mock-col-header">PATH</div>
-            <div v-show="!editing" class="mock-col-value link" @click="filter(route.path)">{{ route.path }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingRoute.path"/>
+            <div class="mock-col-value link" @click="filter(route.path)">{{ route.path }}</div>
         </div>
 
-        <div class="mock-col w3">
+        <div v-show="!editing" class="mock-col w3">
             <div class="mock-col-header">ALT</div>
-            <div v-show="!editing" class="mock-col-value link" @click="filter(route.alt)">{{ route.alt }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingRoute.alt"/>
-        </div>
-
-        <div v-show="editing" class="mock-col w1">
-            <div class="mock-col-header">RESPONSE CODE</div>
-            <input type="text" class="form-control form-control-sm" v-model="editingRoute.responseCode"/>
+            <div class="mock-col-value link" @click="filter(route.alt)">{{ route.alt }}</div>
         </div>
 
         <div class="mock-col w-fixed-auto">
@@ -56,11 +49,23 @@
                 <button type="button" class="btn btn-sm btn-default" :class="{'disabled' : !hasVariables}" @click="vars">vars</button>
                 <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
                 <button type="button" class="btn btn-sm btn-default" @click="test">test</button>
-                <button type="button" class="btn btn-sm btn-danger" @click="del">delete</button>
+                <button type="button" class="btn btn-sm btn-danger ml-4" @click="del">delete</button>
             </div>
         </div>
 
         <div v-show="editing" class="mock-col w100">
+            <div class="mb-2 color-secondary">PATH</div>
+            <input type="text" class="form-control form-control-sm" v-model="editingRoute.path"/>
+        </div>
+
+        <div v-show="editing" class="mock-col w100">
+            <div class="mb-2 color-secondary">ALT</div>
+            <input type="text" class="form-control form-control-sm" v-model="editingRoute.alt"
+                   placeholder="can contain condition (e.g. some_field.some_inner_field = value)"/>
+        </div>
+
+        <div v-show="editing" class="mock-col w100">
+            <div class="mb-2 color-secondary">RESPONSE BODY</div>
             <AutoSizeTextArea v-model="editingRoute.response"
                               :min-rows="1"
                               :max-rows="256"
@@ -70,6 +75,11 @@
         </div>
 
         <div v-show="editing" class="mock-col w100">
+            <div class="mb-2 color-secondary">RESPONSE CODE</div>
+            <input type="text" class="form-control form-control-sm" v-model="editingRoute.responseCode"/>
+        </div>
+
+        <div v-show="editing" class="mock-col w100 mt-1">
             <ToggleSwitch class="mock-col-value" v-model="showRequestBodySchema">SHOW REQUEST BODY SCHEMA</ToggleSwitch>
         </div>
         <div v-show="editing && showRequestBodySchema" class="mock-col w100">
@@ -77,7 +87,7 @@
             ></AutoSizeTextArea>
         </div>
 
-        <div v-show="editing" class="mock-col w1">
+        <div v-show="editing" class="mock-col w1 mt-1">
             <ToggleSwitch class="mock-col-value" v-model="editingRoute.disabled">DISABLED</ToggleSwitch>
         </div>
 

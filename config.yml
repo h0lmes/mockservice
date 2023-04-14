@@ -167,20 +167,6 @@ routes:
   requestBodySchema: ""
   disabled: false
 scenarios:
-- group: default
-  alias: jwt
-  type: MAP
-  data: ""
-- group: entity
-  alias: entity 400
-  type: MAP
-  data: GET;/api/v2/entity;400
-- group: entity
-  alias: entity alt 400
-  type: CIRCULAR_QUEUE
-  data: |-
-    GET;/api/v2/entity
-    GET;/api/v2/entity;400
 - group: robot
   alias: robot sequence
   type: QUEUE

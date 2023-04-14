@@ -11,7 +11,7 @@
         </div>
 
         <div class="mock-col w2">
-            <div class="mock-col-header">TYPE</div>
+            <div class="mock-col-header">SCENARIO TYPE</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.type)">{{ scenario.type }}</div>
             <select v-show="editing" class="form-control form-control-sm" v-model="editingScenario.type">
                 <option>MAP</option>
@@ -21,7 +21,7 @@
         </div>
 
         <div class="mock-col w3">
-            <div class="mock-col-header">ALIAS</div>
+            <div class="mock-col-header">SCENARIO ALIAS</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.alias)">{{ scenario.alias }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingScenario.alias"/>
         </div>
@@ -37,20 +37,21 @@
                 <button type="button" class="btn btn-sm disabled">&#xA0;&#xA0;&#xA0;&#xA0;</button>
                 <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
                 <button type="button" class="btn btn-sm disabled">&#xA0;&#xA0;&#xA0;&#xA0;</button>
-                <button type="button" class="btn btn-sm btn-danger" @click="del">delete</button>
+                <button type="button" class="btn btn-sm btn-danger ml-4" @click="del">delete</button>
             </div>
         </div>
 
         <div v-show="editing" class="mock-col w100">
+            <div class="mb-2 color-secondary">LIST OF ROUTES</div>
             <AutoSizeTextArea v-model="editingScenario.data"
-                              placeholder="SCENARIO (ROUTES)"
+                              placeholder="click SHOW ROUTES to add routes; or just type them in"
                               :min-rows="1"
                               :max-rows="256"
                               ref="data"
             ></AutoSizeTextArea>
         </div>
 
-        <div v-show="editing" class="mock-col w1">
+        <div v-show="editing" class="mock-col w1 mt-1">
             <ToggleSwitch class="mock-col-value" v-model="showRoutes">SHOW ROUTES</ToggleSwitch>
         </div>
         <div v-show="editing" class="mock-col w-fixed-auto">

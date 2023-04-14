@@ -9,7 +9,7 @@
             </div>
             <slot></slot>
             <div v-if="sub"></div>
-            <div v-if="sub" class="inline-block overflow-wrap-anywhere mt-2 color-secondary smaller">{{sub}}</div>
+            <div v-if="sub" class="toggle-switch__sub color-secondary">{{sub}}</div>
         </label>
     </div>
 </template>
@@ -156,5 +156,12 @@
     .toggle-switch > input:checked + label .area .handle {
         background-color: var(--toggle-switch-bg-handle);
         transform: translateX(calc(var(--width) - var(--handle-size)));
+    }
+
+    .toggle-switch .sub {
+        display: inline-block !important;
+        overflow-wrap: anywhere;
+        margin-top: 0.5rem;
+        font-size: smaller;
     }
 </style>

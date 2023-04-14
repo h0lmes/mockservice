@@ -1,21 +1,23 @@
 <template>
     <div class="monospace">
-        <div class="component-toolbar mb-3">
+        <div class="component-toolbar mb-5">
             <div class="toolbar-item">
                 <input ref="search"
                        type="text"
                        class="form-control monospace"
-                       placeholder="search here or click on values"
+                       placeholder="type or click on values (group, path, etc)"
                        @keydown.enter.exact.stop="setFilter($event.target.value)"/>
             </div>
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="jsSearch" @toggle="setFilter('')">JS</ToggleSwitch>
-            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="setFilter('')">Clear search</button>
-            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRoute">Add route</button>
-            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addScenario">Add scenario</button>
-            <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger" @click="deleteVisibleRoutes">Delete visible routes</button>
+            <div>
+                <button type="button" class="toolbar-item-w-fixed-auto btn" @click="setFilter('')">Clear search</button>
+                <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRoute">Add route</button>
+                <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addScenario">Add scenario</button>
+                <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger" @click="deleteVisibleRoutes">Delete visible routes</button>
+            </div>
         </div>
 
-        <div class="component-toolbar mb-3">
+        <div class="component-toolbar mb-5">
             <ViewSelector class="toolbar-item toolbar-item-w-fixed-auto"></ViewSelector>
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRoutes">Routes</ToggleSwitch>
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showScenarios">Scenarios</ToggleSwitch>
@@ -24,24 +26,30 @@
         <Routes :entities="filteredEntities" @filter="setFilter($event)"></Routes>
 
         <div class="color-secondary mt-4">
-            <div class="mt-2 bold">Legend</div>
+            <div class="mt-2 bold">Scenario types</div>
             <div class="mt-2">
-                MAP scenario: searches all routes by METHOD + PATH, returns ALT from the first match or empty if not found.
+                MAP: searches LIST OF ROUTES top-to-bottom for the requested METHOD + PATH, returns the first match. If no match - returns route with matching METHOD + PATH and an empty ALT.
             </div>
             <div class="mt-2">
-                QUEUE scenario: same as MAP but tries to match only the topmost route, removes matched route from the queue.
+                QUEUE: same as MAP but tries to match only the topmost route, removes matched route from the queue.
             </div>
             <div class="mt-2">
-                CIRCULAR_QUEUE scenario: same as QUEUE plus auto-restarts when queue gets depleted.
+                CIRCULAR_QUEUE: same as QUEUE; auto-restarts queue when it depletes.
             </div>
         </div>
         <div class="color-secondary mt-4">
             <div class="mt-2 bold">Tips</div>
             <div class="mt-2">
+                Vars button toggles variables editing mode (if any vars exist in the response body).
+            </div>
+            <div class="mt-2">
+                Edit button toggles edit mode; same for the Test button.
+            </div>
+            <div class="mt-2">
                 Middle-click route or scenario to edit, press Esc in any field to cancel.
             </div>
             <div class="mt-2">
-                For more precise filtering enable 'JS' and use Javascript expressions (example: e.group=='default' && !e.disabled).
+                For more precise filtering enable 'JS' and use Javascript expressions in search field (example: e.group=='default' && !e.disabled).
             </div>
             <div class="mt-2">
                 To alter multiple routes or scenarios quickly consider navigating to Config page and editing it as plain text.
