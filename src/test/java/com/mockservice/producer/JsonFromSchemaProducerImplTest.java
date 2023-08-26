@@ -5,18 +5,15 @@ import com.mockservice.util.IOUtils;
 import com.mockservice.util.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @ExtendWith(MockitoExtension.class)
-@RunWith(JUnitPlatform.class)
 public class JsonFromSchemaProducerImplTest {
 
     @Mock
@@ -30,7 +27,7 @@ public class JsonFromSchemaProducerImplTest {
     public void generate() throws IOException {
         String jsonSchema = IOUtils.asString("json_schema.json");
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> jsonSchemaMap = mapper.readValue(jsonSchema, Map.class);
+        var jsonSchemaMap = (Map<String, Object>) mapper.readValue(jsonSchema, Map.class);
         String json = producer().jsonFromSchema(jsonSchemaMap);
         System.out.println(json);
 

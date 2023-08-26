@@ -1,12 +1,11 @@
 package com.mockservice.service.route;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import com.mockservice.model.RouteVariableDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RouteVariableDtoTest {
 

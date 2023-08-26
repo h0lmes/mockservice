@@ -1,4 +1,4 @@
-package com.mockservice.service.route;
+package com.mockservice.model;
 
 import java.util.Objects;
 
@@ -46,9 +46,10 @@ public class RouteVariable implements Comparable<RouteVariable> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof RouteVariable)) return false;
-        RouteVariable other = (RouteVariable) o;
-        return name.equals(other.getName());
+        if (o instanceof RouteVariable other) {
+            return name.equals(other.getName());
+        }
+        return false;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.mockservice.service;
+package com.mockservice.validate;
 
 import com.mockservice.domain.Route;
 import com.mockservice.template.MockVariables;
@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 public class RequestBodyValidationResult {
 
-    private final Throwable t;
+    private final Throwable throwable;
     private final Route route;
     private final MockVariables variables;
 
@@ -23,18 +23,14 @@ public class RequestBodyValidationResult {
         return new RequestBodyValidationResult(route, t, variables);
     }
 
-    private RequestBodyValidationResult(Route route, Throwable t, MockVariables variables) {
+    private RequestBodyValidationResult(Route route, Throwable throwable, MockVariables variables) {
         this.route = route;
-        this.t = t;
+        this.throwable = throwable;
         this.variables = variables;
     }
 
-    private boolean isOk() {
-        return t == null;
-    }
-
     public void ifError(Consumer<MockVariables> consumer) {
-        if (!isOk()) {
+        if (throwable != null) {
             Objects.requireNonNull(variables, "RequestBodyValidationResult has error but variables are null!");
             consumer.accept(variables);
         }

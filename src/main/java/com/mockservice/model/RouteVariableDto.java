@@ -1,4 +1,4 @@
-package com.mockservice.service.route;
+package com.mockservice.model;
 
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -68,14 +68,13 @@ public class RouteVariableDto implements Comparable<RouteVariableDto> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof RouteVariableDto)) {
-            return false;
+        if (o instanceof RouteVariableDto other) {
+            return method.equals(other.getMethod())
+                    && path.equals(other.getPath())
+                    && alt.equals(other.getAlt())
+                    && name.equals(other.getName());
         }
-        RouteVariableDto other = (RouteVariableDto) o;
-        return method.equals(other.getMethod())
-            && path.equals(other.getPath())
-            && alt.equals(other.getAlt())
-            && name.equals(other.getName());
+        return false;
     }
 
     @Override

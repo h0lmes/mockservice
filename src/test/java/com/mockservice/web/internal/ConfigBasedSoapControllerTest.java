@@ -5,10 +5,9 @@ import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.service.MockService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -16,8 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.util.pattern.PathPattern;
 
 import java.util.List;
@@ -30,7 +27,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@RunWith(JUnitPlatform.class)
 public class ConfigBasedSoapControllerTest {
 
     private static final String BODY = "<test>42</test>";

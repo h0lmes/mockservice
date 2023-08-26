@@ -1,4 +1,4 @@
-package com.mockservice.service.route;
+package com.mockservice.model;
 
 import com.mockservice.domain.RouteType;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -120,11 +120,12 @@ public class RouteDto {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof RouteDto)) return false;
-        RouteDto other = (RouteDto) o;
-        return method.equals(other.getMethod())
-            && path.equals(other.getPath())
-            && alt.equals(other.getAlt());
+        if (o instanceof RouteDto other) {
+            return method.equals(other.getMethod())
+                    && path.equals(other.getPath())
+                    && alt.equals(other.getAlt());
+        }
+        return false;
     }
 
     @Override

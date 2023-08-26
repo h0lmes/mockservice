@@ -1,6 +1,8 @@
-package com.mockservice.service.route;
+package com.mockservice.service;
 
 import com.mockservice.domain.Route;
+import com.mockservice.model.RouteDto;
+import com.mockservice.model.RouteVariableDto;
 import com.mockservice.template.MockVariables;
 import org.springframework.web.bind.annotation.RequestMethod;
 

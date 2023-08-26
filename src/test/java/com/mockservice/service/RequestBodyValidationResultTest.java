@@ -1,9 +1,10 @@
 package com.mockservice.service;
 
 import com.mockservice.domain.Route;
+import com.mockservice.validate.RequestBodyValidationResult;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RequestBodyValidationResultTest {
 

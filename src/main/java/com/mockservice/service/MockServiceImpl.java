@@ -2,16 +2,17 @@ package com.mockservice.service;
 
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
+import com.mockservice.exception.NoRouteFoundException;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.request.RequestFacade;
 import com.mockservice.response.MockResponse;
 import com.mockservice.response.RestMockResponse;
 import com.mockservice.response.SoapMockResponse;
-import com.mockservice.service.route.RouteService;
 import com.mockservice.template.MockVariables;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.validate.DataValidationException;
 import com.mockservice.validate.DataValidator;
+import com.mockservice.validate.RequestBodyValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -172,7 +173,7 @@ public class MockServiceImpl implements MockService {
             for (QuantumTheory theory : quantumTheories) {
                 if (theory.applicable(body)) {
                     body = theory.apply(body);
-                    int statusCode = theory.apply(responseEntity.getStatusCodeValue());
+                    int statusCode = theory.apply(responseEntity.getStatusCode().value());
                     theory.delay();
                     return ResponseEntity
                             .status(statusCode)

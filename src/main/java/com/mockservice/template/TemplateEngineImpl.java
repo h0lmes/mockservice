@@ -12,21 +12,21 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class DefaultTemplateEngine implements TemplateEngine {
+public class TemplateEngineImpl implements TemplateEngine {
 
     private final Map<String, Supplier<Function<String[], String>>> suppliers = new LinkedHashMap<>();
 
-    public DefaultTemplateEngine() {
+    public TemplateEngineImpl() {
         suppliers.put("sequence", IntSequenceFunction::new);
-        suppliers.put("random_int", () -> DefaultTemplateEngine::randomInt);
-        suppliers.put("random_long", () -> DefaultTemplateEngine::randomLong);
-        suppliers.put("random_uuid", () -> DefaultTemplateEngine::randomUuid);
-        suppliers.put("random_string", () -> DefaultTemplateEngine::randomString);
-        suppliers.put("enum", () -> DefaultTemplateEngine::enumFn);
-        suppliers.put("random_date", () -> DefaultTemplateEngine::randomDate);
-        suppliers.put("random_timestamp", () -> DefaultTemplateEngine::randomTimestamp);
-        suppliers.put("current_date", () -> DefaultTemplateEngine::currentDate);
-        suppliers.put("current_timestamp", () -> DefaultTemplateEngine::currentTimestamp);
+        suppliers.put("random_int", () -> TemplateEngineImpl::randomInt);
+        suppliers.put("random_long", () -> TemplateEngineImpl::randomLong);
+        suppliers.put("random_uuid", () -> TemplateEngineImpl::randomUuid);
+        suppliers.put("random_string", () -> TemplateEngineImpl::randomString);
+        suppliers.put("enum", () -> TemplateEngineImpl::enumFn);
+        suppliers.put("random_date", () -> TemplateEngineImpl::randomDate);
+        suppliers.put("random_timestamp", () -> TemplateEngineImpl::randomTimestamp);
+        suppliers.put("current_date", () -> TemplateEngineImpl::currentDate);
+        suppliers.put("current_timestamp", () -> TemplateEngineImpl::currentTimestamp);
     }
 
     @Override

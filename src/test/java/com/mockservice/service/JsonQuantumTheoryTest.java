@@ -3,20 +3,15 @@ package com.mockservice.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.producer.JsonProducerImpl;
 import com.mockservice.producer.ValueProducerImpl;
-import com.mockservice.service.JsonQuantumTheory;
-import com.mockservice.service.QuantumTheory;
 import com.mockservice.util.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-@RunWith(JUnitPlatform.class)
 public class JsonQuantumTheoryTest {
 
     private static final String VALID_JSON = "{\"product_id\": 1, \"label\": \"label\", \"in_stock\": true}";

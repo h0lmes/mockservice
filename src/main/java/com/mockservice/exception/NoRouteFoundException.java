@@ -1,4 +1,4 @@
-package com.mockservice.service;
+package com.mockservice.exception;
 
 import com.mockservice.domain.Route;
 

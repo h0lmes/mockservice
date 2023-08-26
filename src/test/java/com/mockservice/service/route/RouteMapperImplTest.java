@@ -1,20 +1,18 @@
 package com.mockservice.service.route;
 
+import com.mockservice.domain.Route;
+import com.mockservice.domain.RouteType;
+import com.mockservice.mapper.RouteMapper;
+import com.mockservice.mapper.RouteMapperImpl;
+import com.mockservice.model.RouteDto;
+import org.junit.jupiter.api.Test;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.mockservice.domain.Route;
-import com.mockservice.domain.RouteType;
-import java.util.List;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.bind.annotation.RequestMethod;
-
-@ExtendWith(MockitoExtension.class)
-@RunWith(JUnitPlatform.class)
 public class RouteMapperImplTest {
 
     private static final RequestMethod METHOD = RequestMethod.POST;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.Scenario;
 import com.mockservice.domain.Settings;
-import com.mockservice.service.route.RouteVariable;
+import com.mockservice.model.RouteVariable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

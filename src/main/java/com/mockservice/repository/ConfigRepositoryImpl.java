@@ -3,7 +3,7 @@ package com.mockservice.repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.domain.*;
-import com.mockservice.service.route.RouteVariable;
+import com.mockservice.model.RouteVariable;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.template.TokenParser;
 import com.mockservice.util.Cache;

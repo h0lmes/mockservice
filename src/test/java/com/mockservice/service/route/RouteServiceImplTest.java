@@ -1,13 +1,17 @@
 package com.mockservice.service.route;
 
 import com.mockservice.domain.Route;
+import com.mockservice.mapper.RouteMapper;
+import com.mockservice.model.RouteDto;
+import com.mockservice.model.RouteVariable;
+import com.mockservice.model.RouteVariableDto;
 import com.mockservice.repository.ConfigRepository;
+import com.mockservice.service.RouteService;
+import com.mockservice.service.RouteServiceImpl;
 import com.mockservice.template.MockVariables;
 import com.mockservice.util.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -24,7 +28,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@RunWith(JUnitPlatform.class)
 public class RouteServiceImplTest {
 
     private static final RequestMethod METHOD = RequestMethod.POST;
@@ -245,7 +248,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void setRouteVariable_OneVariable_VariableCreated() throws IOException {
+    public void setRouteVariable_OneVariable_VariableCreated() {
         RouteService service = service();
         service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
         Route route = new Route().setPath(PATH);
@@ -256,7 +259,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void clearRouteVariable_ClearExisting_VariableDoesNotExist() throws IOException {
+    public void clearRouteVariable_ClearExisting_VariableDoesNotExist() {
         RouteService service = service();
         service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
         service.clearRouteVariable(new RouteVariableDto().setPath(PATH).setName("id"));
@@ -267,7 +270,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void clearRouteVariable_ClearNonExisting_VariableDoesNotExist() throws IOException {
+    public void clearRouteVariable_ClearNonExisting_VariableDoesNotExist() {
         RouteService service = service();
         service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
         service.clearRouteVariable(new RouteVariableDto().setPath(PATH).setName("name"));
@@ -278,7 +281,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void clearRouteVariable_ClearForNonExistingRoute_VariableExists() throws IOException {
+    public void clearRouteVariable_ClearForNonExistingRoute_VariableExists() {
         RouteService service = service();
         service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
         service.clearRouteVariable(new RouteVariableDto().setPath(PATH).setMethod(METHOD).setAlt(ALT1).setName("id"));

@@ -3,9 +3,9 @@ package com.mockservice.service;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
 import com.mockservice.domain.Settings;
+import com.mockservice.exception.NoRouteFoundException;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.request.RequestFacade;
-import com.mockservice.service.route.RouteService;
 import com.mockservice.template.MockFunctions;
 import com.mockservice.template.MockVariables;
 import com.mockservice.template.TemplateEngine;
@@ -14,8 +14,6 @@ import com.mockservice.validate.DataValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -25,9 +23,7 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,17 +31,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
-@RunWith(JUnitPlatform.class)
 public class MockServiceImplTest {
 
     private static final RequestMethod GET_METHOD = RequestMethod.GET;
     private static final String PATH = "/api/v1/test";
     private static final String ALT_400 = "400";
 
-    private static final String JSON_SCHEMA = "{\"type\": \"object\",\n" +
-            "  \"properties\": {\n" +
-            "    \"product_id\": {\"type\": \"integer\"}\n" +
-            "  }}";
+    private static final String JSON_SCHEMA = """
+            {
+              "type": "object",
+              "properties": {
+                "product_id": {"type": "integer"}
+              }
+            }""";
     private static final String VALID_JSON = "{\"product_id\": 1}";
     private static final String INVALID_JSON = "{\"product_id\": \"\"}";
 

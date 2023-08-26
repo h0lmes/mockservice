@@ -1,6 +1,7 @@
-package com.mockservice.service.route;
+package com.mockservice.mapper;
 
 import com.mockservice.domain.Route;
+import com.mockservice.model.RouteDto;
 
 import javax.annotation.Nullable;
 import java.util.List;

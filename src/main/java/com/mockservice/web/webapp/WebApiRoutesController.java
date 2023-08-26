@@ -1,8 +1,8 @@
 package com.mockservice.web.webapp;
 
-import com.mockservice.service.route.RouteDto;
-import com.mockservice.service.route.RouteService;
-import com.mockservice.service.route.RouteVariableDto;
+import com.mockservice.model.RouteDto;
+import com.mockservice.model.RouteVariableDto;
+import com.mockservice.service.RouteService;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

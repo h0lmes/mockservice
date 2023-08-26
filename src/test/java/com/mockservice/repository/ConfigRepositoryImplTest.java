@@ -4,17 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.mockservice.domain.*;
-import com.mockservice.service.route.RouteDto;
-import com.mockservice.service.route.RouteService;
-import com.mockservice.service.route.RouteVariable;
-import com.mockservice.service.route.RouteVariableDto;
+import com.mockservice.model.RouteVariable;
 import com.mockservice.template.TemplateEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,14 +18,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@RunWith(JUnitPlatform.class)
 public class ConfigRepositoryImplTest {
 
     private static final String STR1 = "AAA";
@@ -476,7 +469,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void deleteScenario_WithNoObservers_DoesNotThrow() throws IOException {
+    public void deleteScenario_WithNoObservers_DoesNotThrow() {
         ConfigRepository configRepository = repositoryWithNoObservers();
 
         Scenario scenario1 = new Scenario().setAlias(STR1);
