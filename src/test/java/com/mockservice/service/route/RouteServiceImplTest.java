@@ -27,8 +27,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("unchecked")
 @ExtendWith(MockitoExtension.class)
-public class RouteServiceImplTest {
+class RouteServiceImplTest {
 
     private static final RequestMethod METHOD = RequestMethod.POST;
     private static final RequestMethod METHOD_OTHER = RequestMethod.PUT;
@@ -50,7 +51,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void getEnabledRoute_EnabledRouteExists_ReturnsRoute() {
+    void getEnabledRoute_EnabledRouteExists_ReturnsRoute() {
         Route route = new Route().setPath(PATH);
         when(configRepository.findRoute(any())).thenReturn(Optional.of(route));
 
@@ -61,7 +62,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void getEnabledRoute_DisabledRouteExists_ReturnsEmpty() {
+    void getEnabledRoute_DisabledRouteExists_ReturnsEmpty() {
         Route route = new Route().setPath(PATH).setDisabled(true);
         when(configRepository.findRoute(any())).thenReturn(Optional.of(route));
 
@@ -72,7 +73,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void getRouteForVariables_RoutesWithMatchingCondition_ReturnsCorrectRoute() {
+    void getRouteForVariables_RoutesWithMatchingCondition_ReturnsCorrectRoute() {
         Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt("1");
         Route route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = \"tes value\"");
         Route route3 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = \"test value\"");
@@ -87,7 +88,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void getRouteForVariables_RoutesWithNonMatchingCondition_ReturnsEmpty() {
+    void getRouteForVariables_RoutesWithNonMatchingCondition_ReturnsEmpty() {
         Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt("1");
         Route route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = \"tes value\"");
         Route route3 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = \"test value\"");
@@ -101,7 +102,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void getRouteForVariables_ConditionHasBeenReset_ReturnsEmpty() {
+    void getRouteForVariables_ConditionHasBeenReset_ReturnsEmpty() {
         Route route3 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = \"test value\"");
         route3.setAlt("");
         when(configRepository.findAllRoutes()).thenReturn(List.of(route3));
@@ -114,7 +115,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void getRoutes_RouteExists_ReturnsRouteDto() {
+    void getRoutes_RouteExists_ReturnsRouteDto() {
         Route route = new Route().setPath(PATH);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route));
         RouteDto routeDto = new RouteDto().setPath(PATH);
@@ -127,7 +128,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void getRoutes_RouteWithVariablesExistsAndVariableValueExists_ReturnsVariables() {
+    void getRoutes_RouteWithVariablesExistsAndVariableValueExists_ReturnsVariables() {
         Route route = new Route().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route));
         when(configRepository.getRouteVariables(any())).thenReturn(List.of(
@@ -163,7 +164,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void getRoutes_RouteWithVariablesExistsAndVariableValueDoesNotExist_ReturnsDefaults() {
+    void getRoutes_RouteWithVariablesExistsAndVariableValueDoesNotExist_ReturnsDefaults() {
         Route route = new Route().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route));
         when(configRepository.getRouteVariables(any())).thenReturn(List.of(
@@ -198,7 +199,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void getRoutes_RouteWithFunctionsExists_ReturnsNoVariables() {
+    void getRoutes_RouteWithFunctionsExists_ReturnsNoVariables() {
         Route route = new Route().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route));
 
@@ -218,7 +219,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void putRoute_RouteDtoAsInput_CallsRepositoryMethod() throws IOException {
+    void putRoute_RouteDtoAsInput_CallsRepositoryMethod() throws IOException {
         RouteService service = service();
         service.putRoute(new RouteDto(), new RouteDto());
 
@@ -226,7 +227,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void putRoutes_ListOfRouteDtoAsInput_CallsRepositoryMethod() throws IOException {
+    void putRoutes_ListOfRouteDtoAsInput_CallsRepositoryMethod() throws IOException {
         RouteService service = service();
         service.putRoutes(List.of(new RouteDto()), true);
 
@@ -234,21 +235,21 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void deleteRoutes_ListOfRouteDtoAsInput_CallsRepositoryMethod() throws IOException {
+    void deleteRoutes_ListOfRouteDtoAsInput_CallsRepositoryMethod() throws IOException {
         Route route = new Route().setPath(PATH);
         when(routeMapper.fromDto(anyList())).thenReturn(List.of(route));
 
         RouteService service = service();
         service.deleteRoutes(List.of(new RouteDto().setPath(PATH)));
 
-        ArgumentCaptor<List<Route>> argument = ArgumentCaptor.forClass(List.class);
-        verify(configRepository).deleteRoutes(argument.capture());
-        assertFalse(argument.getValue().isEmpty());
-        assertEquals(PATH, argument.getValue().get(0).getPath());
+        ArgumentCaptor<List<Route>> routeListCaptor = ArgumentCaptor.forClass(List.class);
+        verify(configRepository).deleteRoutes(routeListCaptor.capture());
+        assertFalse(routeListCaptor.getValue().isEmpty());
+        assertEquals(PATH, routeListCaptor.getValue().get(0).getPath());
     }
 
     @Test
-    public void setRouteVariable_OneVariable_VariableCreated() {
+    void setRouteVariable_OneVariable_VariableCreated() {
         RouteService service = service();
         service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
         Route route = new Route().setPath(PATH);
@@ -259,7 +260,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void clearRouteVariable_ClearExisting_VariableDoesNotExist() {
+    void clearRouteVariable_ClearExisting_VariableDoesNotExist() {
         RouteService service = service();
         service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
         service.clearRouteVariable(new RouteVariableDto().setPath(PATH).setName("id"));
@@ -270,7 +271,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void clearRouteVariable_ClearNonExisting_VariableDoesNotExist() {
+    void clearRouteVariable_ClearNonExisting_VariableDoesNotExist() {
         RouteService service = service();
         service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
         service.clearRouteVariable(new RouteVariableDto().setPath(PATH).setName("name"));
@@ -281,7 +282,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void clearRouteVariable_ClearForNonExistingRoute_VariableExists() {
+    void clearRouteVariable_ClearForNonExistingRoute_VariableExists() {
         RouteService service = service();
         service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
         service.clearRouteVariable(new RouteVariableDto().setPath(PATH).setMethod(METHOD).setAlt(ALT1).setName("id"));
@@ -295,7 +296,7 @@ public class RouteServiceImplTest {
     // --- random alt -----------------------------------------------------
 
     @Test
-    public void getRandomAltFor_MoreThanOneRouteSatisfiesSearchCondition_ReturnsAltOfEither() {
+    void getRandomAltFor_MoreThanOneRouteSatisfiesSearchCondition_ReturnsAltOfEither() {
         Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1);
         Route route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT2);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route1, route2));
@@ -308,7 +309,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void getRandomAltFor_OneRouteSatisfiesSearchCondition_ReturnsAltOfTheRoute() {
+    void getRandomAltFor_OneRouteSatisfiesSearchCondition_ReturnsAltOfTheRoute() {
         Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route1));
 
@@ -320,7 +321,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void getRandomAltFor_NoRoutesSatisfySearchConditionByMethod_ReturnsEmpty() {
+    void getRandomAltFor_NoRoutesSatisfySearchConditionByMethod_ReturnsEmpty() {
         Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route1));
 
@@ -330,7 +331,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void getRandomAltFor_NoRoutesSatisfySearchConditionByPath_ReturnsEmpty() {
+    void getRandomAltFor_NoRoutesSatisfySearchConditionByPath_ReturnsEmpty() {
         Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1);
         Route route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT2);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route1, route2));
@@ -341,7 +342,7 @@ public class RouteServiceImplTest {
     }
 
     @Test
-    public void getRandomAltFor_AnyNumberOfRoutesSatisfySearchConditionButAreDisabled_ReturnsEmpty() {
+    void getRandomAltFor_AnyNumberOfRoutesSatisfySearchConditionButAreDisabled_ReturnsEmpty() {
         Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1).setDisabled(true);
         Route route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT2).setDisabled(true);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route1, route2));

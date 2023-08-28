@@ -7,7 +7,6 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -44,7 +43,7 @@ public class IOUtils {
 
     public static List<String> toList(String resource) {
         try (BufferedReader reader = new BufferedReader(new StringReader(resource))) {
-            return reader.lines().collect(Collectors.toList());
+            return reader.lines().toList();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

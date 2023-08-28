@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 @Component
 public class RouteMapperImpl implements RouteMapper {
@@ -46,11 +45,11 @@ public class RouteMapperImpl implements RouteMapper {
 
     @Override
     public List<RouteDto> toDto(List<Route> routes, @Nullable BiConsumer<Route, RouteDto> postProcess) {
-        return routes.stream().map(r -> toDto(r, postProcess)).collect(Collectors.toList());
+        return routes.stream().map(r -> toDto(r, postProcess)).toList();
     }
 
     @Override
     public List<Route> fromDto(List<RouteDto> dtos) {
-        return dtos.stream().map(this::fromDto).collect(Collectors.toList());
+        return dtos.stream().map(this::fromDto).toList();
     }
 }

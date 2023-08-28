@@ -79,11 +79,11 @@ public class StringTemplate {
             String[] args = TokenParser.parseToken(token);
 
             if (variables.containsKey(args[0])) {
-                String var = variables.get(args[0]);
-                while (TokenParser.isToken(var)) {
-                    var = map(var, variables, functions);
+                String variable = variables.get(args[0]);
+                while (TokenParser.isToken(variable)) {
+                    variable = map(variable, variables, functions);
                 }
-                return var;
+                return variable;
             }
 
             if (functions.containsKey(args[0])) {
@@ -91,11 +91,11 @@ public class StringTemplate {
             }
 
             if (args.length > 1) {
-                String var = args[1];
-                while (TokenParser.isToken(var)) {
-                    var = map(var, variables, functions);
+                String variable = args[1];
+                while (TokenParser.isToken(variable)) {
+                    variable = map(variable, variables, functions);
                 }
-                return var;
+                return variable;
             }
         }
         return token;

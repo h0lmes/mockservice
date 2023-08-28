@@ -109,7 +109,7 @@ public class ScenarioServiceImpl implements ScenarioService, ConfigObserver {
         return configRepository.findAllScenarios()
                 .stream()
                 .filter(s -> aliases.contains(s.getAlias()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // --- listeners ----------------------------------------------------------

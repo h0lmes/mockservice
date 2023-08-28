@@ -18,7 +18,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 @Service
 public class RouteServiceImpl implements RouteService {
@@ -52,7 +51,7 @@ public class RouteServiceImpl implements RouteService {
                 && Objects.equals(path, r.getPath())
                 && !r.getDisabled())
             .map(Route::getAlt)
-            .collect(Collectors.toList());
+            .toList();
         if (alts.isEmpty()) {
             return Optional.empty();
         }

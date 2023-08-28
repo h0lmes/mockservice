@@ -20,7 +20,6 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ConfigRepositoryImpl implements ConfigRepository {
@@ -59,7 +58,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
                             return variable;
                         })
                         .distinct()
-                        .collect(Collectors.toList())
+                        .toList()
         );
 
         try {

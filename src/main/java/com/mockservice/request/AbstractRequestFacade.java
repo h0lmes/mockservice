@@ -34,7 +34,7 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     private String body = "";
 
     @SuppressWarnings("unchecked")
-    public AbstractRequestFacade(HttpServletRequest request, ObjectMapper jsonMapper) {
+    AbstractRequestFacade(HttpServletRequest request, ObjectMapper jsonMapper) {
         this.jsonMapper = jsonMapper;
         endpoint = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE) == null
                 ? "" : (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);

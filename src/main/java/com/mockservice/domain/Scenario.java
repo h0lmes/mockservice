@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class Scenario implements Comparable<Scenario> {
 
@@ -125,7 +124,7 @@ public class Scenario implements Comparable<Scenario> {
     }
 
     private void parse() {
-        List<String> list = data.lines().collect(Collectors.toList());
+        List<String> list = data.lines().toList();
         for (int i = 0; i < list.size(); i++) {
             parseLine(routes, list.get(i), i);
         }

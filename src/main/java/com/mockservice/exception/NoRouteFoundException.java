@@ -4,7 +4,7 @@ import com.mockservice.domain.Route;
 
 public class NoRouteFoundException extends RuntimeException {
 
-    private final Route route;
+    private final transient Route route;
 
     public NoRouteFoundException(Route route) {
         this.route = route;
