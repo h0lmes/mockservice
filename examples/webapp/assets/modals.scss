@@ -1,0 +1,37 @@
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1001;
+  overflow: hidden auto;
+  background: rgba(0, 0, 0, 0.6);
+
+  &.transparent {
+    background: transparent;
+  }
+}
+
+.modal-border {
+  background: linear-gradient(130deg, #cb7e3b, #ad003a 52%, #329696 87%);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 80%;
+  padding: 5px;
+  border-radius: 10px;
+  background-clip: padding-box;
+}
+
+.modal-content {
+  padding: 1em;
+  border-radius: 5px;
+  background: var(--bg-page);
+
+  & p {
+    flex: 0 0 100%;
+    text-align: center;
+  }
+}

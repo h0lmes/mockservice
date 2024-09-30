@@ -1,0 +1,152 @@
+:root {
+  --btn-color-link: var(--color-primary);
+  --btn-color: #505050;
+  --btn-color-focus: black;
+  --btn-bg: #ccc;
+  --btn-bg-focus: #ababab;
+
+  & .btn-primary {
+    --btn-color: #ddd;
+    --btn-color-focus: #fff;
+    --btn-bg: var(--color-accent-one);
+    --btn-bg-focus: var(--color-accent-one);
+  }
+
+  & .btn-danger {
+    --btn-color: #fff;
+    --btn-color-focus: #ccc;
+    --btn-bg: #bf3b4b;
+    --btn-bg-focus: #99313b;
+  }
+}
+
+.sepia-mode {
+  --btn-bg: #ccbda1;
+  --btn-bg-focus: #bfb197;
+}
+
+.dark-mode {
+  --btn-color: #999;
+  --btn-color-focus: #ddd;
+  --btn-bg: #2e2e2e;
+  --btn-bg-focus: #3b3b3b;
+
+  & .btn-primary {
+    --btn-color: #bbb;
+    --btn-color-focus: #eee;
+  }
+
+  & .btn-danger {
+    --btn-color: #b32453;
+    --btn-color-focus: #d62b64;
+    --btn-bg: #2e2e2e;
+    --btn-bg-focus: #3b3b3b;
+  }
+}
+
+.dark2-mode {
+  --btn-color: #aaa;
+  --btn-color-focus: #ddd;
+  --btn-bg: #3e4957;
+  --btn-bg-focus: #475566;
+
+  & .btn-danger {
+    --btn-bg: #803820;
+    --btn-bg-focus: #a64929;
+  }
+}
+
+.btn {
+  display: inline-block;
+  margin: 0;
+  font-weight: 400;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+  touch-action: manipulation;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: .4rem .8rem;
+  line-height: 1.42857143;
+  user-select: none;
+  background-color: var(--btn-bg);
+  color: var(--btn-color);
+
+  outline: none;
+
+  &:hover,
+  &:focus {
+    color: var(--btn-color-focus);
+    text-decoration: none;
+  }
+
+  &:focus:not(.disabled) {
+    background-color: var(--btn-bg-focus);
+  }
+
+  &:active,
+  &.active {
+    background-image: none;
+    outline: 0;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, .18);
+  }
+
+  &.disabled {
+    color: var(--btn-bg);
+    cursor: initial;
+    opacity: .25;
+    box-shadow: none;
+    pointer-events: none;
+  }
+
+  a.disabled {
+    pointer-events: none;
+  }
+}
+
+.btn-link {
+  font-weight: 400;
+  color: var(--btn-color-link);
+  background: transparent;
+  padding: .4rem .3rem;
+  border-color: transparent;
+
+  &,
+  &:active,
+  &.active,
+  &[disabled] {
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  &,
+  &:hover,
+  &:focus,
+  &:active {
+    border-color: transparent;
+  }
+
+  &:hover,
+  &:focus {
+    color: var(--btn-color-link);
+    text-decoration: underline;
+    background-color: transparent;
+  }
+
+  &[disabled] {
+    &:hover,
+    &:focus {
+      color: var(--btn-color);
+      text-decoration: none;
+    }
+  }
+}
+
+.btn-sm {
+  padding: .4rem .9rem;
+  font-size: smaller;
+  line-height: 1.2;
+}
