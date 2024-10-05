@@ -24,8 +24,8 @@
 </template>
 <script>
     import {mapActions} from 'vuex';
-    import Loading from "../components/Loading";
-    import ToggleSwitch from "../components/ToggleSwitch";
+    import Loading from "../components/other/Loading";
+    import ToggleSwitch from "../components/other/ToggleSwitch";
 
     export default {
         name: "settings",

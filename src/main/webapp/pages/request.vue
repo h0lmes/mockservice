@@ -28,10 +28,10 @@
     </div>
 </template>
 <script>
-    import Loading from "../components/Loading";
-    import AutoSizeTextArea from "../components/AutoSizeTextArea";
+    import Loading from "../components/other/Loading";
+    import AutoSizeTextArea from "../components/other/AutoSizeTextArea";
     import copy from "../js/clipboard";
-    import {handleError} from "../js/common";
+    import {handleError} from "@/js/common";
 
     const storageKey = 'MockServiceRequest';
 

@@ -1,7 +1,7 @@
 <template>
     <div class="route__variables-container">
         <div class="mock-col-header w100">
-            <span>VARIABLES (FROM RESPONSE BODY)</span>
+            <span>VARIABLES FROM RESPONSE BODY (OVERRIDE VARIABLES HERE)</span>
         </div>
         <div v-for="variable in route.variables" :key="variable.name">
             <RouteVariable :route="route" :variable="variable"></RouteVariable>

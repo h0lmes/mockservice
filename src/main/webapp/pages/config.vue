@@ -3,8 +3,8 @@
         <div class="component-toolbar mb-5">
             <button type="button" class="btn btn-primary" @click="save">Save and apply</button>
             <button type="button" class="btn btn-default" @click="download">Download as file</button>
-            <button type="button" class="btn btn-default" @click="backup">Backup on server</button>
-            <button type="button" class="btn btn-default" @click="restore">Restore server backup</button>
+            <button type="button" class="btn btn-default" @click="backup">Backup  config on server</button>
+            <button type="button" class="btn btn-default" @click="restore">Restore from server backup</button>
         </div>
         <AutoSizeTextArea class="main" v-model="config" :max-rows="maxRows"></AutoSizeTextArea>
         <AutoSizeTextArea class="helper invisible" v-model="config" :min-rows="1" :max-rows="1"></AutoSizeTextArea>
@@ -13,8 +13,8 @@
 </template>
 <script>
     import {mapActions} from 'vuex';
-    import Loading from "../components/Loading";
-    import AutoSizeTextArea from "../components/AutoSizeTextArea";
+    import Loading from "../components/other/Loading";
+    import AutoSizeTextArea from "../components/other/AutoSizeTextArea";
 
     export default {
         name: "config",

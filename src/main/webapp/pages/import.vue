@@ -17,9 +17,9 @@
 </template>
 <script>
     import {mapActions} from 'vuex';
-    import Loading from "../components/Loading";
-    import ToggleSwitch from "../components/ToggleSwitch";
-    import ImportedRoutes from "../components/ImportedRoutes";
+    import Loading from "../components/other/Loading";
+    import ToggleSwitch from "../components/other/ToggleSwitch";
+    import ImportedRoutes from "../components/other/ImportedRoutes";
 
     export default {
         name: "import",

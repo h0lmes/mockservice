@@ -4,19 +4,18 @@
          @click.middle.stop.prevent="edit"
          @keydown.esc.exact="cancel">
 
+        <div v-show="editing" class="mock-col w1">
+            <div class="mock-col-header">TYPE</div>
+            <select class="form-control form-control-sm" v-model="editingRoute.type">
+                <option>REST</option>
+                <option>SOAP</option>
+            </select>
+        </div>
+
         <div class="mock-col w2">
             <div class="mock-col-header">GROUP</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(route.group)">{{ route.group }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingRoute.group"/>
-        </div>
-
-        <div class="mock-col w1">
-            <div class="mock-col-header">TYPE</div>
-            <div v-show="!editing" class="mock-col-value link" @click="filter(route.type)">{{ route.type }}</div>
-            <select v-show="editing" class="form-control form-control-sm" v-model="editingRoute.type">
-                <option>REST</option>
-                <option>SOAP</option>
-            </select>
         </div>
 
         <div class="mock-col w1">
@@ -109,10 +108,10 @@
 <script>
     import {mapActions} from 'vuex';
     import RouteTester from "./RouteTester";
-    import ToggleSwitch from "../ToggleSwitch";
-    import AutoSizeTextArea from "../AutoSizeTextArea";
     import RouteMethod from "./RouteMethod";
     import RouteVariables from "./RouteVariables";
+    import ToggleSwitch from "../other/ToggleSwitch";
+    import AutoSizeTextArea from "../other/AutoSizeTextArea";
 
     export default {
         name: "Route",

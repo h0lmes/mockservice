@@ -12,7 +12,7 @@
     </div>
 </template>
 <script>
-    import ImportedRoute from "../components/ImportedRoute";
+    import ImportedRoute from "./ImportedRoute";
 
     export default {
         name: "ImportedRoutes",

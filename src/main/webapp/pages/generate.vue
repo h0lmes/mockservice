@@ -20,8 +20,8 @@
 </template>
 <script>
     import {mapActions} from 'vuex';
-    import Loading from "../components/Loading";
-    import AutoSizeTextArea from "../components/AutoSizeTextArea";
+    import Loading from "../components/other/Loading";
+    import AutoSizeTextArea from "../components/other/AutoSizeTextArea";
     import copy from "../js/clipboard";
 
     export default {

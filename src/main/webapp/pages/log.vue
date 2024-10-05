@@ -9,7 +9,7 @@
 </template>
 <script>
     import {mapActions} from 'vuex';
-    import Loading from "../components/Loading";
+    import Loading from "../components/other/Loading";
 
     export default {
         name: "log",

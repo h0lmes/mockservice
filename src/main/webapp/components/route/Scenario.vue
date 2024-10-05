@@ -69,8 +69,8 @@
 <script>
     import {mapActions} from 'vuex';
     import RoutesToAdd from "./RoutesToAdd";
-    import ToggleSwitch from "../ToggleSwitch";
-    import AutoSizeTextArea from "../AutoSizeTextArea";
+    import ToggleSwitch from "../other/ToggleSwitch";
+    import AutoSizeTextArea from "../other/AutoSizeTextArea";
 
     export default {
         name: "Scenario",

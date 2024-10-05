@@ -93,10 +93,10 @@
     </div>
 </template>
 <script>
-    import ColorModePicker from "../components/ColorModePicker";
-    import ColorAccentPicker from "../components/ColorAccentPicker";
-    import ErrorPanel from "../components/ErrorPanel";
-    import Loading from "../components/Loading";
+    import ColorModePicker from "../components/other/ColorModePicker";
+    import ColorAccentPicker from "../components/other/ColorAccentPicker";
+    import ErrorPanel from "../components/other/ErrorPanel";
+    import Loading from "../components/other/Loading";
 
     export default {
         components: {ErrorPanel, Loading, ColorModePicker, ColorAccentPicker},

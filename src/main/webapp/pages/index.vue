@@ -62,9 +62,9 @@
 <script>
     import {mapActions} from 'vuex';
     import Routes from "../components/route/Routes";
-    import Loading from "../components/Loading";
-    import ViewSelector from "../components/ViewSelector";
-    import ToggleSwitch from "../components/ToggleSwitch";
+    import Loading from "../components/other/Loading";
+    import ViewSelector from "../components/other/ViewSelector";
+    import ToggleSwitch from "../components/other/ToggleSwitch";
 
     export default {
         name: "index",

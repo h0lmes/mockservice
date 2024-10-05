@@ -16,11 +16,11 @@
     </div>
 </template>
 <script>
-    import IconSystem from '@/assets/icons/system.svg?inline';
-    import IconLight from '@/assets/icons/light.svg?inline';
-    import IconSepia from '@/assets/icons/sepia.svg?inline';
-    import IconDark from '@/assets/icons/dark.svg?inline';
-    import IconDark2 from '@/assets/icons/cloud.svg?inline';
+    import IconSystem from 'assets/icons/system.svg';
+    import IconLight from 'assets/icons/light.svg';
+    import IconSepia from 'assets/icons/sepia.svg';
+    import IconDark from 'assets/icons/dark.svg';
+    import IconDark2 from 'assets/icons/cloud.svg';
 
     export default {
         name: "ColorModePicker",
