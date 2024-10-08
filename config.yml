@@ -74,7 +74,7 @@ routes:
   path: "/api/v2/entity/{id}"
   alt: ""
   responseCode: 200
-  response: "{\"id\": ${random_int}, \"name\": \"${name:default name}\"}"
+  response: "{\"id\": ${id}, \"name\": \"${name:default name}\", \"status\": \"DELETED\"}"
   requestBodySchema: ""
   disabled: false
 - group: number conversion
@@ -165,10 +165,26 @@ routes:
 - group: store
   type: REST
   method: GET
-  path: /products/1
+  path: "/products/{id}"
   alt: ""
   responseCode: 200
-  response: "{\"id\":1,\"title\":\"Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops\",\"price\":109.95,\"description\":\"Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday\",\"category\":\"men's clothing\",\"image\":\"https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg\",\"rating\":{\"rate\":3.9,\"count\":120}}"
+  response: |-
+    {
+      "id":1,
+      "title":"Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+      "price":99.95,
+      "description":"Your perfect backpack",
+      "category":"men's clothing"
+    }
+  requestBodySchema: ""
+  disabled: false
+- group: store
+  type: REST
+  method: GET
+  path: "/products/{id}"
+  alt: id = 0
+  responseCode: 400
+  response: "{\"message\": \"No product found\"}"
   requestBodySchema: ""
   disabled: false
 - group: store
