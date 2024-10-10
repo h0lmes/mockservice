@@ -25,14 +25,6 @@ public class WebApiRoutesController {
         this.routeService = routeService;
     }
 
-    @ExceptionHandler
-    protected ResponseEntity<ErrorInfo> handleException(Exception e) {
-        log.error("", e);
-        return ResponseEntity.badRequest().body(new ErrorInfo(e));
-    }
-
-    //-----------------------------------------------------------------------------------
-
     @GetMapping
     public List<RouteDto> getRoutes() {
         return routeService.getRoutes();
@@ -76,5 +68,11 @@ public class WebApiRoutesController {
     @DeleteMapping("variables")
     public RouteVariableDto clearVariable(@RequestBody RouteVariableDto variable) {
         return routeService.clearRouteVariable(variable);
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<ErrorInfo> handleException(Exception e) {
+        log.error("", e);
+        return ResponseEntity.badRequest().body(ErrorInfo.of(e));
     }
 }

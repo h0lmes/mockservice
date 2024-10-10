@@ -113,7 +113,7 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
 
     private String mockError(Throwable t) {
         try {
-            return jsonMapper.writeValueAsString(new ErrorInfo(t));
+            return jsonMapper.writeValueAsString(ErrorInfo.of(t));
         } catch (JsonProcessingException e) {
             return "";
         }

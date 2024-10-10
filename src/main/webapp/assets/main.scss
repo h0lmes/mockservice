@@ -2,18 +2,18 @@
   --grey: #909090;
   --gray: #909090;
   --cyan-blue: #179ae6;
-  --blue: #0077ff;
+  --blue: #006aff;
   --violet: #4d4dff;
   --indigo: #2d26ff;
   --purple: #7141d9;
-  --pink: #d92e83;
+  --pink: #d92e94;
   --red: #dc3545;
   --orange: #fc7c19;
   --orange-yellow: #e6a117;
   --yellow: #e6bf00;
   --lime: #8ebd00;
   --green: #29a649;
-  --teal: #1dc288;
+  --teal: #13c285;
   --cyan: #1aaaba;
   /**/
   --color-primary: #243746;
@@ -30,7 +30,7 @@
 }
 
 .sepia-mode {
-  --teal: #50c199;
+  --teal: #44c296;
   --cyan: #1a91a1;
   /**/
   --color-primary: #433422;
@@ -46,18 +46,18 @@
 
 .dark-mode {
   --cyan-blue: #2e7599;
-  --blue: #1f5e99;
+  --blue: #1f5299;
   --violet: #4d4dff;
   --indigo: #3633ff;
   --purple: #7141d9;
-  --pink: #a62e56;
+  --pink: #a62e76;
   --red: #992e3c;
   --orange: #b3580e;
   --orange-yellow: #b37c0e;
   --yellow: #b39f47;
   --lime: #80992e;
   --green: #388c49;
-  --teal: #338066;
+  --teal: #2d8064;
   --cyan: #297e8a;
   /**/
   --color-primary: #c2b9b4;
@@ -73,18 +73,18 @@
 
 .dark2-mode {
   --cyan-blue: #2e7599;
-  --blue: #1f5e99;
+  --blue: #1f5299;
   --violet: #4d4dff;
   --indigo: #3633ff;
   --purple: #7141d9;
-  --pink: #a62e56;
+  --pink: #a62e76;
   --red: #992e3c;
   --orange: #b3580e;
   --orange-yellow: #b37c0e;
   --yellow: #b39f47;
   --lime: #80992e;
   --green: #388c49;
-  --teal: #338066;
+  --teal: #2d8064;
   --cyan: #297e8a;
   /**/
   --color-primary: #dae2eb;
@@ -282,7 +282,8 @@ pre {
   border-top: 1px dashed var(--bg-component);
 
   .compact-view & {
-    margin: 0.5rem 0;
+    margin: 0.85rem 0;
+    border-top: 0;
   }
 }
 
@@ -306,7 +307,7 @@ pre {
   }
 
   .compact-view & {
-    --margin-bottom: 1px;
+    --margin-bottom: 0.2rem;
   }
 
   .compact-view &:not(.open) {
@@ -314,7 +315,7 @@ pre {
   }
 }
 
-@media screen and (max-width: 1279px) {
+@media screen and (max-width: 1079px) {
   .component-row {
     .compact-view &:not(.open) {
       --padding: 0.7rem 1rem;

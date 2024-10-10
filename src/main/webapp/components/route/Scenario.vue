@@ -10,7 +10,7 @@
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingScenario.group"/>
         </div>
 
-        <div class="mock-col w2">
+        <div class="mock-col w1">
             <div class="mock-col-header">SCENARIO TYPE</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.type)">{{ scenario.type }}</div>
             <select v-show="editing" class="form-control form-control-sm" v-model="editingScenario.type">
@@ -26,7 +26,7 @@
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingScenario.alias"/>
         </div>
 
-        <div class="mock-col w2 text-center">
+        <div class="mock-col w3 text-center">
             <div v-show="editing" class="mock-col-header"></div>
             <ToggleSwitch v-model="activeSwitch" @toggle="activeToggled()">Active</ToggleSwitch>
         </div>
@@ -44,7 +44,7 @@
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">LIST OF ROUTES</div>
             <AutoSizeTextArea v-model="editingScenario.data"
-                              placeholder="click SHOW ROUTES to add routes; or just type them in"
+                              placeholder="click SHOW ROUTES to add routes; or just type them in as METHOD;PATH;ALT"
                               :min-rows="1"
                               :max-rows="256"
                               ref="data"

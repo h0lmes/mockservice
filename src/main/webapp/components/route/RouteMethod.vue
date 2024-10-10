@@ -1,5 +1,5 @@
 <template>
-    <div :class="color">{{ value }}</div>
+    <div :class="color">{{ value }}<span v-show="disabled"> (disabled)</span></div>
 </template>
 <script>
     export default {
@@ -12,9 +12,9 @@
             color() {
                 return {
                     'bold': !this.disabled,
-                    'teal': !this.disabled && this.value === 'GET',
+                    'green': !this.disabled && this.value === 'GET',
                     'blue': !this.disabled && this.value === 'POST',
-                    'yellow': !this.disabled && this.value === 'PUT',
+                    'orange-yellow': !this.disabled && this.value === 'PUT',
                     'orange': !this.disabled && this.value === 'PATCH',
                     'pink': !this.disabled && this.value === 'DELETE',
                 }

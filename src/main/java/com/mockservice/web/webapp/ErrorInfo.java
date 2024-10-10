@@ -2,14 +2,14 @@ package com.mockservice.web.webapp;
 
 public class ErrorInfo {
 
-    private String type;
-    private String message;
+    private final String type;
+    private final String message;
 
-    public ErrorInfo(Throwable t) {
-        this(t.getClass().getSimpleName(), t.getMessage());
+    public static ErrorInfo of(Throwable t) {
+        return new ErrorInfo(t.getClass().getSimpleName(), t.getMessage());
     }
 
-    public ErrorInfo(String type, String message) {
+    private ErrorInfo(String type, String message) {
         this.type = type;
         this.message = message;
     }

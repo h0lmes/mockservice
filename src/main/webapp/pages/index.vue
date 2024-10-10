@@ -1,6 +1,6 @@
 <template>
     <div class="monospace">
-        <div class="component-toolbar mb-5">
+        <div class="component-toolbar mb-3">
             <div class="toolbar-item">
                 <input ref="search"
                        type="text"
@@ -9,12 +9,13 @@
                        @keydown.enter.exact.stop="setFilter($event.target.value)"/>
             </div>
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="jsSearch" @toggle="setFilter('')">JS</ToggleSwitch>
-            <div>
-                <button type="button" class="toolbar-item-w-fixed-auto btn" @click="setFilter('')">Clear search</button>
-                <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRoute">Add route</button>
-                <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addScenario">Add scenario</button>
-                <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger" @click="deleteVisibleRoutes">Delete visible routes</button>
-            </div>
+        </div>
+
+        <div class="component-toolbar mb-3">
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="setFilter('')">Clear search</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRoute">Add route</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addScenario">Add scenario</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger" @click="deleteVisibleRoutes">Delete visible routes</button>
         </div>
 
         <div class="component-toolbar mb-5">
@@ -28,31 +29,38 @@
         <div class="color-secondary mt-4">
             <div class="mt-2 bold">Scenario types</div>
             <div class="mt-2">
-                MAP: searches LIST OF ROUTES top-to-bottom for the requested METHOD + PATH, returns the first match. If no match - returns route with matching METHOD + PATH and an empty ALT.
+                <span class="bold">MAP</span>: goes over the LIST OF ROUTES in a scenario top-to-bottom looking for the first match of requested METHOD + PATH pair, returns route with matching ALT. If no match found - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).
             </div>
             <div class="mt-2">
-                QUEUE: same as MAP but tries to match only the topmost route, removes matched route from the queue.
+                <span class="bold">QUEUE</span>: same as MAP but looks only at the topmost route, removes route from a queue if it matches. If topmost route does not match (or all routes were already matched and thus removed from a queue) - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).
             </div>
             <div class="mt-2">
-                CIRCULAR_QUEUE: same as QUEUE; auto-restarts queue when it depletes.
+                <span class="bold">CIRCULAR_QUEUE</span>: same as QUEUE but restarts the queue when it depletes.
             </div>
         </div>
         <div class="color-secondary mt-4">
             <div class="mt-2 bold">Tips</div>
             <div class="mt-2">
-                Vars button toggles variables editing mode (if any vars exist in the response body).
-            </div>
-            <div class="mt-2">
-                Edit button toggles edit mode; same for the Test button.
-            </div>
-            <div class="mt-2">
-                Middle-click route or scenario to edit, press Esc in any field to cancel.
+                Click on any value (GROUP, METHOD, PATH, etc. You'll see underline) to filter by that value.
             </div>
             <div class="mt-2">
                 For more precise filtering enable 'JS' and use Javascript expressions in search field (example: e.group=='default' && !e.disabled).
             </div>
             <div class="mt-2">
+                Vars button toggles variables editing mode (if any vars exist in the RESPONSE BODY of the ROUTE).
+            </div>
+            <div class="mt-2">
+                Edit button toggles edit mode.
+            </div>
+            <div class="mt-2">
+                Test button allows for a quick test.
+            </div>
+            <div class="mt-2">
+                Middle-click route or scenario to edit, press ESC in any field to cancel.
+            </div>
+            <div class="mt-2">
                 To alter multiple routes or scenarios quickly consider navigating to Config page and editing it as plain text.
+                Use Backup button there for extra caution.
             </div>
         </div>
 

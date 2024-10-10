@@ -54,16 +54,12 @@ public class WebApiScenariosController {
     @ExceptionHandler({ScenarioAlreadyExistsException.class, ScenarioParseException.class})
     protected ResponseEntity<ErrorInfo> handleScenarioException(Exception e) {
         log.warn(e.getMessage());
-        return ResponseEntity
-                .badRequest()
-                .body(new ErrorInfo(e));
+        return ResponseEntity.badRequest().body(ErrorInfo.of(e));
     }
 
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorInfo> handleException(Exception e) {
         log.error("", e);
-        return ResponseEntity
-                .badRequest()
-                .body(new ErrorInfo(e));
+        return ResponseEntity.badRequest().body(ErrorInfo.of(e));
     }
 }

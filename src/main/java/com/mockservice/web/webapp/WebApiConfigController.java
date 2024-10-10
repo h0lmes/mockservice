@@ -45,8 +45,6 @@ public class WebApiConfigController {
     @ExceptionHandler
     protected ResponseEntity<ErrorInfo> handleException(Exception e) {
         log.error("", e);
-        return ResponseEntity
-                .badRequest()
-                .body(new ErrorInfo(e));
+        return ResponseEntity.badRequest().body(ErrorInfo.of(e));
     }
 }

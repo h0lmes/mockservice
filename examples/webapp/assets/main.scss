@@ -314,7 +314,7 @@ pre {
   }
 }
 
-@media screen and (max-width: 1279px) {
+@media screen and (max-width: 1079px) {
   .component-row {
     .compact-view &:not(.open) {
       --padding: 0.7rem 1rem;
@@ -394,7 +394,7 @@ pre {
   }
 }
 
-@media screen and (max-width: 1279px) {
+@media screen and (max-width: 1079px) {
   .mock-col {
     &, &.w1, &.w2, &.w3 {
       flex: 0 0 100%;
