@@ -29,13 +29,13 @@
         <div class="color-secondary mt-4">
             <div class="mt-2 bold">Scenario types</div>
             <div class="mt-2">
-                <span class="bold">MAP</span>: goes over the LIST OF ROUTES in a scenario top-to-bottom looking for the first match of requested METHOD + PATH pair, returns route with matching ALT. If no match found - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).
+                - MAP: goes over the LIST OF ROUTES in a scenario top-to-bottom looking for the first match of requested METHOD + PATH pair, returns route with matching ALT. If no match found - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).
             </div>
             <div class="mt-2">
-                <span class="bold">QUEUE</span>: same as MAP but looks only at the topmost route, removes route from a queue if it matches. If topmost route does not match (or all routes were already matched and thus removed from a queue) - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).
+                - QUEUE: same as MAP but looks only at the topmost route, removes route from a queue if it matches. If topmost route does not match (or all routes were already matched and thus removed from a queue) - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).
             </div>
             <div class="mt-2">
-                <span class="bold">CIRCULAR_QUEUE</span>: same as QUEUE but restarts the queue when it depletes.
+                - CIRCULAR_QUEUE: same as QUEUE but restarts the queue when it depletes.
             </div>
         </div>
         <div class="color-secondary mt-4">
