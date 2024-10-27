@@ -37,7 +37,7 @@
             <div class="mock-col-value link" @click="filter(route.path)">{{ route.path }}</div>
         </div>
 
-        <div v-show="!editing" class="mock-col w3">
+        <div v-show="!editing" class="mock-col w2">
             <div class="mock-col-header">ALT</div>
             <div class="mock-col-value link" @click="filter(route.alt)">{{ route.alt }}</div>
         </div>

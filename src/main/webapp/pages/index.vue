@@ -11,17 +11,14 @@
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="jsSearch" @toggle="setFilter('')">JS</ToggleSwitch>
         </div>
 
-        <div class="component-toolbar mb-3">
+        <div class="component-toolbar mb-5">
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="setFilter('')">Clear search</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRoute">Add route</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addScenario">Add scenario</button>
-            <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger" @click="deleteVisibleRoutes">Delete visible routes</button>
-        </div>
-
-        <div class="component-toolbar mb-5">
-            <ViewSelector class="toolbar-item toolbar-item-w-fixed-auto"></ViewSelector>
+            <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger mr-3" @click="deleteVisibleRoutes">Delete visible routes</button>
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRoutes">Routes</ToggleSwitch>
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showScenarios">Scenarios</ToggleSwitch>
+            <ViewSelector class="toolbar-item toolbar-item-w-fixed-auto"></ViewSelector>
         </div>
 
         <Routes :entities="filteredEntities" @filter="setFilter($event)"></Routes>

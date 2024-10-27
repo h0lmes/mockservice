@@ -26,7 +26,7 @@
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingScenario.alias"/>
         </div>
 
-        <div class="mock-col w3 text-center">
+        <div class="mock-col w2 text-center">
             <div v-show="editing" class="mock-col-header"></div>
             <ToggleSwitch v-model="activeSwitch" @toggle="activeToggled()">Active</ToggleSwitch>
         </div>

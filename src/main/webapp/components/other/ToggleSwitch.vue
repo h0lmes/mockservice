@@ -86,6 +86,7 @@
         column-gap: 0;
         line-height: var(--height);
         overflow-wrap: anywhere;
+        cursor: pointer;
 
         &.gap {
             column-gap: 1rem;

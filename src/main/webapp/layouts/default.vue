@@ -58,16 +58,15 @@
             </ul>
 
             <ul class="nav nav-hidden" ref="settings">
-                <li class="nav-group">COLOR THEME</li>
+                <li class="nav-group">COLOR THEME
+                    <button type="button" class="btn monospace nav-close-button" @click="nav">x</button>
+                </li>
                 <li class="nav-block">
                     <ColorModePicker></ColorModePicker>
                 </li>
                 <li class="nav-group">COLOR ACCENT</li>
                 <li class="nav-block">
                     <ColorAccentPicker></ColorAccentPicker>
-                </li>
-                <li class="nav-block">
-                    <button type="button" class="btn monospace mt-5" @click="nav">OK</button>
                 </li>
                 <li class="nav-block nav-dummy"></li>
             </ul>
@@ -154,6 +153,9 @@
                 this.$refs.nav.classList.add('nav-hidden');
                 this.$refs.settings.classList.remove('nav-hidden');
             },
+            accentChanged() {
+                this.close()
+            }
         }
     }
 </script>

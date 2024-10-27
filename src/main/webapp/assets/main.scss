@@ -46,7 +46,7 @@
 
 .dark-mode {
   --cyan-blue: #2e7599;
-  --blue: #1f5299;
+  --blue: #3b7bd0;
   --violet: #4d4dff;
   --indigo: #3633ff;
   --purple: #7141d9;
@@ -64,8 +64,8 @@
   --color-secondary: #6a6d76;
   --color-disabled: #44464e;
   --color-accent-one: var(--teal);
-  --bg-page: #16181a;
-  --bg-component: #212325;
+  --bg-page: #0d1117;
+  --bg-component: #191d20;
   --bg-component-active: #27292b;
   --bg-border: var(--bg-component);
   --bg-border-active: var(--color-accent-one);
@@ -73,7 +73,7 @@
 
 .dark2-mode {
   --cyan-blue: #2e7599;
-  --blue: #1f5299;
+  --blue: #3b7bd0;
   --violet: #4d4dff;
   --indigo: #3633ff;
   --purple: #7141d9;
@@ -152,7 +152,6 @@ html {
 
 body {
   font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  font-size: 16px;
   background-color: var(--bg-page);
   color: var(--color-primary);
   width: 100%;
@@ -222,7 +221,7 @@ pre {
 
 .component {
   background-color: var(--bg-component);
-  border-radius: 5px;
+  border-radius: 0.5rem;
   border: none;
 
   .component > & {
@@ -242,6 +241,7 @@ pre {
   column-gap: 1rem;
   row-gap: 0.7rem;
   align-items: center;
+  width: auto;
 
   .component > & {
     padding: 0.7rem 1rem;
@@ -279,7 +279,7 @@ pre {
   background: transparent;
   margin: 1.5rem 0;
   padding: 0;
-  border-top: 1px dashed var(--bg-component);
+  border-top: 1px solid var(--bg-component);
 
   .compact-view & {
     margin: 0.85rem 0;
@@ -307,7 +307,7 @@ pre {
   }
 
   .compact-view & {
-    --margin-bottom: 0.2rem;
+    --margin-bottom: 0.08rem;
   }
 
   .compact-view &:not(.open) {

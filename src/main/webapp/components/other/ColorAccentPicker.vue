@@ -20,8 +20,8 @@
         components: {},
         data() {
             return {
-                colors: ['default', 'gray', 'cyan-blue', 'blue', 'violet', 'indigo', 'purple', 'pink',
-                    'red', 'orange', 'orange-yellow', 'yellow', 'lime', 'green', 'teal', 'cyan'],
+                colors: ['default', 'gray', 'purple', 'pink', 'red', 'orange', 'orange-yellow', 'yellow', 'lime',
+                    'green', 'teal', 'cyan', 'blue', 'violet', 'indigo'],
                 value: 'default',
             }
         },
@@ -75,11 +75,13 @@
         list-style: none;
         padding: 0;
         margin: 0;
+        text-align: start;
     }
 
     ul li {
         cursor: pointer;
         display: inline-block;
+        text-align: start;
         padding: 0;
         outline: none;
         font-size: smaller;
@@ -92,7 +94,7 @@
     }
 
     .color-item {
-        padding: 0.5rem;
+        padding: 0.7rem;
         outline: none;
     }
 

@@ -1,18 +1,14 @@
 <template>
-    <div>
+    <div class="color-picker-base">
         <ul>
-            <li v-for="color of colors" :key="color" tabindex="0" @keydown.enter.exact="$colorMode.preference = color">
-                <component :is="`icon-${color}`"
-                           @click="$colorMode.preference = color"
-                           :class="getClasses(color)" />
+            <li v-for="color of colors" :key="color"
+                @keydown.enter.exact="$colorMode.preference = color"
+                @click="$colorMode.preference = color"
+                tabindex="0">
+                <component :is="`icon-${color}`" :class="getClasses(color)"/>
+                <span :class="getClasses(color)">{{color}}</span>
             </li>
         </ul>
-        <p class="scheme-info">
-            <ColorScheme placeholder="..." tag="span">
-                <b>{{ $colorMode.preference }}</b>
-                <span v-if="$colorMode.preference === 'system'">(<i>{{ $colorMode.value }}</i>)</span>
-            </ColorScheme>
-        </p>
     </div>
 </template>
 <script>
@@ -51,20 +47,34 @@ export default {
 }
 </script>
 <style scoped>
+.color-picker-base {
+    width: 100%;
+}
 ul {
+    width: 100%;
     list-style: none;
     padding: 0;
     margin: 0;
 }
 ul li {
-    display: inline-block;
+    width: 100%;
+    display: block;
+    text-align: start;
     padding: 0;
     outline: 0;
+    cursor: pointer;
 }
+
 ul li:hover,
 ul li:focus {
     background-color: var(--nav-bg-active);
 }
+
+ul li > * {
+    display: inline-block;
+    vertical-align: middle;
+}
+
 p {
     margin: 0;
     padding: 5px 0;
@@ -87,8 +97,10 @@ p {
 .feather.selected {
     color: var(--color-accent-one);
 }
-.scheme-info {
-    font-size: smaller;
-    font-weight: lighter;
+span.preferred {
+    color: var(--nav-color-active);
+}
+span.selected {
+    color: var(--nav-color-active);
 }
 </style>
