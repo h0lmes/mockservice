@@ -6,6 +6,7 @@
             <button type="button" class="btn btn-primary" @click="selectFile()">Select Open API file</button>
             <button type="button" class="btn btn-default" @click="addAll()">Add all routes</button>
             <ToggleSwitch v-model="overwrite">Overwrite existing routes</ToggleSwitch>
+            <ToggleSwitch v-model="no400500">Ignore 4xx and 5xx</ToggleSwitch>
         </div>
         <ImportedRoutes :imported-routes="importedRoutes"
                         :existing-routes="existingRoutes"
@@ -16,23 +17,25 @@
     </div>
 </template>
 <script>
-    import {mapActions} from 'vuex';
-    import Loading from "../components/other/Loading";
-    import ToggleSwitch from "../components/other/ToggleSwitch";
-    import ImportedRoutes from "../components/other/ImportedRoutes";
+import {mapActions} from 'vuex';
+import Loading from "../components/other/Loading";
+import ToggleSwitch from "../components/other/ToggleSwitch";
+import ImportedRoutes from "../components/other/ImportedRoutes";
 
-    export default {
+export default {
         name: "import",
         components: {Loading, ToggleSwitch, ImportedRoutes},
         data() {
             return {
                 value: '',
                 overwrite: false,
+                no400500: false,
                 fileName: ''
             }
         },
         computed: {
             importedRoutes() {
+                if (this.no400500) return this.$store.state.import.routes.filter(r => !r.alt || +r.alt < 400);
                 return this.$store.state.import.routes;
             },
             existingRoutes() {

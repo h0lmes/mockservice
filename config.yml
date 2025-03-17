@@ -34,8 +34,8 @@ routes:
     ]
   requestBodySchema: ""
   disabled: false
-  triggerRequest: false
-  triggerRequestIds: ""
+  triggerRequest: true
+  triggerRequestIds: default.get.jwt
 - group: entity
   type: REST
   method: GET
@@ -248,8 +248,8 @@ requests:
   group: default
   type: REST
   method: GET
-  path: http://localhost:8081/jwt
-  body: "{\"sub\": \"test-not-default\"}"
+  path: localhost:8081/jwt
+  body: "{\"sub\": \"${random_uuid}\"}"
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""

@@ -121,19 +121,21 @@ public class MockServiceImplTest {
         MockService mockService = createMockService();
         mockService.mock(request);
 
-        verify(requestService, never()).schedule(any());
+        verify(requestService, never()).schedule(any(), any());
     }
 
     @Test
     public void mock_RouteResponseWithCallbackRequest_RequestScheduled() {
-        String bodyWithRequest = "[]\n\nGET http://localhost:8080/ HTTP/1.1";
-        Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(bodyWithRequest);
+        Route route = new Route().setMethod(GET_METHOD).setPath(PATH)
+                .setTriggerRequest(true).setTriggerRequestIds("id");
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
 
         MockService mockService = createMockService();
         mockService.mock(request);
 
-        verify(requestService, times(1)).schedule(any());
+        ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+        verify(requestService).schedule(argument.capture(), any());
+        assertEquals("id", argument.getValue());
     }
 
     @Test

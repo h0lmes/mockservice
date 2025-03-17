@@ -13,18 +13,18 @@
                           :placeholder="'Paste JSON schema here (in JSON or YAML format) or leave empty to generate random JSON\nRead more about JSON schema at https://json-schema.org/'"
                           v-model="schema"
         ></AutoSizeTextArea>
-        <pre class="smaller">{{ value }}</pre>
+        <pre>{{ value }}</pre>
 
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
 </template>
 <script>
-    import {mapActions} from 'vuex';
-    import Loading from "../components/other/Loading";
-    import AutoSizeTextArea from "../components/other/AutoSizeTextArea";
-    import copy from "../js/clipboard";
+import {mapActions} from 'vuex';
+import Loading from "../components/other/Loading";
+import AutoSizeTextArea from "../components/other/AutoSizeTextArea";
+import copy from "../js/clipboard";
 
-    export default {
+export default {
         name: "generate",
         components: {Loading, AutoSizeTextArea},
         data() {

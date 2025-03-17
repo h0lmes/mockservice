@@ -87,7 +87,9 @@ public class MockServiceImpl implements MockService {
         ResponseEntity<String> responseEntity = responseEntityFromResponse(response);
         responseEntity = maybeApplyQuantumTheory(responseEntity);
 
-        response.ifHasRequest(requestService::schedule);
+        if (route.isTriggerRequest()) {
+            requestService.schedule(route.getTriggerRequestIds(), variables);
+        }
 
         return responseEntity;
     }

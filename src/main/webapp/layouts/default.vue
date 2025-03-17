@@ -18,12 +18,6 @@
                 </li>
                 <li class="nav-group">TOOLS</li>
                 <li class="nav-item">
-                    <NuxtLink to="/request">
-                        <FontAwesomeIcon icon="play" class="nav-icon icon-width-fix"/>
-                        <span class="nav-label">Request</span>
-                    </NuxtLink>
-                </li>
-                <li class="nav-item">
                     <NuxtLink to="/generate">
                         <FontAwesomeIcon icon="hammer" class="nav-icon icon-width-fix"/>
                         <span class="nav-label">Generate</span>
@@ -92,12 +86,12 @@
     </div>
 </template>
 <script>
-    import ColorModePicker from "../components/other/ColorModePicker";
-    import ColorAccentPicker from "../components/other/ColorAccentPicker";
-    import ErrorPanel from "../components/other/ErrorPanel";
-    import Loading from "../components/other/Loading";
+import ColorModePicker from "../components/other/ColorModePicker";
+import ColorAccentPicker from "../components/other/ColorAccentPicker";
+import ErrorPanel from "../components/other/ErrorPanel";
+import Loading from "../components/other/Loading";
 
-    export default {
+export default {
         components: {ErrorPanel, Loading, ColorModePicker, ColorAccentPicker},
         data() {
             return {

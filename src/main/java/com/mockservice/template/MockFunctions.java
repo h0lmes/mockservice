@@ -8,6 +8,10 @@ import java.util.function.Function;
 public class MockFunctions {
     private final Map<String, Function<String[], String>> map = new HashMap<>();
 
+    public static MockFunctions empty() {
+        return new MockFunctions();
+    }
+
     public MockFunctions() {
         // default
     }

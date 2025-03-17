@@ -2,6 +2,7 @@ package com.mockservice.web.webapp;
 
 import com.mockservice.model.OutboundRequestDto;
 import com.mockservice.service.RequestService;
+import com.mockservice.template.MockVariables;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,7 @@ public class WebApiRequestsController {
     @ApiOperation(value = "Execute request by ID", tags = "requests")
     @PostMapping("/execute")
     public String execute(@RequestBody OutboundRequestExecuteRequest request) throws IOException {
-        return requestService.executeRequest(request.getRequestId())
+        return requestService.executeRequest(request.getRequestId(), MockVariables.empty())
                 .orElse("Request not found or disabled");
     }
 

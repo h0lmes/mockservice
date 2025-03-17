@@ -1,9 +1,0 @@
-HTTP/1.1
-Test: test
-
-{"test": "test"}
----
- http://localhost:8081/api HTTP/1.1
-Test-Callback: test callback
-
-{"id": 42}

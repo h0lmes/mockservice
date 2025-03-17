@@ -86,6 +86,15 @@
             ></AutoSizeTextArea>
         </div>
 
+        <div v-show="editing" class="mock-col w100 mt-1">
+            <ToggleSwitch class="mock-col-value" v-model="editingData.triggerRequest">TRIGGER REQUESTS</ToggleSwitch>
+        </div>
+
+        <div v-show="editing && editingData.triggerRequest" class="mock-col w100">
+            <input type="text" class="form-control form-control-sm" v-model="editingData.triggerRequestIds"
+                   placeholder="Comma separated request IDs to trigger after this one"/>
+        </div>
+
         <div v-show="editing" class="mock-col w1 mt-1">
             <ToggleSwitch class="mock-col-value" v-model="editingData.disabled">DISABLED</ToggleSwitch>
         </div>
@@ -106,14 +115,14 @@
     </div>
 </template>
 <script>
-    import {mapActions} from 'vuex';
-    import RouteTester from "./RouteTester";
-    import RouteMethod from "./RouteMethod";
-    import RouteVariables from "./RouteVariables";
-    import ToggleSwitch from "../other/ToggleSwitch";
-    import AutoSizeTextArea from "../other/AutoSizeTextArea";
+import {mapActions} from 'vuex';
+import RouteTester from "./RouteTester";
+import RouteMethod from "./RouteMethod";
+import RouteVariables from "./RouteVariables";
+import ToggleSwitch from "../other/ToggleSwitch";
+import AutoSizeTextArea from "../other/AutoSizeTextArea";
 
-    export default {
+export default {
         name: "Route",
         components: {AutoSizeTextArea, RouteTester, RouteMethod, ToggleSwitch, RouteVariables},
         data() {

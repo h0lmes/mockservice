@@ -19,5 +19,9 @@ application:
   config-filename: ${CONFIG_FILENAME:.\config.yml}
   config-backup-filename: ${CONFIG_BACKUP_FILENAME:.\config-backup.yml}
   soap-error-data-file: soapFault.xml
+  ssl:
+    cert-file: ${SSL_CERTIFICATE_FILE:classpath:cert.crt}
+    key-file: ${SSL_KEY_FILE:classpath:cert.key}
+    password: ${SSL_PASSWORD:}
   mock-service:
     cache-size: 256

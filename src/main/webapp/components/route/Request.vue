@@ -5,7 +5,7 @@
          @keydown.esc.exact="cancel">
 
         <div v-show="editing" class="mock-col w1">
-            <div class="mb-2 color-secondary">ID</div>
+            <div class="mock-col-header">ID</div>
             <input type="text" class="form-control form-control-sm" v-model="editingData.id"
                    placeholder="Request ID should be unique"/>
         </div>
@@ -73,12 +73,12 @@
         </div>
 
         <div v-show="editing" class="mock-col w100 mt-1">
-            <ToggleSwitch class="mock-col-value" v-model="editingData.triggerRequest">TRIGGER REQUEST</ToggleSwitch>
+            <ToggleSwitch class="mock-col-value" v-model="editingData.triggerRequest">TRIGGER REQUESTS</ToggleSwitch>
         </div>
 
         <div v-show="editing && editingData.triggerRequest" class="mock-col w100">
             <input type="text" class="form-control form-control-sm" v-model="editingData.triggerRequestIds"
-                   placeholder="Request IDs (comma separated)"/>
+                   placeholder="Comma separated request IDs to trigger after this one"/>
         </div>
 
         <div v-show="editing" class="mock-col w1 mt-1">
@@ -97,13 +97,13 @@
     </div>
 </template>
 <script>
-    import {mapActions} from 'vuex';
-    import RequestTester from "./RequestTester";
-    import RouteMethod from "./RouteMethod";
-    import ToggleSwitch from "../other/ToggleSwitch";
-    import AutoSizeTextArea from "../other/AutoSizeTextArea";
+import {mapActions} from 'vuex';
+import RequestTester from "./RequestTester";
+import RouteMethod from "./RouteMethod";
+import ToggleSwitch from "../other/ToggleSwitch";
+import AutoSizeTextArea from "../other/AutoSizeTextArea";
 
-    export default {
+export default {
         name: "Request",
         components: {AutoSizeTextArea, RequestTester, RouteMethod, ToggleSwitch},
         data() {

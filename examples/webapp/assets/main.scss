@@ -364,7 +364,7 @@ pre {
   margin: 0 auto .5rem;
   text-align: center;
 
-  .compact-view .component-row:not(.open) & {
+  .compact-view .component-row:not(.open) &:not(.mock-col-header-always-visible) {
     --display: none;
   }
 }

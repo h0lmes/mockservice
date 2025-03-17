@@ -7,6 +7,10 @@ import java.util.Map;
 public class MockVariables {
     private final Map<String, String> map = new HashMap<>();
 
+    public static MockVariables empty() {
+        return new MockVariables();
+    }
+
     public MockVariables() {
         // default
     }

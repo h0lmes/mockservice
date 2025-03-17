@@ -354,7 +354,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
             return Optional.empty();
         }
         return findAllRequests().stream()
-                .filter(r -> requestId.equals(r.getId()))
+                .filter(r -> requestId.trim().equals(r.getId()))
                 .findFirst();
     }
 

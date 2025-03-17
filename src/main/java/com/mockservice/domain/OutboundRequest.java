@@ -32,12 +32,14 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
     public String generateId() {
         String result = group.isBlank() ? "" : group + ".";
         result += method.name() + ".";
-        result += path
+        String pathNoSchema = path.contains("://") ? path.substring(path.indexOf("://") + 3) : path;
+        result += pathNoSchema
                 .replace('/', '.')
                 .replace(':', '.')
                 .replace('?', '.')
                 .replace('&', '.')
-                .replace('=', '.');
+                .replace('=', '.')
+                .replace(',', '.');
         return result;
     }
 
