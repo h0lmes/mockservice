@@ -38,7 +38,7 @@
         </div>
 
         <div v-show="!editing" class="mock-col w3">
-            <div class="mock-col-header">PATH</div>
+            <div class="mock-col-header">URL</div>
             <div class="mock-col-value link" @click="filter(request.path)">{{ request.path }}</div>
         </div>
 
@@ -52,13 +52,13 @@
             <div class="mock-col-value">
                 <button type="button" class="btn btn-sm btn-default" :class="{'disabled' : !hasVariables}" @click="vars">vars</button>
                 <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
-                <button type="button" class="btn btn-sm btn-default" @click="test">test</button>
+                <button type="button" class="btn btn-sm btn-primary" @click="test">send</button>
                 <button type="button" class="btn btn-sm btn-danger ml-4" @click="del">delete</button>
             </div>
         </div>
 
         <div v-show="editing" class="mock-col w100">
-            <div class="mb-2 color-secondary">PATH</div>
+            <div class="mb-2 color-secondary">URL</div>
             <input type="text" class="form-control form-control-sm" v-model="editingData.path"/>
         </div>
 
@@ -76,7 +76,7 @@
             <ToggleSwitch class="mock-col-value" v-model="editingData.triggerRequest">TRIGGER REQUEST</ToggleSwitch>
         </div>
 
-        <div v-show="editing" class="mock-col w100">
+        <div v-show="editing && editingData.triggerRequest" class="mock-col w100">
             <input type="text" class="form-control form-control-sm" v-model="editingData.triggerRequestIds"
                    placeholder="Request IDs (comma separated)"/>
         </div>

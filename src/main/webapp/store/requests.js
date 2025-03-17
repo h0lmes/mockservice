@@ -84,7 +84,9 @@ export const actions = {
             };
             const res = await fetch(url, params);
             await handleError(res);
-            return await res.text();
+            const data = await res.text();
+            console.log(data);
+            return data;
         } catch (err) {
             commit('setLastError', err, {root: true});
         }
