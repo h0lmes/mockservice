@@ -1,4 +1,4 @@
-package com.mockservice.domain;
+package com.mockservice.exception;
 
 public class ScenarioParseException extends RuntimeException {
 

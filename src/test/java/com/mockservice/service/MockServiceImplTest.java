@@ -75,7 +75,7 @@ public class MockServiceImplTest {
     }
 
     @BeforeEach
-    public void common() {
+    public void setup() {
         lenient().when(templateEngine.getFunctions()).thenReturn(new MockFunctions());
         lenient().when(scenarioService.getAltFor(any(), any())).thenReturn(Optional.empty());
         lenient().when(configRepository.getSettings()).thenReturn(new Settings());
@@ -183,8 +183,10 @@ public class MockServiceImplTest {
         Settings settings = new Settings().setQuantum(true);
         when(configRepository.getSettings()).thenReturn(settings);
 
+        when(quantumTheoryNonApplicable.applicable(any())).thenReturn(false);
         when(quantumTheory.applicable(any())).thenReturn(true);
-        when(quantumTheory.apply(any())).thenReturn(INVALID_JSON);
+        when(quantumTheory.apply(anyString())).thenReturn(INVALID_JSON);
+        when(quantumTheory.apply(anyInt())).thenReturn(200);
 
         MockService mockService = createMockService();
         ResponseEntity<String> responseEntity = mockService.mock(request);

@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public class WebApiImportControllerTest {
 
     @Autowired
     private MockMvc mvc;
-    @MockBean
+    @MockitoBean
     private OpenApiService openApiService;
 
     @Test
@@ -42,9 +42,7 @@ public class WebApiImportControllerTest {
         Route route = new Route().setPath(PATH);
         when(openApiService.routesFromYaml(any())).thenReturn(List.of(route));
 
-        mvc.perform(
-                put(WEB_API_IMPORT).content("")
-        )
+        mvc.perform(put(WEB_API_IMPORT).content(""))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -56,9 +54,7 @@ public class WebApiImportControllerTest {
     public void json_ExceptionThrown_ReturnsBadRequest() throws Exception {
         when(openApiService.routesFromYaml(any())).thenThrow(RuntimeException.class);
 
-        mvc.perform(
-                put(WEB_API_IMPORT).content("")
-        )
+        mvc.perform(put(WEB_API_IMPORT).content(""))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }

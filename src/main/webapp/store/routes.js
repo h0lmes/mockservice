@@ -97,6 +97,8 @@ export const actions = {
             alt: '',
             response: '',
             disabled: false,
+            triggerRequest: false,
+            triggerRequestIds: '',
             variables: null,
             _new: true,
         };

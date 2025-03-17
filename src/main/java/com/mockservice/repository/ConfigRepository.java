@@ -1,6 +1,7 @@
 package com.mockservice.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mockservice.domain.OutboundRequest;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.Scenario;
 import com.mockservice.domain.Settings;
@@ -27,6 +28,13 @@ public interface ConfigRepository {
     void putRoute(@Nullable Route reference, @Nonnull Route route) throws IOException;
     void putRoutes(List<Route> routes, boolean overwrite) throws IOException;
     void deleteRoutes(List<Route> routes) throws IOException;
+
+    List<OutboundRequest> findAllRequests();
+    Optional<OutboundRequest> findRequest(String requestId);
+    List<RouteVariable> getRequestVariables(String requestId);
+    void putRequest(@Nullable OutboundRequest existing, @Nonnull OutboundRequest request) throws IOException;
+    void putRequests(List<OutboundRequest> requests, boolean overwrite) throws IOException;
+    void deleteRequests(List<OutboundRequest> requests) throws IOException;
 
     List<Scenario> findAllScenarios();
     Optional<Scenario> findScenario(Scenario scenario);

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.mockservice.domain.*;
+import com.mockservice.exception.RouteAlreadyExistsException;
+import com.mockservice.exception.ScenarioAlreadyExistsException;
 import com.mockservice.model.RouteVariable;
 import com.mockservice.template.TemplateEngine;
 import org.junit.jupiter.api.DisplayName;

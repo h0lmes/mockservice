@@ -1,4 +1,6 @@
-package com.mockservice.domain;
+package com.mockservice.exception;
+
+import com.mockservice.domain.Route;
 
 public class RouteAlreadyExistsException extends RuntimeException {
 

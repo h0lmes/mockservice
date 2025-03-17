@@ -3,6 +3,8 @@ package com.mockservice.repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.domain.*;
+import com.mockservice.exception.RouteAlreadyExistsException;
+import com.mockservice.exception.ScenarioAlreadyExistsException;
 import com.mockservice.model.RouteVariable;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.template.TokenParser;
@@ -26,6 +28,8 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     private static final Logger log = LoggerFactory.getLogger(ConfigRepositoryImpl.class);
 
+    private static final String REQUEST_COULD_NOT_BE_NULL = "Request could not be null.";
+
     private Config config;
     private final String fileConfigPath;
     private final String fileConfigBackupPath;
@@ -33,6 +37,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     private List<ConfigObserver> configObservers;
     private List<RouteObserver> routeObservers;
     private final Cache<Route, List<RouteVariable>> routeVariablesCache;
+    private final Cache<OutboundRequest, List<RouteVariable>> requestVariablesCache;
 
     public ConfigRepositoryImpl(@Value("${application.config-filename}") String fileConfigPath,
                                 @Value("${application.config-backup-filename}") String fileConfigBackupPath,
@@ -46,6 +51,24 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         routeVariablesCache = new ConcurrentHashMapCache<>(r ->
                 TokenParser
                         .tokenize(r.getResponse())
+                        .stream()
+                        .filter(TokenParser::isToken)
+                        .map(TokenParser::parseToken)
+                        .filter(args -> !templateEngine.isFunction(args[0]))
+                        .map(args -> {
+                            RouteVariable variable = new RouteVariable().setName(args[0]);
+                            if (args.length > 1) {
+                                variable.setDefaultValue(args[1]);
+                            }
+                            return variable;
+                        })
+                        .distinct()
+                        .toList()
+        );
+
+        requestVariablesCache = new ConcurrentHashMapCache<>(r ->
+                TokenParser
+                        .tokenize(r.getBody())
                         .stream()
                         .filter(TokenParser::isToken)
                         .map(TokenParser::parseToken)
@@ -95,11 +118,16 @@ public class ConfigRepositoryImpl implements ConfigRepository {
             throw new IOException("Mapper returned null Config.");
         }
         sortRoutes();
+        sortRequests();
         sortScenarios();
     }
 
     private void sortRoutes() {
         config.getRoutes().sort(Route::compareTo);
+    }
+
+    private void sortRequests() {
+        config.getRequests().sort(OutboundRequest::compareTo);
     }
 
     private void sortScenarios() {
@@ -113,6 +141,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
                 throw new IOException("Mapper returned null Config.");
             }
             sortRoutes();
+            sortRequests();
             sortScenarios();
         } catch (IOException e) {
             throw new IOException("Could not deserialize config. " + e.getMessage(), e);
@@ -310,6 +339,116 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     //----------------------------------------------------------------------
     //
+    //   Requests
+    //
+    //----------------------------------------------------------------------
+
+    @Override
+    public List<OutboundRequest> findAllRequests() {
+        return config.getRequests();
+    }
+
+    @Override
+    public Optional<OutboundRequest> findRequest(@Nullable String requestId) {
+        if (requestId == null) {
+            return Optional.empty();
+        }
+        return findAllRequests().stream()
+                .filter(r -> requestId.equals(r.getId()))
+                .findFirst();
+    }
+
+    @Override
+    public List<RouteVariable> getRequestVariables(String requestId) {
+        return findRequest(requestId).map(requestVariablesCache::get).orElse(List.of());
+    }
+
+    @Override
+    public void putRequest(@Nullable OutboundRequest existing, @Nonnull OutboundRequest request) throws IOException {
+        Objects.requireNonNull(request, REQUEST_COULD_NOT_BE_NULL);
+
+        existing = findRequest(existing == null ? null : existing.getId()).orElse(null);
+        if (existing == null) {
+            ensureUniqueRequestId(null, request);
+            config.getRequests().add(request);
+            notifyRequestCreated(request);
+        } else {
+            ensureUniqueRequestId(existing.getId(), request);
+            notifyRequestDeleted(existing);
+            existing.assignFrom(request);
+            notifyRequestCreated(existing);
+        }
+
+        sortRequests();
+        tryPersistConfig();
+    }
+
+    private void ensureUniqueRequestId(@Nullable String previousId, @Nonnull OutboundRequest request) {
+        Objects.requireNonNull(request, REQUEST_COULD_NOT_BE_NULL);
+        if (previousId != null && previousId.equals(request.getId())) return;
+
+        if (request.getId() != null
+                && !request.getId().isBlank()
+                && findRequest(request.getId()).isEmpty()) return;
+
+        String baseId = request.generateId();
+        int index = 0;
+        String fullId = baseId;
+        while (findRequest(fullId).isPresent()) {
+            index++;
+            fullId = baseId + "." + index;
+        }
+        request.setId(fullId);
+    }
+
+    @Override
+    public void putRequests(List<OutboundRequest> requests, boolean overwrite) throws IOException {
+        boolean modified = false;
+
+        for (OutboundRequest request : requests) {
+            modified |= putRequestInternal(request, overwrite);
+        }
+
+        if (modified) {
+            sortRequests();
+            tryPersistConfig();
+        }
+    }
+
+    private boolean putRequestInternal(@Nonnull OutboundRequest request, boolean overwrite) {
+        Objects.requireNonNull(request, REQUEST_COULD_NOT_BE_NULL);
+        OutboundRequest existing = findRequest(request.getId()).orElse(null);
+        if (existing == null) {
+            config.getRequests().add(request);
+            notifyRequestCreated(request);
+            return true;
+        } else if (overwrite) {
+            notifyRequestDeleted(existing);
+            existing.assignFrom(request);
+            notifyRequestCreated(existing);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void deleteRequests(List<OutboundRequest> requests) throws IOException {
+        boolean modified = false;
+
+        for (OutboundRequest request : requests) {
+            if (config.getRequests().remove(request)) {
+                notifyRequestDeleted(request);
+                modified = true;
+            }
+        }
+
+        if (modified) {
+            tryPersistConfig();
+        }
+    }
+
+    //----------------------------------------------------------------------
+    //
     //   Scenarios
     //
     //----------------------------------------------------------------------
@@ -377,6 +516,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     private void notifyBeforeConfigChanged() {
         routeVariablesCache.invalidate();
+        requestVariablesCache.invalidate();
         if (configObservers != null) {
             configObservers.forEach(ConfigObserver::onBeforeConfigChanged);
         }
@@ -399,5 +539,14 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         if (routeObservers != null) {
             routeObservers.forEach(o -> o.onRouteDeleted(route));
         }
+    }
+
+    @SuppressWarnings("unused")
+    private void notifyRequestCreated(OutboundRequest request) {
+        // does nothing so far
+    }
+
+    private void notifyRequestDeleted(OutboundRequest request) {
+        requestVariablesCache.evict(request);
     }
 }

@@ -2,8 +2,8 @@ package com.mockservice.web.webapp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.domain.Scenario;
-import com.mockservice.domain.ScenarioAlreadyExistsException;
-import com.mockservice.domain.ScenarioParseException;
+import com.mockservice.exception.ScenarioAlreadyExistsException;
+import com.mockservice.exception.ScenarioParseException;
 import com.mockservice.repository.ConfigObserver;
 import com.mockservice.repository.RouteObserver;
 import com.mockservice.service.ScenarioService;
@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -41,12 +41,12 @@ public class WebApiScenariosControllerTest {
 
     @Autowired
     private MockMvc mvc;
-    @MockBean
+    @MockitoBean
     private ScenarioService scenarioService;
 
-    @MockBean
+    @MockitoBean
     private List<ConfigObserver> configObservers;
-    @MockBean
+    @MockitoBean
     private List<RouteObserver> routeObservers;
 
     @Autowired

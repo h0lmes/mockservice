@@ -1,6 +1,7 @@
 package com.mockservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mockservice.exception.ScenarioParseException;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.ArrayList;
@@ -83,8 +84,7 @@ public class Scenario implements Comparable<Scenario> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Scenario)) return false;
-        Scenario other = (Scenario) o;
+        if (!(o instanceof Scenario other)) return false;
         return alias.equals(other.getAlias());
     }
 

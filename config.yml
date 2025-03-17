@@ -17,6 +17,8 @@ routes:
     }
   requestBodySchema: ""
   disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
 - group: entity
   type: REST
   method: GET
@@ -32,6 +34,8 @@ routes:
     ]
   requestBodySchema: ""
   disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
 - group: entity
   type: REST
   method: GET
@@ -41,6 +45,8 @@ routes:
   response: "{\"id\": ${id}, \"name\": \"entity name\"}"
   requestBodySchema: ""
   disabled: true
+  triggerRequest: false
+  triggerRequestIds: ""
 - group: entity
   type: REST
   method: PUT
@@ -50,6 +56,8 @@ routes:
   response: "{\"id\": ${random_int}, \"name\": \"${name:default name}\"}"
   requestBodySchema: ""
   disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
 - group: entity
   type: REST
   method: PATCH
@@ -59,6 +67,8 @@ routes:
   response: "[]"
   requestBodySchema: ""
   disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
 - group: entity
   type: REST
   method: DELETE
@@ -68,6 +78,8 @@ routes:
   response: "{\"id\": ${id}, \"name\": \"${name:default name}\", \"status\": \"DELETED\"}"
   requestBodySchema: ""
   disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
 - group: number conversion
   type: SOAP
   method: POST
@@ -86,6 +98,8 @@ routes:
     </soapenv:Envelope>
   requestBodySchema: ""
   disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
 - group: robot
   type: REST
   method: GET
@@ -104,6 +118,8 @@ routes:
     {}
   requestBodySchema: ""
   disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
 - group: robot
   type: REST
   method: GET
@@ -113,6 +129,8 @@ routes:
   response: "{\"name\": \"R2D2\"}"
   requestBodySchema: ""
   disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
 - group: robot
   type: REST
   method: GET
@@ -122,6 +140,8 @@ routes:
   response: "{\"name\": \"terminator\"}"
   requestBodySchema: ""
   disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
 - group: store
   type: REST
   method: GET
@@ -153,6 +173,8 @@ routes:
     ]
   requestBodySchema: ""
   disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
 - group: store
   type: REST
   method: GET
@@ -169,6 +191,8 @@ routes:
     }
   requestBodySchema: ""
   disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
 - group: store
   type: REST
   method: GET
@@ -178,6 +202,8 @@ routes:
   response: "{\"message\": \"No product found\"}"
   requestBodySchema: ""
   disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
 - group: store
   type: REST
   method: POST
@@ -195,6 +221,8 @@ routes:
     }
   requestBodySchema: "{\r\n  \"type\" : \"object\",\r\n  \"properties\" : {\r\n    \"id\" : {\r\n      \"type\" : \"integer\",\r\n      \"format\" : \"int64\"\r\n    },\r\n    \"petId\" : {\r\n      \"type\" : \"integer\",\r\n      \"format\" : \"int64\"\r\n    },\r\n    \"quantity\" : {\r\n      \"type\" : \"integer\",\r\n      \"format\" : \"int32\"\r\n    },\r\n    \"shipDate\" : {\r\n      \"type\" : \"string\",\r\n      \"format\" : \"date-time\"\r\n    },\r\n    \"status\" : {\r\n      \"type\" : \"string\",\r\n      \"description\" : \"Order Status\",\r\n      \"enum\" : [ \"placed\", \"approved\", \"delivered\" ]\r\n    },\r\n    \"complete\" : {\r\n      \"type\" : \"boolean\",\r\n      \"default\" : false\r\n    }\r\n  }\r\n}"
   disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
 - group: store
   type: REST
   method: POST
@@ -213,6 +241,18 @@ routes:
     }
   requestBodySchema: ""
   disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
+requests:
+- id: default.get.jwt
+  group: default
+  type: REST
+  method: GET
+  path: http://localhost:8081/jwt
+  body: "{\"sub\": \"test-not-default\"}"
+  disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
 scenarios:
 - group: robot
   alias: robot sequence

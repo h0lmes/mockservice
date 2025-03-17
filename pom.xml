@@ -6,13 +6,13 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.5</version>
+        <version>3.4.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <groupId>com</groupId>
     <artifactId>mockservice</artifactId>
-    <version>0.0.10</version>
+    <version>0.1.0</version>
     <packaging>jar</packaging>
     <name>mockservice</name>
     <description>Mock Service application</description>
@@ -57,12 +57,12 @@
         <dependency>
             <groupId>com.github.javadev</groupId>
             <artifactId>underscore11</artifactId>
-            <version>1.29</version>
+            <version>1.40</version>
         </dependency>
         <dependency>
             <groupId>io.swagger.parser.v3</groupId>
             <artifactId>swagger-parser</artifactId>
-            <version>2.1.14</version>
+            <version>2.1.25</version>
         </dependency>
         <dependency>
             <groupId>com.github.java-json-tools</groupId>
@@ -73,7 +73,7 @@
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
-            <version>7.4</version>
+            <version>8.0</version>
         </dependency>
 
 
@@ -108,13 +108,13 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.2.0</version>
+            <version>5.16.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.2.0</version>
+            <version>5.16.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

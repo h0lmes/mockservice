@@ -14,15 +14,17 @@ public class RouteMapperImpl implements RouteMapper {
     @Override
     public RouteDto toDto(Route route, @Nullable BiConsumer<Route, RouteDto> postProcess) {
         RouteDto dto = new RouteDto()
-            .setGroup(route.getGroup())
-            .setType(route.getType())
-            .setMethod(route.getMethod())
-            .setPath(route.getPath())
-            .setAlt(route.getAlt())
-            .setResponseCode(route.getResponseCode())
-            .setResponse(route.getResponse())
-            .setRequestBodySchema(route.getRequestBodySchema())
-            .setDisabled(route.getDisabled());
+                .setGroup(route.getGroup())
+                .setType(route.getType())
+                .setMethod(route.getMethod())
+                .setPath(route.getPath())
+                .setAlt(route.getAlt())
+                .setResponseCode(route.getResponseCode())
+                .setResponse(route.getResponse())
+                .setRequestBodySchema(route.getRequestBodySchema())
+                .setDisabled(route.getDisabled())
+                .setTriggerRequest(route.isTriggerRequest())
+                .setTriggerRequestIds(route.getTriggerRequestIds());
         if (postProcess != null) {
             postProcess.accept(route, dto);
         }
@@ -32,15 +34,17 @@ public class RouteMapperImpl implements RouteMapper {
     @Override
     public Route fromDto(RouteDto dto) {
         return new Route()
-            .setGroup(dto.getGroup())
-            .setType(dto.getType())
-            .setMethod(dto.getMethod())
-            .setPath(dto.getPath())
-            .setAlt(dto.getAlt())
-            .setResponseCode(dto.getResponseCode())
-            .setResponse(dto.getResponse())
-            .setRequestBodySchema(dto.getRequestBodySchema())
-            .setDisabled(dto.getDisabled());
+                .setGroup(dto.getGroup())
+                .setType(dto.getType())
+                .setMethod(dto.getMethod())
+                .setPath(dto.getPath())
+                .setAlt(dto.getAlt())
+                .setResponseCode(dto.getResponseCode())
+                .setResponse(dto.getResponse())
+                .setRequestBodySchema(dto.getRequestBodySchema())
+                .setDisabled(dto.getDisabled())
+                .setTriggerRequest(dto.isTriggerRequest())
+                .setTriggerRequestIds(dto.getTriggerRequestIds());
     }
 
     @Override

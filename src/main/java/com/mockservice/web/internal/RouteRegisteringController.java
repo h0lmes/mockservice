@@ -28,7 +28,7 @@ public interface RouteRegisteringController {
         int regCount = Math.max(0, registeredRoutes.getOrDefault(key, 0));
         registeredRoutes.put(key, regCount + 1);
         if (regCount > 0) {
-            log.info("Register route (skip - exist): {}", route);
+            log.info("Registering route, skipped (exists): {}", route);
             return;
         }
 
@@ -39,7 +39,7 @@ public interface RouteRegisteringController {
                 .build();
         requestMappingHandlerMapping.registerMapping(mappingInfo, this, mockMethod);
 
-        log.info("Register route (success): {}", route);
+        log.info("Registering route, success: {}", route);
     }
 
     default void unregisterRouteInt(Route route,
@@ -57,13 +57,13 @@ public interface RouteRegisteringController {
         String key = routeRegistrationKey(route);
         int regCount = Math.max(0, registeredRoutes.getOrDefault(key, 0));
         if (regCount <= 0) {
-            log.info("Unregister route (skip - not exist): {}", route);
+            log.info("Unregistering route, skipped (does not exist): {}", route);
             return;
         }
         regCount--;
         registeredRoutes.put(key, regCount);
         if (regCount > 0) {
-            log.info("Unregister route (skip - more): {}", route);
+            log.info("Unregistering route, skipped (more): {}", route);
             return;
         }
 
@@ -74,7 +74,7 @@ public interface RouteRegisteringController {
                 .build();
         requestMappingHandlerMapping.unregisterMapping(mappingInfo);
 
-        log.info("Unregister route (success): {}", route);
+        log.info("Unregistering route, success: {}", route);
     }
 
     default String routeRegistrationKey(Route route) {

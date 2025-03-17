@@ -8,15 +8,17 @@
                        placeholder="type or click on values (group, path, etc)"
                        @keydown.enter.exact.stop="setFilter($event.target.value)"/>
             </div>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="setFilter('')">Clear search</button>
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="jsSearch" @toggle="setFilter('')">JS</ToggleSwitch>
         </div>
 
         <div class="component-toolbar mb-5">
-            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="setFilter('')">Clear search</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRoute">Add route</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRequest">Add request</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addScenario">Add scenario</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger mr-3" @click="deleteVisibleRoutes">Delete visible routes</button>
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRoutes">Routes</ToggleSwitch>
+            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRequests">Requests</ToggleSwitch>
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showScenarios">Scenarios</ToggleSwitch>
             <ViewSelector class="toolbar-item toolbar-item-w-fixed-auto"></ViewSelector>
         </div>
@@ -79,12 +81,14 @@
                 query: '',
                 timeout: null,
                 showRoutes: true,
+                showRequests: true,
                 showScenarios: true,
                 jsSearch: false,
             }
         },
         async fetch() {
             return this.fetchRoutes()
+                .then(this.fetchRequests())
                 .then(this.fetchScenarios());
         },
         fetchDelay: 0,
@@ -92,11 +96,14 @@
             routes() {
                 return this.showRoutes ? this.$store.state.routes.routes : [];
             },
+            requests() {
+                return this.showRequests ? this.$store.state.requests.requests : [];
+            },
             scenarios() {
                 return this.showScenarios ? this.$store.state.scenarios.scenarios : [];
             },
             entities() {
-                return [...this.routes, ...this.scenarios];
+                return [...this.routes, ...this.requests, ...this.scenarios];
             },
             filteredEntities() {
                 if (!this.query) {
@@ -109,7 +116,13 @@
                 } else {
                     const query = this.query;
                     searchFn = function (e) {
-                        if (e.method && e.path) {
+                        if (e.method && e.path && e.id) {
+                            return e.group.includes(query)
+                                || e.type.includes(query)
+                                || e.method.includes(query)
+                                || e.path.includes(query)
+                                || e.id.includes(query);
+                        } else if (e.method && e.path) {
                             return e.group.includes(query)
                                 || e.type.includes(query)
                                 || e.method.includes(query)
@@ -138,12 +151,20 @@
                 fetchRoutes: 'routes/fetch',
                 addRouteAction: 'routes/add',
                 deleteRoutes: 'routes/delete',
+
+                fetchRequests: 'requests/fetch',
+                addRequestAction: 'requests/add',
+
                 fetchScenarios: 'scenarios/fetch',
                 addScenarioAction: 'scenarios/add',
             }),
             addRoute() {
                 this.showRoutes = true
                 this.addRouteAction()
+            },
+            addRequest() {
+                this.showRequests = true
+                this.addRequestAction()
             },
             addScenario() {
                 this.showScenarios = true

@@ -1,8 +1,8 @@
 package com.mockservice.web.webapp;
 
 import com.mockservice.domain.Scenario;
-import com.mockservice.domain.ScenarioAlreadyExistsException;
-import com.mockservice.domain.ScenarioParseException;
+import com.mockservice.exception.ScenarioAlreadyExistsException;
+import com.mockservice.exception.ScenarioParseException;
 import com.mockservice.service.ScenarioService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -94,21 +94,17 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public synchronized void putRoute(RouteDto reference, RouteDto route) throws IOException {
-        Route referenceRoute = routeMapper.fromDto(reference);
-        Route newRoute = routeMapper.fromDto(route);
-        configRepository.putRoute(referenceRoute, newRoute);
+        configRepository.putRoute(routeMapper.fromDto(reference), routeMapper.fromDto(route));
     }
 
     @Override
     public synchronized void putRoutes(List<RouteDto> dto, boolean overwrite) throws IOException {
-        List<Route> routes = routeMapper.fromDto(dto);
-        configRepository.putRoutes(routes, overwrite);
+        configRepository.putRoutes(routeMapper.fromDto(dto), overwrite);
     }
 
     @Override
     public synchronized void deleteRoutes(List<RouteDto> dto) throws IOException {
-        List<Route> routes = routeMapper.fromDto(dto);
-        configRepository.deleteRoutes(routes);
+        configRepository.deleteRoutes(routeMapper.fromDto(dto));
     }
 
     @Override

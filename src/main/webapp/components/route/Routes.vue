@@ -6,25 +6,31 @@
         <div v-for="(entity, index) in sortedEntities" :key="entityKey(entity)">
             <div v-if="groupStart(sortedEntities, entity, index)" class="component-row-group-boundary"></div>
             <Route
-                    v-if="isRoute(entity)"
-                    :route="entity"
-                    @filter="$emit('filter', $event)"
+                v-if="isRoute(entity)"
+                :route="entity"
+                @filter="$emit('filter', $event)"
             ></Route>
+            <Request
+                v-if="isRequest(entity)"
+                :request="entity"
+                @filter="$emit('filter', $event)"
+            ></Request>
             <Scenario
-                    v-else
-                    :scenario="entity"
-                    @filter="$emit('filter', $event)"
+                v-if="isScenario(entity)"
+                :scenario="entity"
+                @filter="$emit('filter', $event)"
             ></Scenario>
         </div>
     </div>
 </template>
 <script>
     import Route from "./Route";
+    import Request from "./Request";
     import Scenario from "./Scenario";
 
     export default {
         name: "Routes",
-        components: {Route, Scenario},
+        components: {Route, Request, Scenario},
         data() {
             return {}
         },
@@ -69,8 +75,16 @@
             isRoute(entity) {
                 return entity.hasOwnProperty('alt');
             },
+            isRequest(entity) {
+                return entity.hasOwnProperty('id') && !entity.hasOwnProperty('alt');
+            },
+            isScenario(entity) {
+                return entity.hasOwnProperty('alias');
+            },
             entityKey(entity) {
-                return this.isRoute(entity) ? entity.method + entity.path + entity.alt : entity.alias;
+                if (this.isRoute(entity)) return entity.method + entity.path + entity.alt;
+                if (this.isRequest(entity)) return entity.id;
+                return entity.alias;
             },
         }
     }

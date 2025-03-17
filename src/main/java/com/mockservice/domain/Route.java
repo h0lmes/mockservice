@@ -16,6 +16,8 @@ public class Route implements Comparable<Route> {
     private String response = "";
     private String requestBodySchema = "";
     private boolean disabled = false;
+    private boolean triggerRequest = false;
+    private String triggerRequestIds = "";
     // generated
     private VariableMatcher matcher;
 
@@ -145,6 +147,24 @@ public class Route implements Comparable<Route> {
         return this;
     }
 
+    public boolean isTriggerRequest() {
+        return triggerRequest;
+    }
+
+    public Route setTriggerRequest(boolean triggerRequest) {
+        this.triggerRequest = triggerRequest;
+        return this;
+    }
+
+    public String getTriggerRequestIds() {
+        return triggerRequestIds;
+    }
+
+    public Route setTriggerRequestIds(String triggerRequestIds) {
+        this.triggerRequestIds = triggerRequestIds;
+        return this;
+    }
+
     public Route assignFrom(Route source) {
         setGroup(source.getGroup());
         setPath(source.getPath());
@@ -155,6 +175,8 @@ public class Route implements Comparable<Route> {
         setResponse(source.getResponse());
         setRequestBodySchema(source.getRequestBodySchema());
         setDisabled(source.getDisabled());
+        setTriggerRequest(source.isTriggerRequest());
+        setTriggerRequestIds(source.getTriggerRequestIds());
         return this;
     }
 
@@ -165,8 +187,7 @@ public class Route implements Comparable<Route> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Route)) return false;
-        Route other = (Route) o;
+        if (!(o instanceof Route other)) return false;
         return method.equals(other.getMethod())
                 && path.equals(other.getPath())
                 && alt.equals(other.getAlt());

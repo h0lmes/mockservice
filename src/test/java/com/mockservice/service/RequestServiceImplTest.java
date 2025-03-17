@@ -1,5 +1,7 @@
 package com.mockservice.service;
 
+import com.mockservice.mapper.OutboundRequestMapper;
+import com.mockservice.repository.ConfigRepository;
 import com.mockservice.response.MockResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,10 @@ public class RequestServiceImplTest {
 
     @Mock
     private MockResponse response;
+    @Mock
+    private ConfigRepository configRepository;
+    @Mock
+    private OutboundRequestMapper requestMapper;
 
     @DisplayName("TODO: Find a better way to test async action with WebClient in it")
     @Test
@@ -26,7 +32,7 @@ public class RequestServiceImplTest {
         when(response.getRequestBody()).thenReturn("");
         when(response.getRequestHeaders()).thenReturn(new HttpHeaders());
 
-        RequestService service = new RequestServiceImpl();
+        RequestService service = new RequestServiceImpl(configRepository, requestMapper);
         service.schedule(response);
         try {
             Thread.sleep(2500);

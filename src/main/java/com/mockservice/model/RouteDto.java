@@ -17,6 +17,8 @@ public class RouteDto {
     private String response = "";
     private String requestBodySchema = "";
     private boolean disabled = false;
+    private boolean triggerRequest = false;
+    private String triggerRequestIds = "";
     private List<RouteVariable> variables;
 
     public RouteDto() {
@@ -101,6 +103,24 @@ public class RouteDto {
 
     public RouteDto setDisabled(boolean disabled) {
         this.disabled = disabled;
+        return this;
+    }
+
+    public boolean isTriggerRequest() {
+        return triggerRequest;
+    }
+
+    public RouteDto setTriggerRequest(boolean triggerRequest) {
+        this.triggerRequest = triggerRequest;
+        return this;
+    }
+
+    public String getTriggerRequestIds() {
+        return triggerRequestIds;
+    }
+
+    public RouteDto setTriggerRequestIds(String triggerRequestIds) {
+        this.triggerRequestIds = triggerRequestIds;
         return this;
     }
 
