@@ -67,13 +67,13 @@
     </div>
 </template>
 <script>
-    import {mapActions} from 'vuex';
-    import Routes from "../components/route/Routes";
-    import Loading from "../components/other/Loading";
-    import ViewSelector from "../components/other/ViewSelector";
-    import ToggleSwitch from "../components/other/ToggleSwitch";
+import {mapActions} from 'vuex';
+import Routes from "../components/route/Routes";
+import Loading from "../components/other/Loading";
+import ViewSelector from "../components/other/ViewSelector";
+import ToggleSwitch from "../components/other/ToggleSwitch";
 
-    export default {
+export default {
         name: "index",
         components: {Routes, Loading, ViewSelector, ToggleSwitch},
         data() {
@@ -106,44 +106,14 @@
                 return [...this.routes, ...this.requests, ...this.scenarios];
             },
             filteredEntities() {
-                if (!this.query) {
-                    return this.entities;
-                }
+                if (!this.query) return this.entities;
 
-                let searchFn;
-                if (this.jsSearch) {
-                    searchFn = Function("e", "return " + this.query + ";");
-                } else {
-                    const query = this.query;
-                    searchFn = function (e) {
-                        if (e.method && e.path && e.id) {
-                            return e.group.includes(query)
-                                || e.type.includes(query)
-                                || e.method.includes(query)
-                                || e.path.includes(query)
-                                || e.id.includes(query);
-                        } else if (e.method && e.path) {
-                            return e.group.includes(query)
-                                || e.type.includes(query)
-                                || e.method.includes(query)
-                                || e.path.includes(query)
-                                || e.alt.includes(query);
-                        } else {
-                            return e.group.includes(query)
-                                || e.alias.includes(query)
-                                || e.type.includes(query);
-                        }
-                    }
-                }
                 try {
-                    return this.entities.filter(searchFn);
+                    return this.entities.filter(this.getSearchFn());
                 } catch (e) {
                     console.error(e);
                     return [];
                 }
-            },
-            filteredRoutes() {
-                return this.filteredEntities.filter(e => e.hasOwnProperty('alt'));
             },
         },
         methods: {
@@ -172,16 +142,45 @@
             },
             deleteVisibleRoutes() {
                 if (confirm('Are you sure you want to delete all visible routes?\n'
-                    + 'Note: if filtered you only delete those you see on the screen.')) {
+                    + 'Note: if filter (search) is applied - you only delete those you see on the screen.')) {
                     this.$nuxt.$loading.start();
-                    this.deleteRoutes(this.filteredRoutes)
-                        .then(() => this.$nuxt.$loading.finish());
+                    this.deleteRoutes(
+                        this.filteredEntities.filter(e => e.hasOwnProperty('alt'))
+                    ).then(() => this.$nuxt.$loading.finish());
                 }
             },
             setFilter(value) {
                 this.$refs.search.value = value.trim();
                 this.query = value.trim();
             },
+            getSearchFn() {
+                if (this.jsSearch) {
+                    return Function("e", "return " + this.query + ";");
+                } else if (!this.query) {
+                    return (e) => true;
+                } else {
+                    const query = this.query;
+                    return (e) => {
+                        if (e.method && e.path && e.id) {
+                            return e.group.includes(query)
+                                || e.type.includes(query)
+                                || e.method.includes(query)
+                                || e.path.includes(query)
+                                || e.id.includes(query);
+                        } else if (e.method && e.path) {
+                            return e.group.includes(query)
+                                || e.type.includes(query)
+                                || e.method.includes(query)
+                                || e.path.includes(query)
+                                || e.alt.includes(query);
+                        } else {
+                            return e.group.includes(query)
+                                || e.alias.includes(query)
+                                || e.type.includes(query);
+                        }
+                    };
+                }
+            }
         }
     }
 </script>

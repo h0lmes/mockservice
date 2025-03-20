@@ -108,14 +108,9 @@ routes:
   responseCode: 202
   response: |-
     HTTP/1.1
-    Extra: extra-value
+    Custom-header: custom-header-value
 
     {"name": "Johnny 5"}
-    ---
-    GET http://localhost:8081/api/robot HTTP/1.1
-    Mock-Alt: api-robot/R2D2
-
-    {}
   requestBodySchema: ""
   disabled: false
   triggerRequest: false
@@ -136,7 +131,7 @@ routes:
   method: GET
   path: /api/robot
   alt: terminator
-  responseCode: 200
+  responseCode: 201
   response: "{\"name\": \"terminator\"}"
   requestBodySchema: ""
   disabled: false
@@ -197,7 +192,7 @@ routes:
   type: REST
   method: GET
   path: "/products/{id}"
-  alt: id = 0
+  alt: id=0
   responseCode: 400
   response: "{\"message\": \"No product found\"}"
   requestBodySchema: ""
@@ -244,19 +239,37 @@ routes:
   triggerRequest: false
   triggerRequestIds: ""
 requests:
-- id: default.get.jwt
-  group: default
+- id: robot.GET.localhost.8081.api.robot
+  group: robot
   type: REST
   method: GET
-  path: localhost:8081/jwt
-  body: "{\"sub\": \"${random_uuid}\"}"
+  path: localhost:8081/api/robot
+  body: ""
+  disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
+- id: store.GET.localhost.8081.products.0
+  group: store
+  type: REST
+  method: GET
+  path: localhost:8081/products/0
+  body: ""
+  disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
+- id: store.GET.localhost.8081.products.1
+  group: store
+  type: REST
+  method: GET
+  path: localhost:8081/products/1
+  body: ""
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
 scenarios:
 - group: robot
   alias: robot sequence
-  type: QUEUE
+  type: CIRCULAR_QUEUE
   data: |-
     GET;/api/robot;R2D2
     GET;/api/robot;

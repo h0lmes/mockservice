@@ -18,7 +18,7 @@ public class VariableMatcher {
         variableValue = "";
         int pos = matcherCondition.indexOf("=");
         if (pos > 0) {
-            variableName = matcherCondition.substring(0, pos - 1).trim();
+            variableName = matcherCondition.substring(0, pos).trim();
             variableValue = matcherCondition.substring(pos + 1).trim();
             if (variableValue.startsWith("\"") && variableValue.endsWith("\"")) {
                 variableValue = variableValue.substring(1, variableValue.length() - 1);

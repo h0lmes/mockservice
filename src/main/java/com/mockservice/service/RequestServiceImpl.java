@@ -1,7 +1,9 @@
 package com.mockservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.domain.OutboundRequest;
+import com.mockservice.exception.RequestServiceRequestException;
 import com.mockservice.mapper.OutboundRequestMapper;
 import com.mockservice.model.OutboundRequestDto;
 import com.mockservice.repository.ConfigRepository;
@@ -112,7 +114,7 @@ public class RequestServiceImpl implements RequestService {
 
     private String executeRequest(OutboundRequest request, MockVariables variables, int level) {
         if (level > MAX_LEVEL_FOR_TRIGGERED_REQUEST) {
-            // prevent infinite loops of requests
+            // try preventing infinite loops of requests
             log.info("Max level for triggered request reached for: {}", request);
             return "";
         }
@@ -123,17 +125,30 @@ public class RequestServiceImpl implements RequestService {
             StringTemplate requestBody = new StringTemplate();
             requestBody.add(request.getBody());
             String uri = request.getPath().contains("://") ? request.getPath() : "http://" + request.getPath();
-            String response = getWebClient(uri.startsWith("https://"))
+            String body = getWebClient(uri.startsWith("https://"))
                     .method(request.getMethod().asHttpMethod())
                     .uri(uri)
                     .bodyValue(requestBody.toString(variables, templateEngine.getFunctions()))
                     //.headers(c -> c.putAll(mockResponse.getRequestHeaders()))
                     .retrieve()
+                    .onStatus((code) -> true, // wrap any response into exception to extract both StatusCode and Body
+                            res -> res.bodyToMono(String.class)
+                                    .handle((error, sink) -> sink.error(
+                                            new RequestServiceRequestException(res.statusCode().value(), error)
+                                    )
+                    ))
                     .bodyToMono(String.class)
                     .block(REQUEST_TIMEOUT);
-            log.info("Request ({}) response:\n{}", request.getId(), response);
-            responseVars.putAll(MapUtils.flattenMap(MapUtils.jsonToMap(response, jsonMapper)));
-            return response;
+
+            throw new RequestServiceRequestException(200, body); // just in case
+        } catch (RequestServiceRequestException e) {
+            try {
+                responseVars.putAll(MapUtils.flattenMap(MapUtils.jsonToMap(e.getBody(), jsonMapper)));
+            } catch (JsonProcessingException jpe) {
+                log.warn("Request; invalid JSON:\n{}", jpe.getMessage());
+            }
+            log.info("Request ({}) response:\n{}", request.getId(), e.toString());
+            return e.toString();
         } catch (Exception e) {
             log.error("Request (" + request.getId() + ") error.", e);
         } finally {

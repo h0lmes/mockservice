@@ -1,7 +1,7 @@
 <template>
     <div>
         <p v-if="entities.length === 0">
-            Nothing here ¯\_(ツ)_/¯
+            Nothing here yet ¯\_(ツ)_/¯
         </p>
         <div v-for="(entity, index) in sortedEntities" :key="entityKey(entity)">
             <div v-if="groupStart(sortedEntities, entity, index)" class="component-row-group-boundary"></div>
@@ -24,11 +24,11 @@
     </div>
 </template>
 <script>
-    import Route from "./Route";
-    import Request from "./Request";
-    import Scenario from "./Scenario";
+import Route from "./Route";
+import Request from "./Request";
+import Scenario from "./Scenario";
 
-    export default {
+export default {
         name: "Routes",
         components: {Route, Request, Scenario},
         data() {
@@ -39,36 +39,54 @@
         },
         computed: {
             sortedEntities() {
-                let compare = function(a, b) {
-                    if (a < b) return -1;
-                    else if (a > b) return 1;
-                    return 0;
-                };
                 return this.entities.sort((a, b) => {
-                    let c;
-                    c = compare(a._new, b._new);
-                    if (c !== 0) return c;
-                    c = compare(a.group, b.group);
+                    // newly created entities at the very top
+                    let c = this.compare(a._new, b._new);
                     if (c !== 0) return c;
 
-                    let isRouteA = a.hasOwnProperty('alt');
-                    let isRouteB = b.hasOwnProperty('alt');
-                    c = compare(isRouteA, isRouteB);
+                    // keep same group entities together
+                    c = this.compare(a.group, b.group);
+                    if (c !== 0) return c;
+
+                    // within a group requests go first
+                    if (this.isRequest(a)) {
+                        if (!this.isRequest(b)) return -1;
+                        // sorted by id
+                        return this.compare(a.id, b.id);
+                    }
+
+                    // scenarios go next
+                    if (this.isScenario(a)) {
+                        if (this.isRequest(b)) return 1;
+                        if (this.isRoute(b)) return -1;
+                        // sorted by alias
+                        return this.compare(a.alias, b.alias);
+                    }
+
+                    // routes go last
+                    let isRouteA = this.isRoute(a);
+                    let isRouteB = this.isRoute(b);
+                    c = this.compare(isRouteA, isRouteB);
                     if (c !== 0) return c;
 
                     if (!isRouteA) return 0;
 
-                    c = compare(a.type, b.type);
+                    c = this.compare(a.type, b.type);
                     if (c !== 0) return c;
-                    c = compare(a.path, b.path);
+                    c = this.compare(a.path, b.path);
                     if (c !== 0) return c;
-                    c = compare(a.method, b.method);
+                    c = this.compare(a.method, b.method);
                     if (c !== 0) return c;
-                    return compare(a.alt, b.alt);
+                    return this.compare(a.alt, b.alt);
                 });
             },
         },
         methods: {
+            compare(a, b) {
+                if (a < b) return -1;
+                else if (a > b) return 1;
+                return 0;
+            },
             groupStart(arr, entity, index) {
                 return index > 0 && entity.group !== arr[index - 1].group;
             },
