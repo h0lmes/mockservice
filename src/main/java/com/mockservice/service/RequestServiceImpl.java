@@ -8,6 +8,7 @@ import com.mockservice.mapper.OutboundRequestMapper;
 import com.mockservice.model.OutboundRequestDto;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.template.MockVariables;
+import com.mockservice.template.RequestHeadersTemplate;
 import com.mockservice.template.StringTemplate;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.util.MapUtils;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ConcurrentLruCache;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
@@ -67,10 +69,12 @@ public class RequestServiceImpl implements RequestService {
     private final ObjectMapper jsonMapper;
     private final String certFile;
     private final String certPassword;
+    private final ConcurrentLruCache<OutboundRequest, RequestHeadersTemplate> headersCache;
 
     public RequestServiceImpl(ConfigRepository configRepository,
                               OutboundRequestMapper requestMapper,
                               TemplateEngine templateEngine,
+                              @Value("${application.request-service.cache-size}") int cacheSize,
                               @Qualifier("jsonMapper") ObjectMapper jsonMapper,
                               @Value("${application.ssl.cert-file}") String certFile,
                               @Value("${application.ssl.password}") String certPassword) {
@@ -80,6 +84,11 @@ public class RequestServiceImpl implements RequestService {
         this.jsonMapper = jsonMapper;
         this.certFile = certFile;
         this.certPassword = certPassword;
+        headersCache = new ConcurrentLruCache<>(cacheSize, this::getRequestHeadersTemplate);
+    }
+
+    private RequestHeadersTemplate getRequestHeadersTemplate(OutboundRequest request) {
+        return new RequestHeadersTemplate(request.getHeaders());
     }
 
     @Override
@@ -97,41 +106,52 @@ public class RequestServiceImpl implements RequestService {
 
     private void executeRequests(String requestIds, MockVariables variables, int level) {
         for (String requestId : requestIds.split(",")) {
-            findAndExecuteRequest(requestId, variables, level);
+            findAndExecuteRequest(requestId, variables, level, true);
         }
     }
 
     @Override
-    public Optional<String> executeRequest(String requestId, MockVariables variables) {
-        return findAndExecuteRequest(requestId, variables, 0);
+    public Optional<String> executeRequest(String requestId, MockVariables variables, boolean allowTrigger) {
+        return findAndExecuteRequest(requestId, variables, 0, allowTrigger);
     }
 
-    private Optional<String> findAndExecuteRequest(String requestId, MockVariables variables, int level) {
-        return configRepository.findRequest(requestId)
-                .filter(r -> !r.isDisabled())
-                .map(r -> executeRequest(r, variables, level));
+    private Optional<String> findAndExecuteRequest(String requestId,
+                                                   MockVariables variables,
+                                                   int level,
+                                                   boolean allowTrigger) {
+        return getEnabledRequest(requestId)
+                .map(r -> executeRequest(r, variables, level, allowTrigger));
     }
 
-    private String executeRequest(OutboundRequest request, MockVariables variables, int level) {
+    private String executeRequest(OutboundRequest request,
+                                  MockVariables variables,
+                                  int level,
+                                  boolean allowTrigger) {
         if (level > MAX_LEVEL_FOR_TRIGGERED_REQUEST) {
-            // try preventing infinite loops of requests
+            // try preventing infinite loop of requests
             log.info("Max level for triggered request reached for: {}", request);
             return "";
         }
 
         log.info("Executing request: {}", request.getId());
         MockVariables responseVars = new MockVariables();
+
         try {
             StringTemplate requestBody = new StringTemplate();
             requestBody.add(request.getBody());
             String uri = request.getPath().contains("://") ? request.getPath() : "http://" + request.getPath();
-            String body = getWebClient(uri.startsWith("https://"))
+            boolean secure = uri.startsWith("https://");
+            var headers = headersCache.get(request)
+                    .toMap(variables, templateEngine.getFunctions());
+
+            String body = getWebClient(secure)
                     .method(request.getMethod().asHttpMethod())
                     .uri(uri)
                     .bodyValue(requestBody.toString(variables, templateEngine.getFunctions()))
-                    //.headers(c -> c.putAll(mockResponse.getRequestHeaders()))
+                    .headers(c -> c.putAll(headers))
                     .retrieve()
-                    .onStatus((code) -> true, // wrap any response into exception to extract both StatusCode and Body
+                    // wrap any response into exception to extract both StatusCode and Body
+                    .onStatus(code -> true,
                             res -> res.bodyToMono(String.class)
                                     .handle((error, sink) -> sink.error(
                                             new RequestServiceRequestException(res.statusCode().value(), error)
@@ -152,7 +172,7 @@ public class RequestServiceImpl implements RequestService {
         } catch (Exception e) {
             log.error("Request (" + request.getId() + ") error.", e);
         } finally {
-            if (request.isTriggerRequest()) {
+            if (allowTrigger && request.isTriggerRequest()) {
                 scheduleRequests(request.getTriggerRequestIds(), responseVars, level + 1);
             }
         }
@@ -200,16 +220,22 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public void putRequest(OutboundRequestDto existing, OutboundRequestDto request) throws IOException {
-        configRepository.putRequest(requestMapper.fromDto(existing), requestMapper.fromDto(request));
+        var ex = requestMapper.fromDto(existing);
+        headersCache.remove(ex);
+        configRepository.putRequest(ex, requestMapper.fromDto(request));
     }
 
     @Override
     public void putRequests(List<OutboundRequestDto> dto, boolean overwrite) throws IOException {
-        configRepository.putRequests(requestMapper.fromDto(dto), overwrite);
+        var requests = requestMapper.fromDto(dto);
+        requests.forEach(headersCache::remove);
+        configRepository.putRequests(requests, overwrite);
     }
 
     @Override
     public void deleteRequests(List<OutboundRequestDto> dto) throws IOException {
-        configRepository.deleteRequests(requestMapper.fromDto(dto));
+        var requests = requestMapper.fromDto(dto);
+        requests.forEach(headersCache::remove);
+        configRepository.deleteRequests(requests);
     }
 }

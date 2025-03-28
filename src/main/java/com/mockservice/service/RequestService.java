@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface RequestService {
     void schedule(String requestIds, MockVariables variables);
-    Optional<String> executeRequest(String requestId, MockVariables variables);
+    Optional<String> executeRequest(String requestId, MockVariables variables, boolean allowTrigger);
     Optional<OutboundRequest> getEnabledRequest(String requestId);
     List<OutboundRequestDto> getRequests();
     void putRequest(OutboundRequestDto existing, OutboundRequestDto request) throws IOException;

@@ -1,6 +1,7 @@
 export const state = () => ({
     BASE_URL: location.protocol + '//' + location.hostname + ':8081',
-    lastError: ''
+    lastError: '',
+    search: ''
 });
 
 export const mutations = {
@@ -11,6 +12,12 @@ export const mutations = {
     resetLastError(state) {
         state.lastError = '';
     },
+    setSearch(state, payload) {
+        state.search = payload;
+    },
+    resetSearch(state) {
+        state.search = '';
+    },
 };
 
 export const actions = {
@@ -19,5 +26,11 @@ export const actions = {
     },
     resetLastError({commit}) {
         commit('resetLastError');
+    },
+    setSearch({commit}, text) {
+        commit('setSearch', text);
+    },
+    resetSearch({commit}) {
+        commit('resetSearch');
     },
 };

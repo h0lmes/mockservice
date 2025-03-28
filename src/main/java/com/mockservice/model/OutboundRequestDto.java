@@ -13,7 +13,9 @@ public class OutboundRequestDto {
     private RouteType type = RouteType.REST;
     private RequestMethod method = RequestMethod.GET;
     private String path = "";
+    private String headers = "";
     private String body = "";
+    private boolean responseToVars = true;
     private boolean disabled = false;
     private boolean triggerRequest = false;
     private String triggerRequestIds = "";
@@ -67,12 +69,30 @@ public class OutboundRequestDto {
         return this;
     }
 
+    public String getHeaders() {
+        return headers;
+    }
+
+    public OutboundRequestDto setHeaders(String headers) {
+        this.headers = headers;
+        return this;
+    }
+
     public String getBody() {
         return body;
     }
 
     public OutboundRequestDto setBody(String body) {
         this.body = body;
+        return this;
+    }
+
+    public boolean isResponseToVars() {
+        return responseToVars;
+    }
+
+    public OutboundRequestDto setResponseToVars(boolean responseToVars) {
+        this.responseToVars = responseToVars;
         return this;
     }
 

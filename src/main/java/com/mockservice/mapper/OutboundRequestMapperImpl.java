@@ -17,7 +17,9 @@ public class OutboundRequestMapperImpl implements OutboundRequestMapper {
                 .setType(request.getType())
                 .setMethod(request.getMethod())
                 .setPath(request.getPath())
+                .setHeaders(request.getHeaders())
                 .setBody(request.getBody())
+                .setResponseToVars(request.isResponseToVars())
                 .setDisabled(request.isDisabled())
                 .setTriggerRequest(request.isTriggerRequest())
                 .setTriggerRequestIds(request.getTriggerRequestIds());
@@ -31,7 +33,9 @@ public class OutboundRequestMapperImpl implements OutboundRequestMapper {
                 .setType(dto.getType())
                 .setMethod(dto.getMethod())
                 .setPath(dto.getPath())
+                .setHeaders(dto.getHeaders())
                 .setBody(dto.getBody())
+                .setResponseToVars(dto.isResponseToVars())
                 .setDisabled(dto.isDisabled())
                 .setTriggerRequest(dto.isTriggerRequest())
                 .setTriggerRequestIds(dto.getTriggerRequestIds());

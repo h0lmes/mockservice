@@ -80,26 +80,6 @@ routes:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
-- group: number conversion
-  type: SOAP
-  method: POST
-  path: /mockNumberConversion
-  alt: ""
-  responseCode: 200
-  response: |-
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://www.dataaccess.com/webservicesserver/">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <web:NumberToDollarsResponse>
-          <web:NumberToDollarsResult>${enum:TEST1:TEST2}</web:NumberToDollarsResult>
-          <web:Result>${NumberToDollarsRequest.Value:DEFAULT_VALUE}</web:Result>
-        </web:NumberToDollarsResponse>
-      </soapenv:Body>
-    </soapenv:Envelope>
-  requestBodySchema: ""
-  disabled: false
-  triggerRequest: false
-  triggerRequestIds: ""
 - group: robot
   type: REST
   method: GET
@@ -238,31 +218,57 @@ routes:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+- group: xml
+  type: SOAP
+  method: POST
+  path: /mockNumberConversion
+  alt: ""
+  responseCode: 200
+  response: |-
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://www.dataaccess.com/webservicesserver/">
+      <soapenv:Header/>
+      <soapenv:Body>
+        <web:NumberToDollarsResponse>
+          <web:NumberToDollarsResult>${enum:TEST1:TEST2}</web:NumberToDollarsResult>
+          <web:Result>${NumberToDollarsRequest.Value:DEFAULT_VALUE}</web:Result>
+        </web:NumberToDollarsResponse>
+      </soapenv:Body>
+    </soapenv:Envelope>
+  requestBodySchema: ""
+  disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
 requests:
-- id: robot.GET.localhost.8081.api.robot
+- id: api.robot
   group: robot
   type: REST
   method: GET
   path: localhost:8081/api/robot
+  headers: ""
   body: ""
+  responseToVars: true
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
-- id: store.GET.localhost.8081.products.0
+- id: products.0
   group: store
   type: REST
   method: GET
   path: localhost:8081/products/0
+  headers: ""
   body: ""
+  responseToVars: true
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
-- id: store.GET.localhost.8081.products.1
+- id: products.1
   group: store
   type: REST
   method: GET
   path: localhost:8081/products/1
+  headers: ""
   body: ""
+  responseToVars: true
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""

@@ -5,12 +5,6 @@
          @keydown.esc.exact="cancel">
 
         <div v-show="editing" class="mock-col w1">
-            <div class="mock-col-header">ID</div>
-            <input type="text" class="form-control form-control-sm" v-model="editingData.id"
-                   placeholder="Request ID should be unique"/>
-        </div>
-
-        <div v-show="editing" class="mock-col w1">
             <div class="mock-col-header">TYPE</div>
             <select class="form-control form-control-sm" v-model="editingData.type">
                 <option>REST</option>
@@ -42,6 +36,11 @@
             <div class="mock-col-value link" @click="filter(request.path)">{{ request.path }}</div>
         </div>
 
+        <div v-show="editing" class="mock-col w1">
+            <div class="mock-col-header">ID</div>
+            <input type="text" class="form-control form-control-sm" v-model="editingData.id"
+                   placeholder="(empty to generate)"/>
+        </div>
         <div v-show="!editing" class="mock-col w2">
             <div class="mock-col-header">ID</div>
             <div class="mock-col-value link" @click="filter(request.id)">{{ request.id }}</div>
@@ -63,6 +62,15 @@
         </div>
 
         <div v-show="editing" class="mock-col w100">
+            <div class="mb-2 color-secondary">REQUEST HEADERS</div>
+            <AutoSizeTextArea v-model="editingData.headers"
+                              :min-rows="1"
+                              :max-rows="256"
+                              placeholder="REQUEST HEADERS"
+            ></AutoSizeTextArea>
+        </div>
+
+        <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">REQUEST BODY</div>
             <AutoSizeTextArea v-model="editingData.body"
                               :min-rows="1"
@@ -70,6 +78,10 @@
                               placeholder="REQUEST BODY"
                               ref="body"
             ></AutoSizeTextArea>
+        </div>
+
+        <div v-show="editing" class="mock-col w100 mt-1">
+            <ToggleSwitch class="mock-col-value" v-model="editingData.responseToVars">SAVE RESPONSE IN GLOBAL VARS</ToggleSwitch>
         </div>
 
         <div v-show="editing" class="mock-col w100 mt-1">

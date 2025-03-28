@@ -1,10 +1,7 @@
 package com.mockservice.util;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.underscore.U;
 
 import java.util.ArrayDeque;
@@ -21,15 +18,6 @@ public class MapUtils {
 
     public static boolean isEmpty(Map<?, ?> map) {
         return map == null || map.isEmpty();
-    }
-
-    public static Map<String, Object> jsonToMap(String json) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-        return jsonToMap(json, mapper);
     }
 
     public static Map<String, Object> jsonToMap(String json, ObjectMapper mapper) throws JsonProcessingException {
@@ -82,17 +70,7 @@ public class MapUtils {
         return result;
     }
 
-    private static class TriEntry {
-        private String parent;
-        private String key;
-        private Object value;
-
-        TriEntry(String parent, String key, Object value) {
-            this.parent = parent;
-            this.key = key;
-            this.value = value;
-        }
-
+    private record TriEntry(String parent, String key, Object value) {
         String getParent() {
             return parent == null ? key : parent + "." + key;
         }

@@ -12,11 +12,14 @@
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="jsSearch" @toggle="setFilter('')">JS</ToggleSwitch>
         </div>
 
-        <div class="component-toolbar mb-5">
+        <div class="component-toolbar mb-3">
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRoute">Add route</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRequest">Add request</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addScenario">Add scenario</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger mr-3" @click="deleteVisibleRoutes">Delete visible routes</button>
+        </div>
+
+        <div class="component-toolbar mb-5">
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRoutes">Routes</ToggleSwitch>
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRequests">Requests</ToggleSwitch>
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showScenarios">Scenarios</ToggleSwitch>

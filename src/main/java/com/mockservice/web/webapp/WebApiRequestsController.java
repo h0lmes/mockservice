@@ -61,7 +61,7 @@ public class WebApiRequestsController {
     @ApiOperation(value = "Execute request by ID", tags = "requests")
     @PostMapping("/execute")
     public String execute(@RequestBody OutboundRequestExecuteRequest request) throws IOException {
-        return requestService.executeRequest(request.getRequestId(), MockVariables.empty())
+        return requestService.executeRequest(request.getRequestId(), MockVariables.empty(), true)
                 .orElse("Request not found or disabled");
     }
 

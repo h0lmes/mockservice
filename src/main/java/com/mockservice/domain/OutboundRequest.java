@@ -11,7 +11,9 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
     private RouteType type = RouteType.REST;
     private RequestMethod method = RequestMethod.GET;
     private String path = "";
+    private String headers = "";
     private String body = "";
+    private boolean responseToVars = true;
     private boolean disabled = false;
     private boolean triggerRequest = false;
     private String triggerRequestIds = "";
@@ -79,12 +81,30 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
         return this;
     }
 
+    public String getHeaders() {
+        return headers;
+    }
+
+    public OutboundRequest setHeaders(String headers) {
+        this.headers = headers;
+        return this;
+    }
+
     public String getBody() {
         return body;
     }
 
     public OutboundRequest setBody(String body) {
         this.body = body;
+        return this;
+    }
+
+    public boolean isResponseToVars() {
+        return responseToVars;
+    }
+
+    public OutboundRequest setResponseToVars(boolean responseToVars) {
+        this.responseToVars = responseToVars;
         return this;
     }
 
@@ -121,7 +141,9 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
         setType(source.getType());
         setMethod(source.getMethod());
         setPath(source.getPath());
+        setHeaders(source.getHeaders());
         setBody(source.getBody());
+        setResponseToVars(source.isResponseToVars());
         setDisabled(source.isDisabled());
         setTriggerRequest(source.isTriggerRequest());
         setTriggerRequestIds(source.getTriggerRequestIds());
@@ -146,8 +168,7 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
 
     @Override
     public int compareTo(OutboundRequest o) {
-        int c;
-        c = this.group.compareTo(o.getGroup());
+        int c = this.group.compareTo(o.getGroup());
         if (c != 0) return c;
         c = this.type.compareTo(o.getType());
         if (c != 0) return c;

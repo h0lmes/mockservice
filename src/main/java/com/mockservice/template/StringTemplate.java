@@ -31,6 +31,15 @@ public class StringTemplate {
      */
     private final List<String> strings = new ArrayList<>();
     private State state = State.EMPTY;
+    private boolean containsTokens = false;
+
+    public StringTemplate() {
+        // default
+    }
+
+    public StringTemplate(String text) {
+        add(text);
+    }
 
     // parser
 
@@ -49,6 +58,7 @@ public class StringTemplate {
         if (TokenParser.isToken(token)) {
             strings.add(token);
             state = State.TOKEN;
+            containsTokens = true;
         } else {
             if (State.TEXT.equals(state)) {
                 int last = strings.size() - 1;
@@ -60,9 +70,26 @@ public class StringTemplate {
         }
     }
 
+    public boolean containsTokens() {
+        return containsTokens;
+    }
+
     // builder
 
+    public String toString() {
+        if (strings.isEmpty()) return "";
+        if (strings.size() == 1) return strings.get(0);
+
+        StringBuilder builder = new StringBuilder();
+        for (String s : strings) {
+            builder.append(s);
+        }
+        return builder.toString();
+    }
+
     public String toString(MockVariables variables, MockFunctions functions) {
+        if (strings.isEmpty()) return "";
+
         StringBuilder builder = new StringBuilder();
         for (String s : strings) {
             String value = map(s, variables, functions);

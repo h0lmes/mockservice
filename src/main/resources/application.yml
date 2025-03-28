@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: ${SERVER_PORT:8081}
 
 logging:
   level:
@@ -30,4 +30,6 @@ application:
     key-file: ${SSL_KEY_FILE:classpath:cert.key}
     password: ${SSL_PASSWORD:}
   mock-service:
-    cache-size: 256
+    cache-size: 1000
+  request-service:
+    cache-size: 1000
