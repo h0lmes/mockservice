@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ScenarioServiceImplTest {
+class ScenarioServiceImplTest {
 
     private static final String STR_1 = "line 1";
     private static final String ALIAS = "alias";
@@ -27,8 +27,8 @@ public class ScenarioServiceImplTest {
     private static final String PATH = "/test";
     private static final String ALT1 = "400";
     private static final String ALT2 = "204";
-    private static final String SCENARIO_DATA1 = METHOD.toString() + ";" + PATH + ";" + ALT1;
-    private static final String SCENARIO_DATA2 = SCENARIO_DATA1 + "\n" + METHOD.toString() + ";" + PATH + ";" + ALT2;
+    private static final String SCENARIO_DATA1 = METHOD + ";" + PATH + ";" + ALT1;
+    private static final String SCENARIO_DATA2 = SCENARIO_DATA1 + "\n" + METHOD + ";" + PATH + ";" + ALT2;
 
     @Mock
     private ConfigRepository configRepository;
@@ -38,7 +38,7 @@ public class ScenarioServiceImplTest {
     }
 
     @Test
-    public void getScenariosAsList() {
+    void getScenariosAsList() {
         Scenario scenario = new Scenario().setAlias(STR_1);
         when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
 
@@ -48,7 +48,7 @@ public class ScenarioServiceImplTest {
     }
 
     @Test
-    public void putScenario() throws IOException {
+    void putScenario() throws IOException {
         Scenario scenario = new Scenario().setAlias(STR_1);
         when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
 
@@ -60,7 +60,7 @@ public class ScenarioServiceImplTest {
     }
 
     @Test
-    public void deleteScenario() throws IOException {
+    void deleteScenario() throws IOException {
         Scenario scenario = new Scenario().setAlias(STR_1);
         when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
 
@@ -73,7 +73,7 @@ public class ScenarioServiceImplTest {
     // --- active scenarios ----------------------------------------------------------------
 
     @Test
-    public void activateScenario_ScenarioNotActive_ScenarioActivates() {
+    void activateScenario_ScenarioNotActive_ScenarioActivates() {
         Scenario scenario = new Scenario().setAlias(ALIAS);
         when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
 
@@ -85,7 +85,7 @@ public class ScenarioServiceImplTest {
     }
 
     @Test
-    public void activateScenario_ScenarioNotExists_ExceptionThrown() {
+    void activateScenario_ScenarioNotExists_ExceptionThrown() {
         Scenario scenario = new Scenario().setAlias(ALIAS);
         when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
 
@@ -95,7 +95,7 @@ public class ScenarioServiceImplTest {
     }
 
     @Test
-    public void deactivateScenario_ScenarioActive_ScenarioDeactivates() {
+    void deactivateScenario_ScenarioActive_ScenarioDeactivates() {
         Scenario scenario = new Scenario().setAlias(ALIAS);
         when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
 
@@ -108,7 +108,7 @@ public class ScenarioServiceImplTest {
     }
 
     @Test
-    public void deactivateScenario_ScenarioNotExists_ExceptionThrown() {
+    void deactivateScenario_ScenarioNotExists_ExceptionThrown() {
         Scenario scenario = new Scenario().setAlias(ALIAS);
         when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
 
@@ -118,14 +118,14 @@ public class ScenarioServiceImplTest {
     }
 
     @Test
-    public void getAltFor_NotActiveScenario_ReturnsEmpty() {
+    void getAltFor_NotActiveScenario_ReturnsEmpty() {
         ScenarioService service = service();
 
         assertTrue(service.getAltFor(RequestMethod.POST, "/not-existing-path").isEmpty());
     }
 
     @Test
-    public void getAltFor_ActiveScenarioMap_ReturnsSameAlt() {
+    void getAltFor_ActiveScenarioMap_ReturnsSameAlt() {
         Scenario scenario = new Scenario().setAlias(ALIAS).setData(SCENARIO_DATA1);
         when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
 
@@ -144,7 +144,7 @@ public class ScenarioServiceImplTest {
     }
 
     @Test
-    public void getAltFor_ActiveScenarioQueue_ReturnsAltThenDepletes() {
+    void getAltFor_ActiveScenarioQueue_ReturnsAltThenDepletes() {
         Scenario scenario = new Scenario().setAlias(ALIAS).setData(SCENARIO_DATA1).setType(ScenarioType.QUEUE);
         when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
 
@@ -162,8 +162,8 @@ public class ScenarioServiceImplTest {
     }
 
     @Test
-    public void getAltFor_ActiveScenarioCircularQueue_ReturnsAltsInOrderAndRestartsQueue() {
-        Scenario scenario = new Scenario().setAlias(ALIAS).setData(SCENARIO_DATA2).setType(ScenarioType.CIRCULAR_QUEUE);
+    void getAltFor_ActiveScenarioCircularQueue_ReturnsAltsInOrderAndRestartsQueue() {
+        Scenario scenario = new Scenario().setAlias(ALIAS).setData(SCENARIO_DATA2).setType(ScenarioType.RING);
         when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
 
         ScenarioService service = service();
@@ -187,7 +187,7 @@ public class ScenarioServiceImplTest {
     // --- listeners ----------------------------------------------------------------
 
     @Test
-    public void onBeforeAfterConfigChanged_ActiveScenarioExists_ScenarioRemainsActive() {
+    void onBeforeAfterConfigChanged_ActiveScenarioExists_ScenarioRemainsActive() {
         Scenario scenario = new Scenario().setAlias(ALIAS);
         when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
 

@@ -20,8 +20,8 @@
         components: {},
         data() {
             return {
-                colors: ['default', 'gray', 'purple', 'pink', 'red', 'orange', 'orange-yellow', 'yellow', 'lime',
-                    'green', 'teal', 'cyan', 'blue', 'violet', 'indigo'],
+                colors: ['default', 'gray', 'purple', 'pink', 'red', 'orange', 'orange-yellow',
+                    'yellow', 'lime', 'green', 'teal', 'cyan', 'blue', 'violet'],
                 value: 'default',
             }
         },

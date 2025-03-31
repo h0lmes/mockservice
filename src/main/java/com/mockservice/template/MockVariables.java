@@ -3,6 +3,7 @@ package com.mockservice.template;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class MockVariables {
     private final Map<String, String> map = new HashMap<>();
@@ -60,6 +61,16 @@ public class MockVariables {
         if (map != null) {
             this.map.putAll(map);
         }
+        return this;
+    }
+
+    public MockVariables forEach(BiConsumer<? super String, ? super String> consumer) {
+        getAll().forEach(consumer);
+        return this;
+    }
+
+    public MockVariables forEachSorted(BiConsumer<? super String, ? super String> consumer) {
+        getAll().keySet().stream().sorted().forEach(k -> consumer.accept(k, getAll().get(k)));
         return this;
     }
 }

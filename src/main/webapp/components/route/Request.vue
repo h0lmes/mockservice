@@ -52,7 +52,7 @@
                 <button type="button" class="btn btn-sm btn-default" :class="{'disabled' : !hasVariables}" @click="vars">vars</button>
                 <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
                 <button type="button" class="btn btn-sm btn-primary" @click="test">send</button>
-                <button type="button" class="btn btn-sm btn-danger ml-4" @click="del">delete</button>
+                <button type="button" class="btn btn-sm btn-danger ml-2" @click="del">delete</button>
             </div>
         </div>
 
@@ -65,8 +65,7 @@
             <div class="mb-2 color-secondary">REQUEST HEADERS</div>
             <AutoSizeTextArea v-model="editingData.headers"
                               :min-rows="1"
-                              :max-rows="256"
-                              placeholder="REQUEST HEADERS"
+                              :max-rows="22"
             ></AutoSizeTextArea>
         </div>
 
@@ -74,8 +73,7 @@
             <div class="mb-2 color-secondary">REQUEST BODY</div>
             <AutoSizeTextArea v-model="editingData.body"
                               :min-rows="1"
-                              :max-rows="256"
-                              placeholder="REQUEST BODY"
+                              :max-rows="22"
                               ref="body"
             ></AutoSizeTextArea>
         </div>
@@ -84,7 +82,7 @@
             <ToggleSwitch class="mock-col-value" v-model="editingData.responseToVars">SAVE RESPONSE IN GLOBAL VARS</ToggleSwitch>
         </div>
 
-        <div v-show="editing" class="mock-col w100 mt-1">
+        <div v-show="editing" class="mock-col w100">
             <ToggleSwitch class="mock-col-value" v-model="editingData.triggerRequest">TRIGGER REQUESTS</ToggleSwitch>
         </div>
 
@@ -93,7 +91,7 @@
                    placeholder="Comma separated request IDs to trigger after this one"/>
         </div>
 
-        <div v-show="editing" class="mock-col w1 mt-1">
+        <div v-show="editing" class="mock-col w1">
             <ToggleSwitch class="mock-col-value" v-model="editingData.disabled">DISABLED</ToggleSwitch>
         </div>
 

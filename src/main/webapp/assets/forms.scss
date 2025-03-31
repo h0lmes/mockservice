@@ -10,19 +10,19 @@
 }
 .sepia-mode {
   --form-control-bg-disabled: #bbbec1;
-  --form-control-border: #decdb6;
+  --form-control-border: #b3a692;
   --form-control-placeholder: #bfb1a3;
   --form-control-bg-hilight-shadow: #b0795d;
 }
 .dark-mode {
   --form-control-bg-disabled: #787979;
-  --form-control-border: #323434;
+  --form-control-border: #434d4d;
   --form-control-placeholder: #4a4f54;
   --form-control-bg-hilight-shadow: var(--color-accent-one);
 }
-.dark2-mode {
+.code-mode {
   --form-control-bg-disabled: #787979;
-  --form-control-border: #3e4957;
+  --form-control-border: #455161;
   --form-control-placeholder: #506073;
   --form-control-bg-hilight-shadow: var(--color-accent-one);
 }

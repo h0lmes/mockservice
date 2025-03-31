@@ -113,12 +113,8 @@ public class Scenario implements Comparable<Scenario> {
     }
 
     public Scenario setActive(boolean active) {
-        if (active) {
-            routes.clear();
-            parse();
-        } else {
-            routes.clear();
-        }
+        routes.clear();
+        if (active) parse();
         this.active = active;
         return this;
     }
@@ -143,6 +139,6 @@ public class Scenario implements Comparable<Scenario> {
 
     public Optional<String> getAltFor(RequestMethod method, String path) {
         Predicate<Route> condition = r -> method.equals(r.getMethod()) && path.equals(r.getPath());
-        return type.getStrategy().apply(routes, condition);
+        return getType().getStrategy().apply(routes, condition);
     }
 }

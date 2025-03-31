@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class MockServiceApplicationTest {
 
     @Test
-    public void test() {
+    void test() {
         MockServiceApplication.main(new String[]{});
         Assertions.assertNull(null);
     }

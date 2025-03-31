@@ -1,44 +1,76 @@
 package com.mockservice.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mockservice.domain.OutboundRequest;
 import com.mockservice.mapper.OutboundRequestMapper;
+import com.mockservice.mapper.OutboundRequestMapperImpl;
 import com.mockservice.repository.ConfigRepository;
-import com.mockservice.response.MockResponse;
-import org.junit.jupiter.api.DisplayName;
+import com.mockservice.template.TemplateEngine;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class RequestServiceImplTest {
+class RequestServiceImplTest {
 
-    @Mock
-    private MockResponse response;
     @Mock
     private ConfigRepository configRepository;
     @Mock
     private OutboundRequestMapper requestMapper;
+    @Mock
+    private TemplateEngine templateEngine;
+    @Mock
+    private VariablesService variablesService;
 
-    @DisplayName("TODO: Find a better way to test async action with WebClient in it")
+    private RequestService getService() {
+        return new RequestServiceImpl(
+                configRepository, new OutboundRequestMapperImpl(), templateEngine,
+                variablesService, 256, new ObjectMapper(),
+                "", "");
+    }
+
     @Test
-    public void schedule() {
-//        String url = "http://localhost:8087";
-//        when(response.getRequestUrl()).thenReturn(url);
-//        when(response.getRequestMethod()).thenReturn(HttpMethod.GET);
-//        when(response.getRequestBody()).thenReturn("");
-//        when(response.getRequestHeaders()).thenReturn(new HttpHeaders());
-//
-//        RequestService service = new RequestServiceImpl(configRepository, requestMapper);
-//        service.schedule(response);
-//        try {
-//            Thread.sleep(2500);
-//        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//        }
-//
-//        verify(response, atLeastOnce()).getRequestUrl();
-//        verify(response, atLeastOnce()).getRequestMethod();
-//        verify(response, atLeastOnce()).getRequestBody();
-//        verify(response, atLeastOnce()).getRequestHeaders();
+    void getRequests() {
+        var req = new OutboundRequest()
+                .setId("test_id")
+                .setPath("localhost:65530")
+                .setMethod(RequestMethod.GET)
+                .setGroup("test_group")
+                .setBody("body")
+                .setHeaders("Test: test");
+        when(configRepository.findAllRequests()).thenReturn(List.of(req));
+        var service = getService();
+        var list = service.getRequests();
+
+        assertEquals(1, list.size());
+        assertEquals("test_id", list.get(0).getId());
+        assertEquals("localhost:65530", list.get(0).getPath());
+        assertEquals(RequestMethod.GET, list.get(0).getMethod());
+        assertEquals("test_group", list.get(0).getGroup());
+        assertEquals("body", list.get(0).getBody());
+        assertEquals("Test: test", list.get(0).getHeaders());
+    }
+
+    @Test
+    void executeRequest() {
+        var req = new OutboundRequest()
+                .setId("test_id").setPath("localhost:65530");
+        when(configRepository.findRequest(anyString())).thenReturn(Optional.of(req));
+        var service = getService();
+        var result = service.executeRequest("id", null, false);
+
+        assertTrue(result.isPresent());
+        assertTrue(result.get().contains("test_id"));
+        assertTrue(result.get().contains("error"));
     }
 }

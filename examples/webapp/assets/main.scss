@@ -4,7 +4,6 @@
   --cyan-blue: #179ae6;
   --blue: #0077ff;
   --violet: #4d4dff;
-  --indigo: #2d26ff;
   --purple: #7141d9;
   --pink: #d92e83;
   --red: #dc3545;
@@ -48,7 +47,6 @@
   --cyan-blue: #2e7599;
   --blue: #1f5e99;
   --violet: #4d4dff;
-  --indigo: #3633ff;
   --purple: #7141d9;
   --pink: #a62e56;
   --red: #992e3c;
@@ -71,11 +69,10 @@
   --bg-border-active: var(--color-accent-one);
 }
 
-.dark2-mode {
+.code-mode {
   --cyan-blue: #2e7599;
   --blue: #1f5e99;
   --violet: #4d4dff;
-  --indigo: #3633ff;
   --purple: #7141d9;
   --pink: #a62e56;
   --red: #992e3c;
@@ -103,7 +100,6 @@
 .accent-cyan-blue {--color-accent-one: var(--cyan-blue);}
 .accent-blue {--color-accent-one: var(--blue);}
 .accent-violet {--color-accent-one: var(--violet);}
-.accent-indigo {--color-accent-one: var(--indigo);}
 .accent-purple {--color-accent-one: var(--purple);}
 .accent-pink {--color-accent-one: var(--pink);}
 .accent-red {--color-accent-one: var(--red);}
@@ -124,7 +120,6 @@
 .cyan-blue {color: var(--cyan-blue) !important; text-decoration-color: var(--cyan-blue) !important;}
 .blue {color: var(--blue) !important; text-decoration-color: var(--blue) !important;}
 .violet {color: var(--violet) !important; text-decoration-color: var(--violet) !important;}
-.indigo {color: var(--indigo) !important; text-decoration-color: var(--indigo) !important;}
 .purple {color: var(--purple) !important; text-decoration-color: var(--purple) !important;}
 .pink {color: var(--pink) !important; text-decoration-color: var(--pink) !important;}
 .red {color: var(--red) !important; text-decoration-color: var(--red) !important;}

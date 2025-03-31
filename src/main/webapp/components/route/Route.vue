@@ -48,34 +48,35 @@
                 <button type="button" class="btn btn-sm btn-default" :class="{'disabled' : !hasVariables}" @click="vars">vars</button>
                 <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
                 <button type="button" class="btn btn-sm btn-default" @click="test">test</button>
-                <button type="button" class="btn btn-sm btn-danger ml-4" @click="del">delete</button>
+                <button type="button" class="btn btn-sm btn-danger ml-2" @click="del">delete</button>
             </div>
         </div>
 
-        <div v-show="editing" class="mock-col w100">
-            <div class="mb-2 color-secondary">PATH</div>
-            <input type="text" class="form-control form-control-sm" v-model="editingData.path"/>
-        </div>
+        <div v-show="editing" class="mock-group w100">
+            <div v-show="editing" class="mock-col w100">
+                <div class="mb-2 color-secondary">PATH</div>
+                <input type="text" class="form-control form-control-sm" v-model="editingData.path"/>
+            </div>
 
-        <div v-show="editing" class="mock-col w100">
-            <div class="mb-2 color-secondary">ALT</div>
-            <input type="text" class="form-control form-control-sm" v-model="editingData.alt"
-                   placeholder="can contain condition (e.g. some_field.some_inner_field = value)"/>
+            <div v-show="editing" class="mock-col w1">
+                <div class="mb-2 color-secondary">ALT</div>
+                <input type="text" class="form-control form-control-sm" v-model="editingData.alt"
+                       placeholder="can contain condition (e.g. variable=value)"/>
+            </div>
+
+            <div v-show="editing" class="mock-col w1">
+                <div class="mb-2 color-secondary">RESPONSE CODE</div>
+                <input type="text" class="form-control form-control-sm" v-model="editingData.responseCode"/>
+            </div>
         </div>
 
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">RESPONSE BODY</div>
             <AutoSizeTextArea v-model="editingData.response"
                               :min-rows="1"
-                              :max-rows="256"
-                              placeholder="RESPONSE BODY"
+                              :max-rows="22"
                               ref="response"
             ></AutoSizeTextArea>
-        </div>
-
-        <div v-show="editing" class="mock-col w100">
-            <div class="mb-2 color-secondary">RESPONSE CODE</div>
-            <input type="text" class="form-control form-control-sm" v-model="editingData.responseCode"/>
         </div>
 
         <div v-show="editing" class="mock-col w100 mt-1">
@@ -86,7 +87,7 @@
             ></AutoSizeTextArea>
         </div>
 
-        <div v-show="editing" class="mock-col w100 mt-1">
+        <div v-show="editing" class="mock-col w100">
             <ToggleSwitch class="mock-col-value" v-model="editingData.triggerRequest">TRIGGER REQUESTS</ToggleSwitch>
         </div>
 
@@ -95,7 +96,7 @@
                    placeholder="Comma separated request IDs to trigger after this one"/>
         </div>
 
-        <div v-show="editing" class="mock-col w1 mt-1">
+        <div v-show="editing" class="mock-col w1">
             <ToggleSwitch class="mock-col-value" v-model="editingData.disabled">DISABLED</ToggleSwitch>
         </div>
 

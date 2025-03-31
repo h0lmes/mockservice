@@ -42,7 +42,7 @@ public class ScenarioTest {
         Scenario scenario2 = new Scenario().setAlias(STR_1)
                 .setGroup(STR_2)
                 .setData(STR_2)
-                .setType(ScenarioType.CIRCULAR_QUEUE);
+                .setType(ScenarioType.RING);
         assertEquals(scenario1, scenario2);
     }
 
@@ -89,7 +89,7 @@ public class ScenarioTest {
     private static final String METHOD = "GET";
     private static final String PATH = "/test";
     private static final String ALT = "400";
-    private static final String SCENARIO_WITH_ALT = METHOD + ";/test;" + ALT;
+    private static final String SCENARIO_WITH_ALT = METHOD + ";" + PATH + ";" + ALT;
     private static final String SCENARIO_WITH_EMPTY_ALT = METHOD + ";" + PATH;
     private static final String SCENARIO_WITH_EMPTY_LINES = "\n\n" + METHOD + ";" + PATH + ";\"" + ALT + "\n";
     private static final String SCENARIO_WITH_ONE_PARAMETER = METHOD;
@@ -116,17 +116,17 @@ public class ScenarioTest {
     }
 
     @Test
-    public void create_ActivateInvalidScenarioWithOneParameter_RouteExists() {
-        Scenario scenario = new Scenario().setData(SCENARIO_WITH_ONE_PARAMETER);
-        assertThrows(ScenarioParseException.class, () -> scenario.setActive(true));
-    }
-
-    @Test
     public void create_AssignToActiveScenario_ScenarioActive() {
         Scenario activeScenario = new Scenario().setData(SCENARIO_WITH_ALT).setActive(true);
         Scenario scenario2 = new Scenario().setData(SCENARIO_WITH_EMPTY_ALT);
         activeScenario.assignFrom(scenario2);
         assertTrue(activeScenario.getActive());
         assertTrue(activeScenario.getAltFor(RequestMethod.valueOf(METHOD), PATH).isPresent());
+    }
+
+    @Test
+    public void create_ActivateInvalidScenarioWithOneParameter_RouteExists() {
+        Scenario scenario = new Scenario().setData(SCENARIO_WITH_ONE_PARAMETER);
+        assertThrows(ScenarioParseException.class, () -> scenario.setActive(true));
     }
 }

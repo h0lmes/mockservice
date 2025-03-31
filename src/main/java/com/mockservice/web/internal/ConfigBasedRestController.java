@@ -50,6 +50,8 @@ public class ConfigBasedRestController implements RouteRegisteringController, Co
         this.mockService = mockService;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
         this.configRepository = configRepository;
+        this.configRepository.registerConfigObserver(this);
+        this.configRepository.registerRouteObserver(this);
         this.jsonMapper = jsonMapper;
 
         mockMethod = this.getClass().getMethod("mock");

@@ -3,6 +3,7 @@ package com.mockservice.util;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.lang.NonNull;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.*;
@@ -41,7 +42,7 @@ public class IOUtils {
         }
     }
 
-    public static List<String> toList(String resource) {
+    public static List<String> toList(@NonNull String resource) {
         try (BufferedReader reader = new BufferedReader(new StringReader(resource))) {
             return reader.lines().toList();
         } catch (IOException e) {

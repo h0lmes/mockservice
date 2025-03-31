@@ -1,10 +1,10 @@
 package com.mockservice.domain;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RouteTest {
 
@@ -153,6 +153,7 @@ public class RouteTest {
                 .setGroup(STR_1).setType(RouteType.REST).setMethod(METHOD2).setPath(STR_1).setAlt(STR_1);
         assertTrue(0 > route1.compareTo(route2));
     }
+
     @Test
     public void compareTo_ByPath() {
         Route route1 = new Route()
@@ -161,6 +162,7 @@ public class RouteTest {
                 .setGroup(STR_1).setType(RouteType.REST).setMethod(METHOD1).setPath(STR_2).setAlt(STR_1);
         assertTrue(0 > route1.compareTo(route2));
     }
+
     @Test
     public void compareTo_ByAlt() {
         Route route1 = new Route()

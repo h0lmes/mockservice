@@ -10,19 +10,19 @@ import java.util.List;
 public class OutboundRequestMapperImpl implements OutboundRequestMapper {
 
     @Override
-    public OutboundRequestDto toDto(OutboundRequest request) {
+    public OutboundRequestDto toDto(OutboundRequest entity) {
         return new OutboundRequestDto()
-                .setId(request.getId())
-                .setGroup(request.getGroup())
-                .setType(request.getType())
-                .setMethod(request.getMethod())
-                .setPath(request.getPath())
-                .setHeaders(request.getHeaders())
-                .setBody(request.getBody())
-                .setResponseToVars(request.isResponseToVars())
-                .setDisabled(request.isDisabled())
-                .setTriggerRequest(request.isTriggerRequest())
-                .setTriggerRequestIds(request.getTriggerRequestIds());
+                .setId(entity.getId())
+                .setGroup(entity.getGroup())
+                .setType(entity.getType())
+                .setMethod(entity.getMethod())
+                .setPath(entity.getPath())
+                .setHeaders(entity.getHeaders())
+                .setBody(entity.getBody())
+                .setResponseToVars(entity.isResponseToVars())
+                .setDisabled(entity.isDisabled())
+                .setTriggerRequest(entity.isTriggerRequest())
+                .setTriggerRequestIds(entity.getTriggerRequestIds());
     }
 
     @Override

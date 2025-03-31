@@ -40,8 +40,12 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
                 .replace(':', '.')
                 .replace('?', '.')
                 .replace('&', '.')
+                .replace('%', '.')
                 .replace('=', '.')
-                .replace(',', '.');
+                .replace(',', '.')
+                .replace('$', '.')
+                .replace('{', '.')
+                .replace('}', '.');
         return result;
     }
 
@@ -49,8 +53,8 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
         return group;
     }
 
-    public OutboundRequest setGroup(String group) {
-        this.group = group;
+    public OutboundRequest setGroup(String value) {
+        this.group = value == null ? "" : value;
         return this;
     }
 
@@ -58,8 +62,8 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
         return type;
     }
 
-    public OutboundRequest setType(RouteType type) {
-        this.type = type;
+    public OutboundRequest setType(RouteType value) {
+        this.type = value == null ? RouteType.REST : value;
         return this;
     }
 
@@ -67,8 +71,8 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
         return method;
     }
 
-    public OutboundRequest setMethod(RequestMethod method) {
-        this.method = method;
+    public OutboundRequest setMethod(RequestMethod value) {
+        this.method = value == null ? RequestMethod.GET : value;
         return this;
     }
 
@@ -76,8 +80,8 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
         return path;
     }
 
-    public OutboundRequest setPath(String path) {
-        this.path = path;
+    public OutboundRequest setPath(String value) {
+        this.path = value == null ? "" : value;
         return this;
     }
 
@@ -85,8 +89,8 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
         return headers;
     }
 
-    public OutboundRequest setHeaders(String headers) {
-        this.headers = headers;
+    public OutboundRequest setHeaders(String value) {
+        this.headers = value == null ? "" : value;
         return this;
     }
 
@@ -94,8 +98,8 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
         return body;
     }
 
-    public OutboundRequest setBody(String body) {
-        this.body = body;
+    public OutboundRequest setBody(String value) {
+        this.body = value == null ? "" : value;
         return this;
     }
 
@@ -130,8 +134,8 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
         return triggerRequestIds;
     }
 
-    public OutboundRequest setTriggerRequestIds(String triggerRequestIds) {
-        this.triggerRequestIds = triggerRequestIds;
+    public OutboundRequest setTriggerRequestIds(String value) {
+        this.triggerRequestIds = value == null ? "" : value;
         return this;
     }
 

@@ -28,6 +28,7 @@ public class ScenarioServiceImpl implements ScenarioService, ConfigObserver {
 
     public ScenarioServiceImpl(ConfigRepository configRepository) {
         this.configRepository = configRepository;
+        this.configRepository.registerConfigObserver(this);
     }
 
     @Override

@@ -2,9 +2,8 @@
   --grey: #909090;
   --gray: #909090;
   --cyan-blue: #179ae6;
-  --blue: #006aff;
+  --blue: #257fff;
   --violet: #4d4dff;
-  --indigo: #2d26ff;
   --purple: #7141d9;
   --pink: #d92e94;
   --red: #dc3545;
@@ -24,7 +23,7 @@
   --color-link-hover: #007bff;
   --bg-page: #ededed;
   --bg-component: #fff;
-  --bg-component-active: #fffaf2;
+  --bg-component-active: #ffbd8b;
   --bg-border: #fff;
   --bg-border-active: #dbe0e5;
 }
@@ -39,7 +38,7 @@
   --color-accent-one: #cc8e47;
   --bg-page: #e3d9c5;
   --bg-component: #f5ebd3;
-  --bg-component-active: #fff6e3;
+  --bg-component-active: #fdce66;
   --bg-border: #f5ebd3;
   --bg-border-active: #fff6e3;
 }
@@ -48,7 +47,6 @@
   --cyan-blue: #2e7599;
   --blue: #3b7bd0;
   --violet: #4d4dff;
-  --indigo: #3633ff;
   --purple: #7141d9;
   --pink: #a62e76;
   --red: #992e3c;
@@ -66,22 +64,21 @@
   --color-accent-one: var(--teal);
   --bg-page: #0d1117;
   --bg-component: #191d20;
-  --bg-component-active: #27292b;
+  --bg-component-active: #565a5e;
   --bg-border: var(--bg-component);
   --bg-border-active: var(--color-accent-one);
 }
 
-.dark2-mode {
+.code-mode {
   --cyan-blue: #2e7599;
   --blue: #3b7bd0;
   --violet: #4d4dff;
-  --indigo: #3633ff;
   --purple: #7141d9;
   --pink: #a62e76;
-  --red: #992e3c;
+  --red: #992e2e;
   --orange: #b3580e;
-  --orange-yellow: #b37c0e;
-  --yellow: #b39f47;
+  --orange-yellow: #d08f11;
+  --yellow: #c5af4b;
   --lime: #80992e;
   --green: #388c49;
   --teal: #2d8064;
@@ -93,7 +90,7 @@
   --color-accent-one: #478bb3;
   --bg-page: #20262e;
   --bg-component: #2a313b;
-  --bg-component-active: #303945;
+  --bg-component-active: #475566;
   --bg-border: var(--bg-component);
   --bg-border-active: var(--color-accent-one);
 }
@@ -103,7 +100,6 @@
 .accent-cyan-blue {--color-accent-one: var(--cyan-blue);}
 .accent-blue {--color-accent-one: var(--blue);}
 .accent-violet {--color-accent-one: var(--violet);}
-.accent-indigo {--color-accent-one: var(--indigo);}
 .accent-purple {--color-accent-one: var(--purple);}
 .accent-pink {--color-accent-one: var(--pink);}
 .accent-red {--color-accent-one: var(--red);}
@@ -124,7 +120,6 @@
 .cyan-blue {color: var(--cyan-blue) !important; text-decoration-color: var(--cyan-blue) !important;}
 .blue {color: var(--blue) !important; text-decoration-color: var(--blue) !important;}
 .violet {color: var(--violet) !important; text-decoration-color: var(--violet) !important;}
-.indigo {color: var(--indigo) !important; text-decoration-color: var(--indigo) !important;}
 .purple {color: var(--purple) !important; text-decoration-color: var(--purple) !important;}
 .pink {color: var(--pink) !important; text-decoration-color: var(--pink) !important;}
 .red {color: var(--red) !important; text-decoration-color: var(--red) !important;}
@@ -215,23 +210,7 @@ pre {
 
 
 
-// --- components --------------------------------------------------------------------------------------
-
-
-
-.component {
-  background-color: var(--bg-component);
-  border-radius: 0.5rem;
-  border: none;
-
-  .component > & {
-    border: 1px solid var(--bg-border);
-  }
-}
-
-
-
-// ----- toolbar -----
+// ----- toolbar --------------------------------------------------
 
 
 
@@ -270,9 +249,25 @@ pre {
 }
 
 
+// --- component --------------------------------------------------------------
 
-// ----- row -----
 
+.component {
+  background-color: var(--bg-component);
+  border-radius: 0.5rem;
+  //transition: background-color 1s ease-out;
+
+  //&.active {
+  //  background-color: var(--bg-component-active);
+  //}
+
+  .component > & {
+    border: 1px solid var(--bg-border);
+  }
+}
+
+
+// ----- component-row ------------------------------------------------------------------
 
 
 .component-row-group-boundary {
@@ -282,7 +277,7 @@ pre {
   border-top: 1px solid var(--bg-component);
 
   .compact-view & {
-    margin: 0.85rem 0;
+    margin: 1rem 0;
     border-top: 0;
   }
 }
@@ -299,11 +294,13 @@ pre {
   align-items: center;
   margin-bottom: var(--margin-bottom);
   padding: var(--padding);
+  border: none;
   font-size: smaller;
-  transition: margin-bottom 0.15s ease;
+  transition: margin-bottom 0.15s ease, background-color 0s;
 
   &.open {
-    background-color: var(--bg-component-active);
+    //background-color: var(--bg-component-active);
+    border: 0.2rem solid var(--color-accent-one);
   }
 
   .compact-view & {
@@ -318,14 +315,58 @@ pre {
 @media screen and (max-width: 1079px) {
   .component-row {
     .compact-view &:not(.open) {
-      --padding: 0.7rem 1rem;
+      --padding: 0 1rem;
     }
   }
 }
 
 
 
-// ----- col -----
+// ----- group ------------------------------
+
+
+
+.mock-group {
+  flex: 1 1 0;
+  position: relative;
+  box-sizing: border-box;
+  min-width: 7rem;
+
+  display: flex;
+  gap: 0.7rem 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: space-around;
+  align-items: center;
+
+  &.w1 {
+    flex: 1 1 0;
+  }
+
+  &.w2 {
+    flex: 2 1 0;
+  }
+
+  &.w3 {
+    flex: 3 1 0;
+  }
+
+  &.w4 {
+    flex: 4 1 0;
+  }
+
+  &.w5 {
+    flex: 5 1 0;
+  }
+
+  &.w100 {
+    flex: 0 0 100%;
+  }
+}
+
+
+
+// ----- col ------------------------------
 
 
 
@@ -350,6 +391,14 @@ pre {
 
   &.w3 {
     flex: 3 1 0;
+  }
+
+  &.w4 {
+    flex: 4 1 0;
+  }
+
+  &.w5 {
+    flex: 5 1 0;
   }
 
   &.w100 {
@@ -392,7 +441,7 @@ pre {
 
 @media screen and (max-width: 1079px) {
   .mock-col {
-    &, &.w1, &.w2, &.w3 {
+    &, &.w1, &.w2, &.w3, &.w4, &.w5 {
       flex: 0 0 100%;
     }
   }

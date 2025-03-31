@@ -11,6 +11,7 @@ import com.mockservice.template.MockVariables;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.validate.DataValidationException;
 import com.mockservice.validate.DataValidator;
+import com.mockservice.ws.WebSocketHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,11 +68,13 @@ public class MockServiceImplTest {
     private QuantumTheory quantumTheoryNonApplicable;
     @Mock
     private DataValidator dataValidator;
+    @Mock
+    private WebSocketHandler webSocketHandler;
 
     private MockService createMockService() {
         return new MockServiceImpl(
                 2, templateEngine, routeService, scenarioService, configRepository, requestService,
-                List.of(quantumTheoryNonApplicable, quantumTheory), List.of(dataValidator));
+                List.of(quantumTheoryNonApplicable, quantumTheory), List.of(dataValidator), webSocketHandler);
     }
 
     @BeforeEach
@@ -113,9 +116,9 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_RouteResponseWithNoCallbackRequest_NoRequestScheduled() {
-        String bodyWithoutRequest = "[]";
-        Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(bodyWithoutRequest);
+    public void mock_RouteResponseWithNoTriggerRequest_NoRequestScheduled() {
+        Route route = new Route().setMethod(GET_METHOD).setPath(PATH)
+                .setTriggerRequest(false);
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
 
         MockService mockService = createMockService();
@@ -125,7 +128,7 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_RouteResponseWithCallbackRequest_RequestScheduled() {
+    public void mock_RouteResponseWithTriggerRequest_RequestScheduled() {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH)
                 .setTriggerRequest(true).setTriggerRequestIds("id");
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));

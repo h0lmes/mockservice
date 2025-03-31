@@ -84,9 +84,7 @@ export const actions = {
             };
             const res = await fetch(url, params);
             await handleError(res);
-            const data = await res.text();
-            console.log(data);
-            return data;
+            return await res.text();
         } catch (err) {
             commit('setLastError', err, {root: true});
         }
@@ -100,7 +98,7 @@ export const actions = {
             path: '/',
             headers: '',
             body: '',
-            responseToVars: true,
+            responseToVars: false,
             disabled: false,
             triggerRequest: false,
             triggerRequestIds: '',

@@ -23,9 +23,11 @@ import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ConcurrentLruCache;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
+import javax.annotation.Nullable;
 import javax.net.ssl.KeyManagerFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -66,14 +68,18 @@ public class RequestServiceImpl implements RequestService {
     private final ConfigRepository configRepository;
     private final OutboundRequestMapper requestMapper;
     private final TemplateEngine templateEngine;
+    private final VariablesService variablesService;
     private final ObjectMapper jsonMapper;
     private final String certFile;
     private final String certPassword;
     private final ConcurrentLruCache<OutboundRequest, RequestHeadersTemplate> headersCache;
+    private final ConcurrentLruCache<OutboundRequest, StringTemplate> uriCache;
+    private final ConcurrentLruCache<OutboundRequest, StringTemplate> requestBodyCache;
 
     public RequestServiceImpl(ConfigRepository configRepository,
                               OutboundRequestMapper requestMapper,
                               TemplateEngine templateEngine,
+                              VariablesService variablesService,
                               @Value("${application.request-service.cache-size}") int cacheSize,
                               @Qualifier("jsonMapper") ObjectMapper jsonMapper,
                               @Value("${application.ssl.cert-file}") String certFile,
@@ -81,22 +87,44 @@ public class RequestServiceImpl implements RequestService {
         this.configRepository = configRepository;
         this.requestMapper = requestMapper;
         this.templateEngine = templateEngine;
+        this.variablesService = variablesService;
         this.jsonMapper = jsonMapper;
         this.certFile = certFile;
         this.certPassword = certPassword;
         headersCache = new ConcurrentLruCache<>(cacheSize, this::getRequestHeadersTemplate);
+        uriCache = new ConcurrentLruCache<>(cacheSize, this::getRequestUriTemplate);
+        requestBodyCache = new ConcurrentLruCache<>(cacheSize, this::getRequestBodyTemplate);
     }
 
     private RequestHeadersTemplate getRequestHeadersTemplate(OutboundRequest request) {
         return new RequestHeadersTemplate(request.getHeaders());
     }
 
+    private StringTemplate getRequestUriTemplate(OutboundRequest request) {
+        return new StringTemplate(
+                request.getPath().contains("://") ? request.getPath() : "http://" + request.getPath());
+    }
+
+    private StringTemplate getRequestBodyTemplate(OutboundRequest request) {
+        return new StringTemplate(request.getBody());
+    }
+
     @Override
-    public void schedule(String requestIds, MockVariables variables) {
+    public void schedule(String requestIds,
+                         @Nullable MockVariables variables) {
         scheduleRequests(requestIds, variables, 0);
     }
 
-    private void scheduleRequests(String requestIds, MockVariables variables, int level) {
+    @Override
+    public Optional<String> executeRequest(String requestId,
+                                           @Nullable MockVariables variables,
+                                           boolean allowTrigger) {
+        return executeRequestById(requestId, variables, 0, allowTrigger);
+    }
+
+    private void scheduleRequests(String requestIds,
+                                  @Nullable MockVariables variables,
+                                  int level) {
         if (Strings.isBlank(requestIds)) return;
         CompletableFuture.runAsync(
                 () -> executeRequests(requestIds, variables, level),
@@ -104,27 +132,24 @@ public class RequestServiceImpl implements RequestService {
         );
     }
 
-    private void executeRequests(String requestIds, MockVariables variables, int level) {
+    private void executeRequests(String requestIds,
+                                 @Nullable MockVariables variables,
+                                 int level) {
         for (String requestId : requestIds.split(",")) {
-            findAndExecuteRequest(requestId, variables, level, true);
+            executeRequestById(requestId, variables, level, true);
         }
     }
 
-    @Override
-    public Optional<String> executeRequest(String requestId, MockVariables variables, boolean allowTrigger) {
-        return findAndExecuteRequest(requestId, variables, 0, allowTrigger);
-    }
-
-    private Optional<String> findAndExecuteRequest(String requestId,
-                                                   MockVariables variables,
-                                                   int level,
-                                                   boolean allowTrigger) {
+    private Optional<String> executeRequestById(String requestId,
+                                                @Nullable MockVariables variables,
+                                                int level,
+                                                boolean allowTrigger) {
         return getEnabledRequest(requestId)
                 .map(r -> executeRequest(r, variables, level, allowTrigger));
     }
 
     private String executeRequest(OutboundRequest request,
-                                  MockVariables variables,
+                                  @Nullable MockVariables inVariables,
                                   int level,
                                   boolean allowTrigger) {
         if (level > MAX_LEVEL_FOR_TRIGGERED_REQUEST) {
@@ -133,21 +158,26 @@ public class RequestServiceImpl implements RequestService {
             return "";
         }
 
-        log.info("Executing request: {}", request.getId());
+        MockVariables requestVars = composeVariables(variablesService.getAll(), inVariables);
         MockVariables responseVars = new MockVariables();
 
-        try {
-            StringTemplate requestBody = new StringTemplate();
-            requestBody.add(request.getBody());
-            String uri = request.getPath().contains("://") ? request.getPath() : "http://" + request.getPath();
-            boolean secure = uri.startsWith("https://");
-            var headers = headersCache.get(request)
-                    .toMap(variables, templateEngine.getFunctions());
+        var requestBody = requestBodyCache.get(request)
+                .toString(requestVars, templateEngine.getFunctions());
+        String uri = uriCache.get(request)
+                .toString(requestVars, templateEngine.getFunctions());
+        var headersTemplate = headersCache.get(request);
+        var headers = headersTemplate
+                .toMap(requestVars, templateEngine.getFunctions());
 
+        boolean secure = uri.startsWith("https://");
+        var startMillis = System.currentTimeMillis();
+
+        try {
+            log.info("Executing request: {}", request.getId());
             String body = getWebClient(secure)
                     .method(request.getMethod().asHttpMethod())
                     .uri(uri)
-                    .bodyValue(requestBody.toString(variables, templateEngine.getFunctions()))
+                    .bodyValue(requestBody)
                     .headers(c -> c.putAll(headers))
                     .retrieve()
                     // wrap any response into exception to extract both StatusCode and Body
@@ -162,21 +192,66 @@ public class RequestServiceImpl implements RequestService {
 
             throw new RequestServiceRequestException(200, body); // just in case
         } catch (RequestServiceRequestException e) {
+            log.info("Request ({}) response:\n{}", request.getId(), e.toString());
             try {
                 responseVars.putAll(MapUtils.flattenMap(MapUtils.jsonToMap(e.getBody(), jsonMapper)));
             } catch (JsonProcessingException jpe) {
                 log.warn("Request; invalid JSON:\n{}", jpe.getMessage());
             }
-            log.info("Request ({}) response:\n{}", request.getId(), e.toString());
-            return e.toString();
+            return formatResponse(
+                    request.getMethod(),
+                    uri,
+                    headersTemplate,
+                    requestBody,
+                    e.toString(),
+                    startMillis);
         } catch (Exception e) {
             log.error("Request (" + request.getId() + ") error.", e);
+            return "Request [" + request.getId() + "] error.\n" + e;
         } finally {
+            if (request.isResponseToVars()) {
+                variablesService.putAll(responseVars);
+                variablesService.putAll(request.getGroup(), responseVars);
+            }
             if (allowTrigger && request.isTriggerRequest()) {
                 scheduleRequests(request.getTriggerRequestIds(), responseVars, level + 1);
             }
         }
-        return "";
+    }
+
+    private MockVariables composeVariables(@Nullable MockVariables global,
+                                           @Nullable MockVariables inVariables) {
+        if (inVariables!= null && global!= null &&
+                !inVariables.isEmpty() && !global.isEmpty()) {
+            return new MockVariables().putAll(global).putAll(inVariables);
+        }
+        if (inVariables!= null && !inVariables.isEmpty()) {
+            return inVariables;
+        }
+        if (global!= null && !global.isEmpty()) {
+            return global;
+        }
+        return null;
+    }
+
+    private String formatResponse(RequestMethod method,
+                                  String uri,
+                                  RequestHeadersTemplate headersTemplate,
+                                  String requestBody,
+                                  String response,
+                                  long startMillis) {
+        var elapsedMillis = System.currentTimeMillis() - startMillis;
+        StringBuilder builder = new StringBuilder();
+        builder.append(method.toString()).append(" ").append(uri).append('\n');
+        if (!headersTemplate.isEmpty()) {
+            builder.append(headersTemplate).append("\n\n");
+        }
+        if (!requestBody.isEmpty()) {
+            builder.append(requestBody).append("\n\n");
+        }
+        builder.append("--- response in ").append(elapsedMillis).append(" ms ---\n")
+                .append(response);
+        return builder.toString();
     }
 
     private WebClient getWebClient(boolean secure) {
@@ -222,20 +297,30 @@ public class RequestServiceImpl implements RequestService {
     public void putRequest(OutboundRequestDto existing, OutboundRequestDto request) throws IOException {
         var ex = requestMapper.fromDto(existing);
         headersCache.remove(ex);
+        uriCache.remove(ex);
+        requestBodyCache.remove(ex);
         configRepository.putRequest(ex, requestMapper.fromDto(request));
     }
 
     @Override
     public void putRequests(List<OutboundRequestDto> dto, boolean overwrite) throws IOException {
         var requests = requestMapper.fromDto(dto);
-        requests.forEach(headersCache::remove);
+        requests.forEach(r -> {
+            headersCache.remove(r);
+            uriCache.remove(r);
+            requestBodyCache.remove(r);
+        });
         configRepository.putRequests(requests, overwrite);
     }
 
     @Override
     public void deleteRequests(List<OutboundRequestDto> dto) throws IOException {
         var requests = requestMapper.fromDto(dto);
-        requests.forEach(headersCache::remove);
+        requests.forEach(r -> {
+            headersCache.remove(r);
+            uriCache.remove(r);
+            requestBodyCache.remove(r);
+        });
         configRepository.deleteRequests(requests);
     }
 }

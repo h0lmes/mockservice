@@ -10,6 +10,7 @@ import com.mockservice.request.RequestFacade;
 import com.mockservice.request.SoapRequestFacade;
 import com.mockservice.service.MockService;
 import com.mockservice.util.IOUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,8 +21,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 import java.io.IOException;
@@ -58,6 +57,8 @@ public class ConfigBasedSoapController implements RouteRegisteringController, Co
         this.mockService = mockService;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
         this.configRepository = configRepository;
+        this.configRepository.registerConfigObserver(this);
+        this.configRepository.registerRouteObserver(this);
         this.jsonMapper = jsonMapper;
 
         mockMethod = this.getClass().getMethod("mock");

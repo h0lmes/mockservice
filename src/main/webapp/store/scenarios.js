@@ -74,7 +74,7 @@ export const actions = {
     add({commit}) {
         const scenario = {
             group: '',
-            alias: 'New Alias',
+            alias: 'New Scenario',
             type: 'MAP',
             data: '',
             _new: true

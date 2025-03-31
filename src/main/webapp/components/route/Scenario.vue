@@ -16,7 +16,7 @@
             <select v-show="editing" class="form-control form-control-sm" v-model="editingScenario.type">
                 <option>MAP</option>
                 <option>QUEUE</option>
-                <option>CIRCULAR_QUEUE</option>
+                <option>RING</option>
             </select>
         </div>
 
@@ -37,7 +37,7 @@
                 <button type="button" class="btn btn-sm disabled">&#xA0;&#xA0;&#xA0;&#xA0;</button>
                 <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
                 <button type="button" class="btn btn-sm disabled">&#xA0;&#xA0;&#xA0;&#xA0;</button>
-                <button type="button" class="btn btn-sm btn-danger ml-4" @click="del">delete</button>
+                <button type="button" class="btn btn-sm btn-danger ml-2" @click="del">delete</button>
             </div>
         </div>
 
@@ -46,7 +46,7 @@
             <AutoSizeTextArea v-model="editingScenario.data"
                               placeholder="click SHOW ROUTES to add routes; or just type them in as METHOD;PATH;ALT"
                               :min-rows="1"
-                              :max-rows="256"
+                              :max-rows="22"
                               ref="data"
             ></AutoSizeTextArea>
         </div>
@@ -67,12 +67,12 @@
     </div>
 </template>
 <script>
-    import {mapActions} from 'vuex';
-    import RoutesToAdd from "./RoutesToAdd";
-    import ToggleSwitch from "../other/ToggleSwitch";
-    import AutoSizeTextArea from "../other/AutoSizeTextArea";
+import {mapActions} from 'vuex';
+import RoutesToAdd from "./RoutesToAdd";
+import ToggleSwitch from "../other/ToggleSwitch";
+import AutoSizeTextArea from "../other/AutoSizeTextArea";
 
-    export default {
+export default {
         name: "Scenario",
         components: {AutoSizeTextArea, RoutesToAdd, ToggleSwitch},
         data() {

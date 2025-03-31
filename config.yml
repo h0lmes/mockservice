@@ -158,7 +158,7 @@ routes:
   responseCode: 200
   response: |-
     {
-      "id":1,
+      "id":${id},
       "title":"Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
       "price":99.95,
       "description":"Your perfect backpack",
@@ -246,36 +246,47 @@ requests:
   path: localhost:8081/api/robot
   headers: ""
   body: ""
-  responseToVars: true
+  responseToVars: false
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
-- id: products.0
+- id: products.random
   group: store
   type: REST
   method: GET
-  path: localhost:8081/products/0
-  headers: ""
+  path: "localhost:8081/products/${enum:0:1:2}"
+  headers: "Test-Header: ${random_uuid}"
   body: ""
-  responseToVars: true
+  responseToVars: false
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
-- id: products.1
+- id: products.by.id
   group: store
   type: REST
   method: GET
-  path: localhost:8081/products/1
+  path: "localhost:8081/products/${id}"
   headers: ""
   body: ""
-  responseToVars: true
+  responseToVars: false
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+tests:
+- group: store
+  alias: store test
+  plan: |-
+    id=0
+    products.by.id
+    id=10
+    products.by.id
+    id=20
+    products.by.id
+    products.random
 scenarios:
 - group: robot
   alias: robot sequence
-  type: CIRCULAR_QUEUE
+  type: RING
   data: |-
     GET;/api/robot;R2D2
     GET;/api/robot;

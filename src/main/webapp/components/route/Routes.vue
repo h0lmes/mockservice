@@ -10,16 +10,21 @@
                 :route="entity"
                 @filter="$emit('filter', $event)"
             ></Route>
-            <Request
-                v-if="isRequest(entity)"
-                :request="entity"
-                @filter="$emit('filter', $event)"
-            ></Request>
             <Scenario
                 v-if="isScenario(entity)"
                 :scenario="entity"
                 @filter="$emit('filter', $event)"
             ></Scenario>
+            <Request
+                v-if="isRequest(entity)"
+                :request="entity"
+                @filter="$emit('filter', $event)"
+            ></Request>
+            <Test
+                v-if="isTest(entity)"
+                :test="entity"
+                @filter="$emit('filter', $event)"
+            ></Test>
         </div>
     </div>
 </template>
@@ -27,10 +32,11 @@
 import Route from "./Route";
 import Request from "./Request";
 import Scenario from "./Scenario";
+import Test from "./Test";
 
 export default {
         name: "Routes",
-        components: {Route, Request, Scenario},
+        components: {Route, Request, Scenario, Test},
         data() {
             return {}
         },
@@ -48,15 +54,24 @@ export default {
                     c = this.compare(a.group, b.group);
                     if (c !== 0) return c;
 
-                    // within a group requests go first
+                    // within a group tests go first
+                    if (this.isTest(a)) {
+                        if (!this.isTest(b)) return -1;
+                        // sorted by alias
+                        return this.compare(a.alias, b.alias);
+                    }
+
+                    // requests
                     if (this.isRequest(a)) {
+                        if (this.isTest(b)) return 1;
                         if (!this.isRequest(b)) return -1;
                         // sorted by id
                         return this.compare(a.id, b.id);
                     }
 
-                    // scenarios go next
+                    // scenarios
                     if (this.isScenario(a)) {
+                        if (this.isTest(b)) return 1;
                         if (this.isRequest(b)) return 1;
                         if (this.isRoute(b)) return -1;
                         // sorted by alias
@@ -97,7 +112,10 @@ export default {
                 return entity.hasOwnProperty('id') && !entity.hasOwnProperty('alt');
             },
             isScenario(entity) {
-                return entity.hasOwnProperty('alias');
+                return entity.hasOwnProperty('alias') && entity.hasOwnProperty('data');
+            },
+            isTest(entity) {
+                return entity.hasOwnProperty('plan');
             },
             entityKey(entity) {
                 if (this.isRoute(entity)) return entity.method + entity.path + entity.alt;

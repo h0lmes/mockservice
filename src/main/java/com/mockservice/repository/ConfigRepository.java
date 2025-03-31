@@ -1,10 +1,7 @@
 package com.mockservice.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mockservice.domain.OutboundRequest;
-import com.mockservice.domain.Route;
-import com.mockservice.domain.Scenario;
-import com.mockservice.domain.Settings;
+import com.mockservice.domain.*;
 import com.mockservice.model.RouteVariable;
 
 import javax.annotation.Nonnull;
@@ -14,6 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ConfigRepository {
+    void registerConfigObserver(ConfigObserver configObserver);
+    void registerRouteObserver(RouteObserver routeObserver);
+
     String getConfigData() throws JsonProcessingException;
     void writeConfigData(String data) throws IOException;
     void backup() throws IOException;
@@ -31,10 +31,15 @@ public interface ConfigRepository {
 
     List<OutboundRequest> findAllRequests();
     Optional<OutboundRequest> findRequest(String requestId);
-    List<RouteVariable> getRequestVariables(String requestId);
     void putRequest(@Nullable OutboundRequest existing, @Nonnull OutboundRequest request) throws IOException;
     void putRequests(List<OutboundRequest> requests, boolean overwrite) throws IOException;
     void deleteRequests(List<OutboundRequest> requests) throws IOException;
+
+    List<ApiTest> findAllTests();
+    Optional<ApiTest> findTest(String alias);
+    void putTest(@Nullable ApiTest existing, @Nonnull ApiTest apiTest) throws IOException;
+    void putTests(List<ApiTest> apiTests, boolean overwrite) throws IOException;
+    void deleteTests(List<ApiTest> apiTests) throws IOException;
 
     List<Scenario> findAllScenarios();
     Optional<Scenario> findScenario(Scenario scenario);

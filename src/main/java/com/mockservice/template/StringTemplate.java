@@ -1,5 +1,6 @@
 package com.mockservice.template;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,6 +89,7 @@ public class StringTemplate {
     }
 
     public String toString(MockVariables variables, MockFunctions functions) {
+        if (!containsTokens()) return this.toString();
         if (strings.isEmpty()) return "";
 
         StringBuilder builder = new StringBuilder();
@@ -101,11 +103,13 @@ public class StringTemplate {
         return builder.toString();
     }
 
-    private static String map(String token, MockVariables variables, MockFunctions functions) {
+    private static String map(String token,
+                              @Nullable MockVariables variables,
+                              @Nullable MockFunctions functions) {
         if (TokenParser.isToken(token)) {
             String[] args = TokenParser.parseToken(token);
 
-            if (variables.containsKey(args[0])) {
+            if (variables != null && variables.containsKey(args[0])) {
                 String variable = variables.get(args[0]);
                 while (TokenParser.isToken(variable)) {
                     variable = map(variable, variables, functions);
@@ -113,7 +117,7 @@ public class StringTemplate {
                 return variable;
             }
 
-            if (functions.containsKey(args[0])) {
+            if (functions != null && functions.containsKey(args[0])) {
                 return functions.get(args[0]).apply(args);
             }
 

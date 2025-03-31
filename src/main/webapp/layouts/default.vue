@@ -6,8 +6,14 @@
                 <li class="nav-group">MOCKS</li>
                 <li class="nav-item">
                     <NuxtLink to="/">
-                        <FontAwesomeIcon icon="route" class="nav-icon"/>
-                        <span class="nav-label">Routes</span>
+                        <FontAwesomeIcon icon="home" class="nav-icon"/>
+                        <span class="nav-label">Home</span>
+                    </NuxtLink>
+                </li>
+                <li class="nav-item">
+                    <NuxtLink to="/variables">
+                        <FontAwesomeIcon icon="subscript" class="nav-icon"/>
+                        <span class="nav-label">Variables</span>
                     </NuxtLink>
                 </li>
                 <li class="nav-item">
@@ -19,7 +25,7 @@
                 <li class="nav-group">TOOLS</li>
                 <li class="nav-item">
                     <NuxtLink to="/generate">
-                        <FontAwesomeIcon icon="hammer" class="nav-icon icon-width-fix"/>
+                        <FontAwesomeIcon icon="dice" class="nav-icon icon-width-fix"/>
                         <span class="nav-label">Generate</span>
                     </NuxtLink>
                 </li>

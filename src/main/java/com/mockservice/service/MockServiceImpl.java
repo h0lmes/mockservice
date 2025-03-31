@@ -13,6 +13,7 @@ import com.mockservice.template.TemplateEngine;
 import com.mockservice.validate.DataValidationException;
 import com.mockservice.validate.DataValidator;
 import com.mockservice.validate.RequestBodyValidationResult;
+import com.mockservice.ws.WebSocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +37,7 @@ public class MockServiceImpl implements MockService {
     private final RequestService requestService;
     private final List<QuantumTheory> quantumTheories;
     private final List<DataValidator> dataValidators;
+    private final WebSocketHandler webSocketHandler;
     private final ConcurrentLruCache<Route, MockResponse> responseCache;
 
     public MockServiceImpl(@Value("${application.mock-service.cache-size}") int cacheSize,
@@ -45,7 +47,8 @@ public class MockServiceImpl implements MockService {
                            ConfigRepository configRepository,
                            RequestService requestService,
                            List<QuantumTheory> quantumTheories,
-                           List<DataValidator> dataValidators) {
+                           List<DataValidator> dataValidators,
+                           WebSocketHandler webSocketHandler) {
         this.templateEngine = templateEngine;
         this.routeService = routeService;
         this.scenarioService = scenarioService;
@@ -53,6 +56,7 @@ public class MockServiceImpl implements MockService {
         this.requestService = requestService;
         this.quantumTheories = quantumTheories;
         this.dataValidators = dataValidators;
+        this.webSocketHandler = webSocketHandler;
         responseCache = new ConcurrentLruCache<>(cacheSize, this::mockResponseFromRoute);
     }
 
@@ -74,11 +78,12 @@ public class MockServiceImpl implements MockService {
     @Override
     public ResponseEntity<String> mock(RequestFacade request) {
         Route route = findRouteForRequest(request);
-
         var validationResult = validateRequestBody(route, request.getBody());
         route = validationResult.getRoute();
-
         MockResponse response = responseCache.get(route);
+
+        webSocketHandler.broadcastRouteRequest(
+                route.getMethod().toString(), route.getPath(), route.getAlt());
 
         MockVariables variables = request.getVariables(Optional.ofNullable(routeService.getRouteVariables(route)));
         response.setVariables(variables, templateEngine.getFunctions());

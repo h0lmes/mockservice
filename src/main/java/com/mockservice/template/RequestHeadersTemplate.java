@@ -20,6 +20,28 @@ public class RequestHeadersTemplate {
         if (!containsTemplates) generateResult();
     }
 
+    public boolean isEmpty() {
+        return templateMap == null || templateMap.isEmpty();
+    }
+
+    public Map<String, List<String>> toMap(MockVariables variables, MockFunctions functions) {
+        if (containsTemplates) updateResult(variables, functions);
+        return resultMap != null ? resultMap : Map.of();
+    }
+
+    @Override
+    public String toString() {
+        if (resultMap == null) return "";
+        StringBuilder builder = new StringBuilder();
+        for (String key : resultMap.keySet()) {
+            resultMap.get(key).forEach(value -> {
+                if (!builder.isEmpty()) builder.append('\n');
+                builder.append(key).append(": ").append(value);
+            });
+        }
+        return builder.toString();
+    }
+
     private void readHeaders(String headers) {
         if (headers.trim().isEmpty()) return;
 
@@ -42,7 +64,7 @@ public class RequestHeadersTemplate {
     }
 
     private void generateResult() {
-        if (templateMap == null) return;
+        if (isEmpty()) return;
         for (String key : templateMap.keySet()) {
             generateResultForKey(key);
         }
@@ -59,7 +81,7 @@ public class RequestHeadersTemplate {
     }
 
     private void updateResult(MockVariables variables, MockFunctions functions) {
-        if (templateMap == null) return;
+        if (isEmpty()) return;
         for (String key : templateMap.keySet()) {
             updateResultForKey(key, variables, functions);
         }
@@ -72,16 +94,10 @@ public class RequestHeadersTemplate {
         if (templateList == null) return;
 
         var resultList = resultMap.getOrDefault(key, new ArrayList<>());
-        int i = 0;
+        resultList.clear();
         for (StringTemplate t : templateList) {
-            resultList.set(i, t.toString(variables, functions));
-            i++;
+            resultList.add(t.toString(variables, functions));
         }
         resultMap.put(key, resultList);
-    }
-
-    public Map<String, List<String>> toMap(MockVariables variables, MockFunctions functions) {
-        if (containsTemplates) updateResult(variables, functions);
-        return resultMap != null ? resultMap : Map.of();
     }
 }

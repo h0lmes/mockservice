@@ -14,15 +14,17 @@
 
         <div class="component-toolbar mb-3">
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRoute">Add route</button>
-            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRequest">Add request</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addScenario">Add scenario</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRequest">Add request</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addTest">Add test</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger mr-3" @click="deleteVisibleRoutes">Delete visible routes</button>
         </div>
 
         <div class="component-toolbar mb-5">
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRoutes">Routes</ToggleSwitch>
-            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRequests">Requests</ToggleSwitch>
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showScenarios">Scenarios</ToggleSwitch>
+            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRequests">Requests</ToggleSwitch>
+            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showTests">Tests</ToggleSwitch>
             <ViewSelector class="toolbar-item toolbar-item-w-fixed-auto"></ViewSelector>
         </div>
 
@@ -37,7 +39,7 @@
                 - QUEUE: same as MAP but looks only at the topmost route, removes route from a queue if it matches. If topmost route does not match (or all routes were already matched and thus removed from a queue) - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).
             </div>
             <div class="mt-2">
-                - CIRCULAR_QUEUE: same as QUEUE but restarts the queue when it depletes.
+                - RING: same as QUEUE but restarts the queue when it depletes.
             </div>
         </div>
         <div class="color-secondary mt-4">
@@ -86,13 +88,15 @@ export default {
                 showRoutes: true,
                 showRequests: true,
                 showScenarios: true,
+                showTests: true,
                 jsSearch: false,
             }
         },
         async fetch() {
             return this.fetchRoutes()
                 .then(this.fetchRequests())
-                .then(this.fetchScenarios());
+                .then(this.fetchScenarios())
+                .then(this.fetchTests());
         },
         fetchDelay: 0,
         computed: {
@@ -105,8 +109,11 @@ export default {
             scenarios() {
                 return this.showScenarios ? this.$store.state.scenarios.scenarios : [];
             },
+            tests() {
+                return this.showTests ? this.$store.state.tests.tests : [];
+            },
             entities() {
-                return [...this.routes, ...this.requests, ...this.scenarios];
+                return [...this.routes, ...this.requests, ...this.scenarios, ...this.tests];
             },
             filteredEntities() {
                 if (!this.query) return this.entities;
@@ -130,6 +137,9 @@ export default {
 
                 fetchScenarios: 'scenarios/fetch',
                 addScenarioAction: 'scenarios/add',
+
+                fetchTests: 'tests/fetch',
+                addTestAction: 'tests/add',
             }),
             addRoute() {
                 this.showRoutes = true
@@ -142,6 +152,10 @@ export default {
             addScenario() {
                 this.showScenarios = true
                 this.addScenarioAction()
+            },
+            addTest() {
+                this.showTests = true
+                this.addTestAction()
             },
             deleteVisibleRoutes() {
                 if (confirm('Are you sure you want to delete all visible routes?\n'
@@ -176,6 +190,9 @@ export default {
                                 || e.method.includes(query)
                                 || e.path.includes(query)
                                 || e.alt.includes(query);
+                        } else if (e.alias && e.plan) {
+                            return e.group.includes(query)
+                                || e.alias.includes(query);
                         } else {
                             return e.group.includes(query)
                                 || e.alias.includes(query)

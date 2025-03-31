@@ -16,7 +16,7 @@ import IconSystem from '@/assets/icons/system.svg?inline';
 import IconLight from '@/assets/icons/light.svg?inline';
 import IconSepia from '@/assets/icons/sepia.svg?inline';
 import IconDark from '@/assets/icons/dark.svg?inline';
-import IconDark2 from '@/assets/icons/cloud.svg?inline';
+import IconCode from '@/assets/icons/cloud.svg?inline';
 
 export default {
     name: "ColorModePicker",
@@ -25,11 +25,11 @@ export default {
         IconLight,
         IconSepia,
         IconDark,
-        IconDark2
+        IconCode
     },
     data() {
         return {
-            colors: ['system', 'light', 'sepia', 'dark', 'dark2']
+            colors: ['system', 'light', 'sepia', 'dark', 'code']
         }
     },
     methods: {

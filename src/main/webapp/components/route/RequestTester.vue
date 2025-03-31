@@ -37,10 +37,8 @@ export default {
             this.$nextTick();
 
             try {
-                const startTime = new Date();
                 const body = await this.executeRequest(this.request.id);
-                const elapsed = new Date() - startTime;
-                this.println('----- response in ' + elapsed + ' ms -----');
+                this.clearOutput();
                 this.println(body);
             } catch (err) {
                 this.println('----------');
@@ -49,6 +47,9 @@ export default {
         },
         println(text) {
             this.testResult = this.testResult + text + '\n';
+        },
+        clearOutput() {
+            this.testResult = '';
         },
     }
 }

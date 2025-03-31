@@ -9,17 +9,18 @@ export default {
         icons: {
             solid: [
                 'faBars',
-                'faRoute',
+                'faHome',
                 'faPlay',
                 'faCode',
                 'faFileAlt',
                 'faCog',
                 'faCogs',
                 'faQuestionCircle',
-                'faHammer',
+                'faDice',
                 'faReceipt',
                 'faFileImport',
-                'faHashtag'
+                'faHashtag',
+                'faSubscript'
             ]
         }
     },

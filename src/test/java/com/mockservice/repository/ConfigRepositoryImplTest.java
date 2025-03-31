@@ -3,7 +3,10 @@ package com.mockservice.repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.mockservice.domain.*;
+import com.mockservice.domain.OutboundRequest;
+import com.mockservice.domain.Route;
+import com.mockservice.domain.Scenario;
+import com.mockservice.domain.Settings;
 import com.mockservice.exception.RouteAlreadyExistsException;
 import com.mockservice.exception.ScenarioAlreadyExistsException;
 import com.mockservice.model.RouteVariable;
@@ -26,7 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ConfigRepositoryImplTest {
+class ConfigRepositoryImplTest {
 
     private static final String STR1 = "AAA";
     private static final String STR2 = "BBB";
@@ -50,8 +53,8 @@ public class ConfigRepositoryImplTest {
                 getYamlMapper(),
                 templateEngine);
 
-        configRepository.setConfigObservers(List.of(configObserver));
-        configRepository.setRouteObservers(List.of(routeObserver));
+        configRepository.registerConfigObserver(configObserver);
+        configRepository.registerRouteObserver(routeObserver);
 
         return configRepository;
     }
@@ -86,13 +89,13 @@ public class ConfigRepositoryImplTest {
     //----------------------------------------------------------------------
 
     @Test
-    public void getConfigData_DefaultConfig_ReturnsNotEmptyConfigData() throws JsonProcessingException {
+    void getConfigData_DefaultConfig_ReturnsNotEmptyConfigData() throws JsonProcessingException {
         ConfigRepository configRepository = repository();
         assertNotEquals("", configRepository.getConfigData());
     }
 
     @Test
-    public void writeConfigData_DefaultConfig_ListenersCalled() throws IOException {
+    void writeConfigData_DefaultConfig_ListenersCalled() throws IOException {
         ConfigRepository configRepository = repository();
 
         String configData = configRepository.getConfigData();
@@ -103,7 +106,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void writeConfigData_NoObservers_DoesNotThrow() throws IOException {
+    void writeConfigData_NoObservers_DoesNotThrow() throws IOException {
         ConfigRepository configRepository = repositoryWithNoObservers();
         String configData = configRepository.getConfigData();
 
@@ -111,7 +114,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void backupAndRestore_NonDefaultConfig_ConfigRestored() throws IOException {
+    void backupAndRestore_NonDefaultConfig_ConfigRestored() throws IOException {
         ConfigRepository configRepository = repository();
         Route route = new Route().setPath(PATH);
         configRepository.putRoute(null, route);
@@ -126,7 +129,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void restore_ListenersCalled() throws IOException {
+    void restore_ListenersCalled() throws IOException {
         ConfigRepository configRepository = repository();
 
         configRepository.backup();
@@ -137,7 +140,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void writeConfigData_WritePreviouslyReadData_ConfigRestored() throws IOException {
+    void writeConfigData_WritePreviouslyReadData_ConfigRestored() throws IOException {
         ConfigRepository configRepository = repository();
         Route route = new Route().setPath(PATH);
         configRepository.putRoute(null, route);
@@ -150,7 +153,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void writeConfigData_EmptyString_Throws() {
+    void writeConfigData_EmptyString_Throws() {
         ConfigRepository configRepository = repository();
 
         assertThrows(IOException.class, () -> configRepository.writeConfigData(""));
@@ -167,13 +170,13 @@ public class ConfigRepositoryImplTest {
     //----------------------------------------------------------------------
 
     @Test
-    public void getSettings_DefaultConfig_ReturnsNonNullSettings() {
+    void getSettings_DefaultConfig_ReturnsNonNullSettings() {
         ConfigRepository configRepository = repository();
         assertNotNull(configRepository.getSettings());
     }
 
     @Test
-    public void setSettings_NonDefaultSettings_ReturnsEqualSettings() throws IOException {
+    void setSettings_NonDefaultSettings_ReturnsEqualSettings() throws IOException {
         ConfigRepository configRepository = repository();
 
         Settings settings = new Settings();
@@ -195,7 +198,7 @@ public class ConfigRepositoryImplTest {
     //----------------------------------------------------------------------
 
     @Test
-    public void getRouteVariables_RouteWithVariables_ReturnsVariables() throws IOException {
+    void getRouteVariables_RouteWithVariables_ReturnsVariables() throws IOException {
         Route route = new Route().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
         ConfigRepository configRepository = repository();
         configRepository.putRoute(null, route);
@@ -218,7 +221,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void putRoute_NonExisting_RouteAdded() throws IOException {
+    void putRoute_NonExisting_RouteAdded() throws IOException {
         ConfigRepository configRepository = repository();
         Route route = new Route().setPath(PATH);
         configRepository.putRoute(null, route);
@@ -229,7 +232,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void putRoute_NonExisting_ListenerCalled() throws IOException {
+    void putRoute_NonExisting_ListenerCalled() throws IOException {
         ConfigRepository configRepository = repository();
         Route route = new Route().setPath(PATH);
         configRepository.putRoute(null, route);
@@ -239,7 +242,7 @@ public class ConfigRepositoryImplTest {
 
     @DisplayName("Update existing route [1] with contents of [2], updates")
     @Test
-    public void putRoute_UpdateExisting_RouteUpdated() throws IOException {
+    void putRoute_UpdateExisting_RouteUpdated() throws IOException {
         ConfigRepository configRepository = repository();
         Route route1 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR1);
         Route route2 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR2);
@@ -254,7 +257,7 @@ public class ConfigRepositoryImplTest {
 
     @DisplayName("Update existing route [1] with contents of [2], calls listener")
     @Test
-    public void putRoute_UpdateExisting_ListenersCalled() throws IOException {
+    void putRoute_UpdateExisting_ListenersCalled() throws IOException {
         ConfigRepository configRepository = repository();
 
         Route route1 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR1);
@@ -270,7 +273,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void putRoute_WithNoObservers_DoesNotThrow() {
+    void putRoute_WithNoObservers_DoesNotThrow() {
         ConfigRepository configRepository = repositoryWithNoObservers();
 
         Route route1 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR1);
@@ -282,7 +285,7 @@ public class ConfigRepositoryImplTest {
 
     @DisplayName("Try to create new route [2] that equals already existing route [1] -> throws (do not allow duplicates)")
     @Test
-    public void putRoute_NewExistsByEquals_Throws() throws IOException {
+    void putRoute_NewExistsByEquals_Throws() throws IOException {
         ConfigRepository configRepository = repository();
         Route route1 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR1);
         Route route2 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR2);
@@ -292,7 +295,7 @@ public class ConfigRepositoryImplTest {
 
     @DisplayName("Update existing route [1] with contents of [3] which equals other existing route [2] -> throws (do not allow duplicates)")
     @Test
-    public void putRoute_ReferenceExistsAndNewExistsAndReferenceNotEqualsNew_Throws() throws IOException {
+    void putRoute_ReferenceExistsAndNewExistsAndReferenceNotEqualsNew_Throws() throws IOException {
         ConfigRepository configRepository = repository();
         Route route1 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR1);
         Route route2 = new Route().setMethod(RequestMethod.POST).setPath(PATH).setResponse(STR1);
@@ -303,7 +306,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void putRoutes_NonExisting_RoutesAdded() throws IOException {
+    void putRoutes_NonExisting_RoutesAdded() throws IOException {
         ConfigRepository configRepository = repository();
 
         Route route1 = new Route().setPath(PATH).setMethod(RequestMethod.GET);
@@ -315,7 +318,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void putRoutes_NonExisting_ListenerCalled() throws IOException {
+    void putRoutes_NonExisting_ListenerCalled() throws IOException {
         ConfigRepository configRepository = repository();
 
         Route route1 = new Route().setPath(PATH).setMethod(RequestMethod.GET);
@@ -326,7 +329,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void putRoutes_OneOfTwoExists_OverwriteTrue_OneRouteAddedOtherRouteModified() throws IOException {
+    void putRoutes_OneOfTwoExists_OverwriteTrue_OneRouteAddedOtherRouteModified() throws IOException {
         ConfigRepository configRepository = repository();
 
         Route route1 = new Route().setPath(PATH).setMethod(RequestMethod.GET);
@@ -347,7 +350,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void putRoutes_RouteExists_OverwriteFalse_RouteNotModified_DoesNotThrow() throws IOException {
+    void putRoutes_RouteExists_OverwriteFalse_RouteNotModified_DoesNotThrow() throws IOException {
         ConfigRepository configRepository = repository();
         Route route2 = new Route().setPath(PATH).setMethod(RequestMethod.POST).setResponse(STR1);
         configRepository.putRoutes(List.of(route2), true);
@@ -362,7 +365,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void deleteRoutes_AddThenDeleteSameRoute_NoRoutesFound() throws IOException {
+    void deleteRoutes_AddThenDeleteSameRoute_NoRoutesFound() throws IOException {
         ConfigRepository configRepository = repository();
 
         Route route1 = new Route().setPath(PATH);
@@ -377,7 +380,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void deleteRoutes_AddThenDeleteSameRoute_ListenerCalled() throws IOException {
+    void deleteRoutes_AddThenDeleteSameRoute_ListenerCalled() throws IOException {
         ConfigRepository configRepository = repository();
 
         Route route1 = new Route().setPath(PATH);
@@ -392,7 +395,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void deleteRoutes_AddThenDeleteDifferentRoute_OneRouteFound() throws IOException {
+    void deleteRoutes_AddThenDeleteDifferentRoute_OneRouteFound() throws IOException {
         ConfigRepository configRepository = repository();
 
         Route route1 = new Route().setPath(PATH).setMethod(RequestMethod.GET);
@@ -417,7 +420,7 @@ public class ConfigRepositoryImplTest {
     //----------------------------------------------------------------------
 
     @Test
-    public void putScenario_NotExisting_Success() throws IOException {
+    void putScenario_NotExisting_Success() throws IOException {
         ConfigRepository configRepository = repository();
 
         Scenario scenario = new Scenario().setAlias(STR1);
@@ -427,7 +430,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void putScenario_UpdateExisting_UpdatesScenario() throws IOException {
+    void putScenario_UpdateExisting_UpdatesScenario() throws IOException {
         ConfigRepository configRepository = repository();
         Scenario scenario1 = new Scenario().setAlias(STR1).setData(STR1);
         Scenario scenario2 = new Scenario().setAlias(STR1).setData(STR2);
@@ -440,7 +443,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void putScenario_NoOriginalAndTryCreatingCopy_Throws() throws IOException {
+    void putScenario_NoOriginalAndTryCreatingCopy_Throws() throws IOException {
         ConfigRepository configRepository = repository();
         Scenario scenario1 = new Scenario().setAlias(STR1).setData(STR1);
         Scenario scenario2 = new Scenario().setAlias(STR1).setData(STR2);
@@ -449,7 +452,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void putScenario_OriginalProvidedAndTryCreatingCopy_Throws() throws IOException {
+    void putScenario_OriginalProvidedAndTryCreatingCopy_Throws() throws IOException {
         ConfigRepository configRepository = repository();
         Scenario scenario1 = new Scenario().setAlias(STR1);
         Scenario scenario2 = new Scenario().setAlias(STR2);
@@ -460,7 +463,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void deleteScenario_AddThenDeleteSameScenario_NoScenariosFound() throws IOException {
+    void deleteScenario_AddThenDeleteSameScenario_NoScenariosFound() throws IOException {
         ConfigRepository configRepository = repository();
 
         Scenario scenario1 = new Scenario().setAlias(STR1);
@@ -471,7 +474,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void deleteScenario_WithNoObservers_DoesNotThrow() {
+    void deleteScenario_WithNoObservers_DoesNotThrow() {
         ConfigRepository configRepository = repositoryWithNoObservers();
 
         Scenario scenario1 = new Scenario().setAlias(STR1);
@@ -480,7 +483,7 @@ public class ConfigRepositoryImplTest {
     }
 
     @Test
-    public void deleteScenario_AddThenDeleteDifferentScenario_OneScenarioFound() throws IOException {
+    void deleteScenario_AddThenDeleteDifferentScenario_OneScenarioFound() throws IOException {
         ConfigRepository configRepository = repository();
 
         Scenario scenario1 = new Scenario().setAlias(STR1);
@@ -490,5 +493,107 @@ public class ConfigRepositoryImplTest {
         configRepository.deleteScenario(scenario2);
 
         assertEquals(1, configRepository.findAllScenarios().size());
+    }
+
+    //----------------------------------------------------------------------
+    //
+    //
+    //
+    //   Requests
+    //
+    //
+    //
+    //----------------------------------------------------------------------
+
+    @Test
+    void putRequest_NonExisting_RequestAdded() throws IOException {
+        ConfigRepository configRepository = repository();
+        var v = new OutboundRequest().setId(STR1);
+        configRepository.putRequest(null, v);
+
+        var list = configRepository.findAllRequests();
+        assertEquals(1, list.size());
+        assertEquals(v, list.get(0));
+    }
+
+    @DisplayName("Update existing Request [1] with contents of [2], success")
+    @Test
+    void putRequest_UpdateExisting_Updated() throws IOException {
+        ConfigRepository configRepository = repository();
+        var v1 = new OutboundRequest().setId(STR1);
+        var v2 = new OutboundRequest().setId(STR2);
+        configRepository.putRequest(null, v1);
+        configRepository.putRequest(v1, v2);
+
+        var optional = configRepository.findRequest(STR2);
+        assertTrue(optional.isPresent());
+        assertEquals(STR2, optional.get().getId());
+    }
+
+    @DisplayName("Try to create new Request [2] that equals already existing Request [1]")
+    @Test
+    void putRequest_ExistsByEquals_NewIdGenerated() throws IOException {
+        ConfigRepository configRepository = repository();
+        var v1 = new OutboundRequest().setId(STR1).setPath(STR1);
+        var v2 = new OutboundRequest().setId(STR1).setPath(STR2);
+        configRepository.putRequest(null, v1);
+        configRepository.putRequest(null, v2);
+
+
+        assertEquals(2, configRepository.findAllRequests().size());
+        assertNotEquals(STR1, v2.getId());
+        var optional = configRepository.findRequest(v2.getId());
+        assertTrue(optional.isPresent());
+    }
+
+    @Test
+    void putRequest_ExistsByEqualsAndPathIsSame_NewIdGeneratedWithIndex() throws IOException {
+        ConfigRepository configRepository = repository();
+        var v1 = new OutboundRequest().setPath(STR1);
+        var v2 = new OutboundRequest().setPath(STR1);
+        configRepository.putRequest(null, v1);
+        configRepository.putRequest(null, v2);
+
+        assertEquals(2, configRepository.findAllRequests().size());
+        assertNotEquals(STR1, v2.getId());
+        var optional = configRepository.findRequest(v2.getId());
+        assertTrue(optional.isPresent());
+        assertTrue(optional.get().getId().endsWith("1"));
+    }
+
+    @Test
+    void putRoutes_NonExisting_Added() throws IOException {
+        ConfigRepository configRepository = repository();
+
+        var v1 = new OutboundRequest().setId(STR1);
+        var v2 = new OutboundRequest().setId(STR2);
+        configRepository.putRequests(List.of(v1, v2), true);
+
+        var list = configRepository.findAllRequests();
+        assertEquals(2, list.size());
+    }
+
+    @Test
+    void createRequest_ThenDeleteSameRequest_NoRequestsFound() throws IOException {
+        ConfigRepository configRepository = repository();
+        var v1 = new OutboundRequest().setId(STR1);
+        var v2 = new OutboundRequest().setId(STR1);
+        configRepository.putRequest(null, v1);
+
+        assertEquals(1, configRepository.findAllRequests().size());
+        configRepository.deleteRequests(List.of(v2));
+        assertEquals(0, configRepository.findAllRequests().size());
+    }
+
+    @Test
+    void createRequest_ThenDeleteDifferentRequest_OneRequestFound() throws IOException {
+        ConfigRepository configRepository = repository();
+        var v1 = new OutboundRequest().setId(STR1);
+        var v2 = new OutboundRequest().setId(STR2);
+        configRepository.putRequest(null, v1);
+
+        assertEquals(1, configRepository.findAllRequests().size());
+        configRepository.deleteRequests(List.of(v2));
+        assertEquals(1, configRepository.findAllRequests().size());
     }
 }

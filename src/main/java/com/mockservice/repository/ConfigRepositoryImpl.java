@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.domain.*;
 import com.mockservice.exception.RouteAlreadyExistsException;
 import com.mockservice.exception.ScenarioAlreadyExistsException;
+import com.mockservice.exception.TestAlreadyExistsException;
 import com.mockservice.model.RouteVariable;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.template.TokenParser;
@@ -12,7 +13,6 @@ import com.mockservice.util.Cache;
 import com.mockservice.util.ConcurrentHashMapCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -29,20 +29,20 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     private static final Logger log = LoggerFactory.getLogger(ConfigRepositoryImpl.class);
 
     private static final String REQUEST_COULD_NOT_BE_NULL = "Request could not be null.";
-
-    private Config config;
+    private static final String TEST_COULD_NOT_BE_NULL = "Test could not be null.";
     private final String fileConfigPath;
     private final String fileConfigBackupPath;
     private final ObjectMapper yamlMapper;
-    private List<ConfigObserver> configObservers;
-    private List<RouteObserver> routeObservers;
     private final Cache<Route, List<RouteVariable>> routeVariablesCache;
-    private final Cache<OutboundRequest, List<RouteVariable>> requestVariablesCache;
+    private final List<ConfigObserver> configObservers = new ArrayList<>();
+    private final List<RouteObserver> routeObservers = new ArrayList<>();
+    private Config config;
 
-    public ConfigRepositoryImpl(@Value("${application.config-filename}") String fileConfigPath,
-                                @Value("${application.config-backup-filename}") String fileConfigBackupPath,
-                                @Qualifier("yamlMapper") ObjectMapper yamlMapper,
-                                TemplateEngine templateEngine
+    public ConfigRepositoryImpl(
+            @Value("${application.config-filename}") String fileConfigPath,
+            @Value("${application.config-backup-filename}") String fileConfigBackupPath,
+            @Qualifier("yamlMapper") ObjectMapper yamlMapper,
+            TemplateEngine templateEngine
     ) {
         this.fileConfigPath = fileConfigPath;
         this.fileConfigBackupPath = fileConfigBackupPath;
@@ -66,24 +66,6 @@ public class ConfigRepositoryImpl implements ConfigRepository {
                         .toList()
         );
 
-        requestVariablesCache = new ConcurrentHashMapCache<>(r ->
-                TokenParser
-                        .tokenize(r.getBody())
-                        .stream()
-                        .filter(TokenParser::isToken)
-                        .map(TokenParser::parseToken)
-                        .filter(args -> !templateEngine.isFunction(args[0]))
-                        .map(args -> {
-                            RouteVariable variable = new RouteVariable().setName(args[0]);
-                            if (args.length > 1) {
-                                variable.setDefaultValue(args[1]);
-                            }
-                            return variable;
-                        })
-                        .distinct()
-                        .toList()
-        );
-
         try {
             readConfigFromFile();
         } catch (IOException e) {
@@ -92,14 +74,14 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
     }
 
-    @Autowired(required = false)
-    public void setConfigObservers(List<ConfigObserver> configObservers) {
-        this.configObservers = configObservers;
+    @Override
+    public void registerConfigObserver(ConfigObserver configObserver) {
+        this.configObservers.add(configObserver);
     }
 
-    @Autowired(required = false)
-    public void setRouteObservers(List<RouteObserver> routeObservers) {
-        this.routeObservers = routeObservers;
+    @Override
+    public void registerRouteObserver(RouteObserver routeObserver) {
+        this.routeObservers.add(routeObserver);
     }
 
     private Map<Class<?>, Class<?>> getMixIns() {
@@ -119,19 +101,8 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
         sortRoutes();
         sortRequests();
+        sortTests();
         sortScenarios();
-    }
-
-    private void sortRoutes() {
-        config.getRoutes().sort(Route::compareTo);
-    }
-
-    private void sortRequests() {
-        config.getRequests().sort(OutboundRequest::compareTo);
-    }
-
-    private void sortScenarios() {
-        config.getScenarios().sort(Scenario::compareTo);
     }
 
     private void configFromString(String yaml) throws IOException {
@@ -142,10 +113,27 @@ public class ConfigRepositoryImpl implements ConfigRepository {
             }
             sortRoutes();
             sortRequests();
+            sortTests();
             sortScenarios();
         } catch (IOException e) {
             throw new IOException("Could not deserialize config. " + e.getMessage(), e);
         }
+    }
+
+    private void sortRoutes() {
+        config.getRoutes().sort(Route::compareTo);
+    }
+
+    private void sortRequests() {
+        config.getRequests().sort(OutboundRequest::compareTo);
+    }
+
+    private void sortTests() {
+        config.getTests().sort(ApiTest::compareTo);
+    }
+
+    private void sortScenarios() {
+        config.getScenarios().sort(Scenario::compareTo);
     }
 
     private void tryPersistConfig() throws IOException {
@@ -358,11 +346,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
                 .findFirst();
     }
 
-    @Override
-    public List<RouteVariable> getRequestVariables(String requestId) {
-        return findRequest(requestId).map(requestVariablesCache::get).orElse(List.of());
-    }
-
+    @SuppressWarnings("java:S125")
     @Override
     public void putRequest(@Nullable OutboundRequest existing, @Nonnull OutboundRequest request) throws IOException {
         Objects.requireNonNull(request, REQUEST_COULD_NOT_BE_NULL);
@@ -371,12 +355,12 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         if (existing == null) {
             ensureUniqueRequestId(null, request);
             config.getRequests().add(request);
-            notifyRequestCreated(request);
+            //notifyRequestCreated(request);
         } else {
             ensureUniqueRequestId(existing.getId(), request);
-            notifyRequestDeleted(existing);
+            //notifyRequestDeleted(existing);
             existing.assignFrom(request);
-            notifyRequestCreated(existing);
+            //notifyRequestCreated(existing);
         }
 
         sortRequests();
@@ -415,29 +399,128 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
     }
 
+    @SuppressWarnings("java:S125")
     private boolean putRequestInternal(@Nonnull OutboundRequest request, boolean overwrite) {
         Objects.requireNonNull(request, REQUEST_COULD_NOT_BE_NULL);
         OutboundRequest existing = findRequest(request.getId()).orElse(null);
         if (existing == null) {
             config.getRequests().add(request);
-            notifyRequestCreated(request);
+            //notifyRequestCreated(request);
             return true;
         } else if (overwrite) {
-            notifyRequestDeleted(existing);
+            //notifyRequestDeleted(existing);
             existing.assignFrom(request);
-            notifyRequestCreated(existing);
+            //notifyRequestCreated(existing);
             return true;
         }
         return false;
     }
 
+    @SuppressWarnings("java:S125")
     @Override
     public void deleteRequests(List<OutboundRequest> requests) throws IOException {
         boolean modified = false;
 
         for (OutboundRequest request : requests) {
             if (config.getRequests().remove(request)) {
-                notifyRequestDeleted(request);
+                //notifyRequestDeleted(request);
+                modified = true;
+            }
+        }
+
+        if (modified) {
+            tryPersistConfig();
+        }
+    }
+
+    //----------------------------------------------------------------------
+    //
+    //   Tests
+    //
+    //----------------------------------------------------------------------
+
+    @Override
+    public List<ApiTest> findAllTests() {
+        return config.getTests();
+    }
+
+    @Override
+    public Optional<ApiTest> findTest(@Nullable String alias) {
+        if (alias == null) {
+            return Optional.empty();
+        }
+        return findAllTests().stream()
+                .filter(e -> alias.trim().equals(e.getAlias()))
+                .findFirst();
+    }
+
+    @SuppressWarnings("java:S125")
+    @Override
+    public void putTest(@Nullable ApiTest existing, @Nonnull ApiTest apiTest) throws IOException {
+        Objects.requireNonNull(apiTest, TEST_COULD_NOT_BE_NULL);
+        existing = findTest(existing == null ? null : existing.getAlias()).orElse(null);
+        if (existing == null) {
+            ensureUniqueTestAlias(null, apiTest);
+            config.getTests().add(apiTest);
+            //notifyTestCreated(test);
+        } else {
+            ensureUniqueTestAlias(existing.getAlias(), apiTest);
+            //notifyTestDeleted(existing);
+            existing.assignFrom(apiTest);
+            //notifyTestCreated(existing);
+        }
+        sortTests();
+        tryPersistConfig();
+    }
+
+    private void ensureUniqueTestAlias(@Nullable String previousAlias, @Nonnull ApiTest apiTest) {
+        Objects.requireNonNull(apiTest, TEST_COULD_NOT_BE_NULL);
+        if (previousAlias != null && previousAlias.equals(apiTest.getAlias())) return;
+
+        if (apiTest.getAlias() != null
+                && !apiTest.getAlias().isBlank()
+                && findTest(apiTest.getAlias()).isEmpty()) return;
+
+        throw new TestAlreadyExistsException(apiTest);
+    }
+
+    @Override
+    public void putTests(List<ApiTest> apiTests, boolean overwrite) throws IOException {
+        boolean modified = false;
+        for (ApiTest apiTest : apiTests) {
+            modified |= putTestInternal(apiTest, overwrite);
+        }
+        if (modified) {
+            sortTests();
+            tryPersistConfig();
+        }
+    }
+
+    @SuppressWarnings("java:S125")
+    private boolean putTestInternal(@Nonnull ApiTest apiTest, boolean overwrite) {
+        Objects.requireNonNull(apiTest, TEST_COULD_NOT_BE_NULL);
+        ApiTest existing = findTest(apiTest.getAlias()).orElse(null);
+        if (existing == null) {
+            config.getTests().add(apiTest);
+            //notifyTestCreated(test);
+            return true;
+        } else if (overwrite) {
+            //notifyTestDeleted(existing);
+            existing.assignFrom(apiTest);
+            //notifyTestCreated(existing);
+            return true;
+        }
+        return false;
+    }
+
+    @SuppressWarnings("java:S125")
+    @Override
+    public void deleteTests(List<ApiTest> apiTests) throws IOException {
+        boolean modified = false;
+
+        for (ApiTest apiTest : apiTests) {
+            if (config.getTests().remove(apiTest)) {
+                //notifyTestDeleted(test);
                 modified = true;
             }
         }
@@ -516,37 +599,19 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     private void notifyBeforeConfigChanged() {
         routeVariablesCache.invalidate();
-        requestVariablesCache.invalidate();
-        if (configObservers != null) {
-            configObservers.forEach(ConfigObserver::onBeforeConfigChanged);
-        }
+        configObservers.forEach(ConfigObserver::onBeforeConfigChanged);
     }
 
     private void notifyAfterConfigChanged() {
-        if (configObservers != null) {
-            configObservers.forEach(ConfigObserver::onAfterConfigChanged);
-        }
+        configObservers.forEach(ConfigObserver::onAfterConfigChanged);
     }
 
     private void notifyRouteCreated(Route route) {
-        if (routeObservers != null) {
-            routeObservers.forEach(o -> o.onRouteCreated(route));
-        }
+        routeObservers.forEach(o -> o.onRouteCreated(route));
     }
 
     private void notifyRouteDeleted(Route route) {
         routeVariablesCache.evict(route);
-        if (routeObservers != null) {
-            routeObservers.forEach(o -> o.onRouteDeleted(route));
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private void notifyRequestCreated(OutboundRequest request) {
-        // does nothing so far
-    }
-
-    private void notifyRequestDeleted(OutboundRequest request) {
-        requestVariablesCache.evict(request);
+        routeObservers.forEach(o -> o.onRouteDeleted(route));
     }
 }
