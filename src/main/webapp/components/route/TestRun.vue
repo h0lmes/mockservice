@@ -12,7 +12,7 @@
             <button type="button" class="btn btn-sm btn-default" @click="$emit('close')">close</button>
         </div>
         <div class="tester-result">
-            <pre class="form-control form-control-sm monospace">{{ testResult }}</pre>
+            <pre class="form-control form-control-sm monospace" v-html="resultProcessed"></pre>
         </div>
     </div>
 </template>
@@ -24,7 +24,7 @@ export default {
     name: "TestRun",
     data() {
         return {
-            testResult: '',
+            result: '',
             copied: false,
             ws: null,
         }
@@ -48,7 +48,13 @@ export default {
     computed: {
         wsUrl() {
             return 'ws://' + location.hostname + ':8081/ws-api'
-        }
+        },
+        resultProcessed() {
+            return this.result
+                .replaceAll('SUCCESS', '<span class="green">SUCCESS</span>')
+                .replaceAll('WARNING', '<span class="orange-yellow">WARNING</span>')
+                .replaceAll('FAILED', '<span class="red">FAILED</span>');
+        },
     },
     methods: {
         ...mapActions({
@@ -93,15 +99,15 @@ export default {
             }
         },
         println(text) {
-            this.testResult = this.testResult + text + '\n';
+            this.result = this.result + text + '\n';
             this.copied = false;
         },
         clearOutput() {
-            this.testResult = '';
+            this.result = '';
             this.copied = false;
         },
         copyToClipboard() {
-            copy(this.testResult).then(
+            copy(this.result).then(
                 () => this.copied = true
             ).catch(
                 console.error

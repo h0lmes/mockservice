@@ -1,4 +1,4 @@
-package com.mockservice.service;
+package com.mockservice.components;
 
 public interface QuantumTheory {
     boolean applicable(String data);

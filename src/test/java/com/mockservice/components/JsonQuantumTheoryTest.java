@@ -1,8 +1,6 @@
-package com.mockservice.service;
+package com.mockservice.components;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mockservice.producer.JsonProducerImpl;
-import com.mockservice.producer.ValueProducerImpl;
 import com.mockservice.util.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,6 +1,7 @@
 package com.mockservice.web.webapp;
 
 import com.mockservice.model.OutboundRequestDto;
+import com.mockservice.model.OutboundRequestResult;
 import com.mockservice.service.RequestService;
 import com.mockservice.template.MockVariables;
 import io.swagger.annotations.ApiOperation;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("web-api/requests")
@@ -61,8 +64,9 @@ public class WebApiRequestsController {
     @ApiOperation(value = "Execute request by ID", tags = "requests")
     @PostMapping("/execute")
     public String execute(@RequestBody OutboundRequestExecuteRequest request) throws IOException {
-        return requestService.executeRequest(request.getRequestId(), MockVariables.empty(), true)
-                .orElse("Request not found or disabled");
+        Optional<OutboundRequestResult> result = requestService.executeRequest(
+                request.getRequestId(), MockVariables.empty(), true);
+        return result.map(Objects::toString).orElse("Request not found or disabled");
     }
 
     @ExceptionHandler

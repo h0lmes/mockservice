@@ -1,7 +1,7 @@
 package com.mockservice.config;
 
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
-import com.mockservice.producer.*;
+import com.mockservice.components.*;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.template.TemplateEngineImpl;
 import com.mockservice.util.RandomUtils;

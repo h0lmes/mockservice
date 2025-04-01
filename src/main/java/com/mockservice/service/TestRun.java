@@ -1,20 +1,29 @@
 package com.mockservice.service;
 
 import com.mockservice.domain.ApiTest;
+import com.mockservice.template.MockVariables;
+import com.mockservice.util.IOUtils;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 @SuppressWarnings("java:S1149")
 public class TestRun {
     private ApiTest apiTest;
     private boolean allowTrigger;
+    private List<String> lines;
     /**
      * StringBuffer is used due to a multithreaded access
      */
     private final StringBuffer buffer = new StringBuffer();
+    private Instant startedAt;
     private int currentLine;
+    private int step;
     private boolean running = false;
-    private boolean requireStop = false;
+    private boolean requestStop = false;
+    private MockVariables mockVariables;
+    private TestRunErrorLevel errorLevel;
     private final ReentrantLock lock = new ReentrantLock();
 
     public boolean init(ApiTest apiTest, boolean allowTrigger) {
@@ -24,10 +33,15 @@ public class TestRun {
 
             this.apiTest = apiTest;
             this.allowTrigger = allowTrigger;
+            this.lines = IOUtils.toList(apiTest.getPlan());
             buffer.setLength(0);
             buffer.trimToSize();
             currentLine = 0;
-            requireStop = false;
+            step = 1;
+            requestStop = false;
+            startedAt = Instant.now();
+            mockVariables = null;
+            errorLevel = TestRunErrorLevel.SUCCESS;
             running = true;
             return true;
         } finally {
@@ -43,7 +57,9 @@ public class TestRun {
             buffer.setLength(0);
             buffer.trimToSize();
             currentLine = 0;
-            requireStop = false;
+            step = 1;
+            mockVariables = null;
+            requestStop = false;
             return true;
         } finally {
             lock.unlock();
@@ -56,6 +72,29 @@ public class TestRun {
 
     public boolean isAllowTrigger() {
         return allowTrigger;
+    }
+
+    public boolean hasLine() {
+        return currentLine < lines.size();
+    }
+
+    public String getLine() {
+        return lines.get(currentLine);
+    }
+
+    public void nextLine() {
+        try {
+            lock.lock();
+            this.currentLine++;
+            this.step++;
+            while (hasLine() && lines.get(currentLine).trim().isEmpty()) this.currentLine++;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public int getStep() {
+        return step;
     }
 
     public TestRun log(String value) {
@@ -81,24 +120,6 @@ public class TestRun {
         return buffer.isEmpty();
     }
 
-    public int getCurrentLine() {
-        try {
-            lock.lock();
-            return currentLine;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    public void setCurrentLine(int currentLine) {
-        try {
-            lock.lock();
-            this.currentLine = currentLine;
-        } finally {
-            lock.unlock();
-        }
-    }
-
     public boolean isRunning() {
         try {
             lock.lock();
@@ -117,10 +138,10 @@ public class TestRun {
         }
     }
 
-    public boolean isRequireStop() {
+    public boolean isRequestStop() {
         try {
             lock.lock();
-            return requireStop;
+            return requestStop;
         } finally {
             lock.unlock();
         }
@@ -129,9 +150,37 @@ public class TestRun {
     public void requestStop() {
         try {
             lock.lock();
-            this.requireStop = true;
+            this.requestStop = true;
         } finally {
             lock.unlock();
         }
+    }
+
+    public Instant getStartedAt() {
+        return startedAt;
+    }
+
+    public long getDurationMillis() {
+        return Instant.now().toEpochMilli() - startedAt.toEpochMilli();
+    }
+
+    public MockVariables getMockVariables() {
+        return mockVariables;
+    }
+
+    public void setMockVariables(MockVariables mockVariables) {
+        this.mockVariables = mockVariables;
+    }
+
+    public TestRunErrorLevel getErrorLevel() {
+        return errorLevel;
+    }
+
+    public void setErrorLevel(TestRunErrorLevel errorLevel) {
+        this.errorLevel = this.errorLevel.compareTo(errorLevel) < 0 ? errorLevel : this.errorLevel;
+    }
+
+    public boolean isFailed() {
+        return TestRunErrorLevel.FAILED.equals(getErrorLevel());
     }
 }

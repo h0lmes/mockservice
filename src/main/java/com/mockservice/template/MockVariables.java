@@ -6,14 +6,46 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 public class MockVariables {
-    private final Map<String, String> map = new HashMap<>();
+    private final Map<String, String> map;
 
     public static MockVariables empty() {
         return new MockVariables();
     }
 
+    /**
+     * Does not create a Map. Uses the provided one.
+     */
+    public static MockVariables of(Map<String, String> map) {
+        return new MockVariables(map);
+    }
+
+    public static String get(@Nullable MockVariables variables, String name) {
+        if (variables == null || variables.isEmpty()) return "null";
+        String v = variables.get(name);
+        return v == null ? "null" : v;
+    }
+
+    public static MockVariables sum(@Nullable MockVariables first,
+                                    @Nullable MockVariables second) {
+        if (second!= null && first!= null &&
+                !second.isEmpty() && !first.isEmpty()) {
+            return new MockVariables().putAll(first).putAll(second);
+        }
+        if (second!= null && !second.isEmpty()) {
+            return second;
+        }
+        if (first!= null && !first.isEmpty()) {
+            return first;
+        }
+        return null;
+    }
+
     public MockVariables() {
-        // default
+        map = new HashMap<>();
+    }
+
+    public MockVariables(Map<String, String> map) {
+        this.map = map;
     }
 
     public MockVariables clear() {

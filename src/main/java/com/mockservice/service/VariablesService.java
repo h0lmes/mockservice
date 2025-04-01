@@ -7,9 +7,9 @@ import java.util.Map;
 
 public interface VariablesService {
     void put(String k, String v);
-    void putAll(Map<String,String> vars);
-    void putAll(MockVariables vars);
-    void putAll(String namespace, MockVariables vars);
+    void putAll(@Nullable Map<String, String> vars);
+    void putAll(@Nullable MockVariables vars);
+    void putAll(String namespace, @Nullable MockVariables vars);
     MockVariables getAll();
     void clearAll();
     String toString();

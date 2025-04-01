@@ -1,7 +1,5 @@
-package com.mockservice.service;
+package com.mockservice.components;
 
-import com.mockservice.producer.JsonProducer;
-import com.mockservice.producer.ValueProducer;
 import com.mockservice.util.JsonUtils;
 import com.mockservice.util.RandomUtils;
 import org.springframework.stereotype.Service;
@@ -30,7 +28,9 @@ public class JsonQuantumTheory implements QuantumTheory {
     private final JsonProducer jsonProducer;
     private final RandomUtils randomUtils;
 
-    public JsonQuantumTheory(ValueProducer valueProducer, JsonProducer jsonProducer, RandomUtils randomUtils) {
+    public JsonQuantumTheory(ValueProducer valueProducer,
+                             JsonProducer jsonProducer,
+                             RandomUtils randomUtils) {
         this.valueProducer = valueProducer;
         this.jsonProducer = jsonProducer;
         this.randomUtils = randomUtils;

@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TestService {
-    TestRunStatus executeTest(String alias, boolean allowTrigger);
-    TestRunStatus stopTest(String alias);
-    String getTestResult(String alias);
-    TestRunStatus clearTestResult(String alias);
+    TestRunStatus execute(String alias, boolean allowTrigger, boolean async);
+    TestRunStatus stop(String alias);
+    String getTestLog(String alias);
+    TestRunStatus clearTestLog(String alias);
     Optional<ApiTest> getEnabledTest(String alias);
     List<ApiTestDto> getTests();
     void putTest(ApiTestDto existing, ApiTestDto test) throws IOException;

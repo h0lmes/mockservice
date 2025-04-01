@@ -1,6 +1,5 @@
-package com.mockservice.service.route;
+package com.mockservice.model;
 
-import com.mockservice.model.RouteDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.bind.annotation.RequestMethod;

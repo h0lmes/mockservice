@@ -1,4 +1,4 @@
-package com.mockservice.producer;
+package com.mockservice.components;
 
 public interface ValueProducer {
     String randomString();

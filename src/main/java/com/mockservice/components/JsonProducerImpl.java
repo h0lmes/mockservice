@@ -1,4 +1,4 @@
-package com.mockservice.producer;
+package com.mockservice.components;
 
 import com.mockservice.util.RandomUtils;
 
@@ -50,22 +50,15 @@ public class JsonProducerImpl implements JsonProducer {
     }
 
     private String generateValue(JsonValueType elementType, int level) {
-        switch (elementType) {
-            case STRING:
-                return "\"" + valueProducer.randomString() + "\"";
-            case NUMBER:
-                return valueProducer.randomNumberString();
-            case INTEGER:
-                return valueProducer.randomIntegerString();
-            case BOOLEAN:
-                return valueProducer.randomBooleanString();
-            case ARRAY:
-                return generateArray(level);
-            case OBJECT:
-                return generateObjectValue(level);
-            default:
-                return "null";
-        }
+        return switch (elementType) {
+            case STRING -> "\"" + valueProducer.randomString() + "\"";
+            case NUMBER -> valueProducer.randomNumberString();
+            case INTEGER -> valueProducer.randomIntegerString();
+            case BOOLEAN -> valueProducer.randomBooleanString();
+            case ARRAY -> generateArray(level);
+            case OBJECT -> generateObjectValue(level);
+            default -> "null";
+        };
     }
 
     private String generateArray(int level) {

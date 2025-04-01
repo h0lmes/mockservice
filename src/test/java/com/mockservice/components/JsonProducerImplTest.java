@@ -1,4 +1,4 @@
-package com.mockservice.producer;
+package com.mockservice.components;
 
 import com.mockservice.util.RandomUtils;
 import org.junit.jupiter.api.Test;

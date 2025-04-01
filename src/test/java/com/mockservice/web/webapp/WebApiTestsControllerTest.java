@@ -129,7 +129,7 @@ class WebApiTestsControllerTest {
 
     @Test
     void execute() throws Exception {
-        when(service.executeTest(any(), anyBoolean())).thenReturn(TestRunStatus.OK);
+        when(service.execute(any(), anyBoolean(), anyBoolean())).thenReturn(TestRunStatus.OK);
 
         mvc.perform(post(WEB_API_URI + "/execute")
                         .contentType(MediaType.TEXT_PLAIN)
@@ -140,7 +140,7 @@ class WebApiTestsControllerTest {
 
     @Test
     void execute202() throws Exception {
-        when(service.executeTest(any(), anyBoolean())).thenReturn(TestRunStatus.ALREADY_IN_PROGRESS);
+        when(service.execute(any(), anyBoolean(), anyBoolean())).thenReturn(TestRunStatus.ALREADY_IN_PROGRESS);
 
         mvc.perform(post(WEB_API_URI + "/execute")
                         .contentType(MediaType.TEXT_PLAIN)
@@ -151,7 +151,7 @@ class WebApiTestsControllerTest {
 
     @Test
     void execute404() throws Exception {
-        when(service.executeTest(any(), anyBoolean())).thenReturn(TestRunStatus.NOT_FOUND);
+        when(service.execute(any(), anyBoolean(), anyBoolean())).thenReturn(TestRunStatus.NOT_FOUND);
 
         mvc.perform(post(WEB_API_URI + "/execute")
                         .contentType(MediaType.TEXT_PLAIN)
@@ -162,7 +162,7 @@ class WebApiTestsControllerTest {
 
     @Test
     void stop() throws Exception {
-        when(service.stopTest(any())).thenReturn(TestRunStatus.OK);
+        when(service.stop(any())).thenReturn(TestRunStatus.OK);
 
         mvc.perform(post(WEB_API_URI + "/stop")
                         .contentType(MediaType.TEXT_PLAIN)
@@ -173,7 +173,7 @@ class WebApiTestsControllerTest {
 
     @Test
     void stop404() throws Exception {
-        when(service.stopTest(any())).thenReturn(TestRunStatus.NOT_FOUND);
+        when(service.stop(any())).thenReturn(TestRunStatus.NOT_FOUND);
 
         mvc.perform(post(WEB_API_URI + "/stop")
                         .contentType(MediaType.TEXT_PLAIN)
@@ -184,7 +184,7 @@ class WebApiTestsControllerTest {
 
     @Test
     void result() throws Exception {
-        when(service.getTestResult(any())).thenReturn("result");
+        when(service.getTestLog(any())).thenReturn("result");
 
         mvc.perform(get(WEB_API_URI + "/" + ALIAS + "/result")
                         .contentType(MediaType.TEXT_PLAIN)
@@ -196,7 +196,7 @@ class WebApiTestsControllerTest {
 
     @Test
     void clear() throws Exception {
-        when(service.clearTestResult(any())).thenReturn(TestRunStatus.OK);
+        when(service.clearTestLog(any())).thenReturn(TestRunStatus.OK);
 
         mvc.perform(post(WEB_API_URI + "/" + ALIAS + "/clear")
                         .contentType(MediaType.TEXT_PLAIN)
@@ -207,7 +207,7 @@ class WebApiTestsControllerTest {
 
     @Test
     void clear202() throws Exception {
-        when(service.clearTestResult(any())).thenReturn(TestRunStatus.ALREADY_IN_PROGRESS);
+        when(service.clearTestLog(any())).thenReturn(TestRunStatus.ALREADY_IN_PROGRESS);
 
         mvc.perform(post(WEB_API_URI + "/" + ALIAS + "/clear")
                         .contentType(MediaType.TEXT_PLAIN)
@@ -218,7 +218,7 @@ class WebApiTestsControllerTest {
 
     @Test
     void clear404() throws Exception {
-        when(service.clearTestResult(any())).thenReturn(TestRunStatus.NOT_FOUND);
+        when(service.clearTestLog(any())).thenReturn(TestRunStatus.NOT_FOUND);
 
         mvc.perform(post(WEB_API_URI + "/" + ALIAS + "/clear")
                         .contentType(MediaType.TEXT_PLAIN)

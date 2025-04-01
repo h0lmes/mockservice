@@ -1,4 +1,4 @@
-package com.mockservice.producer;
+package com.mockservice.components;
 
 import com.mockservice.util.RandomUtils;
 
@@ -26,24 +26,16 @@ public class JsonFromSchemaProducerImpl implements JsonFromSchemaProducer {
 
     private String jsonFromSchema(Map<String, Object> map, int level) {
         String type = getJsonSchemaType(map);
-        switch (type) {
-            case "array":
-                return makeArray(map, level);
-            case "object":
-                return makeObject(map, level);
-            case "number":
-                return valueProducer.randomNumberString();
-            case "integer":
-                return valueProducer.randomIntegerString();
-            case "string":
-                return makeString(map);
-            case "boolean":
-                return valueProducer.randomBooleanString();
-            case "enum":
-                return makeEnum(map);
-            default:
-                return "null";
-        }
+        return switch (type) {
+            case "array" -> makeArray(map, level);
+            case "object" -> makeObject(map, level);
+            case "number" -> valueProducer.randomNumberString();
+            case "integer" -> valueProducer.randomIntegerString();
+            case "string" -> makeString(map);
+            case "boolean" -> valueProducer.randomBooleanString();
+            case "enum" -> makeEnum(map);
+            default -> "null";
+        };
     }
 
     private String getJsonSchemaType(Map<String, Object> map) {
@@ -113,26 +105,17 @@ public class JsonFromSchemaProducerImpl implements JsonFromSchemaProducer {
 
     private String makeStringFromFormat(Map<String, Object> map) {
         String format = String.valueOf(map.get("format"));
-        switch (format) {
-            case "date-time":
-                return "\"2018-11-13T20:20:39+00:00\"";
-            case "time":
-                return "\"20:20:39+00:00\"";
-            case "date":
-                return "\"2018-11-13\"";
-            case "email":
-                return "\"example@gmail.com\"";
-            case "hostname":
-                return "\"some-domain.com\"";
-            case "ipv4":
-                return "\"127.0.0.1\"";
-            case "ipv6":
-                return "\"::1\"";
-            case "uri":
-                return "\"http://some-domain.com/\"";
-            default:
-                return "";
-        }
+        return switch (format) {
+            case "date-time" -> "\"2018-11-13T20:20:39+00:00\"";
+            case "time" -> "\"20:20:39+00:00\"";
+            case "date" -> "\"2018-11-13\"";
+            case "email" -> "\"example@gmail.com\"";
+            case "hostname" -> "\"some-domain.com\"";
+            case "ipv4" -> "\"127.0.0.1\"";
+            case "ipv6" -> "\"::1\"";
+            case "uri" -> "\"http://some-domain.com/\"";
+            default -> "";
+        };
     }
 
     private String makeEnum(Map<String, Object> map) {

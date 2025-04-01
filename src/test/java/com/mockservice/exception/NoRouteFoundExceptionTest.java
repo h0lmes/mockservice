@@ -1,7 +1,6 @@
-package com.mockservice.service;
+package com.mockservice.exception;
 
 import com.mockservice.domain.Route;
-import com.mockservice.exception.NoRouteFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.bind.annotation.RequestMethod;
 

@@ -8,9 +8,9 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.mockservice.components.JsonFromSchemaProducer;
 import com.mockservice.domain.Route;
 import com.mockservice.domain.RouteType;
-import com.mockservice.producer.JsonFromSchemaProducer;
 import com.mockservice.util.JsonUtils;
 import com.mockservice.util.MapUtils;
 import io.swagger.parser.OpenAPIParser;
@@ -156,6 +156,7 @@ public class OpenApiServiceImpl implements OpenApiService {
         return code;
     }
 
+    @SuppressWarnings("java:S1643")
     private String tagsFromOperation(Operation operation) {
         String group = "";
         List<String> tags = operation.getTags();

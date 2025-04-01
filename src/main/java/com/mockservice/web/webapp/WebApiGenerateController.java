@@ -2,8 +2,8 @@ package com.mockservice.web.webapp;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mockservice.producer.JsonFromSchemaProducer;
-import com.mockservice.producer.JsonProducer;
+import com.mockservice.components.JsonFromSchemaProducer;
+import com.mockservice.components.JsonProducer;
 import com.mockservice.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

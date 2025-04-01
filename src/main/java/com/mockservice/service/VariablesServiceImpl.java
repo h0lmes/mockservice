@@ -22,18 +22,20 @@ public class VariablesServiceImpl implements VariablesService {
     }
 
     @Override
-    public void putAll(Map<String,String> vars) {
+    public void putAll(@Nullable Map<String, String> vars) {
         variables.putAll(vars);
     }
 
     @Override
-    public void putAll(MockVariables vars) {
+    public void putAll(@Nullable MockVariables vars) {
         variables.putAll(vars);
     }
 
     @Override
-    public void putAll(String namespace, MockVariables vars) {
-        vars.forEach((k, v) -> variables.put(namespace + "." + k, v));
+    public void putAll(String namespace, @Nullable MockVariables vars) {
+        if (vars != null) {
+            vars.forEach((k, v) -> variables.put(namespace + "." + k, v));
+        }
     }
 
     @Override

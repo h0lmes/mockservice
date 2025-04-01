@@ -1,7 +1,7 @@
 package com.mockservice.web.webapp;
 
-import com.mockservice.producer.JsonFromSchemaProducer;
-import com.mockservice.producer.JsonProducer;
+import com.mockservice.components.JsonFromSchemaProducer;
+import com.mockservice.components.JsonProducer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

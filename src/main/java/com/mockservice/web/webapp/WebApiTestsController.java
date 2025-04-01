@@ -63,7 +63,7 @@ public class WebApiTestsController {
     @ApiOperation(value = "Execute test by alias", tags = "tests")
     @PostMapping("/execute")
     public ResponseEntity<String> execute(@RequestBody String alias) {
-        var status = testService.executeTest(alias, false);
+        var status = testService.execute(alias, false, true);
 
         if (status == TestRunStatus.NOT_FOUND) return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -78,7 +78,7 @@ public class WebApiTestsController {
     @ApiOperation(value = "Stop test by alias", tags = "tests")
     @PostMapping("/stop")
     public ResponseEntity<String> stop(@RequestBody String alias) {
-        var status = testService.stopTest(alias);
+        var status = testService.stop(alias);
 
         if (status == TestRunStatus.NOT_FOUND) return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -90,13 +90,13 @@ public class WebApiTestsController {
     @ApiOperation(value = "Get test result by alias", tags = "tests")
     @GetMapping("/{alias}/result")
     public ResponseEntity<String> result(@PathVariable String alias) {
-        return ResponseEntity.ok(testService.getTestResult(alias));
+        return ResponseEntity.ok(testService.getTestLog(alias));
     }
 
     @ApiOperation(value = "Clear test result by alias", tags = "tests")
     @PostMapping("/{alias}/clear")
     public ResponseEntity<String> clear(@PathVariable String alias) {
-        var status = testService.clearTestResult(alias);
+        var status = testService.clearTestLog(alias);
 
         if (status == TestRunStatus.NOT_FOUND) return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)

@@ -3,12 +3,10 @@ package com.mockservice.repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.mockservice.domain.OutboundRequest;
-import com.mockservice.domain.Route;
-import com.mockservice.domain.Scenario;
-import com.mockservice.domain.Settings;
+import com.mockservice.domain.*;
 import com.mockservice.exception.RouteAlreadyExistsException;
 import com.mockservice.exception.ScenarioAlreadyExistsException;
+import com.mockservice.exception.TestAlreadyExistsException;
 import com.mockservice.model.RouteVariable;
 import com.mockservice.template.TemplateEngine;
 import org.junit.jupiter.api.DisplayName;
@@ -562,12 +560,13 @@ class ConfigRepositoryImplTest {
     }
 
     @Test
-    void putRoutes_NonExisting_Added() throws IOException {
+    void putRequests_NonExistingOneIsDuplicate_TwoAddedOneOverwritten() throws IOException {
         ConfigRepository configRepository = repository();
 
         var v1 = new OutboundRequest().setId(STR1);
         var v2 = new OutboundRequest().setId(STR2);
-        configRepository.putRequests(List.of(v1, v2), true);
+        var v3 = new OutboundRequest().setId(STR1);
+        configRepository.putRequests(List.of(v1, v2, v3), true);
 
         var list = configRepository.findAllRequests();
         assertEquals(2, list.size());
@@ -595,5 +594,88 @@ class ConfigRepositoryImplTest {
         assertEquals(1, configRepository.findAllRequests().size());
         configRepository.deleteRequests(List.of(v2));
         assertEquals(1, configRepository.findAllRequests().size());
+    }
+
+    //----------------------------------------------------------------------
+    //
+    //
+    //
+    //   Tests
+    //
+    //
+    //
+    //----------------------------------------------------------------------
+
+    @Test
+    void putTest_NonExisting_TestAdded() throws IOException {
+        ConfigRepository configRepository = repository();
+        var v = new ApiTest().setAlias(STR1);
+        configRepository.putTest(null, v);
+
+        var list = configRepository.findAllTests();
+        assertEquals(1, list.size());
+        assertEquals(v, list.get(0));
+    }
+
+    @DisplayName("Update existing Test [1] with contents of [2], success")
+    @Test
+    void putTest_UpdateExisting_Updated() throws IOException {
+        ConfigRepository configRepository = repository();
+        var v1 = new ApiTest().setAlias(STR1);
+        var v2 = new ApiTest().setAlias(STR2);
+        configRepository.putTest(null, v1);
+        configRepository.putTest(v1, v2);
+
+        var optional = configRepository.findTest(STR2);
+        assertTrue(optional.isPresent());
+        assertEquals(STR2, optional.get().getAlias());
+    }
+
+    @DisplayName("Try to create new Test [2] that equals already existing Test [1]")
+    @Test
+    void putTest_ExistsByEquals_ExceptionThrows() throws IOException {
+        ConfigRepository configRepository = repository();
+        var v1 = new ApiTest().setAlias(STR1).setGroup(STR1);
+        var v2 = new ApiTest().setAlias(STR1).setGroup(STR2);
+        configRepository.putTest(null, v1);
+
+        assertThrows(TestAlreadyExistsException.class, () -> configRepository.putTest(null, v2));
+    }
+
+    @Test
+    void putTests_NonExistingOneIsDuplicate_TwoAddedOneOverwritten() throws IOException {
+        ConfigRepository configRepository = repository();
+
+        var v1 = new ApiTest().setAlias(STR1);
+        var v2 = new ApiTest().setAlias(STR2);
+        var v3 = new ApiTest().setAlias(STR1);
+        configRepository.putTests(List.of(v1, v2, v3), true);
+
+        var list = configRepository.findAllTests();
+        assertEquals(2, list.size());
+    }
+
+    @Test
+    void createTest_ThenDeleteSameTest_NoTestsFound() throws IOException {
+        ConfigRepository configRepository = repository();
+        var v1 = new ApiTest().setAlias(STR1);
+        var v2 = new ApiTest().setAlias(STR1);
+        configRepository.putTest(null, v1);
+
+        assertEquals(1, configRepository.findAllTests().size());
+        configRepository.deleteTests(List.of(v2));
+        assertEquals(0, configRepository.findAllTests().size());
+    }
+
+    @Test
+    void createTest_ThenDeleteDifferentTest_OneTestFound() throws IOException {
+        ConfigRepository configRepository = repository();
+        var v1 = new ApiTest().setAlias(STR1);
+        var v2 = new ApiTest().setAlias(STR2);
+        configRepository.putTest(null, v1);
+
+        assertEquals(1, configRepository.findAllTests().size());
+        configRepository.deleteTests(List.of(v2));
+        assertEquals(1, configRepository.findAllTests().size());
     }
 }

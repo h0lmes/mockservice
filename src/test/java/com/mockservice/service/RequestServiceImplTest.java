@@ -1,8 +1,8 @@
 package com.mockservice.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mockservice.config.WebClientFactory;
 import com.mockservice.domain.OutboundRequest;
-import com.mockservice.mapper.OutboundRequestMapper;
 import com.mockservice.mapper.OutboundRequestMapperImpl;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.template.TemplateEngine;
@@ -26,29 +26,27 @@ class RequestServiceImplTest {
     @Mock
     private ConfigRepository configRepository;
     @Mock
-    private OutboundRequestMapper requestMapper;
-    @Mock
     private TemplateEngine templateEngine;
     @Mock
     private VariablesService variablesService;
 
     private RequestService getService() {
         return new RequestServiceImpl(
+                new WebClientFactory("", ""),
                 configRepository, new OutboundRequestMapperImpl(), templateEngine,
-                variablesService, 256, new ObjectMapper(),
-                "", "");
+                variablesService, 256, new ObjectMapper());
     }
 
     @Test
     void getRequests() {
-        var req = new OutboundRequest()
+        var entity = new OutboundRequest()
                 .setId("test_id")
                 .setPath("localhost:65530")
                 .setMethod(RequestMethod.GET)
                 .setGroup("test_group")
                 .setBody("body")
                 .setHeaders("Test: test");
-        when(configRepository.findAllRequests()).thenReturn(List.of(req));
+        when(configRepository.findAllRequests()).thenReturn(List.of(entity));
         var service = getService();
         var list = service.getRequests();
 
@@ -63,14 +61,14 @@ class RequestServiceImplTest {
 
     @Test
     void executeRequest() {
-        var req = new OutboundRequest()
-                .setId("test_id").setPath("localhost:65530");
-        when(configRepository.findRequest(anyString())).thenReturn(Optional.of(req));
+        var entity = new OutboundRequest().setId("test_id").setPath("127.0.0.1:65530");
+        when(configRepository.findRequest(anyString())).thenReturn(Optional.of(entity));
         var service = getService();
         var result = service.executeRequest("id", null, false);
 
         assertTrue(result.isPresent());
-        assertTrue(result.get().contains("test_id"));
-        assertTrue(result.get().contains("error"));
+        assertTrue(result.get().isFailed());
+        System.out.println(result.get().getResponseBody());
+        assertTrue(result.get().getResponseBody().contains("127.0.0.1:65530"));
     }
 }

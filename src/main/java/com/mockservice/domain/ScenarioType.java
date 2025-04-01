@@ -4,7 +4,7 @@ public enum ScenarioType {
 
     MAP(new MapScenarioStrategy()),
     QUEUE(new QueueScenarioStrategy()),
-    RING(new CircularQueueScenarioStrategy());
+    RING(new RingScenarioStrategy());
 
     private final ScenarioStrategy strategy;
 

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class CircularQueueScenarioStrategy implements ScenarioStrategy {
+public class RingScenarioStrategy implements ScenarioStrategy {
 
     public Optional<String> apply(List<Route> routes, Predicate<Route> condition) {
         int i = 0;

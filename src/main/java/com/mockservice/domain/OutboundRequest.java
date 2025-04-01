@@ -27,7 +27,17 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
     }
 
     public OutboundRequest setId(String id) {
-        this.id = id;
+        this.id = id
+                .replace('/', '.')
+                .replace(':', '.')
+                .replace('?', '.')
+                .replace('&', '.')
+                .replace('%', '.')
+                .replace('=', '.')
+                .replace(',', '.')
+                .replace('$', '.')
+                .replace('{', '.')
+                .replace('}', '.');
         return this;
     }
 

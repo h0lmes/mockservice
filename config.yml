@@ -3,17 +3,17 @@ settings:
   quantum: false
   alt400OnFailedRequestValidation: true
 routes:
-- group: default
+- group: auth
   type: REST
-  method: GET
-  path: /jwt
+  method: POST
+  path: /api/v1/auth
   alt: ""
   responseCode: 200
   response: |-
     {
-      "sub": "${sub:DEFAULT}",
-      "name": "${name:DEFAULT}",
-      "iat": ${iat:0}
+      "sub": "${sub:Default Name}",
+      "name": "${name:Default Name}",
+      "iat": ${iat:4102444800000}
     }
   requestBodySchema: ""
   disabled: false
@@ -276,13 +276,18 @@ tests:
 - group: store
   alias: store test
   plan: |-
-    id=0
+    id = 0
+    products.by.id -> 400
+    message === No product found
+    message == No product
+
+    id = 10
+    products.by.id -> 200
+
+    id = 20
     products.by.id
-    id=10
-    products.by.id
-    id=20
-    products.by.id
-    products.random
+
+    products.random -> 208
 scenarios:
 - group: robot
   alias: robot sequence

@@ -1,4 +1,4 @@
-package com.mockservice.producer;
+package com.mockservice.components;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockservice.util.IOUtils;
@@ -14,7 +14,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @ExtendWith(MockitoExtension.class)
-public class JsonFromSchemaProducerImplTest {
+class JsonFromSchemaProducerImplTest {
 
     @Mock
     private RandomUtils randomUtils;
@@ -24,7 +24,7 @@ public class JsonFromSchemaProducerImplTest {
     }
 
     @Test
-    public void generate() throws IOException {
+    void generate() throws IOException {
         String jsonSchema = IOUtils.asString("json_schema.json");
         ObjectMapper mapper = new ObjectMapper();
         var jsonSchemaMap = (Map<String, Object>) mapper.readValue(jsonSchema, Map.class);

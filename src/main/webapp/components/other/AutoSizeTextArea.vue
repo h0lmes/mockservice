@@ -4,6 +4,7 @@
               :value="value"
               :placeholder="placeholder"
               :rows="rows"
+              :spellcheck="false"
               @input="e => input(e)"
               @keydown="e => $emit('keydown', e)"
     ></textarea>
