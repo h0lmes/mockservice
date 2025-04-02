@@ -29,24 +29,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Setting up SSL certificates.
- *
- * 1.
- * Verify that .cert and .key files are valid:
- *
- *      openssl x509 -noout -modulus -in cert.crt | openssl md5
- *      #> (stdin)= 7f1a9c4d13aead7fd4a0f241a6ce8
- * and
- *      openssl rsa -noout -modulus -in cert.key | openssl md5
- *      #> (stdin)= 7f1a9c4d13aead7fd4a0f241a6ce8
- *
- * 2.
- * Convert .cert and .key files from PEM to a PKCS12 that Java can understand
- * (this step will prompt for a password):
- *
- *      openssl pkcs12 -export -in cert.crt -in cert.key -out cert.p12
- */
 @Service
 public class RequestServiceImpl implements RequestService {
 

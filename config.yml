@@ -3,22 +3,6 @@ settings:
   quantum: false
   alt400OnFailedRequestValidation: true
 routes:
-- group: auth
-  type: REST
-  method: POST
-  path: /api/v1/auth
-  alt: ""
-  responseCode: 200
-  response: |-
-    {
-      "sub": "${sub:Default Name}",
-      "name": "${name:Default Name}",
-      "iat": ${iat:4102444800000}
-    }
-  requestBodySchema: ""
-  disabled: false
-  triggerRequest: false
-  triggerRequestIds: ""
 - group: entity
   type: REST
   method: GET
@@ -239,6 +223,17 @@ routes:
   triggerRequest: false
   triggerRequestIds: ""
 requests:
+- id: _ssl.GET.localhost.443.hello
+  group: _ssl
+  type: REST
+  method: GET
+  path: https://localhost:443/hello
+  headers: ""
+  body: ""
+  responseToVars: false
+  disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
 - id: api.robot
   group: robot
   type: REST

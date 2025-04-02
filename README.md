@@ -42,20 +42,10 @@ Generate code coverage report
 
 # Route response
 
-Response field may contain:
-- **response** wtih JSON or XML body, with or without HTTP head
-- **callback request** with JSON or XML body, strictly **with** HTTP head
+Response field may contain **response** wtih JSON or XML body, with or without HTTP head
 
 > See examples below and HTTP request and response format at
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages
-
-Response part MUST go first.
-
-If a callback request used a delimiter `---` should go
-between response and callback request.
-
-If callback request is present it would be executed asynchronously
-2 seconds after response is sent back.
 
 **EXAMPLES**
 
@@ -70,33 +60,17 @@ Response with head:
         
     {"code": "E000394", "message": "Internal error"}
 
-Response head + body + callback request head + body:
-
-    HTTP/1.1
-    Extra-Header: arbitrary header value
-    
-    {
-        "status": "PROCESSING",
-        "id": "${item_id}"
-    }
-    ---
-    POST https://backend.cool-store.com/store/cart/item/${item_id} HTTP/1.1
-    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5...
-    
-    {
-        "status": "PROCESSED",
-        "id": "${item_id}"
-    }
-
 # Route alt
 
 **Alt** allows creating multiple responses
 for the same mapping (e.g. method + path).
 By default, alt is empty.
 
-**Alt** can be a condition. If Alt contains `=` then it wll be parsed and compared
-with **Request variables** (see section below). If a match is found - this
-route is used to get a response. Only one variable in a condition is supported.
+**Alt** can be a condition.
+If Alt contains `=` then it wll be parsed and compared
+with **Request variables** (see section below).
+If a match is found - this route is used to get a response.
+Only one variable in a condition is supported.
 
 Examples:
 
