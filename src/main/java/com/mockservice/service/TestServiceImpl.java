@@ -3,7 +3,7 @@ package com.mockservice.service;
 import com.mockservice.domain.ApiTest;
 import com.mockservice.mapper.ApiTestMapper;
 import com.mockservice.model.ApiTestDto;
-import com.mockservice.model.OutboundRequestResult;
+import com.mockservice.model.HttpRequestResult;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.template.MockVariables;
 import com.mockservice.template.StringTemplate;
@@ -250,7 +250,7 @@ public class TestServiceImpl implements TestService {
             var kv = KeyValue.of(run.getLine(), "->");
             run.log("Request: ").log(kv.key()).log('\n');
 
-            Optional<OutboundRequestResult> requestResult = requestService.executeRequest(
+            Optional<HttpRequestResult> requestResult = requestService.executeRequest(
                     kv.key(), null, run.isAllowTrigger());
 
             String result = requestResult.map(Objects::toString).orElse("...nothing...");

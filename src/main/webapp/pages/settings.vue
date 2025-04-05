@@ -16,18 +16,49 @@
                           Variable ${requestBodyValidationErrorMessage} would be available to use in response body."
             >Alt '400' on failed request validation</ToggleSwitch>
         </p>
-        <div class="mt-5 pl-1">
-            <button type="button" class="btn btn-primary" @click="save">Save</button>
+
+        <div class="component px-4 py-3 mt-6">
+            <div>SSL certificate</div>
+            <div class="color-secondary nowrap mt-3">{{certificateHumanReadable}}</div>
+            <input type="file" class="hidden">
+            <button type="button" class="btn btn-default mt-3" @click="selectCertFile">Select certificate file</button>
+            <button type="button" class="btn btn-default mt-3" @click="resetCertFile">Reset certificate file</button>
+            <div class="color-secondary mt-3">
+                To use a certificate:<br>
+                - select a certificate file<br>
+                - save settings<br>
+                - set a password (password input will show once you have a certificate saved).
+            </div>
+
+            <div class="mt-4" v-show="hasCertificateOnServer">
+                <div>SSL certificate password</div>
+                <input type="password" class="form-control form-control-sm mt-3" v-model="password"/>
+                <button type="button" class="btn btn-default mt-3" @click="setPass">
+                    Set password
+                    <span v-show="passwordSet">&#9989;</span>
+                </button>
+                <div class="color-secondary mt-3">
+                    Password is never saved (so, no need to save settings after you set a password).
+                    Once you set it a new SSL context is created until service is restarted.
+                </div>
+            </div>
         </div>
+
+        <div class="mt-6 pl-1">
+            <button type="button" class="btn btn-primary" @click="save">
+                <span class="mx-5">Save settings</span>
+            </button>
+        </div>
+
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
 </template>
 <script>
-    import {mapActions} from 'vuex';
-    import Loading from "../components/other/Loading";
-    import ToggleSwitch from "../components/other/ToggleSwitch";
+import {mapActions} from 'vuex';
+import Loading from "../components/other/Loading";
+import ToggleSwitch from "../components/other/ToggleSwitch";
 
-    export default {
+export default {
         name: "settings",
         components: {Loading, ToggleSwitch},
         data() {
@@ -35,6 +66,9 @@
                 randomAlt: false,
                 quantum: false,
                 alt400OnFailedRequestValidation: true,
+                certificate: null,
+                password: '',
+                passwordSet: false,
             }
         },
         async fetch() {
@@ -45,18 +79,26 @@
             settings() {
                 return this.$store.state.settings.settings
             },
+            hasCertificateOnServer() {
+                return this.certificate !== null && this.certificate !== ''
+            },
+            certificateHumanReadable() {
+                return this.certificate == null ? 'No certificate' : 'Certificate: ' + this.certificate
+            }
         },
         watch: {
             settings() {
                 this.randomAlt = this.settings.randomAlt;
                 this.quantum = this.settings.quantum;
                 this.alt400OnFailedRequestValidation = this.settings.alt400OnFailedRequestValidation;
+                this.certificate = this.settings.certificate;
             },
         },
         methods: {
             ...mapActions({
                 fetchSettings: 'settings/fetch',
-                saveSettings: 'settings/save'
+                saveSettings: 'settings/save',
+                setCertificatePassword: 'settings/certificatePassword',
             }),
             async save() {
                 this.$nuxt.$loading.start();
@@ -64,12 +106,63 @@
                     {
                         randomAlt: this.randomAlt,
                         quantum: this.quantum,
-                        failedInputValidationAlt400: this.failedInputValidationAlt400
+                        failedInputValidationAlt400: this.failedInputValidationAlt400,
+                        certificate: this.certificate,
                     }
                 ).then(() => this.$nuxt.$loading.finish());
+            },
+            selectCertFile() {
+                const el = document.querySelector('input[type="file"]');
+                if (el === null) return;
+
+                el.onchange = () => {
+                    this.$nuxt.$loading.finish();
+                    this.certificate = null;
+                    this.passwordSet = false;
+                    try {
+                        const file = el.files[0];
+                        const reader = new FileReader();
+                        reader.readAsDataURL(file);
+                        reader.onload = () => {
+                            this.certificate = reader.result
+                                .replace('data:', '')
+                                .replace(/^.+,/, '');
+                            console.log('Certificate: ', this.certificate);
+                        }
+                        reader.onerror = (error) => console.log('Error: ', error);
+                    } catch (e) {
+                        console.error(e);
+                    }
+                };
+                this.$nuxt.$loading.start();
+                el.click();
+            },
+            resetCertFile() {
+                this.certificate = null;
+                this.passwordSet = false;
+            },
+            async setPass() {
+                this.$nuxt.$loading.start();
+                await this.setCertificatePassword(this.password)
+                    .then((result, error) => {
+                        this.$nuxt.$loading.finish();
+                        this.password = '';
+                        this.passwordSet = result;
+                    });
             },
         }
     }
 </script>
 <style scoped>
+.flex-group {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1rem;
+    row-gap: 0.7rem;
+    align-items: center;
+    width: auto;
+}
+.flex-group-item {
+    flex: 1 1 0;
+}
 </style>

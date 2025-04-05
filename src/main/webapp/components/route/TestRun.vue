@@ -34,12 +34,7 @@ export default {
     },
     mounted() {
         this.testFetchResult();
-        console.log("Starting WebSocket...")
-        this.ws = new WebSocket(this.wsUrl)
-        this.ws.onmessage = this.onWsMessage;
-        this.ws.onopen = this.onWsOpen;
-        this.ws.onclose = this.onWsClose;
-        this.ws.onerror = this.onWsError;
+        this.startWebSocket();
     },
     beforeDestroy() {
         this.ws.close();
@@ -74,6 +69,7 @@ export default {
             }
         },
         async testExecute() {
+            if (this.ws == null) this.startWebSocket();
             try {
                 await this.executeTest(this.test.alias);
             } catch (err) {
@@ -117,6 +113,14 @@ export default {
             if (this.ws == null) return;
             this.ws.send({command, id, data});
         },
+        startWebSocket() {
+            console.log("Starting WebSocket...")
+            this.ws = new WebSocket(this.wsUrl)
+            this.ws.onmessage = this.onWsMessage;
+            this.ws.onopen = this.onWsOpen;
+            this.ws.onclose = this.onWsClose;
+            this.ws.onerror = this.onWsError;
+        },
         onWsMessage(event) {
             console.log("WebSocket::test_run::message")
             const data = JSON.parse(event.data);
@@ -130,6 +134,7 @@ export default {
         },
         onWsClose() {
             console.log("WebSocket::test_run::closed")
+            this.ws = null;
         },
         onWsError(event) {
             console.error("WebSocket::test_run::error: ", event)

@@ -26,7 +26,7 @@ export const actions = {
         try {
             const url = rootState.BASE_URL + '/web-api/settings';
             const params = {
-                method: 'PUT',
+                method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({...state.settings, ...settings})
             };
@@ -36,6 +36,19 @@ export const actions = {
             commit('store', data);
         } catch (err) {
             commit('setLastError', err, {root: true});
+        }
+    },
+    async certificatePassword({commit, rootState}, password) {
+        try {
+            const url = rootState.BASE_URL + '/web-api/settings/certificatePassword';
+            const params = {method: 'POST', body: password};
+            const res = await fetch(url, params);
+            await handleError(res);
+            await res.text();
+            return true;
+        } catch (err) {
+            commit('setLastError', err, {root: true});
+            return false;
         }
     },
 };

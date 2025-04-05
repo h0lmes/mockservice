@@ -24,10 +24,10 @@ application:
   config-filename: ${CONFIG_FILENAME:.\config.yml}
   config-backup-filename: ${CONFIG_BACKUP_FILENAME:.\config-backup.yml}
   soap-error-data-file: soapFault.xml
-  ssl:
-    cert-file: ${SSL_CERT_FILE:.\ssl\cert.p12}
-    password: ${SSL_PASSWORD:qwerty12345678}
+  client:
+    max-connections: ${MAX_CONNECTIONS:2000}
+    max-pending: ${MAX_PENDING:2000}
   mock-service:
-    cache-size: 1000
+    cache-size: ${MOCK_CACHE_SIZE:1000}
   request-service:
-    cache-size: 1000
+    cache-size: ${REQUEST_CACHE_SIZE:1000}

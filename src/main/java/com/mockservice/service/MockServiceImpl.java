@@ -41,7 +41,7 @@ public class MockServiceImpl implements MockService {
     private final WebSocketHandler webSocketHandler;
     private final ConcurrentLruCache<Route, MockResponse> responseCache;
 
-    public MockServiceImpl(@Value("${application.mock-service.cache-size}") int cacheSize,
+    public MockServiceImpl(@Value("${application.mock-service.cache-size:1000}") int cacheSize,
                            TemplateEngine templateEngine,
                            RouteService routeService,
                            ScenarioService scenarioService,

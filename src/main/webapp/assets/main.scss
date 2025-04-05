@@ -153,6 +153,31 @@ body {
   overflow: hidden auto;
 }
 
+body::-webkit-scrollbar {
+  width: 16px;
+}
+
+body::-webkit-scrollbar-thumb {
+  height: 56px;
+  border-radius: 8px;
+  border: 4px solid transparent;
+  background-clip: content-box;
+  background-color: var(--color-secondary);
+}
+
+textarea::-webkit-scrollbar {
+  width: 16px;
+  cursor: pointer;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  height: 56px;
+  border-radius: 8px;
+  border: 4px solid transparent;
+  background-clip: content-box;
+  background-color: var(--color-secondary);
+}
+
 button {
   font-family: monospace, monospace;
 }
@@ -706,4 +731,14 @@ $sizes:
   @media (min-width: 600px) {
     display: initial;
   }
+}
+
+.hidden {
+  display: none;
+}
+
+.nowrap {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

@@ -1,8 +1,8 @@
 package com.mockservice.service;
 
 import com.mockservice.domain.OutboundRequest;
+import com.mockservice.model.HttpRequestResult;
 import com.mockservice.model.OutboundRequestDto;
-import com.mockservice.model.OutboundRequestResult;
 import com.mockservice.template.MockVariables;
 
 import javax.annotation.Nullable;
@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface RequestService {
     void schedule(String requestIds, @Nullable MockVariables variables);
-    Optional<OutboundRequestResult> executeRequest(
+    Optional<HttpRequestResult> executeRequest(
             String requestId, @Nullable MockVariables variables, boolean allowTrigger);
     Optional<OutboundRequest> getEnabledRequest(String requestId);
     List<OutboundRequestDto> getRequests();

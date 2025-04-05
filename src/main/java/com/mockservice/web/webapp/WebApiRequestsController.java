@@ -1,7 +1,7 @@
 package com.mockservice.web.webapp;
 
+import com.mockservice.model.HttpRequestResult;
 import com.mockservice.model.OutboundRequestDto;
-import com.mockservice.model.OutboundRequestResult;
 import com.mockservice.service.RequestService;
 import com.mockservice.template.MockVariables;
 import io.swagger.annotations.ApiOperation;
@@ -64,7 +64,7 @@ public class WebApiRequestsController {
     @ApiOperation(value = "Execute request by ID", tags = "requests")
     @PostMapping("/execute")
     public String execute(@RequestBody OutboundRequestExecuteRequest request) throws IOException {
-        Optional<OutboundRequestResult> result = requestService.executeRequest(
+        Optional<HttpRequestResult> result = requestService.executeRequest(
                 request.getRequestId(), MockVariables.empty(), true);
         return result.map(Objects::toString).orElse("Request not found or disabled");
     }

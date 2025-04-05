@@ -1,35 +1,37 @@
 package com.mockservice.model;
 
-import com.mockservice.domain.OutboundRequest;
 import com.mockservice.template.MockVariables;
-import com.mockservice.template.RequestHeadersTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-public class OutboundRequestResult {
+import java.util.List;
+import java.util.Map;
+
+public class HttpRequestResult {
 
     private final boolean failed;
-    private final OutboundRequest request;
+    private final RequestMethod method;
     private final String uri;
-    private final RequestHeadersTemplate headersTemplate;
+    private final Map<String, List<String>> headers;
     private final String requestBody;
     private final String responseBody;
     private final MockVariables responseVariables;
     private final int statusCode;
     private final long duration;
 
-    public OutboundRequestResult(boolean failed,
-                                 OutboundRequest request,
-                                 String uri,
-                                 RequestHeadersTemplate headersTemplate,
-                                 String requestBody,
-                                 String responseBody,
-                                 MockVariables responseVariables,
-                                 int statusCode,
-                                 long startMillis) {
+    public HttpRequestResult(boolean failed,
+                             RequestMethod method,
+                             String uri,
+                             Map<String, List<String>> headers,
+                             String requestBody,
+                             String responseBody,
+                             MockVariables responseVariables,
+                             int statusCode,
+                             long startMillis) {
         this.failed = failed;
-        this.request = request;
+        this.method = method;
         this.uri = uri;
-        this.headersTemplate = headersTemplate;
+        this.headers = headers;
         this.requestBody = requestBody;
         this.responseBody = responseBody;
         this.responseVariables = responseVariables;
@@ -39,10 +41,6 @@ public class OutboundRequestResult {
 
     public boolean isFailed() {
         return failed;
-    }
-
-    public OutboundRequest getRequest() {
-        return request;
     }
 
     public String getResponseBody() {
@@ -60,9 +58,9 @@ public class OutboundRequestResult {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(request.getMethod().toString()).append(" ").append(uri).append('\n');
-        if (!headersTemplate.isEmpty()) {
-            builder.append(headersTemplate).append('\n');
+        builder.append(method.toString()).append(" ").append(uri).append('\n');
+        if (!headers.isEmpty()) {
+            appendHeaders(builder);
         }
         if (!requestBody.isEmpty()) {
             builder.append('\n').append(requestBody).append('\n');
@@ -75,6 +73,15 @@ public class OutboundRequestResult {
             appendResult(builder);
         }
         return builder.toString();
+    }
+
+    private void appendHeaders(StringBuilder builder) {
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            for (String value : entry.getValue()) {
+                builder.append(entry.getKey()).append(": ").append(value).append('\n');
+            }
+        }
+        builder.append('\n');
     }
 
     private void appendError(StringBuilder builder) {

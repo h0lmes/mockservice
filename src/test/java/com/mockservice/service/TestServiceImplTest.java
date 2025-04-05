@@ -1,21 +1,21 @@
 package com.mockservice.service;
 
 import com.mockservice.domain.ApiTest;
-import com.mockservice.domain.OutboundRequest;
 import com.mockservice.mapper.ApiTestMapperImpl;
-import com.mockservice.model.OutboundRequestResult;
+import com.mockservice.model.HttpRequestResult;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.template.MockVariables;
-import com.mockservice.template.RequestHeadersTemplate;
 import com.mockservice.template.TemplateEngine;
 import com.mockservice.ws.WebSocketHandler;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -74,8 +74,8 @@ class TestServiceImplTest {
                         """);
         when(configRepository.findTest(anyString())).thenReturn(Optional.of(entity));
 
-        var requestResult = new OutboundRequestResult(
-                false, new OutboundRequest(), "uri", new RequestHeadersTemplate(""),
+        var requestResult = new HttpRequestResult(
+                false, RequestMethod.GET, "uri", Map.of(),
                 "body", "response",
                 new MockVariables().put("var", "2"),
                 200, Instant.now().toEpochMilli());
@@ -107,8 +107,8 @@ class TestServiceImplTest {
                         """);
         when(configRepository.findTest(anyString())).thenReturn(Optional.of(entity));
 
-        var requestResult = new OutboundRequestResult(
-                false, new OutboundRequest(), "uri", new RequestHeadersTemplate(""),
+        var requestResult = new HttpRequestResult(
+                false, RequestMethod.GET, "uri", Map.of(),
                 "body", "response",
                 new MockVariables().put("var", "2"),
                 200, Instant.now().toEpochMilli());
@@ -137,8 +137,8 @@ class TestServiceImplTest {
                         """);
         when(configRepository.findTest(anyString())).thenReturn(Optional.of(entity));
 
-        var requestResult = new OutboundRequestResult(
-                false, new OutboundRequest(), "uri", new RequestHeadersTemplate(""),
+        var requestResult = new HttpRequestResult(
+                false, RequestMethod.GET, "uri", Map.of(),
                 "body", "response",
                 new MockVariables().put("var", "2"),
                 200, Instant.now().toEpochMilli());
