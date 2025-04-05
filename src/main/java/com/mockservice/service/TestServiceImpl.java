@@ -12,7 +12,10 @@ import com.mockservice.util.KeyValue;
 import com.mockservice.ws.WebSocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ConcurrentLruCache;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,22 +37,28 @@ public class TestServiceImpl implements TestService {
     private final TemplateEngine templateEngine;
     private final VariablesService variablesService;
     private final RequestService requestService;
+    private final HttpService httpService;
     private final WebSocketHandler webSocketHandler;
     private final Map<ApiTest, TestRun> runs = new ConcurrentHashMap<>();
+    private final ConcurrentLruCache<String, StringTemplate> templateCache;
 
     public TestServiceImpl(
+            @Value("${application.test-service.cache-size:2000}") int cacheSize,
             ConfigRepository configRepository,
             ApiTestMapper apiTestMapper,
             TemplateEngine templateEngine,
             VariablesService variablesService,
             RequestService requestService,
+            HttpService httpService,
             WebSocketHandler webSocketHandler) {
         this.configRepository = configRepository;
         this.apiTestMapper = apiTestMapper;
         this.templateEngine = templateEngine;
         this.variablesService = variablesService;
         this.requestService = requestService;
+        this.httpService = httpService;
         this.webSocketHandler = webSocketHandler;
+        templateCache = new ConcurrentLruCache<>(cacheSize, StringTemplate::new);
     }
 
     @Override
@@ -164,6 +173,14 @@ public class TestServiceImpl implements TestService {
             String line = run.getLine();
             if (line.trim().isEmpty()) return;
 
+            if (line.startsWith("GET ") ||
+                    line.startsWith("POST ") ||
+                    line.startsWith("PUT ") ||
+                    line.startsWith("PATCH ") ||
+                    line.startsWith("DELETE ")) {
+                executeInlineRequest(run);
+                return;
+            }
             if (line.contains("->")) {
                 executeRequest(run);
                 return;
@@ -247,31 +264,64 @@ public class TestServiceImpl implements TestService {
 
     private void executeRequest(TestRun run) {
         try {
-            var kv = KeyValue.of(run.getLine(), "->");
-            run.log("Request: ").log(kv.key()).log('\n');
+            var kvStep = KeyValue.of(run.getLine(), "->");
+            String request = kvStep.key();
+            String codes = kvStep.value();
+            run.log("Request: ").log(request).log('\n');
 
             Optional<HttpRequestResult> requestResult = requestService.executeRequest(
-                    kv.key(), null, run.isAllowTrigger());
+                    request, null, run.isAllowTrigger());
 
-            String result = requestResult.map(Objects::toString).orElse("...nothing...");
-            run.log(result).log('\n');
-
-            requestResult.ifPresent(res -> {
-                run.setMockVariables(res.getResponseVariables());
-                String codes = kv.value();
-                if (codes.isEmpty() || codes.contains("" + res.getStatusCode())) {
-                    run.log("SUCCESS\n");
-                } else {
-                    run.log(FAILED).log("status code = ").log(res.getStatusCode())
-                            .log("; expected: ").log(codes).log(")\n");
-                    run.setErrorLevel(TestRunErrorLevel.FAILED);
-                }
-            });
+            processRequestResult(run, requestResult, codes);
         } catch (Exception e) {
             log.error("ERROR while executing request. ", e);
             run.log(ERROR).log("while executing request:\n").log(e.toString()).log(")\n");
             run.setErrorLevel(TestRunErrorLevel.FAILED);
         }
+    }
+
+    private void executeInlineRequest(TestRun run) {
+        try {
+            var kvStep = KeyValue.of(run.getLine(), "->");
+            String request = kvStep.key();
+            String codes = kvStep.value();
+            run.log("Request: ").log(request).log('\n');
+
+            var kvRequest = KeyValue.of(request, " ");
+            var kvUriBody = KeyValue.of(kvRequest.value(), " ");
+            RequestMethod method = RequestMethod.resolve(kvRequest.key());
+            String uri = templateCache.get(kvUriBody.key())
+                    .toString(variablesService.getAll(), templateEngine.getFunctions());
+            String body = templateCache.get(kvUriBody.value())
+                    .toString(variablesService.getAll(), templateEngine.getFunctions());
+
+            Optional<HttpRequestResult> requestResult = httpService.request(
+                    method, uri, body, null);
+
+            processRequestResult(run, requestResult, codes);
+        } catch (Exception e) {
+            log.error("ERROR while executing request. ", e);
+            run.log(ERROR).log("while executing request:\n").log(e.toString()).log(")\n");
+            run.setErrorLevel(TestRunErrorLevel.FAILED);
+        }
+    }
+
+    private void processRequestResult(TestRun run,
+                                      Optional<HttpRequestResult> requestResult,
+                                      String codes) {
+        String result = requestResult.map(Objects::toString).orElse("...nothing...");
+        run.log(result).log('\n');
+
+        requestResult.ifPresent(res -> {
+            run.setMockVariables(res.getResponseVariables());
+            if (codes.isEmpty() || codes.contains("" + res.getStatusCode())) {
+                run.log("SUCCESS\n");
+            } else {
+                run.log(FAILED).log("status code = ").log(res.getStatusCode())
+                        .log("; expected: ").log(codes).log(")\n");
+                run.setErrorLevel(TestRunErrorLevel.FAILED);
+            }
+        });
     }
 
     @Override

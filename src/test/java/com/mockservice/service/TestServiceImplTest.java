@@ -32,6 +32,8 @@ class TestServiceImplTest {
     @Mock
     private RequestService requestService;
     @Mock
+    private HttpService httpService;
+    @Mock
     private WebSocketHandler webSocketHandler;
 
     private VariablesService getVarService() {
@@ -40,8 +42,8 @@ class TestServiceImplTest {
 
     private TestService getService(VariablesService variablesService) {
         return new TestServiceImpl(
-                configRepository, new ApiTestMapperImpl(), templateEngine,
-                variablesService, requestService, webSocketHandler);
+                256, configRepository, new ApiTestMapperImpl(), templateEngine,
+                variablesService, requestService, httpService, webSocketHandler);
     }
 
     @Test

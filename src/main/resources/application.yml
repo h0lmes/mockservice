@@ -31,3 +31,5 @@ application:
     cache-size: ${MOCK_CACHE_SIZE:1000}
   request-service:
     cache-size: ${REQUEST_CACHE_SIZE:1000}
+  test-service:
+    cache-size: ${TEST_CACHE_SIZE:2000}

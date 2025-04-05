@@ -2,6 +2,7 @@ settings:
   randomAlt: false
   quantum: false
   alt400OnFailedRequestValidation: true
+  certificate: null
 routes:
 - group: entity
   type: REST
@@ -158,7 +159,7 @@ routes:
   path: "/products/{id}"
   alt: id=0
   responseCode: 400
-  response: "{\"message\": \"No product found\"}"
+  response: "{\"message\": \"No products found\"}"
   requestBodySchema: ""
   disabled: false
   triggerRequest: false
@@ -186,7 +187,7 @@ routes:
   type: REST
   method: POST
   path: /v2/store/order
-  alt: 400
+  alt: x=400
   responseCode: 400
   response: |-
     {
@@ -256,31 +257,22 @@ requests:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
-- id: products.by.id
-  group: store
-  type: REST
-  method: GET
-  path: "localhost:8081/products/${id}"
-  headers: ""
-  body: ""
-  responseToVars: false
-  disabled: false
-  triggerRequest: false
-  triggerRequestIds: ""
 tests:
 - group: store
   alias: store test
   plan: |-
     id = 0
-    products.by.id -> 400
-    message === No product found
-    message == No product
+    GET localhost:8081/products/${id} -> 400
+    message === No products found
+    message == No products
 
     id = 10
-    products.by.id -> 200
+    GET localhost:8081/products/${id} -> 200
 
     id = 20
-    products.by.id
+    GET localhost:8081/products/${id}
+    id = ☺️
+    POST localhost:8081/v2/store/order {"x": 400} -> 400
 
     products.random -> 208
 scenarios:

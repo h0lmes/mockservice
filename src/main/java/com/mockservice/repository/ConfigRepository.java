@@ -11,8 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ConfigRepository {
-    void registerConfigObserver(ConfigObserver configObserver);
-    void registerRouteObserver(RouteObserver routeObserver);
+    void registerConfigObserver(ConfigObserver observer);
+    void registerRouteObserver(RouteObserver observer);
+    void registerSettingsObserver(SettingsObserver observer);
 
     String getConfigData() throws JsonProcessingException;
     void writeConfigData(String data) throws IOException;

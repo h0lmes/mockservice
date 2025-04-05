@@ -30,19 +30,7 @@
 
         <Routes :entities="filteredEntities" @filter="setFilter($event)"></Routes>
 
-        <div class="color-secondary mt-4">
-            <div class="mt-2 bold">Scenario types</div>
-            <div class="mt-2">
-                - MAP: goes over the LIST OF ROUTES in a scenario top-to-bottom looking for the first match of requested METHOD + PATH pair, returns route with matching ALT. If no match found - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).
-            </div>
-            <div class="mt-2">
-                - QUEUE: same as MAP but looks only at the topmost route, removes route from a queue if it matches. If topmost route does not match (or all routes were already matched and thus removed from a queue) - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).
-            </div>
-            <div class="mt-2">
-                - RING: same as QUEUE but restarts the queue when it depletes.
-            </div>
-        </div>
-        <div class="color-secondary mt-4">
+        <div class="color-secondary mt-6">
             <div class="mt-2 bold">Tips</div>
             <div class="mt-2">
                 Click on any value (GROUP, METHOD, PATH, etc.; you'll see underline on hover) to filter by that value.
@@ -65,6 +53,48 @@
             <div class="mt-2">
                 To alter multiple entities quickly consider navigating to Config page and editing it as plain text.
                 Use Backup button there for extra caution.
+            </div>
+        </div>
+        <div class="color-secondary mt-6">
+            <div class="mt-2 bold">Test plan syntax</div>
+            <div class="mt-2">
+                Each line is exactly one command.
+            </div>
+            <div class="mt-2">
+                x = some string - set value of variable in global context (see Variables page).
+            </div>
+            <div class="mt-2">
+                x = ${variable_name} - set value of variable in global context, value comes from latest request response.
+            </div>
+            <div class="mt-2">
+                GET localhost:8081/products/${id} - execute inline request; variable comes from global context.
+            </div>
+            <div class="mt-2">
+                POST localhost:8081/v2/store/order {"x": 400} -> 400,404 - execute inline request and test status code is 400 or 404; if test fails - test run stops with FAILED.
+            </div>
+            <div class="mt-2">
+                request_id - execute request by ID.
+            </div>
+            <div class="mt-2">
+                request_id -> 200 - execute request by ID and test status code is 200; if test fails - test run stops with FAILED.
+            </div>
+            <div class="mt-2">
+                x == 2 - non-strictly test value of variable from the latest request response; if test fails - test run proceeds with WARNING.
+            </div>
+            <div class="mt-2">
+                x === some value - strictly test value of variable from the latest request response; if test fails - test run stops with FAILED.
+            </div>
+        </div>
+        <div class="color-secondary mt-6">
+            <div class="mt-2 bold">Scenario types</div>
+            <div class="mt-2">
+                - MAP: goes over the LIST OF ROUTES in a scenario top-to-bottom looking for the first match of requested METHOD + PATH pair, returns route with matching ALT. If no match found - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).
+            </div>
+            <div class="mt-2">
+                - QUEUE: same as MAP but looks only at the topmost route, removes route from a queue if it matches. If topmost route does not match (or all routes were already matched and thus removed from a queue) - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).
+            </div>
+            <div class="mt-2">
+                - RING: same as QUEUE but restarts the queue when it depletes.
             </div>
         </div>
 

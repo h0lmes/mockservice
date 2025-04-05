@@ -33,12 +33,10 @@ public class RequestHeadersTemplate {
     public String toString() {
         if (resultMap == null) return "";
         StringBuilder builder = new StringBuilder();
-        for (String key : resultMap.keySet()) {
-            resultMap.get(key).forEach(value -> {
-                if (!builder.isEmpty()) builder.append('\n');
-                builder.append(key).append(": ").append(value);
-            });
-        }
+        resultMap.forEach((key, list) -> list.forEach(value -> {
+            if (!builder.isEmpty()) builder.append('\n');
+            builder.append(key).append(": ").append(value);
+        }));
         return builder.toString();
     }
 
@@ -95,8 +93,8 @@ public class RequestHeadersTemplate {
 
         var resultList = resultMap.getOrDefault(key, new ArrayList<>());
         resultList.clear();
-        for (StringTemplate t : templateList) {
-            resultList.add(t.toString(variables, functions));
+        for (StringTemplate template : templateList) {
+            resultList.add(template.toString(variables, functions));
         }
         resultMap.put(key, resultList);
     }

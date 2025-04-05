@@ -32,22 +32,22 @@ public class RequestServiceImpl implements RequestService {
     private final OutboundRequestMapper requestMapper;
     private final TemplateEngine templateEngine;
     private final VariablesService variablesService;
-    private final HttpClientService httpClientService;
+    private final HttpService httpService;
     private final ConcurrentLruCache<OutboundRequest, RequestHeadersTemplate> headersCache;
     private final ConcurrentLruCache<OutboundRequest, StringTemplate> uriCache;
     private final ConcurrentLruCache<OutboundRequest, StringTemplate> requestBodyCache;
 
-    public RequestServiceImpl(ConfigRepository configRepository,
+    public RequestServiceImpl(@Value("${application.request-service.cache-size:1000}") int cacheSize,
+                              ConfigRepository configRepository,
                               OutboundRequestMapper requestMapper,
                               TemplateEngine templateEngine,
                               VariablesService variablesService,
-                              @Value("${application.request-service.cache-size:1000}") int cacheSize,
-                              HttpClientService httpClientService) {
+                              HttpService httpService) {
         this.configRepository = configRepository;
         this.requestMapper = requestMapper;
         this.templateEngine = templateEngine;
         this.variablesService = variablesService;
-        this.httpClientService = httpClientService;
+        this.httpService = httpService;
         headersCache = new ConcurrentLruCache<>(cacheSize, this::getRequestHeadersTemplate);
         uriCache = new ConcurrentLruCache<>(cacheSize, this::getRequestUriTemplate);
         requestBodyCache = new ConcurrentLruCache<>(cacheSize, this::getRequestBodyTemplate);
@@ -58,8 +58,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     private StringTemplate getRequestUriTemplate(OutboundRequest request) {
-        return new StringTemplate(
-                request.getPath().contains("://") ? request.getPath() : "http://" + request.getPath());
+        return new StringTemplate(request.getPath());
     }
 
     private StringTemplate getRequestBodyTemplate(OutboundRequest request) {
@@ -115,8 +114,7 @@ public class RequestServiceImpl implements RequestService {
         var headersTemplate = headersCache.get(request);
         var headers = headersTemplate.toMap(requestVars, templateEngine.getFunctions());
 
-        var result = httpClientService.request(
-                request.getMethod(), uri, requestBody, headers);
+        var result = httpService.request(request.getMethod(), uri, requestBody, headers);
 
         result.ifPresent(res -> {
             if (request.isResponseToVars()) {

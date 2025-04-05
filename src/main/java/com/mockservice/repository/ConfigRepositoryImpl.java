@@ -36,6 +36,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     private final Cache<Route, List<RouteVariable>> routeVariablesCache;
     private final List<ConfigObserver> configObservers = new ArrayList<>();
     private final List<RouteObserver> routeObservers = new ArrayList<>();
+    private final List<SettingsObserver> settingsObservers = new ArrayList<>();
     private Config config;
 
     public ConfigRepositoryImpl(
@@ -75,13 +76,18 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     @Override
-    public void registerConfigObserver(ConfigObserver configObserver) {
-        this.configObservers.add(configObserver);
+    public void registerConfigObserver(ConfigObserver observer) {
+        this.configObservers.add(observer);
     }
 
     @Override
-    public void registerRouteObserver(RouteObserver routeObserver) {
-        this.routeObservers.add(routeObserver);
+    public void registerRouteObserver(RouteObserver observer) {
+        this.routeObservers.add(observer);
+    }
+
+    @Override
+    public void registerSettingsObserver(SettingsObserver observer) {
+        this.settingsObservers.add(observer);
     }
 
     private Map<Class<?>, Class<?>> getMixIns() {
@@ -176,6 +182,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         notifyBeforeConfigChanged();
         configFromString(data);
         notifyAfterConfigChanged();
+        notifySettingsChanged();
         tryPersistConfig();
     }
 
@@ -189,6 +196,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         notifyBeforeConfigChanged();
         readConfigFromFile(getConfigBackupFile());
         notifyAfterConfigChanged();
+        notifySettingsChanged();
         tryPersistConfig();
     }
 
@@ -206,6 +214,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     @Override
     public synchronized void setSettings(Settings settings) throws IOException {
         config.setSettings(settings);
+        notifySettingsChanged();
         tryPersistConfig();
     }
 
@@ -613,5 +622,9 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     private void notifyRouteDeleted(Route route) {
         routeVariablesCache.evict(route);
         routeObservers.forEach(o -> o.onRouteDeleted(route));
+    }
+
+    private void notifySettingsChanged() {
+        settingsObservers.forEach(SettingsObserver::onAfterSettingsChanged);
     }
 }

@@ -39,7 +39,7 @@
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">TEST PLAN</div>
             <AutoSizeTextArea v-model="editingTest.plan"
-                              placeholder="Each line either Request ID or variable assignment (e.g. x=something)"
+                              placeholder="See test plan syntax at the bottom of page"
                               :min-rows="1"
                               :max-rows="22"
                               ref="data"

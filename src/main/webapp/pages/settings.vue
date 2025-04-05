@@ -21,13 +21,13 @@
             <div>SSL certificate</div>
             <div class="color-secondary nowrap mt-3">{{certificateHumanReadable}}</div>
             <input type="file" class="hidden">
-            <button type="button" class="btn btn-default mt-3" @click="selectCertFile">Select certificate file</button>
-            <button type="button" class="btn btn-default mt-3" @click="resetCertFile">Reset certificate file</button>
+            <button type="button" class="btn btn-default mt-3" @click="selectCertFile">Select local file</button>
+            <button type="button" class="btn btn-default mt-3" @click="resetCertFile">Forget certificate</button>
             <div class="color-secondary mt-3">
                 To use a certificate:<br>
-                - select a certificate file<br>
+                - select a PKCS #12 certificate file<br>
                 - save settings<br>
-                - set a password (password input will show once you have a certificate saved).
+                - set a password (password input will show once you have certificate saved).
             </div>
 
             <div class="mt-4" v-show="hasCertificateOnServer">
@@ -38,7 +38,7 @@
                     <span v-show="passwordSet">&#9989;</span>
                 </button>
                 <div class="color-secondary mt-3">
-                    Password is never saved (so, no need to save settings after you set a password).
+                    Password is not stored in Config (so, no need to save settings after you set a password).
                     Once you set it a new SSL context is created until service is restarted.
                 </div>
             </div>
@@ -80,7 +80,7 @@ export default {
                 return this.$store.state.settings.settings
             },
             hasCertificateOnServer() {
-                return this.certificate !== null && this.certificate !== ''
+                return this.settings.certificate !== null && this.settings.certificate !== ''
             },
             certificateHumanReadable() {
                 return this.certificate == null ? 'No certificate' : 'Certificate: ' + this.certificate

@@ -32,12 +32,11 @@ class RequestServiceImplTest {
     @Mock
     private VariablesService variablesService;
     @Mock
-    private HttpClientService httpClientService;
+    private HttpService httpService;
 
     private RequestService getService() {
-        return new RequestServiceImpl(
-                configRepository, new OutboundRequestMapperImpl(), templateEngine,
-                variablesService, 256, httpClientService);
+        return new RequestServiceImpl(256, configRepository,
+                new OutboundRequestMapperImpl(), templateEngine, variablesService, httpService);
     }
 
     @Test
@@ -68,7 +67,7 @@ class RequestServiceImplTest {
                 false, RequestMethod.GET, "uri", Map.of(),
                 "{\"test\": \"test\"}", "reqBody",
                 MockVariables.empty(), 200, Instant.now().toEpochMilli()));
-        when(httpClientService.request(any(), anyString(), anyString(), any())).thenReturn(res);
+        when(httpService.request(any(), anyString(), anyString(), any())).thenReturn(res);
 
         var entity = new OutboundRequest().setId("test_id");
         when(configRepository.findRequest(anyString())).thenReturn(Optional.of(entity));

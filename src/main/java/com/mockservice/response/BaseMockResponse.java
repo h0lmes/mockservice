@@ -8,7 +8,7 @@ import org.springframework.http.HttpHeaders;
 public class BaseMockResponse implements MockResponse {
 
     private final MockVariables variables = new MockVariables();
-    private final MockFunctions functions = new MockFunctions();
+    private MockFunctions functions;
     private final int responseCode;
     final HttpHeaders responseHeaders = new HttpHeaders();
     final StringTemplate responseBody;
@@ -22,8 +22,7 @@ public class BaseMockResponse implements MockResponse {
     public MockResponse setVariables(MockVariables variables, MockFunctions functions) {
         this.variables.clear();
         this.variables.putAll(variables);
-        this.functions.clear();
-        this.functions.putAll(functions);
+        this.functions = functions;
         return this;
     }
 

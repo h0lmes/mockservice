@@ -59,7 +59,7 @@ public class HttpRequestResult {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(method.toString()).append(" ").append(uri).append('\n');
-        if (!headers.isEmpty()) {
+        if (headers != null && !headers.isEmpty()) {
             appendHeaders(builder);
         }
         if (!requestBody.isEmpty()) {
@@ -92,11 +92,8 @@ public class HttpRequestResult {
     private void appendResult(StringBuilder builder) {
         builder.append("--- response in ").append(duration).append(" ms ---\n");
         var status = HttpStatus.resolve(statusCode);
-        builder.append("HTTP ")
-                .append(statusCode)
-                .append(" ")
-                .append(status == null ? "Unknown" : status.getReasonPhrase())
-                .append('\n');
+        builder.append(statusCode).append(" ")
+                .append(status == null ? "Unknown" : status.getReasonPhrase()).append('\n');
         builder.append(responseBody);
     }
 }
