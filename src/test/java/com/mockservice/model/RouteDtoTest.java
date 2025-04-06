@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class RouteDtoTest {
+class RouteDtoTest {
 
     private static final RequestMethod METHOD1 = RequestMethod.GET;
     private static final RequestMethod METHOD2 = RequestMethod.PUT;
@@ -17,7 +17,7 @@ public class RouteDtoTest {
 
     @DisplayName("Test equality based on method, path and alt (other parameters don't matter).")
     @Test
-    public void equals_SameMethodPathAlt_OtherFieldsDiffer_True() {
+    void equals_SameMethodPathAlt_OtherFieldsDiffer_True() {
         RouteDto route1 = new RouteDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1)
                 .setGroup(STR_1)
                 .setResponse(STR_1)
@@ -34,47 +34,47 @@ public class RouteDtoTest {
     }
 
     @Test
-    public void equals_Null_False() {
+    void equals_Null_False() {
         RouteDto route = new RouteDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
         assertNotEquals(null, route);
     }
 
     @Test
-    public void equals_ObjectOfOtherType_False() {
+    void equals_ObjectOfOtherType_False() {
         RouteDto route = new RouteDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
         assertNotEquals(route, new Object());
     }
 
     @Test
-    public void equals_DifferentMethod_False() {
+    void equals_DifferentMethod_False() {
         RouteDto route1 = new RouteDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
         RouteDto route2 = new RouteDto().setMethod(METHOD2).setPath(STR_1).setAlt(STR_1);
         assertNotEquals(route1, route2);
     }
 
     @Test
-    public void equals_DifferentPath_False() {
+    void equals_DifferentPath_False() {
         RouteDto route1 = new RouteDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
         RouteDto route2 = new RouteDto().setMethod(METHOD1).setPath(STR_2).setAlt(STR_1);
         assertNotEquals(route1, route2);
     }
 
     @Test
-    public void equals_DifferentAlt_False() {
+    void equals_DifferentAlt_False() {
         RouteDto route1 = new RouteDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
         RouteDto route2 = new RouteDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_2);
         assertNotEquals(route1, route2);
     }
 
     @Test
-    public void hashCode_EqualsForEqualObjects() {
+    void hashCode_EqualsForEqualObjects() {
         RouteDto route1 = new RouteDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
         RouteDto route2 = new RouteDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
         assertEquals(route1.hashCode(), route2.hashCode());
     }
 
     @Test
-    public void toString_EqualsForEqualObjects() {
+    void toString_EqualsForEqualObjects() {
         RouteDto route1 = new RouteDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
         RouteDto route2 = new RouteDto().setMethod(METHOD1).setPath(STR_1).setAlt(STR_1);
         assertEquals(route1.toString(), route2.toString());

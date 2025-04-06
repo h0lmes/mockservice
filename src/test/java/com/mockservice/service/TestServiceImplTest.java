@@ -5,7 +5,6 @@ import com.mockservice.mapper.ApiTestMapperImpl;
 import com.mockservice.model.HttpRequestResult;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.template.MockVariables;
-import com.mockservice.template.TemplateEngine;
 import com.mockservice.ws.WebSocketHandler;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,8 +27,6 @@ class TestServiceImplTest {
     @Mock
     private ConfigRepository configRepository;
     @Mock
-    private TemplateEngine templateEngine;
-    @Mock
     private RequestService requestService;
     @Mock
     private HttpService httpService;
@@ -42,7 +39,7 @@ class TestServiceImplTest {
 
     private TestService getService(VariablesService variablesService) {
         return new TestServiceImpl(
-                256, configRepository, new ApiTestMapperImpl(), templateEngine,
+                256, configRepository, new ApiTestMapperImpl(),
                 variablesService, requestService, httpService, webSocketHandler);
     }
 
@@ -155,5 +152,39 @@ class TestServiceImplTest {
         assertFalse(service.getTestLog("test_alias").contains(TestServiceImpl.WARNING));
         // if test fails check this output
         System.out.println(service.getTestLog("test_alias"));
+    }
+
+    @Test
+    void execute_inlineRequests_Success() {
+        var entity = new ApiTest()
+                .setAlias("test_alias")
+                .setGroup("test_group")
+                .setPlan("""
+                        GET localhost:8080 -> 200
+                        POST localhost:8080 {} -> 200
+                        PUT localhost:8080 {} -> 200
+                        PATCH localhost:8080 {} -> 200
+                        DELETE localhost:8080 {} -> 200
+                        """);
+        when(configRepository.findTest(anyString())).thenReturn(Optional.of(entity));
+
+        var requestResult = new HttpRequestResult(
+                false, RequestMethod.GET, "localhost:8080", Map.of(),
+                "", "",
+                new MockVariables(),
+                200, Instant.now().toEpochMilli());
+        when(httpService.request(any(), anyString(), anyString(), any()))
+                .thenReturn(Optional.of(requestResult));
+
+        var varService = getVarService();
+        var service = getService(varService);
+        var result = service.execute("test_alias", false, false);
+
+        // if test fails check this output
+        System.out.println(service.getTestLog("test_alias"));
+        assertEquals(TestRunStatus.OK, result);
+        assertTrue(service.getTestLog("test_alias").contains(TestServiceImpl.SUCCESS));
+        assertFalse(service.getTestLog("test_alias").contains(TestServiceImpl.FAILED));
+        assertFalse(service.getTestLog("test_alias").contains(TestServiceImpl.WARNING));
     }
 }

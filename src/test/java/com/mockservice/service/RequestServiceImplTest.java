@@ -5,7 +5,6 @@ import com.mockservice.mapper.OutboundRequestMapperImpl;
 import com.mockservice.model.HttpRequestResult;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.template.MockVariables;
-import com.mockservice.template.TemplateEngine;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -28,15 +27,13 @@ class RequestServiceImplTest {
     @Mock
     private ConfigRepository configRepository;
     @Mock
-    private TemplateEngine templateEngine;
-    @Mock
     private VariablesService variablesService;
     @Mock
     private HttpService httpService;
 
     private RequestService getService() {
         return new RequestServiceImpl(256, configRepository,
-                new OutboundRequestMapperImpl(), templateEngine, variablesService, httpService);
+                new OutboundRequestMapperImpl(), variablesService, httpService);
     }
 
     @Test

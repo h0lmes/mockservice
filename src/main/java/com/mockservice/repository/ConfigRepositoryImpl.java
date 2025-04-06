@@ -6,11 +6,6 @@ import com.mockservice.domain.*;
 import com.mockservice.exception.RouteAlreadyExistsException;
 import com.mockservice.exception.ScenarioAlreadyExistsException;
 import com.mockservice.exception.TestAlreadyExistsException;
-import com.mockservice.model.RouteVariable;
-import com.mockservice.template.TemplateEngine;
-import com.mockservice.template.TokenParser;
-import com.mockservice.util.Cache;
-import com.mockservice.util.ConcurrentHashMapCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,7 +28,6 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     private final String fileConfigPath;
     private final String fileConfigBackupPath;
     private final ObjectMapper yamlMapper;
-    private final Cache<Route, List<RouteVariable>> routeVariablesCache;
     private final List<ConfigObserver> configObservers = new ArrayList<>();
     private final List<RouteObserver> routeObservers = new ArrayList<>();
     private final List<SettingsObserver> settingsObservers = new ArrayList<>();
@@ -42,30 +36,11 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     public ConfigRepositoryImpl(
             @Value("${application.config-filename}") String fileConfigPath,
             @Value("${application.config-backup-filename}") String fileConfigBackupPath,
-            @Qualifier("yamlMapper") ObjectMapper yamlMapper,
-            TemplateEngine templateEngine
+            @Qualifier("yamlMapper") ObjectMapper yamlMapper
     ) {
         this.fileConfigPath = fileConfigPath;
         this.fileConfigBackupPath = fileConfigBackupPath;
         this.yamlMapper = yamlMapper.copy().setMixIns(getMixIns());
-
-        routeVariablesCache = new ConcurrentHashMapCache<>(r ->
-                TokenParser
-                        .tokenize(r.getResponse())
-                        .stream()
-                        .filter(TokenParser::isToken)
-                        .map(TokenParser::parseToken)
-                        .filter(args -> !templateEngine.isFunction(args[0]))
-                        .map(args -> {
-                            RouteVariable variable = new RouteVariable().setName(args[0]);
-                            if (args.length > 1) {
-                                variable.setDefaultValue(args[1]);
-                            }
-                            return variable;
-                        })
-                        .distinct()
-                        .toList()
-        );
 
         try {
             readConfigFromFile();
@@ -237,11 +212,6 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         return findAllRoutes().stream()
                 .filter(route::equals)
                 .findFirst();
-    }
-
-    @Override
-    public List<RouteVariable> getRouteVariables(Route route) {
-        return routeVariablesCache.get(route);
     }
 
     @Override
@@ -607,7 +577,6 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     //----------------------------------------------------------------------
 
     private void notifyBeforeConfigChanged() {
-        routeVariablesCache.invalidate();
         configObservers.forEach(ConfigObserver::onBeforeConfigChanged);
     }
 
@@ -620,7 +589,6 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     private void notifyRouteDeleted(Route route) {
-        routeVariablesCache.evict(route);
         routeObservers.forEach(o -> o.onRouteDeleted(route));
     }
 

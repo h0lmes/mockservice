@@ -27,7 +27,7 @@ public class StringTemplate {
      * Internal list of strings holds data in the following way:
      * - a line can contain text (line breaks allowed)
      * - a line can contain a token (exactly one)
-     * - there could be no consecutive text lines
+     * - there could be no consecutive lines with text
      * - there could be consecutive lines with tokens
      */
     private final List<String> strings = new ArrayList<>();
@@ -88,7 +88,8 @@ public class StringTemplate {
         return builder.toString();
     }
 
-    public String toString(MockVariables variables, MockFunctions functions) {
+    public String toString(@Nullable MockVariables variables,
+                           @Nullable MockFunctions functions) {
         if (!containsTokens()) return this.toString();
         if (strings.isEmpty()) return "";
 

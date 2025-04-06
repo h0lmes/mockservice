@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class RestRequestFacadeTest {
+class RestRequestFacadeTest {
 
     private static final String STR1 = "aaa";
     private static final String STR2 = "bbb";
@@ -45,7 +45,7 @@ public class RestRequestFacadeTest {
     }
 
     @Test
-    public void getRequestMethod_MethodIsGet_ReturnsGet() {
+    void getRequestMethod_MethodIsGet_ReturnsGet() {
         when(request.getMethod()).thenReturn("GET");
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
 
@@ -53,7 +53,7 @@ public class RestRequestFacadeTest {
     }
 
     @Test
-    public void getEndpoint_Path_ReturnsPath() {
+    void getEndpoint_Path_ReturnsPath() {
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH1);
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
 
@@ -61,7 +61,7 @@ public class RestRequestFacadeTest {
     }
 
     @Test
-    public void getBody_ValidJsonBody_ReturnsBodyJson() throws IOException {
+    void getBody_ValidJsonBody_ReturnsBodyJson() throws IOException {
         when(request.getReader()).thenReturn(asReader(BODY));
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
 
@@ -69,7 +69,7 @@ public class RestRequestFacadeTest {
     }
 
     @Test
-    public void getAlt_MockAltHeaderContainsPathAndAlt_ReturnsAlt() {
+    void getAlt_MockAltHeaderContainsPathAndAlt_ReturnsAlt() {
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH1);
 
         Enumeration<String> headers = Collections.enumeration(List.of(STR1 + "/" + ALT));
@@ -82,7 +82,7 @@ public class RestRequestFacadeTest {
     }
 
     @Test
-    public void getAlt_MockAltHeaderContainsWrongPath_ReturnsEmpty() {
+    void getAlt_MockAltHeaderContainsWrongPath_ReturnsEmpty() {
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH1);
 
         Enumeration<String> headers = Collections.enumeration(List.of(STR2 + "/" + ALT));
@@ -94,7 +94,7 @@ public class RestRequestFacadeTest {
     }
 
     @Test
-    public void getAlt_MockAltHeaderInvalidFormat_ReturnsEmpty() {
+    void getAlt_MockAltHeaderInvalidFormat_ReturnsEmpty() {
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH1);
 
         Enumeration<String> headers = Collections.enumeration(List.of(STR1));
@@ -106,7 +106,7 @@ public class RestRequestFacadeTest {
     }
 
     @Test
-    public void getAlt_MockAltHeaderEmpty_ReturnsEmpty() {
+    void getAlt_MockAltHeaderEmpty_ReturnsEmpty() {
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH1);
 
         Enumeration<String> headers = Collections.enumeration(List.of(""));
@@ -118,7 +118,7 @@ public class RestRequestFacadeTest {
     }
 
     @Test
-    public void getAlt_MockAltHeaderIsNull_ReturnsEmpty() {
+    void getAlt_MockAltHeaderIsNull_ReturnsEmpty() {
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH1);
 
         List<String> list = new ArrayList<>();
@@ -132,7 +132,7 @@ public class RestRequestFacadeTest {
     }
 
     @Test
-    public void getAlt_NoMockAltHeader_ReturnsEmpty() {
+    void getAlt_NoMockAltHeader_ReturnsEmpty() {
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH1);
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
 
@@ -140,7 +140,7 @@ public class RestRequestFacadeTest {
     }
 
     @Test
-    public void getVariables_MultipleSources_ReturnsVariables() throws IOException {
+    void getVariables_MultipleSources_ReturnsVariables() throws IOException {
         lenient().when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH1);
         Enumeration<String> headers = Collections.enumeration(List.of(STR1 + "/" + HEADER_VARIABLE_NAME + "/42 42"));
         lenient().when(request.getHeaders(eq("Mock-Variable"))).thenReturn(headers);
@@ -160,79 +160,79 @@ public class RestRequestFacadeTest {
 
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
 
-        assertEquals("42", facade.getVariables(Optional.empty()).get("id"));
-        assertEquals("42 42", facade.getVariables(Optional.empty()).get(HEADER_VARIABLE_NAME));
-        assertEquals("42", facade.getVariables(Optional.empty()).get("pathVariable"));
-        assertEquals("42 42 42", facade.getVariables(Optional.empty()).get("parameterVariable"));
-        assertEquals(JWT_SUB, facade.getVariables(Optional.empty()).get("sub"));
+        assertEquals("42", facade.getVariables(null).get("id"));
+        assertEquals("42 42", facade.getVariables(null).get(HEADER_VARIABLE_NAME));
+        assertEquals("42", facade.getVariables(null).get("pathVariable"));
+        assertEquals("42 42 42", facade.getVariables(null).get("parameterVariable"));
+        assertEquals(JWT_SUB, facade.getVariables(null).get("sub"));
     }
 
     @Test
-    public void getVariables_HeaderVariableInvalidFormat_NoSuchVariable() {
+    void getVariables_HeaderVariableInvalidFormat_NoSuchVariable() {
         lenient().when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH1);
         Enumeration<String> headers = Collections.enumeration(List.of(STR1 + "/" + HEADER_VARIABLE_NAME));
         lenient().when(request.getHeaders(eq("Mock-Variable"))).thenReturn(headers);
 
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
-        MockVariables variables = facade.getVariables(Optional.empty());
+        MockVariables variables = facade.getVariables(null);
 
         assertFalse(variables.containsKey(HEADER_VARIABLE_NAME));
     }
 
     @Test
-    public void getVariables_HeaderVariableWrongPath_NoSuchVariable() {
+    void getVariables_HeaderVariableWrongPath_NoSuchVariable() {
         lenient().when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH2);
         Enumeration<String> headers = Collections.enumeration(List.of(STR1 + "/" + HEADER_VARIABLE_NAME + "/42 42"));
         lenient().when(request.getHeaders(eq("Mock-Variable"))).thenReturn(headers);
 
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
 
-        assertFalse(facade.getVariables(Optional.empty()).containsKey(HEADER_VARIABLE_NAME));
+        assertFalse(facade.getVariables(null).containsKey(HEADER_VARIABLE_NAME));
     }
 
     @Test
-    public void getVariables_InvalidJsonBody_ReturnsNoVariables() throws IOException {
+    void getVariables_InvalidJsonBody_ReturnsNoVariables() throws IOException {
         lenient().when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH1);
         when(request.getReader()).thenReturn(asReader(BODY_INVALID));
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
 
-        assertTrue(facade.getVariables(Optional.empty()).isEmpty());
+        assertTrue(facade.getVariables(null).isEmpty());
     }
 
     @Test
-    public void getVariables_ParameterMapIsNull_DoesNotThrow() {
+    void getVariables_ParameterMapIsNull_DoesNotThrow() {
         when(request.getParameterMap()).thenReturn(null);
 
         assertDoesNotThrow(() -> new RestRequestFacade(request, new ObjectMapper()));
     }
 
     @Test
-    public void getVariables_JwtNotBearer_ReturnsNoVariables() {
+    void getVariables_JwtNotBearer_ReturnsNoVariables() {
         Enumeration<String> authHeaders = Collections.enumeration(List.of(JWT));
         lenient().when(request.getHeaders(eq("Authorization"))).thenReturn(authHeaders);
 
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
 
-        assertTrue(facade.getVariables(Optional.empty()).isEmpty());
+        assertTrue(facade.getVariables(null).isEmpty());
     }
 
     @Test
-    public void getVariables_JwtWithOneChunk_ReturnsNoVariables() {
+    void getVariables_JwtWithOneChunk_ReturnsNoVariables() {
         Enumeration<String> authHeaders = Collections.enumeration(List.of("bearer " + JWT_WITH_ONE_CHUNK));
         lenient().when(request.getHeaders(eq("Authorization"))).thenReturn(authHeaders);
 
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
 
-        assertTrue(facade.getVariables(Optional.empty()).isEmpty());
+        assertTrue(facade.getVariables(null).isEmpty());
     }
 
     @Test
-    public void getVariables_JwtInvalid_ReturnsNoVariables() {
+    void getVariables_JwtInvalid_ReturnsNoVariables() {
         Enumeration<String> authHeaders = Collections.enumeration(List.of("bearer " + JWT_INVALID));
         lenient().when(request.getHeaders(eq("Authorization"))).thenReturn(authHeaders);
 
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
 
-        assertTrue(facade.getVariables(Optional.empty()).isEmpty());
+        assertTrue(facade.getVariables(null).isEmpty());
     }
 }

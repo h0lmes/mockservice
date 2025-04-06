@@ -3,8 +3,6 @@ package com.mockservice.service;
 import com.mockservice.domain.Route;
 import com.mockservice.mapper.RouteMapper;
 import com.mockservice.model.RouteDto;
-import com.mockservice.model.RouteVariable;
-import com.mockservice.model.RouteVariableDto;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.template.MockVariables;
 import com.mockservice.util.RandomUtils;
@@ -19,7 +17,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiConsumer;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,7 +32,6 @@ class RouteServiceImplTest {
     private static final String PATH_OTHER = "/api/test";
     private static final String ALT1 = "400";
     private static final String ALT2 = "204";
-    private static final String RESPONSE_WITH_VARIABLES = "${id} ... ${name:default} ...";
 
     @Mock
     private ConfigRepository configRepository;
@@ -117,103 +113,12 @@ class RouteServiceImplTest {
         Route route = new Route().setPath(PATH);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route));
         RouteDto routeDto = new RouteDto().setPath(PATH);
-        when(routeMapper.toDto(anyList(), any())).thenReturn(List.of(routeDto));
+        when(routeMapper.toDto(anyList())).thenReturn(List.of(routeDto));
 
         RouteService service = service();
 
         List<RouteDto> routes = service.getRoutes();
         assertTrue(routes.contains(routeDto));
-    }
-
-    @Test
-    void getRoutes_RouteWithVariablesExistsAndVariableValueExists_ReturnsVariables() {
-        Route route = new Route().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
-        when(configRepository.findAllRoutes()).thenReturn(List.of(route));
-        when(configRepository.getRouteVariables(any())).thenReturn(List.of(
-                new RouteVariable().setName("id"),
-                new RouteVariable().setName("name").setDefaultValue("default")
-        ));
-
-        RouteDto routeDto = new RouteDto().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
-        doAnswer(ans -> {
-            BiConsumer<Route, RouteDto> postProcess = (BiConsumer<Route, RouteDto>) ans.getArguments()[1];
-            postProcess.accept(route, routeDto);
-            return List.of(routeDto);
-        }).when(routeMapper).toDto(anyList(), any());
-
-        RouteService service = service();
-        service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
-        List<RouteDto> routes = service.getRoutes();
-
-        assertEquals(1, routes.size());
-        assertEquals(2, routes.get(0).getVariables().size());
-
-        RouteVariable var0 = routes.get(0).getVariables().get(0);
-        RouteVariable var1 = routes.get(0).getVariables().get(1);
-        assertAll(() -> {
-            assertEquals("id", var0.getName());
-            assertNull(var0.getDefaultValue());
-            assertEquals("123", var0.getValue());
-
-            assertEquals("name", var1.getName());
-            assertEquals("default", var1.getDefaultValue());
-            assertNull(var1.getValue());
-        });
-    }
-
-    @Test
-    void getRoutes_RouteWithVariablesExistsAndVariableValueDoesNotExist_ReturnsDefaults() {
-        Route route = new Route().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
-        when(configRepository.findAllRoutes()).thenReturn(List.of(route));
-        when(configRepository.getRouteVariables(any())).thenReturn(List.of(
-                new RouteVariable().setName("id"),
-                new RouteVariable().setName("name").setDefaultValue("default")
-        ));
-
-        RouteDto routeDto = new RouteDto().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
-        doAnswer(ans -> {
-            BiConsumer<Route, RouteDto> postProcess = (BiConsumer<Route, RouteDto>) ans.getArguments()[1];
-            postProcess.accept(route, routeDto);
-            return List.of(routeDto);
-        }).when(routeMapper).toDto(anyList(), any());
-
-        RouteService service = service();
-        List<RouteDto> routes = service.getRoutes();
-
-        assertEquals(1, routes.size());
-        assertEquals(2, routes.get(0).getVariables().size());
-
-        RouteVariable var0 = routes.get(0).getVariables().get(0);
-        RouteVariable var1 = routes.get(0).getVariables().get(1);
-        assertAll(() -> {
-            assertEquals("id", var0.getName());
-            assertNull(var0.getDefaultValue());
-            assertNull(var0.getValue());
-
-            assertEquals("name", var1.getName());
-            assertEquals("default", var1.getDefaultValue());
-            assertNull(var1.getValue());
-        });
-    }
-
-    @Test
-    void getRoutes_RouteWithFunctionsExists_ReturnsNoVariables() {
-        Route route = new Route().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
-        when(configRepository.findAllRoutes()).thenReturn(List.of(route));
-
-        RouteDto routeDto = new RouteDto().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
-        doAnswer(ans -> {
-            BiConsumer<Route, RouteDto> postProcess = (BiConsumer<Route, RouteDto>) ans.getArguments()[1];
-            postProcess.accept(route, routeDto);
-            return List.of(routeDto);
-        }).when(routeMapper).toDto(anyList(), any());
-
-        RouteService service = service();
-        service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
-        List<RouteDto> routes = service.getRoutes();
-
-        assertEquals(1, routes.size());
-        assertTrue(routes.get(0).getVariables().isEmpty());
     }
 
     @Test
@@ -244,51 +149,6 @@ class RouteServiceImplTest {
         verify(configRepository).deleteRoutes(routeListCaptor.capture());
         assertFalse(routeListCaptor.getValue().isEmpty());
         assertEquals(PATH, routeListCaptor.getValue().get(0).getPath());
-    }
-
-    @Test
-    void setRouteVariable_OneVariable_VariableCreated() {
-        RouteService service = service();
-        service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
-        Route route = new Route().setPath(PATH);
-        MockVariables routeVariables = service.getRouteVariables(route);
-
-        assertEquals(1, routeVariables.size());
-        assertEquals("123", routeVariables.get("id"));
-    }
-
-    @Test
-    void clearRouteVariable_ClearExisting_VariableDoesNotExist() {
-        RouteService service = service();
-        service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
-        service.clearRouteVariable(new RouteVariableDto().setPath(PATH).setName("id"));
-        Route route = new Route().setPath(PATH);
-        MockVariables routeVariables = service.getRouteVariables(route);
-
-        assertNull(routeVariables);
-    }
-
-    @Test
-    void clearRouteVariable_ClearNonExisting_VariableDoesNotExist() {
-        RouteService service = service();
-        service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
-        service.clearRouteVariable(new RouteVariableDto().setPath(PATH).setName("name"));
-        Route route = new Route().setPath(PATH);
-        MockVariables routeVariables = service.getRouteVariables(route);
-
-        assertFalse(routeVariables.isEmpty());
-    }
-
-    @Test
-    void clearRouteVariable_ClearForNonExistingRoute_VariableExists() {
-        RouteService service = service();
-        service.setRouteVariable(new RouteVariableDto().setPath(PATH).setName("id").setValue("123"));
-        service.clearRouteVariable(new RouteVariableDto().setPath(PATH).setMethod(METHOD).setAlt(ALT1).setName("id"));
-        Route route = new Route().setPath(PATH);
-        MockVariables routeVariables = service.getRouteVariables(route);
-
-        assertEquals(1, routeVariables.size());
-        assertEquals("123", routeVariables.get("id"));
     }
 
     // --- random alt -----------------------------------------------------

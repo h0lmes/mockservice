@@ -5,9 +5,9 @@ import com.mockservice.mapper.ApiTestMapper;
 import com.mockservice.model.ApiTestDto;
 import com.mockservice.model.HttpRequestResult;
 import com.mockservice.repository.ConfigRepository;
+import com.mockservice.template.MockFunctions;
 import com.mockservice.template.MockVariables;
 import com.mockservice.template.StringTemplate;
-import com.mockservice.template.TemplateEngine;
 import com.mockservice.util.KeyValue;
 import com.mockservice.ws.WebSocketHandler;
 import org.slf4j.Logger;
@@ -27,14 +27,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class TestServiceImpl implements TestService {
-    public static final String SUCCESS = "SUCCESS (";
-    public static final String WARNING = "WARNING (";
-    public static final String FAILED = "FAILED (";
+    public static final String SUCCESS = "SUCCESS";
+    public static final String WARNING = "WARNING";
+    public static final String FAILED = "FAILED";
     public static final String ERROR = "ERROR (";
     private static final Logger log = LoggerFactory.getLogger(TestServiceImpl.class);
     private final ConfigRepository configRepository;
     private final ApiTestMapper apiTestMapper;
-    private final TemplateEngine templateEngine;
     private final VariablesService variablesService;
     private final RequestService requestService;
     private final HttpService httpService;
@@ -46,14 +45,12 @@ public class TestServiceImpl implements TestService {
             @Value("${application.test-service.cache-size:2000}") int cacheSize,
             ConfigRepository configRepository,
             ApiTestMapper apiTestMapper,
-            TemplateEngine templateEngine,
             VariablesService variablesService,
             RequestService requestService,
             HttpService httpService,
             WebSocketHandler webSocketHandler) {
         this.configRepository = configRepository;
         this.apiTestMapper = apiTestMapper;
-        this.templateEngine = templateEngine;
         this.variablesService = variablesService;
         this.requestService = requestService;
         this.httpService = httpService;
@@ -213,9 +210,9 @@ public class TestServiceImpl implements TestService {
             String value = MockVariables.get(run.getMockVariables(), kv.key());
 
             if (value.equals(expectedValue)) {
-                run.log(SUCCESS).log(kv.key()).log(" == ").log(value).log(")\n");
+                run.log(SUCCESS).log(" (").log(kv.key()).log(" == ").log(value).log(")\n");
             } else {
-                run.log(WARNING).log(kv.key()).log(" == ").log(value)
+                run.log(WARNING).log(" (").log(kv.key()).log(" == ").log(value)
                         .log("; expected: ").log(expectedValue).log(")\n");
                 run.setErrorLevel(TestRunErrorLevel.WARNING);
             }
@@ -234,9 +231,9 @@ public class TestServiceImpl implements TestService {
             String value = MockVariables.get(run.getMockVariables(), kv.key());
 
             if (value.equals(expectedValue)) {
-                run.log(SUCCESS).log(kv.key()).log(" === ").log(value).log(")\n");
+                run.log(SUCCESS).log(" (").log(kv.key()).log(" === ").log(value).log(")\n");
             } else {
-                run.log(FAILED).log(kv.key()).log(" === ").log(value)
+                run.log(FAILED).log(" (").log(kv.key()).log(" === ").log(value)
                         .log("; expected: ").log(expectedValue).log(")\n");
                 run.setErrorLevel(TestRunErrorLevel.FAILED);
             }
@@ -251,10 +248,10 @@ public class TestServiceImpl implements TestService {
         try {
             var kv = KeyValue.of(run.getLine(), "=");
             StringTemplate valueTemplate = new StringTemplate(kv.value());
-            String value = valueTemplate.toString(variablesService.getAll(), templateEngine.getFunctions());
+            String value = valueTemplate.toString(variablesService.getAll(), MockFunctions.create());
 
             variablesService.put(kv.key(), value);
-            run.log(SUCCESS).log(kv.key()).log(" = ").log(value).log(")\n");
+            run.log(SUCCESS).log(" (").log(kv.key()).log(" = ").log(value).log(")\n");
         } catch (Exception e) {
             log.error("ERROR while processing variable. ", e);
             run.log(ERROR).log("while processing variable:\n").log(e.toString()).log(")\n");
@@ -290,10 +287,11 @@ public class TestServiceImpl implements TestService {
             var kvRequest = KeyValue.of(request, " ");
             var kvUriBody = KeyValue.of(kvRequest.value(), " ");
             RequestMethod method = RequestMethod.resolve(kvRequest.key());
+            var functions = MockFunctions.create();
             String uri = templateCache.get(kvUriBody.key())
-                    .toString(variablesService.getAll(), templateEngine.getFunctions());
+                    .toString(variablesService.getAll(), functions);
             String body = templateCache.get(kvUriBody.value())
-                    .toString(variablesService.getAll(), templateEngine.getFunctions());
+                    .toString(variablesService.getAll(), functions);
 
             Optional<HttpRequestResult> requestResult = httpService.request(
                     method, uri, body, null);
@@ -314,10 +312,10 @@ public class TestServiceImpl implements TestService {
 
         requestResult.ifPresent(res -> {
             run.setMockVariables(res.getResponseVariables());
-            if (codes.isEmpty() || codes.contains("" + res.getStatusCode())) {
+            if (codes == null || codes.isEmpty() || codes.contains("" + res.getStatusCode())) {
                 run.log("SUCCESS\n");
             } else {
-                run.log(FAILED).log("status code = ").log(res.getStatusCode())
+                run.log(FAILED).log(" (").log("status code = ").log(res.getStatusCode())
                         .log("; expected: ").log(codes).log(")\n");
                 run.setErrorLevel(TestRunErrorLevel.FAILED);
             }

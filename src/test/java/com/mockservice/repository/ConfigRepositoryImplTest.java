@@ -7,8 +7,6 @@ import com.mockservice.domain.*;
 import com.mockservice.exception.RouteAlreadyExistsException;
 import com.mockservice.exception.ScenarioAlreadyExistsException;
 import com.mockservice.exception.TestAlreadyExistsException;
-import com.mockservice.model.RouteVariable;
-import com.mockservice.template.TemplateEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,10 +30,7 @@ class ConfigRepositoryImplTest {
     private static final String STR1 = "AAA";
     private static final String STR2 = "BBB";
     private static final String PATH = "/test";
-    private static final String RESPONSE_WITH_VARIABLES = "${id} ... ${name:default} ...";
 
-    @Mock
-    private TemplateEngine templateEngine;
     @Mock
     private ConfigObserver configObserver;
     @Mock
@@ -48,8 +43,7 @@ class ConfigRepositoryImplTest {
         ConfigRepositoryImpl configRepository = new ConfigRepositoryImpl(
                 getTempFile("config.yml"),
                 getTempFile("backup.yml"),
-                getYamlMapper(),
-                templateEngine);
+                getYamlMapper());
 
         configRepository.registerConfigObserver(configObserver);
         configRepository.registerRouteObserver(routeObserver);
@@ -61,8 +55,7 @@ class ConfigRepositoryImplTest {
         return new ConfigRepositoryImpl(
                 getTempFile("config.yml"),
                 getTempFile("backup.yml"),
-                getYamlMapper(),
-                templateEngine);
+                getYamlMapper());
     }
 
     private String getTempFile(String fileName) {
@@ -194,29 +187,6 @@ class ConfigRepositoryImplTest {
     //
     //
     //----------------------------------------------------------------------
-
-    @Test
-    void getRouteVariables_RouteWithVariables_ReturnsVariables() throws IOException {
-        Route route = new Route().setPath(PATH).setResponse(RESPONSE_WITH_VARIABLES);
-        ConfigRepository configRepository = repository();
-        configRepository.putRoute(null, route);
-
-        List<RouteVariable> routeVariables = configRepository.getRouteVariables(route);
-
-        assertEquals(2, routeVariables.size());
-
-        RouteVariable var0 = routeVariables.get(0);
-        RouteVariable var1 = routeVariables.get(1);
-        assertAll(() -> {
-            assertEquals("id", var0.getName());
-            assertNull(var0.getDefaultValue());
-            assertNull(var0.getValue());
-
-            assertEquals("name", var1.getName());
-            assertEquals("default", var1.getDefaultValue());
-            assertNull(var1.getValue());
-        });
-    }
 
     @Test
     void putRoute_NonExisting_RouteAdded() throws IOException {

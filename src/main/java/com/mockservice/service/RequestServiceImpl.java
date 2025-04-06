@@ -5,10 +5,10 @@ import com.mockservice.mapper.OutboundRequestMapper;
 import com.mockservice.model.HttpRequestResult;
 import com.mockservice.model.OutboundRequestDto;
 import com.mockservice.repository.ConfigRepository;
+import com.mockservice.template.MockFunctions;
 import com.mockservice.template.MockVariables;
 import com.mockservice.template.RequestHeadersTemplate;
 import com.mockservice.template.StringTemplate;
-import com.mockservice.template.TemplateEngine;
 import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,6 @@ public class RequestServiceImpl implements RequestService {
 
     private final ConfigRepository configRepository;
     private final OutboundRequestMapper requestMapper;
-    private final TemplateEngine templateEngine;
     private final VariablesService variablesService;
     private final HttpService httpService;
     private final ConcurrentLruCache<OutboundRequest, RequestHeadersTemplate> headersCache;
@@ -40,12 +39,10 @@ public class RequestServiceImpl implements RequestService {
     public RequestServiceImpl(@Value("${application.request-service.cache-size:1000}") int cacheSize,
                               ConfigRepository configRepository,
                               OutboundRequestMapper requestMapper,
-                              TemplateEngine templateEngine,
                               VariablesService variablesService,
                               HttpService httpService) {
         this.configRepository = configRepository;
         this.requestMapper = requestMapper;
-        this.templateEngine = templateEngine;
         this.variablesService = variablesService;
         this.httpService = httpService;
         headersCache = new ConcurrentLruCache<>(cacheSize, this::getRequestHeadersTemplate);
@@ -108,11 +105,12 @@ public class RequestServiceImpl implements RequestService {
             return Optional.empty();
         }
 
+        var functions = MockFunctions.create();
         var requestVars = MockVariables.sum(variablesService.getAll(), inVariables);
-        var requestBody = requestBodyCache.get(request).toString(requestVars, templateEngine.getFunctions());
-        var uri = uriCache.get(request).toString(requestVars, templateEngine.getFunctions());
+        var requestBody = requestBodyCache.get(request).toString(requestVars, functions);
+        var uri = uriCache.get(request).toString(requestVars, functions);
         var headersTemplate = headersCache.get(request);
-        var headers = headersTemplate.toMap(requestVars, templateEngine.getFunctions());
+        var headers = headersTemplate.toMap(requestVars, functions);
 
         var result = httpService.request(request.getMethod(), uri, requestBody, headers);
 

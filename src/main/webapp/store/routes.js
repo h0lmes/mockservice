@@ -9,20 +9,6 @@ export const mutations = {
     add(state, payload) {
         state.routes.unshift(payload);
     },
-    variable(state, payload) {
-        let route = state.routes.find(
-            r => r.method === payload.method
-                && r.path === payload.path
-                && r.alt === payload.alt
-        );
-
-        if (route && route.variables) {
-            let variable = route.variables.find(v => v.name === payload.name);
-            if (variable) {
-                variable.value = payload.value;
-            }
-        }
-    },
 };
 
 import {handleError} from "../js/common";
@@ -103,37 +89,5 @@ export const actions = {
             _new: true,
         };
         commit('add', route);
-    },
-    async setVariable({commit, rootState}, variable) {
-        try {
-            const url = rootState.BASE_URL + '/web-api/routes/variables';
-            const params = {
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(variable)
-            };
-            const res = await fetch(url, params);
-            await handleError(res);
-            const data = await res.json();
-            commit('variable', data);
-        } catch (err) {
-            commit('setLastError', err, {root: true});
-        }
-    },
-    async clearVariable({commit, rootState}, variable) {
-        try {
-            const url = rootState.BASE_URL + '/web-api/routes/variables';
-            const params = {
-                method: 'DELETE',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(variable)
-            };
-            const res = await fetch(url, params);
-            await handleError(res);
-            const data = await res.json();
-            commit('variable', data);
-        } catch (err) {
-            commit('setLastError', err, {root: true});
-        }
     },
 };

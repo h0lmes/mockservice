@@ -4,16 +4,14 @@ import com.mockservice.domain.Route;
 import com.mockservice.model.RouteDto;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 @Component
 public class RouteMapperImpl implements RouteMapper {
 
     @Override
-    public RouteDto toDto(Route route, @Nullable BiConsumer<Route, RouteDto> postProcess) {
-        RouteDto dto = new RouteDto()
+    public RouteDto toDto(Route route) {
+        return new RouteDto()
                 .setGroup(route.getGroup())
                 .setType(route.getType())
                 .setMethod(route.getMethod())
@@ -25,10 +23,6 @@ public class RouteMapperImpl implements RouteMapper {
                 .setDisabled(route.getDisabled())
                 .setTriggerRequest(route.isTriggerRequest())
                 .setTriggerRequestIds(route.getTriggerRequestIds());
-        if (postProcess != null) {
-            postProcess.accept(route, dto);
-        }
-        return dto;
     }
 
     @Override
@@ -48,12 +42,12 @@ public class RouteMapperImpl implements RouteMapper {
     }
 
     @Override
-    public List<RouteDto> toDto(List<Route> routes, @Nullable BiConsumer<Route, RouteDto> postProcess) {
-        return routes.stream().map(r -> toDto(r, postProcess)).toList();
+    public List<RouteDto> toDto(List<Route> routes) {
+        return routes.stream().map(this::toDto).toList();
     }
 
     @Override
-    public List<Route> fromDto(List<RouteDto> dtos) {
-        return dtos.stream().map(this::fromDto).toList();
+    public List<Route> fromDto(List<RouteDto> list) {
+        return list.stream().map(this::fromDto).toList();
     }
 }

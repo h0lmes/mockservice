@@ -33,25 +33,16 @@
         <div class="color-secondary mt-6">
             <div class="mt-2 bold">Tips</div>
             <div class="mt-2">
-                Click on any value (GROUP, METHOD, PATH, etc.; you'll see underline on hover) to filter by that value.
+                - Click on any value (GROUP, METHOD, PATH, etc.; you'll see underline on hover) to filter by that value.
             </div>
             <div class="mt-2">
-                For more precise filtering enable 'JS' and use Javascript expressions in search field (example: e.group=='default' && !e.disabled).
+                - For more precise filtering enable 'JS' and use Javascript expressions in search field (example: e.group=='default' && !e.disabled).
             </div>
             <div class="mt-2">
-                Vars button toggles variables editing mode (if any vars exist in the RESPONSE BODY of the ROUTE).
+                - Middle-click to edit, press ESC in any field to cancel.
             </div>
             <div class="mt-2">
-                Edit button toggles edit mode.
-            </div>
-            <div class="mt-2">
-                Test button allows for a quick test to see if Route is functional.
-            </div>
-            <div class="mt-2">
-                Middle-click to edit, press ESC in any field to cancel.
-            </div>
-            <div class="mt-2">
-                To alter multiple entities quickly consider navigating to Config page and editing it as plain text.
+                - To alter multiple entities quickly consider navigating to Config page and editing it as plain text.
                 Use Backup button there for extra caution.
             </div>
         </div>

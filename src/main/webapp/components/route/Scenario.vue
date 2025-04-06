@@ -36,7 +36,6 @@
             <div class="mock-col-value">
                 <button type="button" class="btn btn-sm disabled">&#xA0;&#xA0;&#xA0;&#xA0;</button>
                 <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
-                <button type="button" class="btn btn-sm disabled">&#xA0;&#xA0;&#xA0;&#xA0;</button>
                 <button type="button" class="btn btn-sm btn-danger ml-2" @click="del">delete</button>
             </div>
         </div>

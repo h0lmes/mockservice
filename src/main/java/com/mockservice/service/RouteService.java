@@ -2,7 +2,6 @@ package com.mockservice.service;
 
 import com.mockservice.domain.Route;
 import com.mockservice.model.RouteDto;
-import com.mockservice.model.RouteVariableDto;
 import com.mockservice.template.MockVariables;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -18,7 +17,4 @@ public interface RouteService {
     void putRoute(RouteDto reference, RouteDto route) throws IOException;
     void putRoutes(List<RouteDto> dto, boolean overwrite) throws IOException;
     void deleteRoutes(List<RouteDto> dto) throws IOException;
-    MockVariables getRouteVariables(Route route);
-    RouteVariableDto setRouteVariable(RouteVariableDto variable);
-    RouteVariableDto clearRouteVariable(RouteVariableDto variable);
 }

@@ -14,14 +14,17 @@ import org.springframework.web.servlet.HandlerMapping;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class SoapRequestFacadeTest {
+class SoapRequestFacadeTest {
 
     private static final String PATH = "/test";
     private static final String ALT = "400";
@@ -35,7 +38,7 @@ public class SoapRequestFacadeTest {
     }
 
     @Test
-    public void getRequestMethod_MethodIsGet_ReturnsGet() {
+    void getRequestMethod_MethodIsGet_ReturnsGet() {
         when(request.getMethod()).thenReturn("POST");
         RequestFacade facade = new SoapRequestFacade(request, new ObjectMapper());
 
@@ -43,7 +46,7 @@ public class SoapRequestFacadeTest {
     }
 
     @Test
-    public void getEndpoint_Path_ReturnsPath() {
+    void getEndpoint_Path_ReturnsPath() {
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH);
         RequestFacade facade = new SoapRequestFacade(request, new ObjectMapper());
 
@@ -51,7 +54,7 @@ public class SoapRequestFacadeTest {
     }
 
     @Test
-    public void getBody_ValidBody_ReturnsBody() throws IOException {
+    void getBody_ValidBody_ReturnsBody() throws IOException {
         when(request.getReader()).thenReturn(asReader(BODY));
         RequestFacade facade = new SoapRequestFacade(request, new ObjectMapper());
 
@@ -59,7 +62,7 @@ public class SoapRequestFacadeTest {
     }
 
     @Test
-    public void getAlt_MockAltHeaderContainsPathAndAlt_ReturnsAlt() {
+    void getAlt_MockAltHeaderContainsPathAndAlt_ReturnsAlt() {
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH);
 
         Enumeration<String> headers = Collections.enumeration(List.of("test/" + ALT));
@@ -72,7 +75,7 @@ public class SoapRequestFacadeTest {
     }
 
     @Test
-    public void getAlt_MockAltHeaderContainsWrongPath_ReturnsEmpty() {
+    void getAlt_MockAltHeaderContainsWrongPath_ReturnsEmpty() {
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH);
 
         Enumeration<String> headers = Collections.enumeration(List.of("wrong-path/" + ALT));
@@ -84,7 +87,7 @@ public class SoapRequestFacadeTest {
     }
 
     @Test
-    public void getAlt_MockAltHeaderEmpty_ReturnsEmpty() {
+    void getAlt_MockAltHeaderEmpty_ReturnsEmpty() {
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH);
 
         Enumeration<String> headers = Collections.enumeration(List.of(""));
@@ -96,7 +99,7 @@ public class SoapRequestFacadeTest {
     }
 
     @Test
-    public void getAlt_MockAltHeaderIsNull_ReturnsEmpty() {
+    void getAlt_MockAltHeaderIsNull_ReturnsEmpty() {
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH);
 
         List<String> list = new ArrayList<>();
@@ -110,7 +113,7 @@ public class SoapRequestFacadeTest {
     }
 
     @Test
-    public void getAlt_NoMockAltHeader_ReturnsEmpty() {
+    void getAlt_NoMockAltHeader_ReturnsEmpty() {
         when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH);
         RequestFacade facade = new SoapRequestFacade(request, new ObjectMapper());
 
@@ -118,7 +121,7 @@ public class SoapRequestFacadeTest {
     }
 
     @Test
-    public void getVariables_MultipleSources_ReturnsVariables() throws IOException {
+    void getVariables_MultipleSources_ReturnsVariables() throws IOException {
         lenient().when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(PATH);
         Enumeration<String> headers = Collections.enumeration(List.of("test/headerVariable/42 42"));
         lenient().when(request.getHeaders(eq("Mock-Variable"))).thenReturn(headers);
@@ -127,7 +130,7 @@ public class SoapRequestFacadeTest {
         when(request.getReader()).thenReturn(asReader(body));
 
         RequestFacade facade = new SoapRequestFacade(request, new ObjectMapper());
-        MockVariables variables = facade.getVariables(Optional.empty());
+        MockVariables variables = facade.getVariables(null);
 
         assertEquals("${NumberToDollarsRequest.Value:DEFAULT_VALUE}",
                 variables.get("NumberToDollarsResponse.Result"));
@@ -135,21 +138,21 @@ public class SoapRequestFacadeTest {
     }
 
     @Test
-    public void getVariables_InvalidXmlInBody_ReturnsNoVariables() throws IOException {
+    void getVariables_InvalidXmlInBody_ReturnsNoVariables() throws IOException {
         String body = IOUtils.asString("soap_envelope_invalid.xml");
         when(request.getReader()).thenReturn(asReader(body));
 
         RequestFacade facade = new SoapRequestFacade(request, new ObjectMapper());
-        MockVariables variables = facade.getVariables(Optional.empty());
+        MockVariables variables = facade.getVariables(null);
 
         assertTrue(variables.isEmpty());
     }
 
     @Test
-    public void getVariables_EmptyBody_ReturnsNoVariables() throws IOException {
+    void getVariables_EmptyBody_ReturnsNoVariables() throws IOException {
         when(request.getReader()).thenReturn(asReader(""));
         RequestFacade facade = new SoapRequestFacade(request, new ObjectMapper());
-        MockVariables variables = facade.getVariables(Optional.empty());
+        MockVariables variables = facade.getVariables(null);
 
         assertTrue(variables.isEmpty());
     }

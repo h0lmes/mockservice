@@ -3,8 +3,6 @@ package com.mockservice.service;
 import com.mockservice.domain.Route;
 import com.mockservice.mapper.RouteMapper;
 import com.mockservice.model.RouteDto;
-import com.mockservice.model.RouteVariable;
-import com.mockservice.model.RouteVariableDto;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.template.MockVariables;
 import com.mockservice.util.RandomUtils;
@@ -13,11 +11,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiConsumer;
 
 @Service
 public class RouteServiceImpl implements RouteService {
@@ -25,8 +20,6 @@ public class RouteServiceImpl implements RouteService {
     private final ConfigRepository configRepository;
     private final RouteMapper routeMapper;
     private final RandomUtils randomUtils;
-
-    private final Map<Route, MockVariables> routesVariablesValues = new ConcurrentHashMap<>();
 
     public RouteServiceImpl(ConfigRepository configRepository,
                             RouteMapper routeMapper,
@@ -77,19 +70,7 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public List<RouteDto> getRoutes() {
-        BiConsumer<Route, RouteDto> postProcess = (route, dto) -> dto.setVariables(variablesFromRoute(route));
-        return routeMapper.toDto(configRepository.findAllRoutes(), postProcess);
-    }
-
-    private List<RouteVariable> variablesFromRoute(Route route) {
-        List<RouteVariable> routeVariables = configRepository.getRouteVariables(route);
-        routeVariables.forEach(v -> {
-            MockVariables routeVariablesValues = routesVariablesValues.get(route);
-            if (routeVariablesValues != null) {
-                v.setValue(routeVariablesValues.get(v.getName()));
-            }
-        });
-        return routeVariables;
+        return routeMapper.toDto(configRepository.findAllRoutes());
     }
 
     @Override
@@ -105,31 +86,5 @@ public class RouteServiceImpl implements RouteService {
     @Override
     public synchronized void deleteRoutes(List<RouteDto> dto) throws IOException {
         configRepository.deleteRoutes(routeMapper.fromDto(dto));
-    }
-
-    @Override
-    public MockVariables getRouteVariables(Route route) {
-        return routesVariablesValues.get(route);
-    }
-
-    @Override
-    public RouteVariableDto setRouteVariable(RouteVariableDto variable) {
-        Route route = new Route(variable.getMethod(), variable.getPath(), variable.getAlt());
-        MockVariables values = routesVariablesValues.computeIfAbsent(route, r -> new MockVariables());
-        values.put(variable.getName(), variable.getValue());
-        return variable;
-    }
-
-    @Override
-    public RouteVariableDto clearRouteVariable(RouteVariableDto variable) {
-        Route route = new Route(variable.getMethod(), variable.getPath(), variable.getAlt());
-        MockVariables values = routesVariablesValues.get(route);
-        if (values != null) {
-            values.remove(variable.getName());
-            if (values.isEmpty()) {
-                routesVariablesValues.remove(route);
-            }
-        }
-        return variable.setValue(null);
     }
 }

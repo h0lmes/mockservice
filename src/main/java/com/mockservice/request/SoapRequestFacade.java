@@ -6,6 +6,7 @@ import com.mockservice.util.MapUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.lang.Nullable;
 
 import java.util.Optional;
 
@@ -18,9 +19,9 @@ public class SoapRequestFacade extends AbstractRequestFacade {
     }
 
     @Override
-    public MockVariables getVariables(Optional<MockVariables> baseVariables) {
+    public MockVariables getVariables(@Nullable MockVariables baseVariables) {
         MockVariables vars = new MockVariables();
-        baseVariables.ifPresent(vars::putAll);
+        if (baseVariables != null) vars.putAll(baseVariables);
         getBodyAsVariables().ifPresent(vars::putAll);
         vars.putAll(getHeaderVariables());
         return vars;

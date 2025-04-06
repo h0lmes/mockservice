@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TemplateEngineImplTest {
+class MockFunctionsTest {
 
     private static final String[] EMPTY_ARGS = new String[]{};
     private static final String[] NUMERIC_ARGS = new String[]{"enum", "1", "10"};
@@ -23,9 +23,8 @@ public class TemplateEngineImplTest {
             "\\b[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-\\b[0-9a-fA-F]{12}\\b";
 
     @Test
-    public void getFunctions_Sequence() {
-        TemplateEngine engine = new TemplateEngineImpl();
-        Function<String[], String> fn = engine.getFunctions().get("sequence");
+    void getFunctions_Sequence() {
+        Function<String[], String> fn = MockFunctions.create().get("sequence");
 
         assertEquals("1", fn.apply(EMPTY_ARGS));
         assertEquals("2", fn.apply(EMPTY_ARGS));
@@ -33,17 +32,15 @@ public class TemplateEngineImplTest {
     }
 
     @Test
-    public void getFunctions_RandomInt() {
-        TemplateEngine engine = new TemplateEngineImpl();
-        Function<String[], String> fn = engine.getFunctions().get("random_int");
+    void getFunctions_RandomInt() {
+        Function<String[], String> fn = MockFunctions.create().get("random_int");
 
         assertDoesNotThrow(() -> Integer.parseInt(fn.apply(EMPTY_ARGS)));
     }
 
     @Test
-    public void getFunctions_RandomIntInRange() {
-        TemplateEngine engine = new TemplateEngineImpl();
-        Function<String[], String> fn = engine.getFunctions().get("random_int");
+    void getFunctions_RandomIntInRange() {
+        Function<String[], String> fn = MockFunctions.create().get("random_int");
 
         assertDoesNotThrow(() -> Integer.parseInt(fn.apply(NUMERIC_ARGS)));
         int val = Integer.parseInt(fn.apply(NUMERIC_ARGS));
@@ -51,17 +48,15 @@ public class TemplateEngineImplTest {
     }
 
     @Test
-    public void getFunctions_RandomLong() {
-        TemplateEngine engine = new TemplateEngineImpl();
-        Function<String[], String> fn = engine.getFunctions().get("random_long");
+    void getFunctions_RandomLong() {
+        Function<String[], String> fn = MockFunctions.create().get("random_long");
 
         assertDoesNotThrow(() -> Long.parseLong(fn.apply(EMPTY_ARGS)));
     }
 
     @Test
-    public void getFunctions_RandomLongInRange() {
-        TemplateEngine engine = new TemplateEngineImpl();
-        Function<String[], String> fn = engine.getFunctions().get("random_long");
+    void getFunctions_RandomLongInRange() {
+        Function<String[], String> fn = MockFunctions.create().get("random_long");
 
         assertDoesNotThrow(() -> Long.parseLong(fn.apply(NUMERIC_ARGS)));
         long val = Long.parseLong(fn.apply(NUMERIC_ARGS));
@@ -69,9 +64,8 @@ public class TemplateEngineImplTest {
     }
 
     @Test
-    public void getFunctions_RandomUuid() {
-        TemplateEngine engine = new TemplateEngineImpl();
-        Function<String[], String> fn = engine.getFunctions().get("random_uuid");
+    void getFunctions_RandomUuid() {
+        Function<String[], String> fn = MockFunctions.create().get("random_uuid");
 
         Pattern pattern = Pattern.compile(REGEX_UUID);
         Matcher matcher = pattern.matcher(fn.apply(EMPTY_ARGS));
@@ -79,25 +73,22 @@ public class TemplateEngineImplTest {
     }
 
     @Test
-    public void getFunctions_RandomString() {
-        TemplateEngine engine = new TemplateEngineImpl();
-        Function<String[], String> fn = engine.getFunctions().get("random_string");
+    void getFunctions_RandomString() {
+        Function<String[], String> fn = MockFunctions.create().get("random_string");
 
         assertFalse(fn.apply(EMPTY_ARGS).isEmpty());
     }
 
     @Test
-    public void getFunctions_Enum() {
-        TemplateEngine engine = new TemplateEngineImpl();
-        Function<String[], String> fn = engine.getFunctions().get("enum");
+    void getFunctions_Enum() {
+        Function<String[], String> fn = MockFunctions.create().get("enum");
 
         assertTrue(Set.of(ENUM_VALUE1, ENUM_VALUE2).contains(fn.apply(ENUM_ARGS)));
     }
 
     @Test
-    public void getFunctions_RandomDate() {
-        TemplateEngine engine = new TemplateEngineImpl();
-        Function<String[], String> fn = engine.getFunctions().get("random_date");
+    void getFunctions_RandomDate() {
+        Function<String[], String> fn = MockFunctions.create().get("random_date");
 
         assertDoesNotThrow(
                 () -> LocalDate.parse(fn.apply(ENUM_ARGS),
@@ -106,9 +97,8 @@ public class TemplateEngineImplTest {
     }
 
     @Test
-    public void getFunctions_RandomTimestamp() {
-        TemplateEngine engine = new TemplateEngineImpl();
-        Function<String[], String> fn = engine.getFunctions().get("random_timestamp");
+    void getFunctions_RandomTimestamp() {
+        Function<String[], String> fn = MockFunctions.create().get("random_timestamp");
 
         assertDoesNotThrow(
                 () -> LocalDateTime.parse(fn.apply(ENUM_ARGS),
@@ -117,9 +107,8 @@ public class TemplateEngineImplTest {
     }
 
     @Test
-    public void getFunctions_CurrentDate() {
-        TemplateEngine engine = new TemplateEngineImpl();
-        Function<String[], String> fn = engine.getFunctions().get("current_date");
+    void getFunctions_CurrentDate() {
+        Function<String[], String> fn = MockFunctions.create().get("current_date");
 
         assertDoesNotThrow(
                 () -> LocalDate.parse(fn.apply(ENUM_ARGS),
@@ -136,9 +125,8 @@ public class TemplateEngineImplTest {
     }
 
     @Test
-    public void getFunctions_CurrentTimestamp() {
-        TemplateEngine engine = new TemplateEngineImpl();
-        Function<String[], String> fn = engine.getFunctions().get("current_timestamp");
+    void getFunctions_CurrentTimestamp() {
+        Function<String[], String> fn = MockFunctions.create().get("current_timestamp");
 
         assertDoesNotThrow(
                 () -> LocalDateTime.parse(fn.apply(ENUM_ARGS),

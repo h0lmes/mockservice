@@ -7,9 +7,7 @@ import com.mockservice.domain.Settings;
 import com.mockservice.exception.NoRouteFoundException;
 import com.mockservice.repository.ConfigRepository;
 import com.mockservice.request.RequestFacade;
-import com.mockservice.template.MockFunctions;
 import com.mockservice.template.MockVariables;
-import com.mockservice.template.TemplateEngine;
 import com.mockservice.validate.DataValidationException;
 import com.mockservice.validate.DataValidator;
 import com.mockservice.ws.WebSocketHandler;
@@ -33,7 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
-public class MockServiceImplTest {
+class MockServiceImplTest {
 
     private static final RequestMethod GET_METHOD = RequestMethod.GET;
     private static final String PATH = "/api/v1/test";
@@ -51,8 +49,6 @@ public class MockServiceImplTest {
 
     private static final String XML_DATA = "<soapenv:Envelope></soapenv:Envelope>";
 
-    @Mock
-    private TemplateEngine templateEngine;
     @Mock
     private RouteService routeService;
     @Mock
@@ -74,19 +70,19 @@ public class MockServiceImplTest {
 
     private MockService createMockService() {
         return new MockServiceImpl(
-                2, templateEngine, routeService, scenarioService, configRepository, requestService,
-                List.of(quantumTheoryNonApplicable, quantumTheory), List.of(dataValidator), webSocketHandler);
+                2, routeService, scenarioService, configRepository, requestService,
+                List.of(quantumTheoryNonApplicable, quantumTheory),
+                List.of(dataValidator), webSocketHandler);
     }
 
     @BeforeEach
-    public void setup() {
-        lenient().when(templateEngine.getFunctions()).thenReturn(new MockFunctions());
+    void setup() {
         lenient().when(scenarioService.getAltFor(any(), any())).thenReturn(Optional.empty());
         lenient().when(configRepository.getSettings()).thenReturn(new Settings());
     }
 
     @Test
-    public void mock_RouteResponseHasNoVariables_BodyUnchanged() {
+    void mock_RouteResponseHasNoVariables_BodyUnchanged() {
         String bodyWithoutVariables = "[]";
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(bodyWithoutVariables);
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
@@ -98,7 +94,7 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_RouteResponseHasVariable_VariableSubstitutedWithValue() {
+    void mock_RouteResponseHasVariable_VariableSubstitutedWithValue() {
         String variableName = "id";
         String variableValue = "5";
         String bodyWithVariables = "{\"test\": ${" + variableName + "}}";
@@ -117,7 +113,7 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_RouteResponseWithNoTriggerRequest_NoRequestScheduled() {
+    void mock_RouteResponseWithNoTriggerRequest_NoRequestScheduled() {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH)
                 .setTriggerRequest(false);
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
@@ -129,7 +125,7 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_RouteResponseWithTriggerRequest_RequestScheduled() {
+    void mock_RouteResponseWithTriggerRequest_RequestScheduled() {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH)
                 .setTriggerRequest(true).setTriggerRequestIds("id");
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
@@ -143,7 +139,7 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_SettingsRandomAltTrue_RandomAlt400_SearchesRouteWithAlt400() {
+    void mock_SettingsRandomAltTrue_RandomAlt400_SearchesRouteWithAlt400() {
         Settings settings = new Settings().setRandomAlt(true);
         when(configRepository.getSettings()).thenReturn(settings);
 
@@ -163,8 +159,9 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_SoapRoute_ReturnsBody() {
-        Route route = new Route().setType(RouteType.SOAP).setMethod(GET_METHOD).setPath(PATH).setResponse(XML_DATA);
+    void mock_SoapRoute_ReturnsBody() {
+        Route route = new Route().setType(RouteType.SOAP)
+                .setMethod(GET_METHOD).setPath(PATH).setResponse(XML_DATA);
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
 
         MockService mockService = createMockService();
@@ -174,7 +171,7 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_NoRouteFound_ExceptionThrown() {
+    void mock_NoRouteFound_ExceptionThrown() {
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.empty());
         MockService mockService = createMockService();
 
@@ -182,7 +179,7 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_QuantumEnabled_UsesQuantumToAlterResponse() {
+    void mock_QuantumEnabled_UsesQuantumToAlterResponse() {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(VALID_JSON);
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
 
@@ -207,7 +204,7 @@ public class MockServiceImplTest {
     //----------------------------------------------------------------------
 
     @Test
-    public void cacheRemove_RouteResponseChanged_ReturnNewResponse() {
+    void cacheRemove_RouteResponseChanged_ReturnNewResponse() {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(INVALID_JSON);
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
         MockService mockService = createMockService();
@@ -226,7 +223,7 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void cacheRemove_RouteExists_LogsEviction(CapturedOutput output) {
+    void cacheRemove_RouteExists_LogsEviction(CapturedOutput output) {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(INVALID_JSON);
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
         MockService mockService = createMockService();
@@ -237,7 +234,7 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void cacheRemove_RouteNotExists_LogsNothing(CapturedOutput output) {
+    void cacheRemove_RouteNotExists_LogsNothing(CapturedOutput output) {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(INVALID_JSON);
         MockService mockService = createMockService();
 
@@ -252,7 +249,7 @@ public class MockServiceImplTest {
     //----------------------------------------------------------------------
 
     @Test
-    public void mock_RouteHasRequestBodySchema_ValidJson_NoExceptionThrown() {
+    void mock_RouteHasRequestBodySchema_ValidJson_NoExceptionThrown() {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setRequestBodySchema(JSON_SCHEMA);
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
         when(request.getBody()).thenReturn(VALID_JSON);
@@ -262,7 +259,7 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_RouteHasRequestBodySchema_InvalidJson_Alt400Disabled_ExceptionThrown() {
+    void mock_RouteHasRequestBodySchema_InvalidJson_Alt400Disabled_ExceptionThrown() {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setRequestBodySchema(JSON_SCHEMA);
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
 
@@ -278,7 +275,7 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_RouteHasRequestBodySchema_InvalidJson_Alt400EnabledButNoRoute400_ExceptionThrown() {
+    void mock_RouteHasRequestBodySchema_InvalidJson_Alt400EnabledButNoRoute400_ExceptionThrown() {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setRequestBodySchema(JSON_SCHEMA);
         when(routeService.getEnabledRoute(any()))
                 .thenReturn(Optional.of(route))
@@ -296,7 +293,7 @@ public class MockServiceImplTest {
     }
 
     @Test
-    public void mock_RouteHasRequestBodySchema_InvalidJson_Alt400EnabledAndRoute400Exists_NoExceptionThrown() {
+    void mock_RouteHasRequestBodySchema_InvalidJson_Alt400EnabledAndRoute400Exists_NoExceptionThrown() {
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setRequestBodySchema(JSON_SCHEMA);
         Route route400 = new Route(route).setAlt(ALT_400);
         when(routeService.getEnabledRoute(any()))

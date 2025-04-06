@@ -45,9 +45,8 @@
         <div class="mock-col w-fixed-auto">
             <div v-show="editing" class="mock-col-header"></div>
             <div class="mock-col-value">
-                <button type="button" class="btn btn-sm btn-default" :class="{'disabled' : !hasVariables}" @click="vars">vars</button>
-                <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
                 <button type="button" class="btn btn-sm btn-default" @click="test">test</button>
+                <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
                 <button type="button" class="btn btn-sm btn-danger ml-2" @click="del">delete</button>
             </div>
         </div>
@@ -109,30 +108,24 @@
         <div v-if="testing" class="mock-col w100">
             <RouteTester :route="route" @close="testing = false"></RouteTester>
         </div>
-
-        <div v-if="showVariables" class="mock-col w100 mt-2">
-            <RouteVariables :route="route"></RouteVariables>
-        </div>
     </div>
 </template>
 <script>
 import {mapActions} from 'vuex';
 import RouteTester from "./RouteTester";
 import RouteMethod from "./RouteMethod";
-import RouteVariables from "./RouteVariables";
 import ToggleSwitch from "../other/ToggleSwitch";
 import AutoSizeTextArea from "../other/AutoSizeTextArea";
 
 export default {
         name: "Route",
-        components: {AutoSizeTextArea, RouteTester, RouteMethod, ToggleSwitch, RouteVariables},
+        components: {AutoSizeTextArea, RouteTester, RouteMethod, ToggleSwitch},
         data() {
             return {
                 editing: false,
                 editingData: {},
                 testing: false,
                 showRequestBodySchema: false,
-                showVariables: false,
             }
         },
         props: {
@@ -158,9 +151,6 @@ export default {
             }),
             filter(value) {
                 this.$emit('filter', value);
-            },
-            vars() {
-                this.showVariables = !this.showVariables;
             },
             edit() {
                 this.testing = false;

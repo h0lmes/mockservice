@@ -47,35 +47,9 @@ class RouteMapperImplTest {
     void toDto_OneInput_MappedCorrect() {
         var mapper = new RouteMapperImpl();
         var entity = entity();
-        var dto = mapper.toDto(entity, null);
+        var dto = mapper.toDto(entity);
 
         assertAll(() -> {
-            assertEquals(entity.getGroup(), dto.getGroup());
-            assertEquals(entity.getType(), dto.getType());
-            assertEquals(entity.getMethod(), dto.getMethod());
-            assertEquals(entity.getPath(), dto.getPath());
-            assertEquals(entity.getAlt(), dto.getAlt());
-            assertEquals(entity.getResponseCode(), dto.getResponseCode());
-            assertEquals(entity.getResponse(), dto.getResponse());
-            assertEquals(entity.getRequestBodySchema(), dto.getRequestBodySchema());
-            assertEquals(entity.getDisabled(), dto.getDisabled());
-        });
-    }
-
-    @Test
-    void toDto_OneInputWithPostProcess_CallsPostProcess() {
-        var mapper = new RouteMapperImpl();
-        var entity = entity();
-        var routes = new Route[1];
-        var arr = new RouteDto[1];
-        mapper.toDto(entity, (r, d) -> {
-            routes[0] = r;
-            arr[0] = d;
-        });
-        var dto = arr[0];
-
-        assertAll(() -> {
-            assertEquals(entity, routes[0]);
             assertEquals(entity.getGroup(), dto.getGroup());
             assertEquals(entity.getType(), dto.getType());
             assertEquals(entity.getMethod(), dto.getMethod());
@@ -92,37 +66,11 @@ class RouteMapperImplTest {
     void toDto_ListInput_MappedCorrect() {
         var mapper = new RouteMapperImpl();
         var entity = entity();
-        var list = mapper.toDto(List.of(entity), null);
+        var list = mapper.toDto(List.of(entity));
 
         assertEquals(1, list.size());
         var dto = list.get(0);
         assertAll(() -> {
-            assertEquals(entity.getGroup(), dto.getGroup());
-            assertEquals(entity.getType(), dto.getType());
-            assertEquals(entity.getMethod(), dto.getMethod());
-            assertEquals(entity.getPath(), dto.getPath());
-            assertEquals(entity.getAlt(), dto.getAlt());
-            assertEquals(entity.getResponseCode(), dto.getResponseCode());
-            assertEquals(entity.getResponse(), dto.getResponse());
-            assertEquals(entity.getRequestBodySchema(), dto.getRequestBodySchema());
-            assertEquals(entity.getDisabled(), dto.getDisabled());
-        });
-    }
-
-    @Test
-    void toDto_ListInputWithPostProcess_CallsPostProcess() {
-        var mapper = new RouteMapperImpl();
-        var entity = entity();
-        var routes = new Route[1];
-        var arr = new RouteDto[1];
-        mapper.toDto(List.of(entity), (r, d) -> {
-            routes[0] = r;
-            arr[0] = d;
-        });
-        var dto = arr[0];
-
-        assertAll(() -> {
-            assertEquals(entity, routes[0]);
             assertEquals(entity.getGroup(), dto.getGroup());
             assertEquals(entity.getType(), dto.getType());
             assertEquals(entity.getMethod(), dto.getMethod());

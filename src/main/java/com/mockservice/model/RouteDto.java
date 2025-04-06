@@ -3,7 +3,6 @@ package com.mockservice.model;
 import com.mockservice.domain.RouteType;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.util.List;
 import java.util.Objects;
 
 public class RouteDto {
@@ -19,7 +18,6 @@ public class RouteDto {
     private boolean disabled = false;
     private boolean triggerRequest = false;
     private String triggerRequestIds = "";
-    private List<RouteVariable> variables;
 
     public RouteDto() {
         // default
@@ -121,15 +119,6 @@ public class RouteDto {
 
     public RouteDto setTriggerRequestIds(String triggerRequestIds) {
         this.triggerRequestIds = triggerRequestIds;
-        return this;
-    }
-
-    public List<RouteVariable> getVariables() {
-        return variables;
-    }
-
-    public RouteDto setVariables(List<RouteVariable> variables) {
-        this.variables = variables;
         return this;
     }
 

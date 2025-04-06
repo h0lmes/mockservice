@@ -9,8 +9,8 @@ import com.mockservice.request.RequestFacade;
 import com.mockservice.response.MockResponse;
 import com.mockservice.response.RestMockResponse;
 import com.mockservice.response.SoapMockResponse;
+import com.mockservice.template.MockFunctions;
 import com.mockservice.template.MockVariables;
-import com.mockservice.template.TemplateEngine;
 import com.mockservice.validate.DataValidationException;
 import com.mockservice.validate.DataValidator;
 import com.mockservice.validate.RequestBodyValidationResult;
@@ -31,7 +31,6 @@ public class MockServiceImpl implements MockService {
 
     private static final Logger log = LoggerFactory.getLogger(MockServiceImpl.class);
 
-    private final TemplateEngine templateEngine;
     private final RouteService routeService;
     private final ScenarioService scenarioService;
     private final ConfigRepository configRepository;
@@ -42,7 +41,6 @@ public class MockServiceImpl implements MockService {
     private final ConcurrentLruCache<Route, MockResponse> responseCache;
 
     public MockServiceImpl(@Value("${application.mock-service.cache-size:1000}") int cacheSize,
-                           TemplateEngine templateEngine,
                            RouteService routeService,
                            ScenarioService scenarioService,
                            ConfigRepository configRepository,
@@ -50,7 +48,6 @@ public class MockServiceImpl implements MockService {
                            List<QuantumTheory> quantumTheories,
                            List<DataValidator> dataValidators,
                            WebSocketHandler webSocketHandler) {
-        this.templateEngine = templateEngine;
         this.routeService = routeService;
         this.scenarioService = scenarioService;
         this.configRepository = configRepository;
@@ -86,8 +83,8 @@ public class MockServiceImpl implements MockService {
         webSocketHandler.broadcastRouteRequest(
                 route.getMethod().toString(), route.getPath(), route.getAlt());
 
-        MockVariables variables = request.getVariables(Optional.ofNullable(routeService.getRouteVariables(route)));
-        response.setVariables(variables, templateEngine.getFunctions());
+        MockVariables variables = request.getVariables(null);
+        response.setVariables(variables, MockFunctions.create());
         validationResult.ifError(response::addVariables);
 
         ResponseEntity<String> responseEntity = responseEntityFromResponse(response);
@@ -104,7 +101,7 @@ public class MockServiceImpl implements MockService {
         Optional<Route> maybeRoute = routeService.getRouteForVariables(
                 request.getRequestMethod(),
                 request.getEndpoint(),
-                request.getVariables(Optional.empty()));
+                request.getVariables(null));
 
         if (maybeRoute.isPresent()) {
             log.info("Route requested (defined by variables): {}", maybeRoute.get());

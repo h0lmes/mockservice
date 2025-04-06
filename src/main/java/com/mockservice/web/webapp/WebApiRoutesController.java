@@ -1,7 +1,6 @@
 package com.mockservice.web.webapp;
 
 import com.mockservice.model.RouteDto;
-import com.mockservice.model.RouteVariableDto;
 import com.mockservice.service.RouteService;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -56,18 +55,6 @@ public class WebApiRoutesController {
     public List<RouteDto> deleteRoutes(@RequestBody List<RouteDto> routes) throws IOException {
         routeService.deleteRoutes(routes);
         return routeService.getRoutes();
-    }
-
-    @ApiOperation(value = "Set specific variable for the specified route", tags = "routes")
-    @PutMapping("variables")
-    public RouteVariableDto setVariable(@RequestBody RouteVariableDto variable) {
-        return routeService.setRouteVariable(variable);
-    }
-
-    @ApiOperation(value = "Clear specific variable for the specified route", tags = "routes")
-    @DeleteMapping("variables")
-    public RouteVariableDto clearVariable(@RequestBody RouteVariableDto variable) {
-        return routeService.clearRouteVariable(variable);
     }
 
     @ExceptionHandler
