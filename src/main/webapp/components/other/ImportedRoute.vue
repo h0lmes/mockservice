@@ -20,11 +20,17 @@
         <div class="mock-col">
             <div class="mock-col-value">{{ route.alt }}</div>
         </div>
-        <div class="mock-col">
+        <div class="mock-col w2">
             <div class="mock-col-value link" :class="{'color-accent-one' : more}">{{ moreLabel }}</div>
+        </div>
+        <div class="mock-col w100" v-show="open">
+            RESPONSE (GENERATED)
         </div>
         <div class="mock-col w100" v-show="open" @click.stop>
             <AutoSizeTextArea v-model="route.response" placeholder="NO RESPONSE" :min-rows="1"></AutoSizeTextArea>
+        </div>
+        <div class="mock-col w100" v-show="open">
+            REQUEST BODY SCHEMA
         </div>
         <div class="mock-col w100" v-show="open" @click.stop>
             <AutoSizeTextArea v-model="route.requestBodySchema" placeholder="NO REQUEST BODY SCHEMA" :min-rows="1"></AutoSizeTextArea>
@@ -32,10 +38,10 @@
     </div>
 </template>
 <script>
-    import AutoSizeTextArea from "./AutoSizeTextArea";
-    import RouteMethod from "../route/RouteMethod";
+import AutoSizeTextArea from "./AutoSizeTextArea";
+import RouteMethod from "../route/RouteMethod";
 
-    export default {
+export default {
         name: "ImportedRoute",
         components: {AutoSizeTextArea, RouteMethod},
         data() {
@@ -64,7 +70,7 @@
                 return this.exists ? 'exists' : '-';
             },
             addLabel() {
-                return this.exists ? 'overwrite' : '\u00A0\u00A0 add \u00A0\u00A0';
+                return this.exists ? 'overwrite route' : '\u00A0\u00A0 add route \u00A0\u00A0';
             }
         },
         methods: {

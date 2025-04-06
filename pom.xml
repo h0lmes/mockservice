@@ -11,10 +11,10 @@
     </parent>
 
     <groupId>com</groupId>
-    <artifactId>mockservice</artifactId>
+    <artifactId>mockachu</artifactId>
     <version>0.1.2</version>
     <packaging>jar</packaging>
-    <name>mockservice</name>
+    <name>mockachu</name>
     <description>Mock Service application</description>
 
     <properties>

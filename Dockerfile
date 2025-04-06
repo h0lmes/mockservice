@@ -2,7 +2,7 @@ FROM image
 
 RUN mkdir /app
 
-COPY ./target/mockservice-0.0.9.jar /app/
+COPY ./target/mockachu-0.1.2.jar /app/
 
 RUN chmod +x /app/run.sh
 
@@ -14,4 +14,4 @@ EXPOSE 8081
 RUN groupadd -r app && useradd --no-log-init -r -g app app
 USER app
 
-CMD ["java", "-jar", "/app/mockservice-0.0.9.jar"]
+CMD ["java", "-jar", "/app/mockachu-0.1.2.jar"]

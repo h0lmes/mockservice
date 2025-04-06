@@ -2,16 +2,22 @@
 ![Branches](.github/badges/branches.svg)
 [![License](.github/badges/license.svg)](/LICENSE)
 
-# Mock Service
+# Mockachu
 
-An easy-to-use service to mock REST and SOAP endpoints.
-Suitable for integration and e2e testing.
-Can import OpenAPI 3 and Swagger 2 formats (YAML).
+**Effortless API Mocking and Testing**
 
-> Note. SOAP support is very simplistic and limited.
-You are required to provide a valid SOAP envelope as a response
-(see an example later in this README).
-There is NO support for WSDL/XSD.
+Mockachu is a user-friendly service designed to
+streamline the process of mocking and testing APIs.
+Whether you're developing new APIs or testing existing ones,
+Mockachu makes it easy to simulate real-world
+scenarios and ensure your services are working as expected.
+
+Key Features:
+- Instant API Creation: Import your OpenAPI (YAML) documentation and generate mock APIs in seconds.
+- Seamless Configuration: Manage and customize your API mock settings directly from an intuitive Web UI.
+- Comprehensive Test Plans: Create and execute detailed test plans to ensure your API behaves as expected.
+- Single-File Configuration: Consolidate all your configurations into one file for easy sharing and collaboration.
+- Coming Soon: Support for Kafka, making it easier to simulate event-driven architectures.
 
 This project is licensed under the MIT License -
 see the [LICENSE](/LICENSE) file for details
@@ -25,35 +31,15 @@ see the [LICENSE](/LICENSE) file for details
 
 For build instructions refer to [README](/src/main/webapp/README.md).
 
-# Development
+# Route
 
-To run the app
+BODY can contain text, JSON or XML, with or without HTTP head.
 
-    $ ./mvnw
-
-To build the app (given frontend app has been built)
-
-    $ ./mvnw clean package
-
-Generate code coverage report
-
-    $ ./mvnw test
-
-
-# Route response
-
-Response field may contain **response** wtih JSON or XML body, with or without HTTP head
-
-> See examples below and HTTP request and response format at
-https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages
-
-**EXAMPLES**
-
-Response (body only):
+Simple response:
 
     {"id": 1, name": "Johnny 5"}
 
-Response with head:
+Response with header:
 
     HTTP/1.1
     Cache-Control: no-cache
@@ -113,12 +99,6 @@ For SOAP routes - all fields of the SOAP envelope `Body` tag (without namespace)
 Both JSON and SOAP are "flattened" preserving hierarchy. See examples.
 3. **Path variables** (`/api/v1/account/{id}`).
 4. **Request parameters** (`/api/v1/account?id=1`).
-5. **Mock-Variable** header (see section below).
-
-> Note. Variables passed via **Mock-Variable** header
-> (which is #5 on the list) will be written into the Map the last
-> replacing any variables with the same name that are already in the `map`
-> thus having the highest precedence.  
 
 
 Example of a request payload (JSON body):
@@ -177,23 +157,7 @@ with their values each time an endpoint is fetched:
 - `${current_timestamp}` - current timestamp in yyyy-MM-dd HH:mm:ss.SSS format.
 - `${enum:str1:str2:...}` - a random one of given arguments (may be useful to represent enum values)
 
-# "Mock-Variable" header
-
-Multiple **Mock-Variable** headers supported per HTTP request.
-Each header should define exactly one variable.
-
-Header format:
-
-    request-mapping/variable_name/value
-    
-Example:
-
-    Mock-Variable: api-v1-item-{id}/item_name/Chips
-
-In the example above if you call an endpoint `/api/v1/item/{id}`
-a variable `item_name` with the value `Chips` would be available.
-
-# Request Validation
+# Route request payload validation
 
 You can define **Request Body Schema** (in JSON format) for any route
 to have request body validated against the schema.

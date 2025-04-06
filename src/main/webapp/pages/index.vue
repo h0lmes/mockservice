@@ -52,7 +52,7 @@
                 Each line is exactly one command.
             </div>
             <div class="mt-2">
-                x = some string - set value of variable in global context (see Variables page).
+                x = some string - set value of variable in global context (see Context page).
             </div>
             <div class="mt-2">
                 x = ${variable_name} - set value of variable in global context, value comes from latest request response.
@@ -178,11 +178,11 @@ export default {
                 this.showTests = true
                 this.addTestAction()
             },
-            deleteVisibleRoutes() {
+            async deleteVisibleRoutes() {
                 if (confirm('Are you sure you want to delete all visible routes?\n'
                     + 'Note: if filter (search) is applied - you only delete those you see on the screen.')) {
                     this.$nuxt.$loading.start();
-                    this.deleteRoutes(
+                    await this.deleteRoutes(
                         this.filteredEntities.filter(e => e.hasOwnProperty('alt'))
                     ).then(() => this.$nuxt.$loading.finish());
                 }

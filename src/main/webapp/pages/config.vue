@@ -1,6 +1,6 @@
 <template>
     <div class="config-page monospace">
-        <div class="component-toolbar mb-5">
+        <div class="component-toolbar mb-4">
             <button type="button" class="btn btn-primary" @click="save">Save and apply</button>
             <button type="button" class="btn btn-default" @click="download">Download as file</button>
             <button type="button" class="btn btn-default" @click="backup">Backup  config on server</button>
@@ -12,11 +12,11 @@
     </div>
 </template>
 <script>
-    import {mapActions} from 'vuex';
-    import Loading from "../components/other/Loading";
-    import AutoSizeTextArea from "../components/other/AutoSizeTextArea";
+import {mapActions} from 'vuex';
+import Loading from "../components/other/Loading";
+import AutoSizeTextArea from "../components/other/AutoSizeTextArea";
 
-    export default {
+export default {
         name: "config",
         components: {AutoSizeTextArea, Loading},
         data() {

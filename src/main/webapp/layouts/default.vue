@@ -11,9 +11,9 @@
                     </NuxtLink>
                 </li>
                 <li class="nav-item">
-                    <NuxtLink to="/variables">
+                    <NuxtLink to="/context">
                         <FontAwesomeIcon icon="subscript" class="nav-icon"/>
-                        <span class="nav-label">Variables</span>
+                        <span class="nav-label">Context</span>
                     </NuxtLink>
                 </li>
                 <li class="nav-item">

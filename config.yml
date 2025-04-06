@@ -271,7 +271,7 @@ tests:
 
     id = 20
     GET localhost:8081/products/${id}
-    id = ☺️
+    smile = ☺️
     POST localhost:8081/v2/store/order {"x": 400} -> 400
 
     products.random -> 208

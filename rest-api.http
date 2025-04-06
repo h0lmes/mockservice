@@ -1,9 +1,0 @@
-GET http://localhost:8081/api/v2/entity
-Cache-Control: no-cache
-
-###
-
-GET http://localhost:8081/api/robot
-Cache-Control: no-cache
-
-###

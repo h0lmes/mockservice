@@ -4,7 +4,7 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
 
     <property name="LOGS" value="./logs" />
-    <property name="LOG_FILE" value="${LOGS}/mockservice.log" />
+    <property name="LOG_FILE" value="${LOGS}/mockachu.log" />
 
     <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />

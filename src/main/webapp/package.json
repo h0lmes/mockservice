@@ -1,5 +1,5 @@
 {
-  "name": "mockservice",
+  "name": "mockachu",
   "version": "1.0.0",
   "scripts": {
     "dev": "nuxt",

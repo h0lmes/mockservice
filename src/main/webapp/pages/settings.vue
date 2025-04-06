@@ -23,11 +23,14 @@
             <input type="file" class="hidden">
             <button type="button" class="btn btn-default mt-3" @click="selectCertFile">Select local file</button>
             <button type="button" class="btn btn-default mt-3" @click="resetCertFile">Forget certificate</button>
+            <div class="color-secondary mt-4">
+                If [No certificate] all remote certificates are considered trusted.
+            </div>
             <div class="color-secondary mt-3">
                 To use a certificate:<br>
                 - select a PKCS #12 certificate file<br>
                 - save settings<br>
-                - set a password (password input will show once you have certificate saved).
+                - set a password; password input will show once you have certificate saved.
             </div>
 
             <div class="mt-4" v-show="hasCertificateOnServer">
@@ -154,15 +157,4 @@ export default {
     }
 </script>
 <style scoped>
-.flex-group {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: 1rem;
-    row-gap: 0.7rem;
-    align-items: center;
-    width: auto;
-}
-.flex-group-item {
-    flex: 1 1 0;
-}
 </style>

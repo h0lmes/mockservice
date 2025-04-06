@@ -4,7 +4,7 @@
         <div class="component-toolbar mb-4">
             <div v-show="fileName">{{ fileName }}</div>
             <button type="button" class="btn btn-primary" @click="selectFile()">Select Open API file</button>
-            <button type="button" class="btn btn-default" @click="addAll()">Add all routes</button>
+            <button type="button" class="btn btn-default" @click="addAll()">Add all as routes</button>
             <ToggleSwitch v-model="overwrite">Overwrite existing routes</ToggleSwitch>
             <ToggleSwitch v-model="no400500">Ignore 4xx and 5xx</ToggleSwitch>
         </div>
@@ -74,15 +74,15 @@ export default {
                 }
             },
             selectFile() {
-                this.fileName = '';
+                this.fileName = 'Loading...';
+                this.$nuxt.$loading.start();
+                this.$nextTick();
                 this.$refs.file.value = null;
                 this.$refs.file.click()
             },
             openFile() {
                 const files = this.$refs.file.files;
                 if (files && files[0]) {
-                    this.fileName = 'Loading...';
-                    this.$nuxt.$loading.start();
                     const reader = new FileReader();
                     reader.readAsText(files[0], "UTF-8");
                     reader.onload = (e) => {

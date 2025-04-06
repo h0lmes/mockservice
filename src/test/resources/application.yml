@@ -4,12 +4,12 @@ server:
 logging:
   level:
     ROOT: ${ROOT_LOGGING_LEVEL:INFO}
-    com.mockservice: ${LOGGING_LEVEL:INFO}
+    com.mockachu: ${LOGGING_LEVEL:INFO}
     org.springframework.boot.SpringApplication: INFO
 
 spring:
   application:
-    name: MockService
+    name: Mockachu
 
   main:
     banner-mode: LOG
