@@ -30,6 +30,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     private final ObjectMapper yamlMapper;
     private final List<ConfigObserver> configObservers = new ArrayList<>();
     private final List<RouteObserver> routeObservers = new ArrayList<>();
+    private final List<OutboundRequestObserver> requestObservers = new ArrayList<>();
     private final List<SettingsObserver> settingsObservers = new ArrayList<>();
     private Config config;
 
@@ -58,6 +59,11 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     @Override
     public void registerRouteObserver(RouteObserver observer) {
         this.routeObservers.add(observer);
+    }
+
+    @Override
+    public void registerRequestObserver(OutboundRequestObserver observer) {
+        requestObservers.add(observer);
     }
 
     @Override
@@ -325,7 +331,6 @@ public class ConfigRepositoryImpl implements ConfigRepository {
                 .findFirst();
     }
 
-    @SuppressWarnings("java:S125")
     @Override
     public void putRequest(@Nullable OutboundRequest existing, @Nonnull OutboundRequest request) throws IOException {
         Objects.requireNonNull(request, REQUEST_COULD_NOT_BE_NULL);
@@ -334,12 +339,12 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         if (existing == null) {
             ensureUniqueRequestId(null, request);
             config.getRequests().add(request);
-            //notifyRequestCreated(request);
+            notifyRequestCreated(request);
         } else {
             ensureUniqueRequestId(existing.getId(), request);
-            //notifyRequestDeleted(existing);
+            notifyRequestDeleted(existing);
             existing.assignFrom(request);
-            //notifyRequestCreated(existing);
+            notifyRequestCreated(existing);
         }
 
         sortRequests();
@@ -378,31 +383,29 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
     }
 
-    @SuppressWarnings("java:S125")
     private boolean putRequestInternal(@Nonnull OutboundRequest request, boolean overwrite) {
         Objects.requireNonNull(request, REQUEST_COULD_NOT_BE_NULL);
         OutboundRequest existing = findRequest(request.getId()).orElse(null);
         if (existing == null) {
             config.getRequests().add(request);
-            //notifyRequestCreated(request);
+            notifyRequestCreated(request);
             return true;
         } else if (overwrite) {
-            //notifyRequestDeleted(existing);
+            notifyRequestDeleted(existing);
             existing.assignFrom(request);
-            //notifyRequestCreated(existing);
+            notifyRequestCreated(existing);
             return true;
         }
         return false;
     }
 
-    @SuppressWarnings("java:S125")
     @Override
     public void deleteRequests(List<OutboundRequest> requests) throws IOException {
         boolean modified = false;
 
         for (OutboundRequest request : requests) {
             if (config.getRequests().remove(request)) {
-                //notifyRequestDeleted(request);
+                notifyRequestDeleted(request);
                 modified = true;
             }
         }
@@ -590,6 +593,14 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     private void notifyRouteDeleted(Route route) {
         routeObservers.forEach(o -> o.onRouteDeleted(route));
+    }
+
+    private void notifyRequestCreated(OutboundRequest request) {
+        requestObservers.forEach(o -> o.onRequestCreated(request));
+    }
+
+    private void notifyRequestDeleted(OutboundRequest request) {
+        requestObservers.forEach(o -> o.onRequestDeleted(request));
     }
 
     private void notifySettingsChanged() {

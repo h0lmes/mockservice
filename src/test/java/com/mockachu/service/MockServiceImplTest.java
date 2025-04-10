@@ -4,13 +4,12 @@ import com.mockachu.components.QuantumTheory;
 import com.mockachu.domain.Route;
 import com.mockachu.domain.RouteType;
 import com.mockachu.domain.Settings;
-import com.mockachu.exception.NoRouteFoundException;
+import com.mockachu.exception.RouteNotFoundException;
 import com.mockachu.repository.ConfigRepository;
 import com.mockachu.request.RequestFacade;
 import com.mockachu.template.MockVariables;
 import com.mockachu.validate.DataValidationException;
 import com.mockachu.validate.DataValidator;
-import com.mockachu.ws.WebSocketHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,14 +64,11 @@ class MockServiceImplTest {
     private QuantumTheory quantumTheoryNonApplicable;
     @Mock
     private DataValidator dataValidator;
-    @Mock
-    private WebSocketHandler webSocketHandler;
 
     private MockService createMockService() {
         return new MockServiceImpl(
                 2, routeService, scenarioService, configRepository, requestService,
-                List.of(quantumTheoryNonApplicable, quantumTheory),
-                List.of(dataValidator), webSocketHandler);
+                List.of(quantumTheoryNonApplicable, quantumTheory), List.of(dataValidator));
     }
 
     @BeforeEach
@@ -121,7 +117,7 @@ class MockServiceImplTest {
         MockService mockService = createMockService();
         mockService.mock(request);
 
-        verify(requestService, never()).schedule(any(), any());
+        verify(requestService, never()).schedule(any(), any(), any());
     }
 
     @Test
@@ -134,7 +130,7 @@ class MockServiceImplTest {
         mockService.mock(request);
 
         ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
-        verify(requestService).schedule(argument.capture(), any());
+        verify(requestService).schedule(argument.capture(), any(), any());
         assertEquals("id", argument.getValue());
     }
 
@@ -175,7 +171,7 @@ class MockServiceImplTest {
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.empty());
         MockService mockService = createMockService();
 
-        assertThrows(NoRouteFoundException.class, () -> mockService.mock(request));
+        assertThrows(RouteNotFoundException.class, () -> mockService.mock(request));
     }
 
     @Test

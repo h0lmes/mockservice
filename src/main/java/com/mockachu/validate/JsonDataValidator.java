@@ -28,7 +28,7 @@ public class JsonDataValidator implements DataValidator {
     }
 
     @Override
-    public void validate(String data, String schema) {
+    public void validate(String data, String schema) throws DataValidationException {
         final JsonNode nodeSchema;
         final JsonNode nodeJson;
         try {

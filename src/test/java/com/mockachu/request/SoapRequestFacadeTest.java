@@ -42,7 +42,7 @@ class SoapRequestFacadeTest {
         when(request.getMethod()).thenReturn("POST");
         RequestFacade facade = new SoapRequestFacade(request, new ObjectMapper());
 
-        assertEquals(RequestMethod.POST, facade.getRequestMethod());
+        assertEquals(RequestMethod.POST, facade.getMethod());
     }
 
     @Test

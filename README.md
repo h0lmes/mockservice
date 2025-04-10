@@ -20,7 +20,7 @@ Key Features:
 - Coming Soon: Support for Kafka, making it easier to simulate event-driven architectures.
 
 This project is licensed under the MIT License -
-see the [LICENSE](/LICENSE) file for details
+see [LICENSE](/LICENSE) file for details
 
 # Where to start
 
@@ -60,11 +60,14 @@ Only one variable in a condition is supported.
 
 Examples:
 
-    key1 = 1
-    user_data.first_name = "Albert Einstein"
+    id = 1
 
-Apart from that to select specific alt you can also:
-- either send **Mock-Alt** header in HTTP request
+or
+
+    user_data.first_name = Albert Einstein
+
+Apart from that to select specific alt you can:
+- send **Mock-Alt** header in HTTP request
 - or use **Scenarios**.
 
 Multiple **Mock-Alt** headers supported per HTTP request.
@@ -82,7 +85,7 @@ The first header whose path equals route path would be used.
 In the example above if you call an endpoint `/api/v1/item/{id}`
 then the route with alt = `invalid_format` would match.
 
-> You may also try enabling **Random Alt** in **Settings** or dare **Go Quantum**. 😄
+> You may try **Random Alt** in **Settings** or dare **Go Quantum**. 😄
 
 # Request variables
 

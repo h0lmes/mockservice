@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface ConfigRepository {
     void registerConfigObserver(ConfigObserver observer);
     void registerRouteObserver(RouteObserver observer);
+    void registerRequestObserver(OutboundRequestObserver observer);
     void registerSettingsObserver(SettingsObserver observer);
 
     String getConfigData() throws JsonProcessingException;

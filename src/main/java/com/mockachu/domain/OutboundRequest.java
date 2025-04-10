@@ -17,6 +17,7 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
     private boolean disabled = false;
     private boolean triggerRequest = false;
     private String triggerRequestIds = "";
+    private String triggerRequestDelay= "";
 
     public OutboundRequest() {
         // default constructor
@@ -27,7 +28,12 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
     }
 
     public OutboundRequest setId(String id) {
-        this.id = id
+        this.id = replaceRestrictedChars(id);
+        return this;
+    }
+
+    private String replaceRestrictedChars(String value) {
+        return value
                 .replace('/', '.')
                 .replace(':', '.')
                 .replace('?', '.')
@@ -38,24 +44,13 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
                 .replace('$', '.')
                 .replace('{', '.')
                 .replace('}', '.');
-        return this;
     }
 
     public String generateId() {
         String result = group.isBlank() ? "" : group + ".";
         result += method.name() + ".";
         String pathNoSchema = path.contains("://") ? path.substring(path.indexOf("://") + 3) : path;
-        result += pathNoSchema
-                .replace('/', '.')
-                .replace(':', '.')
-                .replace('?', '.')
-                .replace('&', '.')
-                .replace('%', '.')
-                .replace('=', '.')
-                .replace(',', '.')
-                .replace('$', '.')
-                .replace('{', '.')
-                .replace('}', '.');
+        result += replaceRestrictedChars(pathNoSchema);
         return result;
     }
 
@@ -149,6 +144,15 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
         return this;
     }
 
+    public String getTriggerRequestDelay() {
+        return triggerRequestDelay;
+    }
+
+    public OutboundRequest setTriggerRequestDelay(String value) {
+        this.triggerRequestDelay = value == null ? "" : value;
+        return this;
+    }
+
     public OutboundRequest assignFrom(OutboundRequest source) {
         setId(source.getId());
         setGroup(source.getGroup());
@@ -161,6 +165,7 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
         setDisabled(source.isDisabled());
         setTriggerRequest(source.isTriggerRequest());
         setTriggerRequestIds(source.getTriggerRequestIds());
+        setTriggerRequestDelay(source.getTriggerRequestDelay());
         return this;
     }
 
@@ -177,7 +182,7 @@ public class OutboundRequest implements Comparable<OutboundRequest> {
 
     @Override
     public String toString() {
-        return String.format("(id=%s, method=%s, path=%s)", id, method, path);
+        return String.format("%s %s %s", id, method, path);
     }
 
     @Override

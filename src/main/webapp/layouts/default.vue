@@ -17,12 +17,18 @@
                     </NuxtLink>
                 </li>
                 <li class="nav-item">
+                    <NuxtLink to="/request-graph">
+                        <FontAwesomeIcon icon="project-diagram" class="nav-icon"/>
+                        <span class="nav-label">Requests graph</span>
+                    </NuxtLink>
+                </li>
+                <li class="nav-group">TOOLS</li>
+                <li class="nav-item">
                     <NuxtLink to="/import">
                         <FontAwesomeIcon icon="file-import" class="nav-icon icon-width-fix"/>
                         <span class="nav-label">Import</span>
                     </NuxtLink>
                 </li>
-                <li class="nav-group">TOOLS</li>
                 <li class="nav-item">
                     <NuxtLink to="/generate">
                         <FontAwesomeIcon icon="dice" class="nav-icon icon-width-fix"/>

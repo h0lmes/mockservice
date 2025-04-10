@@ -248,7 +248,8 @@ public class TestServiceImpl implements TestService {
         try {
             var kv = KeyValue.of(run.getLine(), "=");
             StringTemplate valueTemplate = new StringTemplate(kv.value());
-            String value = valueTemplate.toString(run.getMockVariables(), MockFunctions.create());
+            String value = valueTemplate.toString(
+                    MockVariables.sum(run.getMockVariables(), contextService.get()), MockFunctions.create());
 
             contextService.put(kv.key(), value);
             run.log(SUCCESS).log(" (").log(kv.key()).log(" = ").log(value).log(")\n");

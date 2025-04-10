@@ -16,7 +16,7 @@ import {handleError} from "../js/common";
 export const actions = {
     async fetch({commit, rootState}) {
         try {
-            const url = rootState.BASE_URL + '/web-api/routes';
+            const url = rootState.BASE_URL + '/__webapi__/routes';
             const res = await fetch(url);
             await handleError(res);
             const data = await res.json();
@@ -27,7 +27,7 @@ export const actions = {
     },
     async save({commit, rootState}, routes) {
         try {
-            const url = rootState.BASE_URL + '/web-api/routes';
+            const url = rootState.BASE_URL + '/__webapi__/routes';
             const params = {
                 method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
@@ -43,7 +43,7 @@ export const actions = {
     },
     async saveAll({commit, rootState}, payload) {
         try {
-            const url = rootState.BASE_URL + '/web-api/routes';
+            const url = rootState.BASE_URL + '/__webapi__/routes';
             const method = payload.overwrite ? 'PUT' : 'POST';
             const params = {
                 method,
@@ -60,7 +60,7 @@ export const actions = {
     },
     async delete({commit, rootState}, routes) {
         try {
-            const url = rootState.BASE_URL + '/web-api/routes';
+            const url = rootState.BASE_URL + '/__webapi__/routes';
             const params = {
                 method: 'DELETE',
                 headers: {'Content-Type': 'application/json'},
@@ -85,7 +85,7 @@ export const actions = {
             disabled: false,
             triggerRequest: false,
             triggerRequestIds: '',
-            variables: null,
+            triggerRequestDelay: '',
             _new: true,
         };
         commit('add', route);

@@ -18,6 +18,7 @@ public class RouteDto {
     private boolean disabled = false;
     private boolean triggerRequest = false;
     private String triggerRequestIds = "";
+    private String triggerRequestDelay = "";
 
     public RouteDto() {
         // default
@@ -119,6 +120,15 @@ public class RouteDto {
 
     public RouteDto setTriggerRequestIds(String triggerRequestIds) {
         this.triggerRequestIds = triggerRequestIds;
+        return this;
+    }
+
+    public String getTriggerRequestDelay() {
+        return triggerRequestDelay;
+    }
+
+    public RouteDto setTriggerRequestDelay(String triggerRequestDelay) {
+        this.triggerRequestDelay = triggerRequestDelay;
         return this;
     }
 

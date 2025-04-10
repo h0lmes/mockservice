@@ -3,7 +3,7 @@ package com.mockachu.service;
 import com.mockachu.components.QuantumTheory;
 import com.mockachu.domain.Route;
 import com.mockachu.domain.RouteType;
-import com.mockachu.exception.NoRouteFoundException;
+import com.mockachu.exception.RouteNotFoundException;
 import com.mockachu.repository.ConfigRepository;
 import com.mockachu.request.RequestFacade;
 import com.mockachu.response.MockResponse;
@@ -14,7 +14,6 @@ import com.mockachu.template.MockVariables;
 import com.mockachu.validate.DataValidationException;
 import com.mockachu.validate.DataValidator;
 import com.mockachu.validate.RequestBodyValidationResult;
-import com.mockachu.ws.WebSocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +36,6 @@ public class MockServiceImpl implements MockService {
     private final RequestService requestService;
     private final List<QuantumTheory> quantumTheories;
     private final List<DataValidator> dataValidators;
-    private final WebSocketHandler webSocketHandler;
     private final ConcurrentLruCache<Route, MockResponse> responseCache;
 
     public MockServiceImpl(@Value("${application.mock-service.cache-size:1000}") int cacheSize,
@@ -46,15 +44,13 @@ public class MockServiceImpl implements MockService {
                            ConfigRepository configRepository,
                            RequestService requestService,
                            List<QuantumTheory> quantumTheories,
-                           List<DataValidator> dataValidators,
-                           WebSocketHandler webSocketHandler) {
+                           List<DataValidator> dataValidators) {
         this.routeService = routeService;
         this.scenarioService = scenarioService;
         this.configRepository = configRepository;
         this.requestService = requestService;
         this.quantumTheories = quantumTheories;
         this.dataValidators = dataValidators;
-        this.webSocketHandler = webSocketHandler;
         responseCache = new ConcurrentLruCache<>(cacheSize, this::mockResponseFromRoute);
     }
 
@@ -75,33 +71,28 @@ public class MockServiceImpl implements MockService {
 
     @Override
     public ResponseEntity<String> mock(RequestFacade request) {
-        Route route = findRouteForRequest(request);
+        var variables = request.getVariables(null);
+        var route = findRouteForRequest(request, variables);
         var validationResult = validateRequestBody(route, request.getBody());
         route = validationResult.getRoute();
-        MockResponse response = responseCache.get(route);
+        var response = responseCache.get(route);
 
-        webSocketHandler.broadcastRouteRequest(
-                route.getMethod().toString(), route.getPath(), route.getAlt());
-
-        MockVariables variables = request.getVariables(null);
         response.setVariables(variables, MockFunctions.create());
         validationResult.ifError(response::addVariables);
 
-        ResponseEntity<String> responseEntity = responseEntityFromResponse(response);
+        var responseEntity = response.asResponseEntity();
         responseEntity = maybeApplyQuantumTheory(responseEntity);
 
         if (route.isTriggerRequest()) {
-            requestService.schedule(route.getTriggerRequestIds(), variables);
+            requestService.schedule(route.getTriggerRequestIds(), route.getTriggerRequestDelay(), variables);
         }
 
         return responseEntity;
     }
 
-    private Route findRouteForRequest(RequestFacade request) {
-        Optional<Route> maybeRoute = routeService.getRouteForVariables(
-                request.getRequestMethod(),
-                request.getEndpoint(),
-                request.getVariables(null));
+    private Route findRouteForRequest(RequestFacade request, MockVariables variables) {
+        var maybeRoute = routeService.getRouteForVariables(
+                request.getMethod(), request.getEndpoint(), variables);
 
         if (maybeRoute.isPresent()) {
             log.info("Route requested (defined by variables): {}", maybeRoute.get());
@@ -109,20 +100,17 @@ public class MockServiceImpl implements MockService {
         }
 
         String alt = request.getAlt()
-                .or(() -> scenarioService.getAltFor(request.getRequestMethod(), request.getEndpoint()))
-                .or(() -> maybeGetRandomAltFor(request.getRequestMethod(), request.getEndpoint()))
+                .or(() -> scenarioService.getAltFor(request.getMethod(), request.getEndpoint()))
+                .or(() -> maybeGetRandomAltFor(request.getMethod(), request.getEndpoint()))
                 .orElse("");
 
         Route searchRoute = new Route()
-                .setMethod(request.getRequestMethod())
-                .setPath(request.getEndpoint())
-                .setAlt(alt);
+                .setMethod(request.getMethod()).setPath(request.getEndpoint()).setAlt(alt);
 
         log.info("Route requested: {}", searchRoute);
 
-        return routeService
-                .getEnabledRoute(searchRoute)
-                .orElseThrow(() -> new NoRouteFoundException(searchRoute));
+        return routeService.getEnabledRoute(searchRoute)
+                .orElseThrow(() -> new RouteNotFoundException(searchRoute));
     }
 
     private Optional<String> maybeGetRandomAltFor(RequestMethod method, String path) {
@@ -134,12 +122,12 @@ public class MockServiceImpl implements MockService {
 
     private RequestBodyValidationResult validateRequestBody(Route route, String body) {
         String schema = route.getRequestBodySchema();
+        if (schema == null || schema.isEmpty()) return RequestBodyValidationResult.success(route);
+
         try {
-            if (!schema.isEmpty()) {
-                for (DataValidator validator : dataValidators) {
-                    if (validator.applicable(body)) {
-                        validator.validate(body, schema);
-                    }
+            for (DataValidator validator : dataValidators) {
+                if (validator.applicable(body)) {
+                    validator.validate(body, schema);
                 }
             }
         } catch (DataValidationException e) {
@@ -165,26 +153,16 @@ public class MockServiceImpl implements MockService {
         return routeService.getEnabledRoute(route400).orElse(null);
     }
 
-    private ResponseEntity<String> responseEntityFromResponse(MockResponse response) {
-        return ResponseEntity
-                .status(response.getResponseCode())
-                .headers(response.getResponseHeaders())
-                .body(response.getResponseBody());
-    }
-
     private ResponseEntity<String> maybeApplyQuantumTheory(ResponseEntity<String> responseEntity) {
-        if (configRepository.getSettings().getQuantum()) {
-            String body = responseEntity.getBody();
-            for (QuantumTheory theory : quantumTheories) {
-                if (theory.applicable(body)) {
-                    body = theory.apply(body);
-                    int statusCode = theory.apply(responseEntity.getStatusCode().value());
-                    theory.delay();
-                    return ResponseEntity
-                            .status(statusCode)
-                            .headers(responseEntity.getHeaders())
-                            .body(body);
-                }
+        if (!configRepository.getSettings().getQuantum()) return responseEntity;
+
+        for (QuantumTheory theory : quantumTheories) {
+            if (theory.applicable(responseEntity.getBody())) {
+                theory.delay();
+                return ResponseEntity
+                        .status(theory.apply(responseEntity.getStatusCode().value()))
+                        .headers(responseEntity.getHeaders())
+                        .body(theory.apply(responseEntity.getBody()));
             }
         }
         return responseEntity;

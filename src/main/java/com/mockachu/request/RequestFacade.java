@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.Optional;
 
 public interface RequestFacade {
-    RequestMethod getRequestMethod();
+    RequestMethod getMethod();
     String getEndpoint();
     Optional<String> getAlt();
     MockVariables getVariables(@Nullable MockVariables baseVariables);

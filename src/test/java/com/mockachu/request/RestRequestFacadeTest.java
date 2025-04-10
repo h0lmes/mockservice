@@ -49,7 +49,7 @@ class RestRequestFacadeTest {
         when(request.getMethod()).thenReturn("GET");
         RequestFacade facade = new RestRequestFacade(request, new ObjectMapper());
 
-        assertEquals(RequestMethod.GET, facade.getRequestMethod());
+        assertEquals(RequestMethod.GET, facade.getMethod());
     }
 
     @Test

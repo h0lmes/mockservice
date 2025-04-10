@@ -22,7 +22,8 @@ public class OutboundRequestMapperImpl implements OutboundRequestMapper {
                 .setResponseToVars(entity.isResponseToVars())
                 .setDisabled(entity.isDisabled())
                 .setTriggerRequest(entity.isTriggerRequest())
-                .setTriggerRequestIds(entity.getTriggerRequestIds());
+                .setTriggerRequestIds(entity.getTriggerRequestIds())
+                .setTriggerRequestDelay(entity.getTriggerRequestDelay());
     }
 
     @Override
@@ -38,7 +39,8 @@ public class OutboundRequestMapperImpl implements OutboundRequestMapper {
                 .setResponseToVars(dto.isResponseToVars())
                 .setDisabled(dto.isDisabled())
                 .setTriggerRequest(dto.isTriggerRequest())
-                .setTriggerRequestIds(dto.getTriggerRequestIds());
+                .setTriggerRequestIds(dto.getTriggerRequestIds())
+                .setTriggerRequestDelay(dto.getTriggerRequestDelay());
     }
 
     @Override

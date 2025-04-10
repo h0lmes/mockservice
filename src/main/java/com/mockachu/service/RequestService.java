@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RequestService {
-    void schedule(String requestIds, @Nullable MockVariables variables);
+    void schedule(String requestIds, String requestDelays, @Nullable MockVariables variables);
     Optional<HttpRequestResult> executeRequest(
             String requestId, @Nullable MockVariables variables, boolean allowTrigger);
     Optional<OutboundRequest> getEnabledRequest(String requestId);

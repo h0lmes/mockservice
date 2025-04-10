@@ -19,6 +19,7 @@ public class OutboundRequestDto {
     private boolean disabled = false;
     private boolean triggerRequest = false;
     private String triggerRequestIds = "";
+    private String triggerRequestDelay = "";
 
     public OutboundRequestDto() {
         // default constructor
@@ -120,6 +121,15 @@ public class OutboundRequestDto {
 
     public OutboundRequestDto setTriggerRequestIds(String triggerRequestIds) {
         this.triggerRequestIds = triggerRequestIds;
+        return this;
+    }
+
+    public String getTriggerRequestDelay() {
+        return triggerRequestDelay;
+    }
+
+    public OutboundRequestDto setTriggerRequestDelay(String triggerRequestDelay) {
+        this.triggerRequestDelay = triggerRequestDelay;
         return this;
     }
 

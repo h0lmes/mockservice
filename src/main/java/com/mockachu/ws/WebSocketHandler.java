@@ -36,12 +36,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 new WebSocketServerEvent(WebSocketServerEventType.TEST_RESULT, testAlias, testResult));
     }
 
-    public void broadcastRouteRequest(String method, String path, String alt) {
-        String routeId = method + ";" + path + ";" + alt;
-        broadcastMessage(
-                new WebSocketServerEvent(WebSocketServerEventType.ROUTE_REQUEST, routeId, ""));
-    }
-
     private void broadcastMessage(WebSocketServerEvent payload) {
         removeClosedSessions();
         if (sessions.isEmpty()) return;

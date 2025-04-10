@@ -18,6 +18,7 @@ public class Route implements Comparable<Route> {
     private boolean disabled = false;
     private boolean triggerRequest = false;
     private String triggerRequestIds = "";
+    private String triggerRequestDelay = "";
     // generated
     private VariableMatcher matcher;
 
@@ -165,6 +166,15 @@ public class Route implements Comparable<Route> {
         return this;
     }
 
+    public String getTriggerRequestDelay() {
+        return triggerRequestDelay;
+    }
+
+    public Route setTriggerRequestDelay(String value) {
+        this.triggerRequestDelay = value == null ? "" : value;
+        return this;
+    }
+
     public Route assignFrom(Route source) {
         setGroup(source.getGroup());
         setPath(source.getPath());
@@ -177,6 +187,7 @@ public class Route implements Comparable<Route> {
         setDisabled(source.getDisabled());
         setTriggerRequest(source.isTriggerRequest());
         setTriggerRequestIds(source.getTriggerRequestIds());
+        setTriggerRequestDelay(source.getTriggerRequestDelay());
         return this;
     }
 
@@ -195,7 +206,7 @@ public class Route implements Comparable<Route> {
 
     @Override
     public String toString() {
-        return String.format("(method=%s, path=%s, alt=%s)", method, path, alt);
+        return getMethod() + " " + getPath() + (getAlt().isBlank() ? "" : " " + getAlt());
     }
 
     @Override

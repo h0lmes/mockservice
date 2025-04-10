@@ -81,13 +81,19 @@
             <ToggleSwitch class="mock-col-value" v-model="editingData.responseToVars">SAVE RESPONSE IN GLOBAL VARS</ToggleSwitch>
         </div>
 
-        <div v-show="editing" class="mock-col w100">
-            <ToggleSwitch class="mock-col-value" v-model="editingData.triggerRequest">TRIGGER REQUESTS</ToggleSwitch>
-        </div>
-
-        <div v-show="editing && editingData.triggerRequest" class="mock-col w100">
-            <input type="text" class="form-control form-control-sm" v-model="editingData.triggerRequestIds"
-                   placeholder="Comma separated request IDs to trigger after this one"/>
+        <div v-show="editing" class="mock-group w100">
+            <div v-show="editing" class="mock-col w100">
+                <ToggleSwitch class="mock-col-value" v-model="editingData.triggerRequest">TRIGGER REQUESTS</ToggleSwitch>
+            </div>
+            <div v-show="editing && editingData.triggerRequest" class="mock-col w2">
+                <input type="text" class="form-control form-control-sm" v-model="editingData.triggerRequestIds"
+                       placeholder="Comma separated request IDs to trigger after this one"/>
+            </div>
+            <div v-show="editing && editingData.triggerRequest">after (millis)</div>
+            <div v-show="editing && editingData.triggerRequest" class="mock-col w1">
+                <input type="text" class="form-control form-control-sm" v-model="editingData.triggerRequestDelay"
+                       placeholder="Comma separated delays (default is 100)"/>
+            </div>
         </div>
 
         <div v-show="editing" class="mock-col w1">

@@ -9,7 +9,7 @@ import {handleError} from "../js/common";
 export const actions = {
     async fetch({commit, rootState}) {
         try {
-            const url = rootState.BASE_URL + '/web-api/context';
+            const url = rootState.BASE_URL + '/__webapi__/context';
             const res = await fetch(url);
             await handleError(res);
             return await res.text();
@@ -19,7 +19,7 @@ export const actions = {
     },
     async save({commit, rootState}, data) {
         try {
-            const url = rootState.BASE_URL + '/web-api/context';
+            const url = rootState.BASE_URL + '/__webapi__/context';
             const params = {
                 method: 'POST',
                 headers: {'Content-Type': 'text/plain'},

@@ -14,7 +14,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class WebSocketHandlerTest {
+class WebSocketHandlerTest {
 
     private ObjectMapper jsonMapper = new ObjectMapper();
     private String sentMessage;
@@ -43,23 +43,11 @@ public class WebSocketHandlerTest {
     }
 
     @Test
-    void testBroadcastRouteRequest() {
-        var handler = new WebSocketHandler(jsonMapper);
-        var session = getSession("3", true);
-
-        handler.afterConnectionEstablished(session);
-        handler.broadcastRouteRequest("test_method", "test_path", "test_alt");
-        assertTrue(sentMessage.contains("test_method"));
-        assertTrue(sentMessage.contains("test_path"));
-        assertTrue(sentMessage.contains("test_alt"));
-    }
-
-    @Test
     void testBroadcastWithNoSessions() {
         sentMessage = null;
         var handler = new WebSocketHandler(jsonMapper);
 
-        handler.broadcastRouteRequest("test_method", "test_path", "test_alt");
+        handler.broadcastTestResult("test_alias", "test_result");
         assertNull(sentMessage);
     }
 
@@ -70,7 +58,7 @@ public class WebSocketHandlerTest {
         var session = getSession("3", false);
 
         handler.afterConnectionEstablished(session);
-        handler.broadcastRouteRequest("test_method", "test_path", "test_alt");
+        handler.broadcastTestResult("test_alias", "test_result");
         assertNull(sentMessage);
     }
 

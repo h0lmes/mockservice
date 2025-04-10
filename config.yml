@@ -20,7 +20,8 @@ routes:
   requestBodySchema: ""
   disabled: false
   triggerRequest: true
-  triggerRequestIds: default.get.jwt
+  triggerRequestIds: "api.robot,api.robot"
+  triggerRequestDelay: "2000,2500"
 - group: entity
   type: REST
   method: GET
@@ -32,6 +33,7 @@ routes:
   disabled: true
   triggerRequest: false
   triggerRequestIds: ""
+  triggerRequestDelay: ""
 - group: entity
   type: REST
   method: PUT
@@ -43,6 +45,7 @@ routes:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+  triggerRequestDelay: ""
 - group: entity
   type: REST
   method: PATCH
@@ -54,6 +57,7 @@ routes:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+  triggerRequestDelay: ""
 - group: entity
   type: REST
   method: DELETE
@@ -65,6 +69,7 @@ routes:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+  triggerRequestDelay: ""
 - group: robot
   type: REST
   method: GET
@@ -80,6 +85,7 @@ routes:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+  triggerRequestDelay: ""
 - group: robot
   type: REST
   method: GET
@@ -91,6 +97,7 @@ routes:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+  triggerRequestDelay: ""
 - group: robot
   type: REST
   method: GET
@@ -102,6 +109,7 @@ routes:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+  triggerRequestDelay: ""
 - group: store
   type: REST
   method: GET
@@ -135,6 +143,7 @@ routes:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+  triggerRequestDelay: ""
 - group: store
   type: REST
   method: GET
@@ -153,6 +162,7 @@ routes:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+  triggerRequestDelay: ""
 - group: store
   type: REST
   method: GET
@@ -164,6 +174,7 @@ routes:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+  triggerRequestDelay: ""
 - group: store
   type: REST
   method: POST
@@ -183,6 +194,7 @@ routes:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+  triggerRequestDelay: ""
 - group: store
   type: REST
   method: POST
@@ -203,6 +215,7 @@ routes:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+  triggerRequestDelay: ""
 - group: xml
   type: SOAP
   method: POST
@@ -223,7 +236,20 @@ routes:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+  triggerRequestDelay: ""
 requests:
+- id: _ssl.GET.localhost.443.hello.1
+  group: _kafka
+  type: REST
+  method: GET
+  path: http://localhost:8081/__webapi__/tests/kafka
+  headers: ""
+  body: ""
+  responseToVars: false
+  disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
+  triggerRequestDelay: ""
 - id: _ssl.GET.localhost.443.hello
   group: _ssl
   type: REST
@@ -235,6 +261,7 @@ requests:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+  triggerRequestDelay: ""
 - id: api.robot
   group: robot
   type: REST
@@ -246,6 +273,7 @@ requests:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+  triggerRequestDelay: ""
 - id: products.random
   group: store
   type: REST
@@ -257,6 +285,7 @@ requests:
   disabled: false
   triggerRequest: false
   triggerRequestIds: ""
+  triggerRequestDelay: ""
 tests:
 - group: store
   alias: store test
@@ -271,7 +300,7 @@ tests:
 
     id = 20
     GET localhost:8081/products/${id}
-    smile = ☺️
+    smile = ??
     POST localhost:8081/v2/store/order {"x": 400} -> 400
 
     products.random -> 208

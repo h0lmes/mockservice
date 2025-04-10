@@ -21,12 +21,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class RequestServiceImpl implements RequestService {
-
     private static final Logger log = LoggerFactory.getLogger(RequestServiceImpl.class);
-    private static final int MAX_LEVEL_FOR_TRIGGERED_REQUEST = 3;
+    private static final int MAX_LEVEL_FOR_TRIGGERED_REQUEST = 5;
 
     private final ConfigRepository configRepository;
     private final OutboundRequestMapper requestMapper;
@@ -63,8 +63,8 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public void schedule(String requestIds, @Nullable MockVariables variables) {
-        scheduleRequests(requestIds, variables, 0);
+    public void schedule(String requestIds, String requestDelays, @Nullable MockVariables variables) {
+        scheduleRequests(requestIds, requestDelays, variables, 0);
     }
 
     @Override
@@ -74,17 +74,34 @@ public class RequestServiceImpl implements RequestService {
         return executeRequestById(requestId, variables, 0, allowTrigger);
     }
 
-    private void scheduleRequests(String requestIds,
+    private void scheduleRequests(String requestIds, String requestDelays,
                                   @Nullable MockVariables variables, int level) {
         if (Strings.isBlank(requestIds)) return;
-        CompletableFuture.runAsync(() -> executeRequests(requestIds, variables, level));
+
+        var idArray = requestIds.split(",");
+        var delayArray = requestDelays.split(",");
+        for (int i = 0; i < idArray.length; i++) {
+            long delay = 100;
+            if (i < delayArray.length) {
+                try {
+                    delay = Long.parseLong(delayArray[i].trim());
+                } catch (Exception e) {
+                    // don't care
+                }
+            }
+            scheduleRequest(idArray[i].trim(), delay, variables, level);
+        }
     }
 
-    private void executeRequests(String requestIds,
-                                 @Nullable MockVariables variables,
-                                 int level) {
-        for (String requestId : requestIds.split(",")) {
-            executeRequestById(requestId, variables, level, true);
+    private void scheduleRequest(String requestId, long delay,
+                                 @Nullable MockVariables variables, int level) {
+        if (delay == 0) {
+            CompletableFuture.runAsync(
+                    () -> executeRequestById(requestId, variables, level, true));
+        } else {
+            CompletableFuture.runAsync(
+                    () -> executeRequestById(requestId, variables, level, true),
+                    CompletableFuture.delayedExecutor(delay, TimeUnit.MILLISECONDS));
         }
     }
 
@@ -120,7 +137,10 @@ public class RequestServiceImpl implements RequestService {
                 contextService.putAll(request.getGroup(), res.getResponseVariables());
             }
             if (allowTrigger && request.isTriggerRequest()) {
-                scheduleRequests(request.getTriggerRequestIds(), res.getResponseVariables(), level + 1);
+                scheduleRequests(request.getTriggerRequestIds(),
+                        request.getTriggerRequestDelay(),
+                        res.getResponseVariables(),
+                        level + 1);
             }
         });
 

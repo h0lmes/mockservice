@@ -7,6 +7,11 @@ import java.util.function.Predicate;
 public class MapScenarioStrategy implements ScenarioStrategy {
 
     public Optional<String> apply(List<Route> routes, Predicate<Route> condition) {
-        return routes.stream().filter(condition).map(Route::getAlt).findFirst();
+        for (Route route : routes) {
+            if (condition.test(route)) {
+                return Optional.of(route.getAlt());
+            }
+        }
+        return Optional.empty();
     }
 }

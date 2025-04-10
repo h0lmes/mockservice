@@ -22,7 +22,8 @@ public class RouteMapperImpl implements RouteMapper {
                 .setRequestBodySchema(route.getRequestBodySchema())
                 .setDisabled(route.getDisabled())
                 .setTriggerRequest(route.isTriggerRequest())
-                .setTriggerRequestIds(route.getTriggerRequestIds());
+                .setTriggerRequestIds(route.getTriggerRequestIds())
+                .setTriggerRequestDelay(route.getTriggerRequestDelay());
     }
 
     @Override
@@ -38,7 +39,8 @@ public class RouteMapperImpl implements RouteMapper {
                 .setRequestBodySchema(dto.getRequestBodySchema())
                 .setDisabled(dto.getDisabled())
                 .setTriggerRequest(dto.isTriggerRequest())
-                .setTriggerRequestIds(dto.getTriggerRequestIds());
+                .setTriggerRequestIds(dto.getTriggerRequestIds())
+                .setTriggerRequestDelay(dto.getTriggerRequestDelay());
     }
 
     @Override

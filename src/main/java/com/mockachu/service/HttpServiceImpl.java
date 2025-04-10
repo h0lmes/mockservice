@@ -8,6 +8,7 @@ import com.mockachu.model.HttpRequestResult;
 import com.mockachu.repository.ConfigRepository;
 import com.mockachu.repository.SettingsObserver;
 import com.mockachu.template.MockVariables;
+import com.mockachu.util.JsonUtils;
 import com.mockachu.util.MapUtils;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -147,12 +148,16 @@ public class HttpServiceImpl implements HttpService, SettingsObserver {
     }
 
     private MockVariables jsonToMap(String json) {
+        if (!JsonUtils.isJson(json)) {
+            return MockVariables.empty();
+        }
+
         try {
             return MockVariables.of(
                     MapUtils.flattenMap(
                             MapUtils.jsonToMap(json, jsonMapper)));
         } catch (JsonProcessingException jpe) {
-            log.warn("Request; invalid JSON:\n{}", jpe.getMessage());
+            log.warn("Couldn't deserialize JSON:\n{}", jpe.getMessage());
             return MockVariables.empty();
         }
     }

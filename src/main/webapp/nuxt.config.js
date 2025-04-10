@@ -20,7 +20,8 @@ export default {
                 'faReceipt',
                 'faFileImport',
                 'faHashtag',
-                'faSubscript'
+                'faSubscript',
+                'faProjectDiagram'
             ]
         }
     },

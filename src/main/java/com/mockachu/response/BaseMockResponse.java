@@ -4,6 +4,7 @@ import com.mockachu.template.MockFunctions;
 import com.mockachu.template.MockVariables;
 import com.mockachu.template.StringTemplate;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 
 public class BaseMockResponse implements MockResponse {
 
@@ -45,5 +46,12 @@ public class BaseMockResponse implements MockResponse {
     @Override
     public String getResponseBody() {
         return responseBody.toString(variables, functions);
+    }
+
+    public ResponseEntity<String> asResponseEntity() {
+        return ResponseEntity
+                .status(getResponseCode())
+                .headers(getResponseHeaders())
+                .body(getResponseBody());
     }
 }

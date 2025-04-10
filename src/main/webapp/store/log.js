@@ -9,7 +9,7 @@ import {handleError} from "../js/common";
 export const actions = {
     async fetch({commit, rootState}) {
         try {
-            const url = rootState.BASE_URL + '/web-api/log';
+            const url = rootState.BASE_URL + '/__webapi__/log';
             const res = await fetch(url);
             await handleError(res);
             return await res.text();

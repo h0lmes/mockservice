@@ -16,7 +16,7 @@ import {handleError} from "../js/common";
 export const actions = {
     async fetch({commit, rootState}) {
         try {
-            const url = rootState.BASE_URL + '/web-api/tests';
+            const url = rootState.BASE_URL + '/__webapi__/tests';
             const res = await fetch(url);
             await handleError(res);
             const data = await res.json();
@@ -27,7 +27,7 @@ export const actions = {
     },
     async save({commit, rootState}, tests) {
         try {
-            const url = rootState.BASE_URL + '/web-api/tests';
+            const url = rootState.BASE_URL + '/__webapi__/tests';
             const params = {
                 method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
@@ -43,7 +43,7 @@ export const actions = {
     },
     async saveAll({commit, rootState}, payload) {
         try {
-            const url = rootState.BASE_URL + '/web-api/tests';
+            const url = rootState.BASE_URL + '/__webapi__/tests';
             const method = payload.overwrite ? 'PUT' : 'POST';
             const params = {
                 method,
@@ -60,7 +60,7 @@ export const actions = {
     },
     async delete({commit, rootState}, tests) {
         try {
-            const url = rootState.BASE_URL + '/web-api/tests';
+            const url = rootState.BASE_URL + '/__webapi__/tests';
             const params = {
                 method: 'DELETE',
                 headers: {'Content-Type': 'application/json'},
@@ -76,7 +76,7 @@ export const actions = {
     },
     async execute({commit, rootState}, alias) {
         try {
-            const url = rootState.BASE_URL + '/web-api/tests/execute';
+            const url = rootState.BASE_URL + '/__webapi__/tests/execute';
             const params = {
                 method: 'POST',
                 headers: {'Content-Type': 'text/text'},
@@ -99,7 +99,7 @@ export const actions = {
     },
     async stop({commit, rootState}, alias) {
         try {
-            const url = rootState.BASE_URL + '/web-api/tests/stop';
+            const url = rootState.BASE_URL + '/__webapi__/tests/stop';
             const params = {
                 method: 'POST',
                 headers: {'Content-Type': 'text/text'},
@@ -118,7 +118,7 @@ export const actions = {
     },
     async result({commit, rootState}, alias) {
         try {
-            const url = rootState.BASE_URL + `/web-api/tests/${alias}/result`;
+            const url = rootState.BASE_URL + `/__webapi__/tests/${alias}/result`;
             const res = await fetch(url, {method: 'GET'});
             await handleError(res);
             return await res.text();
@@ -128,7 +128,7 @@ export const actions = {
     },
     async clear({commit, rootState}, alias) {
         try {
-            const url = rootState.BASE_URL + `/web-api/tests/${alias}/clear`;
+            const url = rootState.BASE_URL + `/__webapi__/tests/${alias}/clear`;
             const res = await fetch(url, {method: 'POST'});
             if (res.status === 404) {
                 commit('setLastError', 'Test not found or not run yet', {root: true});

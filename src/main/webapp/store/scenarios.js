@@ -30,7 +30,7 @@ import {handleError} from "../js/common";
 export const actions = {
     async fetch({commit, rootState}) {
         try {
-            const url = rootState.BASE_URL + '/web-api/scenarios';
+            const url = rootState.BASE_URL + '/__webapi__/scenarios';
             const res = await fetch(url);
             await handleError(res);
             const data = await res.json();
@@ -41,7 +41,7 @@ export const actions = {
     },
     async save({commit, rootState}, scenarios) {
         try {
-            const url = rootState.BASE_URL + '/web-api/scenarios';
+            const url = rootState.BASE_URL + '/__webapi__/scenarios';
             const params = {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
@@ -57,7 +57,7 @@ export const actions = {
     },
     async delete({commit, rootState}, scenario) {
         try {
-            const url = rootState.BASE_URL + '/web-api/scenarios';
+            const url = rootState.BASE_URL + '/__webapi__/scenarios';
             const params = {
                 method: 'DELETE',
                 headers: {'Content-Type': 'application/json'},
@@ -83,7 +83,7 @@ export const actions = {
     },
     async activate({commit, rootState}, alias) {
         try {
-            const url = rootState.BASE_URL + '/web-api/scenarios/active';
+            const url = rootState.BASE_URL + '/__webapi__/scenarios/active';
             const params = {method: 'PUT', body: alias};
             const res = await fetch(url, params);
             await handleError(res);
@@ -97,7 +97,7 @@ export const actions = {
     },
     async deactivate({commit, rootState}, alias) {
         try {
-            const url = rootState.BASE_URL + '/web-api/scenarios/active';
+            const url = rootState.BASE_URL + '/__webapi__/scenarios/active';
             const params = {method: 'DELETE', body: alias};
             const res = await fetch(url, params);
             await handleError(res);

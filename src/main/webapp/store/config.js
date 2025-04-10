@@ -9,7 +9,7 @@ import {handleError} from "../js/common";
 export const actions = {
     async fetch({commit, rootState}) {
         try {
-            const url = rootState.BASE_URL + '/web-api/config';
+            const url = rootState.BASE_URL + '/__webapi__/config';
             const res = await fetch(url);
             await handleError(res);
             return await res.text();
@@ -19,7 +19,7 @@ export const actions = {
     },
     async save({commit, rootState}, config) {
         try {
-            const url = rootState.BASE_URL + '/web-api/config';
+            const url = rootState.BASE_URL + '/__webapi__/config';
             const params = {
                 method: 'PUT',
                 headers: {'Content-Type': 'text/plain'},
@@ -34,7 +34,7 @@ export const actions = {
     },
     async backup({commit, rootState}) {
         try {
-            const url = rootState.BASE_URL + '/web-api/config/backup';
+            const url = rootState.BASE_URL + '/__webapi__/config/backup';
             const res = await fetch(url);
             await handleError(res);
             return await res.text();
@@ -44,7 +44,7 @@ export const actions = {
     },
     async restore({commit, rootState}) {
         try {
-            const url = rootState.BASE_URL + '/web-api/config/restore';
+            const url = rootState.BASE_URL + '/__webapi__/config/restore';
             const res = await fetch(url);
             await handleError(res);
             return await res.text();

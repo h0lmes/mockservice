@@ -13,19 +13,19 @@
         </div>
 
         <div class="component-toolbar mb-3">
-            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRoute">Add route</button>
-            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addScenario">Add scenario</button>
-            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRequest">Add request</button>
-            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addTest">Add test</button>
-            <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger mr-3" @click="deleteVisibleRoutes">Delete visible routes</button>
-        </div>
-
-        <div class="component-toolbar mb-5">
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRoutes">Routes</ToggleSwitch>
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showScenarios">Scenarios</ToggleSwitch>
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRequests">Requests</ToggleSwitch>
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showTests">Tests</ToggleSwitch>
             <ViewSelector class="toolbar-item toolbar-item-w-fixed-auto"></ViewSelector>
+        </div>
+
+        <div class="component-toolbar mb-5">
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRoute">Add route</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addScenario">Add scenario</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRequest">Add request</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addTest">Add test</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger mr-3" @click="deleteVisibleRoutes">Delete visible routes</button>
         </div>
 
         <Routes :entities="filteredEntities" @filter="setFilter($event)"></Routes>
@@ -52,10 +52,10 @@
                 Each line is exactly one command.
             </div>
             <div class="mt-2">
-                x = some string - set value of variable in global context (see Context page).
+                x = some string - set value of variable 'x' in global context (see Context page).
             </div>
             <div class="mt-2">
-                x = ${variable_name} - set value of variable in global context, value comes from latest request response.
+                x = ${item.capacity} - set value of variable 'x' in global context, value comes from variable 'item.capacity' from latest request response (assuming latest response was like <span>{"item": {"capacity": 100}}</span>>) or from global context.
             </div>
             <div class="mt-2">
                 GET localhost:8081/products/${id} - execute inline request; variable comes from global context.
@@ -64,16 +64,16 @@
                 POST localhost:8081/v2/store/order {"x": 400} -> 400,404 - execute inline request and test status code is 400 or 404; if test fails - test run stops with FAILED.
             </div>
             <div class="mt-2">
-                request_id - execute request by ID.
+                request_id - execute request with ID 'request_id'.
             </div>
             <div class="mt-2">
-                request_id -> 200 - execute request by ID and test status code is 200; if test fails - test run stops with FAILED.
+                request_id -> 200 - execute request with ID 'request_id' and test status code is 200; if test fails - test run stops with FAILED.
             </div>
             <div class="mt-2">
-                x == 2 - non-strictly test value of variable from the latest request response; if test fails - test run proceeds with WARNING.
+                x == 2 - non-strictly test variable 'x' from the latest request response; if test fails - test run proceeds with WARNING.
             </div>
             <div class="mt-2">
-                x === some value - strictly test value of variable from the latest request response; if test fails - test run stops with FAILED.
+                x === some value - strictly test variable 'x' from the latest request response; if test fails - test run stops with FAILED.
             </div>
         </div>
         <div class="color-secondary mt-6">

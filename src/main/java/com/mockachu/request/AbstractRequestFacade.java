@@ -36,8 +36,8 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     @SuppressWarnings("unchecked")
     AbstractRequestFacade(HttpServletRequest request, ObjectMapper jsonMapper) {
         this.jsonMapper = jsonMapper;
-        endpoint = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE) == null
-                ? "" : (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        endpoint = pattern == null ? "" : pattern;
         encodedEndpoint = encodeEndpoint(endpoint);
         requestMethod = request.getMethod();
 
@@ -86,7 +86,7 @@ public abstract class AbstractRequestFacade implements RequestFacade {
     }
 
     @Override
-    public RequestMethod getRequestMethod() {
+    public RequestMethod getMethod() {
         return RequestMethod.valueOf(requestMethod);
     }
 

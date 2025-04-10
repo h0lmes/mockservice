@@ -117,7 +117,7 @@
 
 .nav .nav-group {
   box-sizing: border-box;
-  padding: 1.5rem 20px 0.9rem 25px;
+  padding: 1.5rem 1rem 0.9rem 1.25rem;
   font-size: smaller;
   font-family: monospace, monospace;
   font-weight: 700;
@@ -131,7 +131,7 @@
 
 .nav .nav-block {
   box-sizing: border-box;
-  padding: 0 20px;
+  padding: 0 1rem;
   text-align: center;
 
   .navbar-mini &,
@@ -149,7 +149,7 @@
 
 .nav > li > a {
   display: block;
-  padding: 14px 20px 14px 35px;
+  padding: 0.8rem 1rem 0.8rem 1.5rem;
   font-weight: 400;
   color: var(--nav-color);
 
@@ -160,7 +160,8 @@
 }
 
 .nav > li > a .nav-icon {
-  margin-right: 6px;
+  min-width: 1.5rem;
+  margin-right: 0.35rem;
 }
 
 .nav > li.active > a,

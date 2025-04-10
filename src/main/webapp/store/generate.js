@@ -13,7 +13,7 @@ import {handleError} from "../js/common";
 export const actions = {
     async json({commit, rootState}, schema) {
         try {
-            const url = rootState.BASE_URL + '/web-api/generate/json';
+            const url = rootState.BASE_URL + '/__webapi__/generate/json';
             let res;
             if (schema) {
                 const params = {

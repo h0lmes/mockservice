@@ -4,7 +4,7 @@
             <h1 class="mb-5">Mockachu</h1>
             <p class="mb-2">Effortless API Mocking and Testing</p>
             <p class="mb-2">
-                <a target="_blank" href="https://github.com/h0lmes/mockachu" rel="noopener noreferrer">GitHub</a>
+                <a target="_blank" href="https://github.com/h0lmes/mockservice" rel="noopener noreferrer">GitHub</a>
             </p>
             <pre class="ascii">         --------                       </pre>
             <pre class="ascii">    V   | Mock ? |   -------       V    </pre>

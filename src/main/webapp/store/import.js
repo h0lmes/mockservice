@@ -13,7 +13,7 @@ import {handleError} from "../js/common";
 export const actions = {
     async import({commit, dispatch, rootState}, param) {
         try {
-            const url = rootState.BASE_URL + '/web-api/import';
+            const url = rootState.BASE_URL + '/__webapi__/import';
             const params = {
                 method: 'PUT',
                 headers: {'Content-Type': 'text/plain'},
