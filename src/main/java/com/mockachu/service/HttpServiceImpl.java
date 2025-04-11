@@ -8,7 +8,6 @@ import com.mockachu.model.HttpRequestResult;
 import com.mockachu.repository.ConfigRepository;
 import com.mockachu.repository.SettingsObserver;
 import com.mockachu.template.MockVariables;
-import com.mockachu.util.JsonUtils;
 import com.mockachu.util.MapUtils;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -113,6 +112,7 @@ public class HttpServiceImpl implements HttpService, SettingsObserver {
         try {
             if (!uri.contains("://")) uri = "http" + "://" + uri;
             log.info("Executing request: {} {}", method, uri);
+
             String body = webClient
                     .method(method.asHttpMethod())
                     .uri(uri)
@@ -148,16 +148,11 @@ public class HttpServiceImpl implements HttpService, SettingsObserver {
     }
 
     private MockVariables jsonToMap(String json) {
-        if (!JsonUtils.isJson(json)) {
-            return MockVariables.empty();
-        }
-
         try {
             return MockVariables.of(
                     MapUtils.flattenMap(
-                            MapUtils.jsonToMap(json, jsonMapper)));
+                            MapUtils.toMap(json, jsonMapper)));
         } catch (JsonProcessingException jpe) {
-            log.warn("Couldn't deserialize JSON:\n{}", jpe.getMessage());
             return MockVariables.empty();
         }
     }

@@ -1,4 +1,4 @@
-package com.mockachu.config;
+package com.mockachu.kafka;
 
 import org.apache.kafka.clients.consumer.ConsumerGroupMetadata;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
@@ -9,9 +9,7 @@ import org.apache.kafka.common.errors.ProducerFencedException;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -23,43 +21,40 @@ public class MockachuKafkaProducer<K, V> implements Producer<K, V> {
     private final Serializer<K> keySerializer;
     private final Serializer<V> valueSerializer;
     private final MockachuKafkaSender sender;
+    private final MockachuKafkaProtocol protocol;
 
     public MockachuKafkaProducer(Map<String, Object> configs,
                                  Serializer<K> keySerializer,
                                  Serializer<V> valueSerializer,
-                                 MockachuKafkaSender sender) {
+                                 MockachuKafkaSender sender, MockachuKafkaProtocol protocol) {
         this.clientId = (String) configs.get("client.id");
-        this.keySerializer = getKeySerializer(keySerializer, configs);
-        this.valueSerializer = getValueSerializer(valueSerializer, configs);
+        this.keySerializer = getSerializer(keySerializer, configs, ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG);
+        this.valueSerializer = getSerializer(valueSerializer, configs, ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG);
         this.sender = sender;
+        this.protocol = protocol;
     }
 
-    private Serializer<K> getKeySerializer(Serializer<K> serializer,
-                                                     Map<String, Object> configs) {
+    private <T> Serializer<T> getSerializer(Serializer<T> serializer,
+                                               Map<String, Object> configs,
+                                               String configKey) {
         if (serializer != null) return serializer;
         try {
-            var clazz = (Class<?>) configs.get(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG);
-            if (clazz != null && Serializer.class.isAssignableFrom(clazz)) {
-                serializer = (Serializer) clazz.getDeclaredConstructor().newInstance();
+            Object name = configs.get(configKey);
+            if (name instanceof String className) {
+                return (Serializer<T>) Class.forName(className).getDeclaredConstructor().newInstance();
             }
         } catch (Exception e) {
             // ignore
         }
-        return serializer;
-    }
-
-    private Serializer<V> getValueSerializer(Serializer<V> serializer,
-                                                     Map<String, Object> configs) {
-        if (serializer != null) return serializer;
         try {
-            var clazz = (Class<?>) configs.get(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG);
+            var clazz = (Class<T>) configs.get(configKey);
             if (clazz != null && Serializer.class.isAssignableFrom(clazz)) {
-                serializer = (Serializer) clazz.getDeclaredConstructor().newInstance();
+                return (Serializer<T>) clazz.getDeclaredConstructor().newInstance();
             }
         } catch (Exception e) {
             // ignore
         }
-        return serializer;
+        return null;
     }
 
     @Override
@@ -99,52 +94,57 @@ public class MockachuKafkaProducer<K, V> implements Producer<K, V> {
 
     @Override
     public Future<RecordMetadata> send(ProducerRecord<K, V> producerRecord, Callback callback) {
-//        ProducerRecord<K, V> interceptedRecord = this.interceptors == null ? producerRecord : this.interceptors.onSend(producerRecord);
+//        ProducerRecord<K, V> interceptedRecord = this.interceptors == null ? record : this.interceptors.onSend(record);
 //        return doSend(interceptedRecord, callback);
         return doSend(producerRecord, callback);
     }
 
-    private Future<RecordMetadata> doSend(ProducerRecord<K, V> record, Callback callback) {
+    private Future<RecordMetadata> doSend(ProducerRecord<K, V> producerRecord, Callback callback) {
         try {
-            long nowMs = System.currentTimeMillis();
+            long millis = producerRecord.timestamp() != null ? producerRecord.timestamp() : System.currentTimeMillis();
 
             byte[] serializedKey;
             try {
-//                if (keySerializer == null) {
-//                    serializedKey = record.key().toString().getBytes(StandardCharsets.UTF_8);
-//                } else {
-                    serializedKey = keySerializer.serialize(record.topic(), record.headers(), record.key());
-                //}
+                serializedKey = keySerializer.serialize(
+                        producerRecord.topic(), producerRecord.headers(), producerRecord.key());
             } catch (ClassCastException cce) {
                 throw new SerializationException("Can't convert key", cce);
             }
 
             byte[] serializedValue;
             try {
-//                if (valueSerializer == null) {
-//                    serializedValue = record.value().toString().getBytes(StandardCharsets.UTF_8);
-//                } else {
-                    serializedValue = valueSerializer.serialize(record.topic(), record.headers(), record.value());
-                //}
+                serializedValue = valueSerializer.serialize(
+                        producerRecord.topic(), producerRecord.headers(), producerRecord.value());
             } catch (ClassCastException cce) {
                 throw new SerializationException("Can't convert value", cce);
             }
+            var serializedKeyLen = serializedKey == null ? 0 : serializedKey.length;
+            var serializedValueLen = serializedValue == null ? 0 : serializedValue.length;
 
-            int partition = this.partition(record, serializedKey, serializedValue, null);
+            int partition = partition(producerRecord, serializedKey, serializedValue, null);
+            var topicPartition = new TopicPartition(producerRecord.topic(), partition);
 
-            var keyBytes = Base64.getEncoder().encode(serializedKey);
-            String keyStr = new String(keyBytes, StandardCharsets.UTF_8);
-            var valueBytes = Base64.getEncoder().encode(serializedValue);
-            String valueStr = new String(valueBytes, StandardCharsets.UTF_8);
+            String message = protocol.encodeProducerMessage(producerRecord.topic(), partition,
+                    millis, serializedKey, serializedValue, producerRecord.headers());
 
-            return this.sender.send(
-                    "",
-                    record.topic() + ";" + partition + ";" + nowMs + ";" + keyStr + ";" + valueStr,
-                    record.topic(),
-                    partition);
+            var future = new CompletableFuture<RecordMetadata>();
+            var senderFuture = sender.send(message);
+            senderFuture.whenComplete((result, error) -> {
+                if (error != null) {
+                    future.completeExceptionally(error);
+                    return;
+                }
+
+                var offset = 0;
+                var metadata = new RecordMetadata(
+                        topicPartition, offset, 0, millis, serializedKeyLen, serializedValueLen);
+                future.complete(metadata);
+            });
+            return future;
         } catch (ApiException apiException) {
-            var nullTopicPartition = new TopicPartition(record.topic(), 0);
-            RecordMetadata nullMetadata = new RecordMetadata(nullTopicPartition, -1L, -1, -1L, -1, -1);
+            var nullTopicPartition = new TopicPartition(producerRecord.topic(), 0);
+            RecordMetadata nullMetadata = new RecordMetadata(
+                    nullTopicPartition, -1L, -1, -1L, -1, -1);
             if (callback != null) {
                 callback.onCompletion(nullMetadata, apiException);
             }
@@ -157,12 +157,8 @@ public class MockachuKafkaProducer<K, V> implements Producer<K, V> {
         }
     }
 
-    private int partition(ProducerRecord<K, V> record, byte[] serializedKey, byte[] serializedValue, Cluster cluster) {
-        if (record.partition() != null) {
-            return record.partition();
-        } else {
-            return 0;
-        }
+    private int partition(ProducerRecord<K, V> producerRecord, byte[] serializedKey, byte[] serializedValue, Cluster cluster) {
+        return producerRecord.partition() != null ? producerRecord.partition() : 0;
     }
 
     @Override

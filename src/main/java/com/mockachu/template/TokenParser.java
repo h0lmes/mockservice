@@ -3,17 +3,25 @@ package com.mockachu.template;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Token format:
+ * - ${var_name}
+ * - ${var_name:def_val}
+ * - ${function_name}
+ * - ${function_name:param1:param2:....}
+ *
+ * @author  Roman Dubinin
+ */
 public class TokenParser {
-
     private static final String TOKEN_START = "${";
+    private static final char[] TOKEN_START_AS_CHARS = TOKEN_START.toCharArray();
     private static final int TOKEN_START_LEN = TOKEN_START.length();
     private static final String TOKEN_END = "}";
+    private static final char[] TOKEN_END_AS_CHARS = TOKEN_END.toCharArray();
     private static final int TOKEN_END_LEN = TOKEN_END.length();
-
-    private static final char TOKEN_START_CHAR = '$';
+    private static final char TOKEN_ARGS_SPLIT_CHAR = ':';
     private static final char OPENING_BRACKET_CHAR = '{';
     private static final char CLOSING_BRACKET_CHAR = '}';
-    private static final char TOKEN_ARGS_SPLIT_CHAR = ':';
 
     private TokenParser() {
         // private
@@ -39,12 +47,12 @@ public class TokenParser {
                 collectToken(level == 0, token, tokens);
                 level++;
                 token.append(ch);
-            } else if (ch == CLOSING_BRACKET_CHAR && level == 1) {
+            } else if (endOfTokenAt(index, chars, len) && level == 1) {
                 token.append(ch);
                 level = 0;
                 assertTokenLength(token, index, text);
                 collectToken(true, token, tokens);
-            } else if (ch == CLOSING_BRACKET_CHAR && level > 1) {
+            } else if (endOfTokenAt(index, chars, len) && level > 1) {
                 token.append(ch);
                 level--;
             } else {
@@ -60,7 +68,19 @@ public class TokenParser {
     }
 
     private static boolean startOfTokenAt(int index, char[] chars, int len) {
-        return chars[index] == TOKEN_START_CHAR && index + 1 < len && chars[index + 1] == OPENING_BRACKET_CHAR;
+        for (int i = 0; i < TOKEN_START_LEN; i++) {
+            if (index + i >= len) return false;
+            if (chars[index + i] != TOKEN_START_AS_CHARS[i]) return false;
+        }
+        return true;
+    }
+
+    private static boolean endOfTokenAt(int index, char[] chars, int len) {
+        for (int i = 0; i < TOKEN_END_LEN; i++) {
+            if (index + i >= len) return false;
+            if (chars[index + i] != TOKEN_END_AS_CHARS[i]) return false;
+        }
+        return true;
     }
 
     private static void assertTokenLength(StringBuilder token, int index, String text) {

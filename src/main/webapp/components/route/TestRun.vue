@@ -42,7 +42,7 @@ export default {
     },
     computed: {
         wsUrl() {
-            return 'ws://' + location.hostname + ':8081/ws-api'
+            return 'ws://' + location.hostname + ':8081/__wsapi__'
         },
         resultProcessed() {
             return this.result

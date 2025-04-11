@@ -6,14 +6,13 @@ import com.mockachu.components.JsonFromSchemaProducer;
 import com.mockachu.components.JsonProducer;
 import com.mockachu.model.ErrorInfo;
 import com.mockachu.util.JsonUtils;
+import com.mockachu.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("__webapi__/generate")
@@ -42,14 +41,11 @@ public class GenerateController {
     }
 
     @PostMapping("json")
-    @SuppressWarnings("unchecked")
     public String jsonFromSchema(@RequestBody String schema) throws JsonProcessingException {
         if (JsonUtils.isJson(schema)) {
-            Map<String, Object> jsonSchemaMap = jsonMapper.readValue(schema, Map.class);
-            return jsonFromSchemaProducer.jsonFromSchema(jsonSchemaMap);
+            return jsonFromSchemaProducer.jsonFromSchema(MapUtils.toMap(schema, jsonMapper));
         } else {
-            Map<String, Object> jsonSchemaMap = yamlMapper.readValue(schema, Map.class);
-            return jsonFromSchemaProducer.jsonFromSchema(jsonSchemaMap);
+            return jsonFromSchemaProducer.jsonFromSchema(MapUtils.toMap(schema, yamlMapper));
         }
     }
 

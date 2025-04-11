@@ -36,7 +36,7 @@ public class RestRequestFacade extends AbstractRequestFacade {
         String body = getBody();
         try {
             MockVariables vars = new MockVariables();
-            vars.putAll(MapUtils.flattenMap(MapUtils.jsonToMap(body, jsonMapper)));
+            vars.putAll(MapUtils.flattenMap(MapUtils.toMap(body, jsonMapper)));
             return Optional.of(vars);
         } catch (JsonProcessingException e) {
             log.warn("Invalid JSON:\n{}", body);
@@ -55,7 +55,7 @@ public class RestRequestFacade extends AbstractRequestFacade {
                     String payload = new String(decoder.decode(chunks[1]));
                     try {
                         MockVariables vars = new MockVariables();
-                        vars.putAll(MapUtils.flattenMap(MapUtils.jsonToMap(payload, jsonMapper)));
+                        vars.putAll(MapUtils.flattenMap(MapUtils.toMap(payload, jsonMapper)));
                         return Optional.of(vars);
                     } catch (JsonProcessingException e) {
                         log.warn("Invalid JWT payload:\n{}", payload);

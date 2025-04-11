@@ -1,4 +1,4 @@
-package com.mockachu.config;
+package com.mockachu.kafka;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.kafka.clients.consumer.ConsumerGroupMetadata;
@@ -68,39 +68,47 @@ public class MockachuKafkaProducerFactory<K, V> extends KafkaResourceFactory imp
     private volatile MockachuKafkaProducerFactory.CloseSafeProducer<K, V> producer;
 
     private final MockachuKafkaSender sender;
+    private final MockachuKafkaProtocol protocol;
 
-    public MockachuKafkaProducerFactory(Map<String, Object> configs, MockachuKafkaSender sender) {
-        this(configs, () -> null, () -> null, sender);
+    public MockachuKafkaProducerFactory(Map<String, Object> configs,
+                                        MockachuKafkaSender sender,
+                                        MockachuKafkaProtocol protocol) {
+        this(configs, () -> null, () -> null, sender, protocol);
     }
 
     public MockachuKafkaProducerFactory(Map<String, Object> configs,
                                         @Nullable Serializer<K> keySerializer,
                                         @Nullable Serializer<V> valueSerializer,
-                                        MockachuKafkaSender sender) {
-        this(configs, () -> keySerializer, () -> valueSerializer, true, sender);
+                                        MockachuKafkaSender sender,
+                                        MockachuKafkaProtocol protocol) {
+        this(configs, () -> keySerializer, () -> valueSerializer, true, sender, protocol);
     }
 
     public MockachuKafkaProducerFactory(Map<String, Object> configs,
                                         @Nullable Serializer<K> keySerializer,
                                         @Nullable Serializer<V> valueSerializer,
                                         boolean configureSerializers,
-                                        MockachuKafkaSender sender) {
-        this(configs, () -> keySerializer, () -> valueSerializer, configureSerializers, sender);
+                                        MockachuKafkaSender sender,
+                                        MockachuKafkaProtocol protocol) {
+        this(configs, () -> keySerializer, () -> valueSerializer, configureSerializers, sender, protocol);
     }
 
     public MockachuKafkaProducerFactory(Map<String, Object> configs,
                                         @Nullable Supplier<Serializer<K>> keySerializerSupplier,
                                         @Nullable Supplier<Serializer<V>> valueSerializerSupplier,
-                                        MockachuKafkaSender sender) {
-        this(configs, keySerializerSupplier, valueSerializerSupplier, true, sender);
+                                        MockachuKafkaSender sender,
+                                        MockachuKafkaProtocol protocol) {
+        this(configs, keySerializerSupplier, valueSerializerSupplier, true, sender, protocol);
     }
 
     public MockachuKafkaProducerFactory(Map<String, Object> configs,
                                         @Nullable Supplier<Serializer<K>> keySerializerSupplier,
                                         @Nullable Supplier<Serializer<V>> valueSerializerSupplier,
                                         boolean configureSerializers,
-                                        MockachuKafkaSender sender) {
+                                        MockachuKafkaSender sender,
+                                        MockachuKafkaProtocol protocol) {
         this.sender = sender;
+        this.protocol = protocol;
 
         this.globalLock = new ReentrantLock();
         this.cache = new ConcurrentHashMap<>();
@@ -296,7 +304,7 @@ public class MockachuKafkaProducerFactory<K, V> extends KafkaResourceFactory imp
                 this.getKeySerializerSupplier(),
                 this.getValueSerializerSupplier(),
                 this.isConfigureSerializers(),
-                this.sender);
+                sender, protocol);
         newFactory.setPhysicalCloseTimeout((int) this.getPhysicalCloseTimeout().getSeconds());
         newFactory.setProducerPerThread(this.isProducerPerThread());
 
@@ -643,7 +651,7 @@ public class MockachuKafkaProducerFactory<K, V> extends KafkaResourceFactory imp
                 new MockachuKafkaProducer<>(rawConfigs,
                         this.keySerializerSupplier.get(),
                         this.valueSerializerSupplier.get(),
-                        this.sender);
+                        sender, protocol);
 
         ProducerPostProcessor<K, V> pp;
         for (Iterator<ProducerPostProcessor<K, V>> it = this.postProcessors.iterator();

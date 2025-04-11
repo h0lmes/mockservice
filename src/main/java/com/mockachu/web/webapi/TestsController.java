@@ -10,12 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("__webapi__/tests")
@@ -25,12 +23,9 @@ public class TestsController {
     private static final String TEST_NOT_FOUND = "Test not found";
 
     private final TestService testService;
-    private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public TestsController(TestService testService,
-                           KafkaTemplate<String, String> kafkaTemplate) {
+    public TestsController(TestService testService) {
         this.testService = testService;
-        this.kafkaTemplate = kafkaTemplate;
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -112,12 +107,6 @@ public class TestsController {
                 .body("Test is in progress");
 
         return ResponseEntity.ok("");
-    }
-
-    @GetMapping(value = "/kafka", produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> kafka() throws ExecutionException, InterruptedException {
-        kafkaTemplate.send("topic-name", "-test-key-", "-test-data-");
-        return ResponseEntity.ok("kafka message sent");
     }
 
     @ExceptionHandler(produces = MediaType.APPLICATION_JSON_VALUE)

@@ -17,6 +17,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
     }
 
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(handler, "/ws-api").setAllowedOrigins("*");
+        registry.addHandler(handler, "__wsapi__").setAllowedOrigins("*");
     }
 }

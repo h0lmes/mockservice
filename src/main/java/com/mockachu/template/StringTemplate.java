@@ -6,12 +6,6 @@ import java.util.List;
 
 /**
  * The {@code StringTemplate} class represents parsed template.
- * <p>
- * Token format:
- * - ${var_name}
- * - ${var_name:def_val}
- * - ${function_name}
- * - ${function_name:param1:param2:....}
  *
  * @author  Roman Dubinin
  */

@@ -1,15 +1,16 @@
 package com.mockachu.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.underscore.U;
+import org.springframework.lang.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 
-@SuppressWarnings("unchecked")
 public class MapUtils {
 
     private MapUtils() {
@@ -20,11 +21,9 @@ public class MapUtils {
         return map == null || map.isEmpty();
     }
 
-    public static Map<String, Object> jsonToMap(String json, ObjectMapper mapper) throws JsonProcessingException {
-        if (json == null || json.isEmpty()) {
-            return new HashMap<>();
-        }
-        return mapper.readValue(json, Map.class);
+    public static <T> T toMap(@Nullable String value, ObjectMapper mapper) throws JsonProcessingException {
+        if (value == null || value.isBlank()) return null;
+        return mapper.readValue(value, new TypeReference<>() {});
     }
 
     public static Map<String, Object> xmlToMap(String data) {
@@ -36,6 +35,7 @@ public class MapUtils {
         return getXmlMapKeyAsMap(map, "body");
     }
 
+    @SuppressWarnings("unchecked")
     private static Map<String, Object> getXmlMapKeyAsMap(Map<String, Object> map, String key) {
         if (map != null) {
             for (Map.Entry<String, Object> e : map.entrySet()) {
@@ -48,12 +48,14 @@ public class MapUtils {
         return new HashMap<>();
     }
 
-    public static Map<String, String> flattenMap(Map<String, Object> map) {
+    public static Map<String, String> flattenMap(@Nullable Map<String, Object> map) {
+        if (map == null) return new HashMap<>();
         Queue<TriEntry> queue = new ArrayDeque<>();
         map.forEach((k, v) -> queue.offer(new TriEntry(null, k, v)));
         return runBfs(queue);
     }
 
+    @SuppressWarnings("unchecked")
     private static Map<String, String> runBfs(Queue<TriEntry> queue) {
         Map<String, String> result = new HashMap<>();
         while (!queue.isEmpty()) {

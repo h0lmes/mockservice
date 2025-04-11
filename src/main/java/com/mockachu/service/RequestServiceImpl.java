@@ -124,12 +124,13 @@ public class RequestServiceImpl implements RequestService {
 
         var functions = MockFunctions.create();
         var requestVars = MockVariables.sum(contextService.get(), inVariables);
+
         var requestBody = requestBodyCache.get(request).toString(requestVars, functions);
         var uri = uriCache.get(request).toString(requestVars, functions);
-        var headersTemplate = headersCache.get(request);
-        var headers = headersTemplate.toMap(requestVars, functions);
+        var headers = headersCache.get(request).toMap(requestVars, functions);
 
-        var result = httpService.request(request.getMethod(), uri, requestBody, headers);
+        var result = httpService.request(
+                request.getMethod(), uri, requestBody, headers);
 
         result.ifPresent(res -> {
             if (request.isResponseToVars()) {

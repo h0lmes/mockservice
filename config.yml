@@ -238,23 +238,11 @@ routes:
   triggerRequestIds: ""
   triggerRequestDelay: ""
 requests:
-- id: _ssl.GET.localhost.443.hello.1
+- id: _kafka.GET.localhost.8081.__kafka__.test
   group: _kafka
   type: REST
   method: GET
-  path: http://localhost:8081/__webapi__/tests/kafka
-  headers: ""
-  body: ""
-  responseToVars: false
-  disabled: false
-  triggerRequest: false
-  triggerRequestIds: ""
-  triggerRequestDelay: ""
-- id: _ssl.GET.localhost.443.hello
-  group: _ssl
-  type: REST
-  method: GET
-  path: https://localhost:443/hello
+  path: http://localhost:8081/__kafka__/test
   headers: ""
   body: ""
   responseToVars: false
@@ -267,6 +255,18 @@ requests:
   type: REST
   method: GET
   path: localhost:8081/api/robot
+  headers: ""
+  body: ""
+  responseToVars: false
+  disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
+  triggerRequestDelay: ""
+- id: ssl.GET.localhost.443.hello
+  group: ssl
+  type: REST
+  method: GET
+  path: https://localhost:443/hello
   headers: ""
   body: ""
   responseToVars: false

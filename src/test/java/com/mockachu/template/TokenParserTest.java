@@ -6,9 +6,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TokenParserTest {
+class TokenParserTest {
 
-    private static final String TOKEN_AT_THE_BEGINNING = "${var}---";
+    private static final String TOKEN_AT_THE_BEGINNING = "{{var}}---";
     private static final String TOKEN_AND_UNRELATED_DELIMITERS =
             "{- 1 -${var:${random_int:10:20}:${opt:${random_int:20:30}}}$- 2 -${var:${of:TEST:TEXT}}- 3 -}";
     private static final String TOKEN_WITH_NESTED_TOKENS = "${var:${random_int:10:20}:${opt:${random_int:20:30}}}";
@@ -20,14 +20,14 @@ public class TokenParserTest {
     // UnitOfWork_StateUnderTest_ExpectedBehavior
 
     @Test
-    public void tokenize_TokenAtTheBeginning_FirstLineNotEmpty() {
+    void tokenize_TokenAtTheBeginning_FirstLineNotEmpty() {
         List<String> list = TokenParser.tokenize(TOKEN_AT_THE_BEGINNING);
 
         assertNotEquals("", list.get(0));
     }
 
     @Test
-    public void tokenize_TokenAndUnrelatedDelimiters_Success() {
+    void tokenize_TokenAndUnrelatedDelimiters_Success() {
         List<String> list = TokenParser.tokenize(TOKEN_AND_UNRELATED_DELIMITERS);
 
         assertEquals(5, list.size());
@@ -39,17 +39,17 @@ public class TokenParserTest {
     }
 
     @Test
-    public void tokenize_TokenWithMissingClosingBracket_Throws() {
+    void tokenize_TokenWithMissingClosingBracket_Throws() {
         assertThrows(IllegalArgumentException.class, () -> TokenParser.tokenize(TOKEN_WITH_MISSING_CLOSING_BRACKET));
     }
 
     @Test
-    public void tokenize_EmptyToken_Throws() {
+    void tokenize_EmptyToken_Throws() {
         assertThrows(IllegalArgumentException.class, () -> TokenParser.tokenize(TOKEN_EMPTY));
     }
 
     @Test
-    public void parse_TokenWithNestedTokens_Success() {
+    void parse_TokenWithNestedTokens_Success() {
         String[] args = TokenParser.parseToken(TOKEN_WITH_NESTED_TOKENS);
 
         assertEquals(3, args.length);
@@ -59,17 +59,17 @@ public class TokenParserTest {
     }
 
     @Test
-    public void parse_TokenWithMissingClosingBracket_Throws() {
+    void parse_TokenWithMissingClosingBracket_Throws() {
         assertThrows(IllegalArgumentException.class, () -> TokenParser.parseToken(TOKEN_WITH_MISSING_CLOSING_BRACKET));
     }
 
     @Test
-    public void parse_TokenWithExtraClosingBracket_Throws() {
+    void parse_TokenWithExtraClosingBracket_Throws() {
         assertThrows(IllegalArgumentException.class, () -> TokenParser.parseToken(TOKEN_WITH_EXTRA_CLOSING_BRACKET));
     }
 
     @Test
-    public void parse_TokenWithEmptyFirstArgument_Throws() {
+    void parse_TokenWithEmptyFirstArgument_Throws() {
         assertThrows(IllegalArgumentException.class, () -> TokenParser.parseToken(TOKEN_WITH_EMPTY_FIRST_ARGUMENT));
     }
 }

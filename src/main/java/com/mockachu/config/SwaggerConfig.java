@@ -8,11 +8,10 @@ package com.mockachu.config;
 @SuppressWarnings("java:S125")
 public class SwaggerConfig {
 
+    // make springdoc generate Array schema for Set.class (remove uniqueItems: true)
     public SwaggerConfig() {
-        // make springdoc generate Array schema for Set.class (remove uniqueItems: true)
-        // uncomment if needed
-        //var schema = new Schema<Set<?>>();
-        //schema.type("array").example(Collections.emptyList());
-        //SpringDocUtils.getConfig().replaceWithSchema(Set.class, schema);
+//        var schema = new Schema<Set<?>>();
+//        schema.type("array").example(Collections.emptyList());
+//        SpringDocUtils.getConfig().replaceWithSchema(Set.class, schema);
     }
 }

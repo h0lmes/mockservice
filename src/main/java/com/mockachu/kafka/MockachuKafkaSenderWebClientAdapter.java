@@ -1,9 +1,5 @@
-package com.mockachu.config;
+package com.mockachu.kafka;
 
-import org.apache.kafka.clients.producer.RecordMetadata;
-import org.apache.kafka.common.TopicPartition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
@@ -11,48 +7,21 @@ import reactor.netty.http.client.HttpClient;
 import java.util.concurrent.CompletableFuture;
 
 public class MockachuKafkaSenderWebClientAdapter implements MockachuKafkaSender {
-    private static final Logger log = LoggerFactory.getLogger(
-            MockachuKafkaSenderWebClientAdapter.class);
-
-    private static final String KAFKA_ENDPOINT = "__kafka__/v1";
     private final WebClient client;
-    private final String baseUri;
 
     public MockachuKafkaSenderWebClientAdapter(String baseUri) {
-        this.baseUri = baseUri.endsWith("/") ?
-                baseUri + KAFKA_ENDPOINT : baseUri + "/" + KAFKA_ENDPOINT;
         var httpClient = HttpClient.create();
         var clientHttpConnector = new ReactorClientHttpConnector(httpClient);
-        this.client = WebClient.builder().clientConnector(clientHttpConnector).build();
+        this.client = WebClient.builder().clientConnector(clientHttpConnector).baseUrl(baseUri).build();
     }
 
-    public CompletableFuture<RecordMetadata> send(String uri,
-                                                  String message,
-                                                  String topic,
-                                                  int partition) {
-        log.info("send({}, {}, {}, {})", uri, message, topic, partition);
-        var future = new CompletableFuture<RecordMetadata>();
-        client.post().uri(baseUri + uri).bodyValue(message)
+    public CompletableFuture<String> send(String message) {
+        var future = new CompletableFuture<String>();
+        client.post().uri("").bodyValue(message)
                 .retrieve()
                 .bodyToMono(String.class)
-                .subscribe(
-                        success -> complete(future, success, topic, partition),
-                        future::completeExceptionally
-                );
+                .subscribe(future::complete, future::completeExceptionally);
         return future;
-    }
-
-    private void complete(CompletableFuture<RecordMetadata> future,
-                          String result,
-                          String topic,
-                          int partition) {
-        log.info("complete({}, {}, {})", result, topic, partition);
-        var offset = getValueLong(result, "offset", 0);
-
-        var topicPartition = new TopicPartition(topic, partition);
-        var metadata = new RecordMetadata(
-                topicPartition, offset, 0, 0, 0, 0);
-        future.complete(metadata);
     }
 
     private static String getValue(String string, String key) {

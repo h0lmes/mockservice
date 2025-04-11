@@ -34,7 +34,7 @@ class MapUtilsTest {
     @Test
     void jsonTotMapAndFlattenMap_ValidJson_MapAsExpected() throws IOException {
         String json = IOUtils.asString("map.json");
-        Map<String, Object> objectMap = MapUtils.jsonToMap(json, mapper);
+        Map<String, Object> objectMap = MapUtils.toMap(json, mapper);
         Map<String, String> map = MapUtils.flattenMap(objectMap);
 
         assertEquals(2, objectMap.size());
@@ -48,14 +48,12 @@ class MapUtilsTest {
 
     @Test
     void jsonToMap_EmptyString_ReturnsEmptyMap() throws IOException {
-        Map<String, Object> objectMap = MapUtils.jsonToMap("", mapper);
-        assertTrue(objectMap.isEmpty());
+        assertNull(MapUtils.<Map<String, Object>>toMap("", mapper));
     }
 
     @Test
     void jsonToMap_NullString_ReturnsEmptyMap() throws IOException {
-        Map<String, Object> objectMap = MapUtils.jsonToMap(null, mapper);
-        assertTrue(objectMap.isEmpty());
+        assertNull(MapUtils.<Map<String, Object>>toMap(null, mapper));
     }
 
     @Test
@@ -66,6 +64,16 @@ class MapUtilsTest {
 
         assertEquals("${enum:TEST1:TEST2}", map.get("NumberToDollarsResponse.NumberToDollarsResult"));
         assertEquals("${NumberToDollarsRequest.Value:DEFAULT_VALUE}", map.get("NumberToDollarsResponse.Result"));
+    }
+
+    @Test
+    void xmlToMap_SoapEnvelopeNoBody_MapAsExpected() throws IOException {
+        String xml = IOUtils.asString("soap_envelope_no_body.xml");
+        Map<String, Object> objectMap = MapUtils.xmlToMap(xml);
+        Map<String, String> map = MapUtils.flattenMap(objectMap);
+
+        assertNotNull(map);
+        assertTrue(map.isEmpty());
     }
 
     @Test
