@@ -167,6 +167,7 @@
                     <excludes>
                         <exclude>**/aop/logging/*</exclude>
                         <exclude>**/config/*</exclude>
+                        <exclude>**/kafka/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
