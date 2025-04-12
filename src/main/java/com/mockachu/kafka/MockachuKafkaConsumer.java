@@ -1,10 +1,13 @@
 package com.mockachu.kafka;
 
 import org.apache.kafka.clients.consumer.*;
+import org.apache.kafka.clients.consumer.internals.ConsumerUtils;
 import org.apache.kafka.common.*;
 import org.apache.kafka.common.errors.WakeupException;
+import org.apache.kafka.common.metrics.Metrics;
 import org.apache.kafka.common.record.TimestampType;
 import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.kafka.common.utils.Time;
 
 import java.time.Duration;
 import java.util.*;
@@ -24,6 +27,7 @@ public class MockachuKafkaConsumer<K, V> implements Consumer<K, V> {
     private final boolean autoCommitEnabled;
     private Set<String> subscriptions;
     private Map<TopicPartition, LocalAssignment> assignments;
+    private final Metrics metrics;
     private final AtomicBoolean wakeup = new AtomicBoolean(false);
 
     public MockachuKafkaConsumer(ConsumerConfig config,
@@ -36,6 +40,7 @@ public class MockachuKafkaConsumer<K, V> implements Consumer<K, V> {
         this.defaultApiTimeoutMs = config.getInt("default.api.timeout.ms");
         this.retryBackoffMs = config.getLong("retry.backoff.ms");
         this.autoCommitEnabled = config.getBoolean("enable.auto.commit");
+        this.metrics = ConsumerUtils.createMetrics(config, Time.SYSTEM, List.of());
     }
 
     @Override
@@ -104,7 +109,24 @@ public class MockachuKafkaConsumer<K, V> implements Consumer<K, V> {
 //        K key;
 //        V value;
 //        private final Optional<Integer> leaderEpoch; always = 0
-        return null;
+
+        String topic = "";
+        for (String subscription : subscriptions) {
+            topic = subscription;
+        }
+        var tp = new TopicPartition(topic, 0);
+        Map<TopicPartition, List<ConsumerRecord<K, V>>> map = new HashMap<>();
+
+        //var rec = new ConsumerRecord<K, V>(topic, 0, 0, null, (V) "test");
+        //map.put(tp, List.of(rec));
+        map.put(tp, List.of());
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return new ConsumerRecords<>(map);
     }
 
     // server data struct: offset, time cli, time srv, key, value
@@ -219,13 +241,12 @@ public class MockachuKafkaConsumer<K, V> implements Consumer<K, V> {
 
     @Override
     public Uuid clientInstanceId(Duration duration) {
-        // TODO ?
-        return null;
+        return Uuid.ZERO_UUID;
     }
 
     @Override
     public Map<MetricName, ? extends Metric> metrics() {
-        return null;
+        return Collections.unmodifiableMap(this.metrics.metrics());
     }
 
     @Override
