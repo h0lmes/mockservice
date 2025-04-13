@@ -2,7 +2,7 @@ package com.mockachu.kafka;
 
 import java.util.Map;
 
-public record MockachuKafkaProducerMessage(String topic,
+public record MockachuKafkaProducerRequest(String topic,
                                            Integer partition,
                                            Long timestamp,
                                            String key,

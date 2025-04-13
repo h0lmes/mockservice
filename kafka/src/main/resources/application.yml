@@ -1,0 +1,11 @@
+logging:
+  level:
+    ROOT: ${ROOT_LOGGING_LEVEL:INFO}
+    com.kafkatest: ${LOGGING_LEVEL:INFO}
+    org.springframework.boot.SpringApplication: INFO
+
+spring:
+  application:
+    name: Mockachu Kafka Test Application
+
+application:

@@ -1,5 +1,6 @@
-package com.mockachu.kafka;
+package com.kafkatest.mockachu;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerGroupMetadata;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.*;
@@ -7,36 +8,43 @@ import org.apache.kafka.common.*;
 import org.apache.kafka.common.errors.ApiException;
 import org.apache.kafka.common.errors.ProducerFencedException;
 import org.apache.kafka.common.errors.SerializationException;
+import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Serializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 public class MockachuKafkaProducer<K, V> implements Producer<K, V> {
+    private static final Logger log = LoggerFactory.getLogger(MockachuKafkaProducer.class);
+
     private final String clientId;
     private final Serializer<K> keySerializer;
     private final Serializer<V> valueSerializer;
     private final MockachuKafkaSender sender;
-    private final MockachuKafkaProtocol protocol;
+    private final ObjectMapper objectMapper;
 
     public MockachuKafkaProducer(Map<String, Object> configs,
                                  Serializer<K> keySerializer,
                                  Serializer<V> valueSerializer,
-                                 MockachuKafkaSender sender, MockachuKafkaProtocol protocol) {
+                                 MockachuKafkaSender sender) {
         this.clientId = (String) configs.get("client.id");
         this.keySerializer = getSerializer(keySerializer, configs, ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG);
         this.valueSerializer = getSerializer(valueSerializer, configs, ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG);
         this.sender = sender;
-        this.protocol = protocol;
+        this.objectMapper = new ObjectMapper();
     }
 
     private <T> Serializer<T> getSerializer(Serializer<T> serializer,
-                                               Map<String, Object> configs,
-                                               String configKey) {
+                                            Map<String, Object> configs,
+                                            String configKey) {
         if (serializer != null) return serializer;
         try {
             Object name = configs.get(configKey);
@@ -89,7 +97,7 @@ public class MockachuKafkaProducer<K, V> implements Producer<K, V> {
 
     @Override
     public Future<RecordMetadata> send(ProducerRecord<K, V> producerRecord) {
-        return this.send(producerRecord, null);
+        return send(producerRecord, null);
     }
 
     @Override
@@ -124,18 +132,21 @@ public class MockachuKafkaProducer<K, V> implements Producer<K, V> {
             int partition = partition(producerRecord, serializedKey, serializedValue, null);
             var topicPartition = new TopicPartition(producerRecord.topic(), partition);
 
-            String message = protocol.encodeProducerMessage(producerRecord.topic(), partition,
+            var message = encodeMessage(producerRecord.topic(), partition,
                     millis, serializedKey, serializedValue, producerRecord.headers());
 
+            var strMessage = objectMapper.writeValueAsString(List.of(message));
+
             var future = new CompletableFuture<RecordMetadata>();
-            var senderFuture = sender.send(message);
+            var senderFuture = sender.sendAsync(strMessage);
             senderFuture.whenComplete((result, error) -> {
                 if (error != null) {
+                    log.error(error.getMessage());
                     future.completeExceptionally(error);
                     return;
                 }
 
-                var offset = 0;
+                var offset = 0; // TODO receive offset
                 var metadata = new RecordMetadata(
                         topicPartition, offset, 0, millis, serializedKeyLen, serializedValueLen);
                 future.complete(metadata);
@@ -153,8 +164,19 @@ public class MockachuKafkaProducer<K, V> implements Producer<K, V> {
         } catch (Exception e) {
             //var nullTopicPartition = new TopicPartition(record.topic(), 0);
             //this.interceptors.onSendError(record, nullTopicPartition, e);
-            throw e;
+            throw new RuntimeException(e);
         }
+    }
+
+    private MockachuKafkaProducerRequest encodeMessage(
+            String topic, Integer partition, Long millis, byte[] key, byte[] value, Headers headers) {
+        String sKey = key == null ? null : new String(key, StandardCharsets.UTF_8);
+        String sValue = value == null ? null : new String(value, StandardCharsets.UTF_8);
+
+        Map<String, String> map = new HashMap<>();
+        headers.forEach(h -> map.put(h.key(), new String(h.value())));
+
+        return new MockachuKafkaProducerRequest(topic, partition, millis, sKey, sValue, map);
     }
 
     private int partition(ProducerRecord<K, V> producerRecord, byte[] serializedKey, byte[] serializedValue, Cluster cluster) {

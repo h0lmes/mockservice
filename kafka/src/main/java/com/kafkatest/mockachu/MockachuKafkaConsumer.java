@@ -1,14 +1,22 @@
-package com.mockachu.kafka;
+package com.kafkatest.mockachu;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.consumer.internals.ConsumerUtils;
 import org.apache.kafka.common.*;
 import org.apache.kafka.common.errors.WakeupException;
+import org.apache.kafka.common.header.Headers;
+import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.apache.kafka.common.metrics.Metrics;
 import org.apache.kafka.common.record.TimestampType;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.utils.Time;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,7 +24,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class MockachuKafkaConsumer<K, V> implements Consumer<K, V> {
-    private static record LocalAssignment () {}
+    private static final Logger log = LoggerFactory.getLogger(MockachuKafkaConsumer.class);
 
     private final String clientId;
     private final ConsumerConfig config;
@@ -25,14 +33,19 @@ public class MockachuKafkaConsumer<K, V> implements Consumer<K, V> {
     private final long retryBackoffMs;
     private final int defaultApiTimeoutMs;
     private final boolean autoCommitEnabled;
-    private Set<String> subscriptions;
-    private Map<TopicPartition, LocalAssignment> assignments;
     private final Metrics metrics;
     private final AtomicBoolean wakeup = new AtomicBoolean(false);
+    private final Optional<Integer> leaderEpoch = Optional.of(0);
+    private final MockachuKafkaSender sender;
+    private final ObjectMapper objectMapper;
+    private Set<String> subscriptions;
+    private Set<TopicPartition> assignments;
+    private final ConsumerRecords<K,V> emptyRecords = new ConsumerRecords<>(Collections.emptyMap());
 
     public MockachuKafkaConsumer(ConsumerConfig config,
                                  Deserializer<K> keyDeserializer,
-                                 Deserializer<V> valueDeserializer) {
+                                 Deserializer<V> valueDeserializer,
+                                 MockachuKafkaSender sender) {
         this.clientId = config.getString("client.id");
         this.config = config;
         this.keyDeserializer = keyDeserializer;
@@ -41,13 +54,14 @@ public class MockachuKafkaConsumer<K, V> implements Consumer<K, V> {
         this.retryBackoffMs = config.getLong("retry.backoff.ms");
         this.autoCommitEnabled = config.getBoolean("enable.auto.commit");
         this.metrics = ConsumerUtils.createMetrics(config, Time.SYSTEM, List.of());
+
+        this.sender = sender;
+        this.objectMapper = new ObjectMapper();
     }
 
     @Override
     public Set<TopicPartition> assignment() {
-        return subscriptions.stream()
-                .map(topic -> new TopicPartition(topic, 0))
-                .collect(Collectors.toSet());
+        return Collections.unmodifiableSet(assignments);
     }
 
     @Override
@@ -68,7 +82,11 @@ public class MockachuKafkaConsumer<K, V> implements Consumer<K, V> {
 
     @Override
     public void assign(Collection<TopicPartition> collection) {
-        throw new RuntimeException("E_NOT_IMPLEMENTED");
+        assignments = new HashSet<>(collection);
+        log.info("Set assignments {}", assignments);
+        subscriptions = assignments.stream()
+                .map(TopicPartition::topic)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -88,58 +106,68 @@ public class MockachuKafkaConsumer<K, V> implements Consumer<K, V> {
     }
 
     private void updateAssignments() {
-        // TODO
+        assignments = subscriptions.stream()
+                .map(topic -> new TopicPartition(topic, 0))
+                .collect(Collectors.toSet());
+        log.info("Updated assignments {}", assignments);
     }
 
     @Override
     public ConsumerRecords<K, V> poll(long l) {
-        if (wakeup.get()) throw new WakeupException();
-
-        TimestampType timestampType = TimestampType.CREATE_TIME;
-        // TODO
-        // record is:
-//        String topic; - have
-//        int partition; - have
-//        long offset;
-//        long timestamp;
-//        TimestampType timestampType;
-//        int serializedKeySize; - calc on client
-//        int serializedValueSize; - calc on client
-//        Headers headers;
-//        K key;
-//        V value;
-//        private final Optional<Integer> leaderEpoch; always = 0
-
-        String topic = "";
-        for (String subscription : subscriptions) {
-            topic = subscription;
+        if (wakeup.get()) {
+            throw new WakeupException();
         }
-        var tp = new TopicPartition(topic, 0);
-        Map<TopicPartition, List<ConsumerRecord<K, V>>> map = new HashMap<>();
-
-        //var rec = new ConsumerRecord<K, V>(topic, 0, 0, null, (V) "test");
-        //map.put(tp, List.of(rec));
-        map.put(tp, List.of());
 
         try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            Map<TopicPartition, List<ConsumerRecord<K, V>>> map = new HashMap<>();
+
+            query().forEach(rec -> {
+                var tp = new TopicPartition(rec.topic(), rec.partition());
+                var consumerRecords = map.computeIfAbsent(tp, k -> new ArrayList<>());
+
+                Headers headers = new RecordHeaders();
+                rec.headers().forEach((k, v) -> headers.add(k, v.getBytes(StandardCharsets.UTF_8)));
+
+                int keySize = rec.key() == null ? 0 : rec.key().length();
+                int valueSize = rec.value() == null ? 0 : rec.value().length();
+                K key = deserialize(keyDeserializer, rec.topic(), headers, rec.key());
+                V value = deserialize(valueDeserializer, rec.topic(), headers, rec.value());
+
+                consumerRecords.add(new ConsumerRecord<>(
+                        rec.topic(),
+                        rec.partition(),
+                        rec.offset(),
+                        rec.timestamp(),
+                        TimestampType.CREATE_TIME,
+                        keySize, valueSize, key, value,
+                        headers,
+                        leaderEpoch));
+            });
+
+            return new ConsumerRecords<>(map);
+        } catch (Exception e) {
+            return emptyRecords;
         }
-        return new ConsumerRecords<>(map);
     }
 
-    // server data struct: offset, time cli, time srv, key, value
+    private List<MockachuKafkaConsumerResponse> query() throws JsonProcessingException {
+        List<MockachuKafkaConsumerRequest> requests = new ArrayList<>();
+        assignments.forEach(a -> requests.add(new MockachuKafkaConsumerRequest(a.topic(), a.partition(), -1L)));
 
-    // no headers support for now
+        var strRequest = objectMapper.writeValueAsString(requests);
+        var strResponse = sender.sendSync(strRequest);
 
-    // client connect -> get assignments ->
-    // other consumers of this topic get new assignments on next poll
+        if (strResponse != null && !strResponse.isBlank()) {
+            return objectMapper.readValue(strResponse, new TypeReference<>() {
+            });
+        }
+        return List.of();
+    }
 
-    // close -> client disconnect ->
-    // other consumers of this topic get new assignments
-
-    // seek
+    private <T> T deserialize(Deserializer<T> deserializer, String topic, Headers headers, String value) {
+        if (value == null) return null;
+        return deserializer.deserialize(topic, headers, value.getBytes(StandardCharsets.UTF_8));
+    }
 
     @Override
     public ConsumerRecords<K, V> poll(Duration duration) {
@@ -336,12 +364,12 @@ public class MockachuKafkaConsumer<K, V> implements Consumer<K, V> {
 
     @Override
     public void close() {
-        // TODO ?
+        // don't care
     }
 
     @Override
     public void close(Duration duration) {
-        // TODO ?
+        // don't care
     }
 
     @Override

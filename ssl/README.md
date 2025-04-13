@@ -6,17 +6,23 @@ Create your own certificate and key
     openssl req -new -key key.pem -out csr.pem
     openssl x509 -req -in csr.pem -signkey key.pem -out cert.pem
 
+So far you should have 3 files
+
+    key.pem
+    csr.pem
+    cert.pem
+
 Install Flask and Flask-SSLify
 
     pip install flask flask-sslify
 
-Run app
+Run the app
 
     python app.py
 
 ##Setting up SSL certificates for Java
 
-Verify that cert.pem and key.pem files are valid
+**Optional:** Verify that cert.pem and key.pem files are valid
 
     openssl x509 -noout -modulus -in cert.pem | openssl md5
     openssl rsa -noout -modulus -in key.pem | openssl md5

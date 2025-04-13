@@ -1,4 +1,4 @@
-package com.mockachu.kafka;
+package com.kafkatest.mockachu;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -34,23 +34,40 @@ public class MockachuKafkaConsumerFactory<K, V> extends KafkaResourceFactory imp
     private boolean configureDeserializers;
     private ApplicationContext applicationContext;
 
-    public MockachuKafkaConsumerFactory(Map<String, Object> configs) {
-        this(configs, () -> null, () -> null);
+    private final MockachuKafkaSender sender;
+
+    public MockachuKafkaConsumerFactory(Map<String, Object> configs,
+                                        MockachuKafkaSender sender) {
+        this(configs, () -> null, () -> null, sender);
     }
 
-    public MockachuKafkaConsumerFactory(Map<String, Object> configs, @Nullable Deserializer<K> keyDeserializer, @Nullable Deserializer<V> valueDeserializer) {
-        this(configs, () -> keyDeserializer, () -> valueDeserializer);
+    public MockachuKafkaConsumerFactory(Map<String, Object> configs,
+                                        @Nullable Deserializer<K> keyDeserializer,
+                                        @Nullable Deserializer<V> valueDeserializer,
+                                        MockachuKafkaSender sender) {
+        this(configs, () -> keyDeserializer, () -> valueDeserializer, sender);
     }
 
-    public MockachuKafkaConsumerFactory(Map<String, Object> configs, @Nullable Deserializer<K> keyDeserializer, @Nullable Deserializer<V> valueDeserializer, boolean configureDeserializers) {
-        this(configs, () -> keyDeserializer, () -> valueDeserializer, configureDeserializers);
+    public MockachuKafkaConsumerFactory(Map<String, Object> configs,
+                                        @Nullable Deserializer<K> keyDeserializer,
+                                        @Nullable Deserializer<V> valueDeserializer,
+                                        boolean configureDeserializers,
+                                        MockachuKafkaSender sender) {
+        this(configs, () -> keyDeserializer, () -> valueDeserializer, configureDeserializers, sender);
     }
 
-    public MockachuKafkaConsumerFactory(Map<String, Object> configs, @Nullable Supplier<Deserializer<K>> keyDeserializerSupplier, @Nullable Supplier<Deserializer<V>> valueDeserializerSupplier) {
-        this(configs, keyDeserializerSupplier, valueDeserializerSupplier, true);
+    public MockachuKafkaConsumerFactory(Map<String, Object> configs,
+                                        @Nullable Supplier<Deserializer<K>> keyDeserializerSupplier,
+                                        @Nullable Supplier<Deserializer<V>> valueDeserializerSupplier,
+                                        MockachuKafkaSender sender) {
+        this(configs, keyDeserializerSupplier, valueDeserializerSupplier, true, sender);
     }
 
-    public MockachuKafkaConsumerFactory(Map<String, Object> configs, @Nullable Supplier<Deserializer<K>> keyDeserializerSupplier, @Nullable Supplier<Deserializer<V>> valueDeserializerSupplier, boolean configureDeserializers) {
+    public MockachuKafkaConsumerFactory(Map<String, Object> configs,
+                                        @Nullable Supplier<Deserializer<K>> keyDeserializerSupplier,
+                                        @Nullable Supplier<Deserializer<V>> valueDeserializerSupplier,
+                                        boolean configureDeserializers,
+                                        MockachuKafkaSender sender) {
         this.listeners = new ArrayList<>();
         this.postProcessors = new ArrayList<>();
         this.beanName = "not.managed.by.Spring";
@@ -59,6 +76,8 @@ public class MockachuKafkaConsumerFactory<K, V> extends KafkaResourceFactory imp
         this.configureDeserializers = configureDeserializers;
         this.keyDeserializerSupplier = keyDeserializerSupplier;
         this.valueDeserializerSupplier = valueDeserializerSupplier;
+
+        this.sender = sender;
     }
 
     public void setBeanName(String name) {
@@ -295,7 +314,8 @@ public class MockachuKafkaConsumerFactory<K, V> extends KafkaResourceFactory imp
         protected ExtendedKafkaConsumer(Map<String, Object> configProps) {
             super(new ConsumerConfig(configProps),
                     MockachuKafkaConsumerFactory.this.keyDeserializer(configProps),
-                    MockachuKafkaConsumerFactory.this.valueDeserializer(configProps));
+                    MockachuKafkaConsumerFactory.this.valueDeserializer(configProps),
+                    MockachuKafkaConsumerFactory.this.sender);
 
             if (!MockachuKafkaConsumerFactory.this.listeners.isEmpty()) {
                 Iterator<MetricName> metricIterator = this.metrics().keySet().iterator();
