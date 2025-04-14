@@ -48,8 +48,8 @@ public class MockachuKafkaConsumer<K, V> implements Consumer<K, V> {
                                  MockachuKafkaSender sender) {
         this.clientId = config.getString("client.id");
         this.config = config;
-        this.keyDeserializer = keyDeserializer;
-        this.valueDeserializer = valueDeserializer;
+        this.keyDeserializer = getDeserializer(keyDeserializer, config, ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG);
+        this.valueDeserializer = getDeserializer(valueDeserializer, config, ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG);
         this.defaultApiTimeoutMs = config.getInt("default.api.timeout.ms");
         this.retryBackoffMs = config.getLong("retry.backoff.ms");
         this.autoCommitEnabled = config.getBoolean("enable.auto.commit");
@@ -57,6 +57,29 @@ public class MockachuKafkaConsumer<K, V> implements Consumer<K, V> {
 
         this.sender = sender;
         this.objectMapper = new ObjectMapper();
+    }
+
+    private <T> Deserializer<T> getDeserializer(Deserializer<T> deserializer,
+                                                ConsumerConfig config,
+                                                String configKey) {
+        if (deserializer != null) return deserializer;
+        try {
+            Object name = config.getString(configKey);
+            if (name instanceof String className) {
+                return (Deserializer<T>) Class.forName(className).getDeclaredConstructor().newInstance();
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        try {
+            var clazz = config.getClass(configKey);
+            if (clazz != null && Deserializer.class.isAssignableFrom(clazz)) {
+                return (Deserializer<T>) clazz.getDeclaredConstructor().newInstance();
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        return null;
     }
 
     @Override
@@ -133,7 +156,7 @@ public class MockachuKafkaConsumer<K, V> implements Consumer<K, V> {
                 K key = deserialize(keyDeserializer, rec.topic(), headers, rec.key());
                 V value = deserialize(valueDeserializer, rec.topic(), headers, rec.value());
 
-                consumerRecords.add(new ConsumerRecord<>(
+                var consumerRecord = new ConsumerRecord<>(
                         rec.topic(),
                         rec.partition(),
                         rec.offset(),
@@ -141,11 +164,13 @@ public class MockachuKafkaConsumer<K, V> implements Consumer<K, V> {
                         TimestampType.CREATE_TIME,
                         keySize, valueSize, key, value,
                         headers,
-                        leaderEpoch));
+                        leaderEpoch);
+                consumerRecords.add(consumerRecord);
             });
 
             return new ConsumerRecords<>(map);
         } catch (Exception e) {
+            log.error("Error: ", e);
             return emptyRecords;
         }
     }

@@ -165,9 +165,9 @@
                 <version>0.8.7</version>
                 <configuration>
                     <excludes>
+                        <exclude>**/com/kafkatest/**</exclude>
                         <exclude>**/aop/logging/*</exclude>
                         <exclude>**/config/*</exclude>
-                        <exclude>**/kafka/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

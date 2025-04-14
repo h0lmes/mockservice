@@ -1,5 +1,6 @@
 package com.kafkatest.mockachu;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
@@ -18,7 +19,9 @@ public class MockachuKafkaSenderWebClientAdapter implements MockachuKafkaSender 
 
     public CompletableFuture<String> sendAsync(String message) {
         var future = new CompletableFuture<String>();
-        client.post().bodyValue(message)
+        client.post()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(message)
                 .retrieve()
                 .bodyToMono(String.class)
                 .subscribe(future::complete, future::completeExceptionally);
@@ -26,7 +29,9 @@ public class MockachuKafkaSenderWebClientAdapter implements MockachuKafkaSender 
     }
 
     public String sendSync(String message) {
-        return client.post().bodyValue(message)
+        return client.post()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(message)
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
