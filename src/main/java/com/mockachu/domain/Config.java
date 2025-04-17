@@ -6,9 +6,10 @@ import java.util.List;
 public class Config {
     private Settings settings = new Settings();
     private final List<Route> routes = new ArrayList<>();
+    private final List<Scenario> scenarios = new ArrayList<>();
     private final List<OutboundRequest> requests = new ArrayList<>();
     private final List<ApiTest> tests = new ArrayList<>();
-    private final List<Scenario> scenarios = new ArrayList<>();
+    private final List<KafkaTopic> kafkaTopics = new ArrayList<>();
 
     public Config() {
         // default
@@ -26,6 +27,10 @@ public class Config {
         return routes;
     }
 
+    public List<Scenario> getScenarios() {
+        return scenarios;
+    }
+
     public List<OutboundRequest> getRequests() {
         return requests;
     }
@@ -34,7 +39,7 @@ public class Config {
         return tests;
     }
 
-    public List<Scenario> getScenarios() {
-        return scenarios;
+    public List<KafkaTopic> getKafkaTopics() {
+        return kafkaTopics;
     }
 }

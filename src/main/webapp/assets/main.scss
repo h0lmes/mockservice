@@ -26,6 +26,8 @@
   --bg-component-active: #ffbd8b;
   --bg-border: #fff;
   --bg-border-active: #dbe0e5;
+
+  --component-border-radius: 0.5rem;
 }
 
 .sepia-mode {
@@ -279,7 +281,7 @@ pre {
 
 .component {
   background-color: var(--bg-component);
-  border-radius: 0.5rem;
+  border-radius: var(--component-border-radius);
   //transition: background-color 1s ease-out;
 
   //&.active {

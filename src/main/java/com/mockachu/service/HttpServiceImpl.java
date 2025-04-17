@@ -152,7 +152,7 @@ public class HttpServiceImpl implements HttpService, SettingsObserver {
             return MockVariables.of(
                     MapUtils.flattenMap(
                             MapUtils.toMap(json, jsonMapper)));
-        } catch (JsonProcessingException jpe) {
+        } catch (ClassCastException | JsonProcessingException jpe) {
             return MockVariables.empty();
         }
     }

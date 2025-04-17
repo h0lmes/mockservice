@@ -7,19 +7,25 @@
                 <li class="nav-item">
                     <NuxtLink to="/">
                         <FontAwesomeIcon icon="home" class="nav-icon"/>
-                        <span class="nav-label">Home</span>
+                        <span class="nav-label">API</span>
+                    </NuxtLink>
+                </li>
+                <li class="nav-item">
+                    <NuxtLink to="/request-graph">
+                        <FontAwesomeIcon icon="project-diagram" class="nav-icon"/>
+                        <span class="nav-label">API graph</span>
+                    </NuxtLink>
+                </li>
+                <li class="nav-item">
+                    <NuxtLink to="/kafka">
+                        <component :is="`icon-kafka`" class="nav-icon size-24"/>
+                        <span class="nav-label">Kafka</span>
                     </NuxtLink>
                 </li>
                 <li class="nav-item">
                     <NuxtLink to="/context">
                         <FontAwesomeIcon icon="subscript" class="nav-icon"/>
                         <span class="nav-label">Context</span>
-                    </NuxtLink>
-                </li>
-                <li class="nav-item">
-                    <NuxtLink to="/request-graph">
-                        <FontAwesomeIcon icon="project-diagram" class="nav-icon"/>
-                        <span class="nav-label">Requests graph</span>
                     </NuxtLink>
                 </li>
                 <li class="nav-group">TOOLS</li>
@@ -102,9 +108,10 @@ import ColorModePicker from "../components/other/ColorModePicker";
 import ColorAccentPicker from "../components/other/ColorAccentPicker";
 import ErrorPanel from "../components/other/ErrorPanel";
 import Loading from "../components/other/Loading";
+import IconKafka from '@/assets/icons/kafka.svg?inline';
 
 export default {
-        components: {ErrorPanel, Loading, ColorModePicker, ColorAccentPicker},
+        components: {ErrorPanel, Loading, ColorModePicker, ColorAccentPicker, IconKafka},
         data() {
             return {
                 isOpen: true,
@@ -172,5 +179,13 @@ export default {
 
     .nav-dummy {
         height: 3.3rem;
+    }
+
+    .size-24 {
+        width: 24px;
+        height: 24px;
+        margin: -5px 0 -3px 0;
+        padding: 0;
+        vertical-align: middle;
     }
 </style>

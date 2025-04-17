@@ -5,7 +5,7 @@
                 <input ref="search"
                        type="text"
                        class="form-control monospace"
-                       placeholder="type or click on values (group, path, etc)"
+                       placeholder="type in or click on values (group, path, etc)"
                        @keydown.enter.exact.stop="setFilter($event.target.value)"/>
             </div>
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="setFilter('')">Clear search</button>
@@ -30,63 +30,63 @@
 
         <Routes :entities="filteredEntities" @filter="setFilter($event)"></Routes>
 
-        <div class="color-secondary mt-6">
+        <div class="color-secondary mt-6 text-indent">
             <div class="mt-2 bold">Tips</div>
-            <div class="mt-2">
+            <p class="mt-2">
                 - Click on any value (GROUP, METHOD, PATH, etc.; you'll see underline on hover) to filter by that value.
-            </div>
-            <div class="mt-2">
+            </p>
+            <p class="mt-2">
                 - For more precise filtering enable 'JS' and use Javascript expressions in search field (example: e.group=='default' && !e.disabled).
-            </div>
-            <div class="mt-2">
+            </p>
+            <p class="mt-2">
                 - Middle-click to edit, press ESC in any field to cancel.
-            </div>
-            <div class="mt-2">
+            </p>
+            <p class="mt-2">
                 - To alter multiple entities quickly consider navigating to Config page and editing it as plain text.
                 Use Backup button there for extra caution.
-            </div>
+            </p>
         </div>
-        <div class="color-secondary mt-6">
+        <div class="color-secondary mt-6 text-indent">
             <div class="mt-2 bold">Test plan syntax</div>
-            <div class="mt-2">
-                Each line is exactly one command.
-            </div>
-            <div class="mt-2">
-                x = some string - set value of variable 'x' in global context (see Context page).
-            </div>
-            <div class="mt-2">
-                x = ${item.capacity} - set value of variable 'x' in global context, value comes from variable 'item.capacity' from latest request response (assuming latest response was like <span>{"item": {"capacity": 100}}</span>>) or from global context.
-            </div>
-            <div class="mt-2">
-                GET localhost:8081/products/${id} - execute inline request; variable comes from global context.
-            </div>
-            <div class="mt-2">
-                POST localhost:8081/v2/store/order {"x": 400} -> 400,404 - execute inline request and test status code is 400 or 404; if test fails - test run stops with FAILED.
-            </div>
-            <div class="mt-2">
-                request_id - execute request with ID 'request_id'.
-            </div>
-            <div class="mt-2">
-                request_id -> 200 - execute request with ID 'request_id' and test status code is 200; if test fails - test run stops with FAILED.
-            </div>
-            <div class="mt-2">
-                x == 2 - non-strictly test variable 'x' from the latest request response; if test fails - test run proceeds with WARNING.
-            </div>
-            <div class="mt-2">
-                x === some value - strictly test variable 'x' from the latest request response; if test fails - test run stops with FAILED.
-            </div>
+            <p class="mt-2">
+                - Each line is exactly one command.
+            </p>
+            <p class="mt-2">
+                - x = some string - set value of variable 'x' in global context (see Context page).
+            </p>
+            <p class="mt-2">
+                - x = ${item.capacity} - set value of variable 'x' in global context, value comes from variable 'item.capacity' from latest request response (assuming latest response was like <span>{"item": {"capacity": 100}}</span>>) or from global context.
+            </p>
+            <p class="mt-2">
+                - GET localhost:8081/products/${id} - execute inline request; variable comes from global context.
+            </p>
+            <p class="mt-2">
+                - POST localhost:8081/v2/store/order {"x": 400} -> 400,404 - execute inline request and test status code is 400 or 404; if test fails - test run stops with FAILED.
+            </p>
+            <p class="mt-2">
+                - request_id - execute request with ID 'request_id'.
+            </p>
+            <p class="mt-2">
+                - request_id -> 200 - execute request with ID 'request_id' and test status code is 200; if test fails - test run stops with FAILED.
+            </p>
+            <p class="mt-2">
+                - x == 2 - non-strictly test variable 'x' from the latest request response; if test fails - test run proceeds with WARNING.
+            </p>
+            <p class="mt-2">
+                - x === some value - strictly test variable 'x' from the latest request response; if test fails - test run stops with FAILED.
+            </p>
         </div>
-        <div class="color-secondary mt-6">
+        <div class="color-secondary mt-6 text-indent">
             <div class="mt-2 bold">Scenario types</div>
-            <div class="mt-2">
+            <p class="mt-2">
                 - MAP: goes over the LIST OF ROUTES in a scenario top-to-bottom looking for the first match of requested METHOD + PATH pair, returns route with matching ALT. If no match found - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).
-            </div>
-            <div class="mt-2">
+            </p>
+            <p class="mt-2">
                 - QUEUE: same as MAP but looks only at the topmost route, removes route from a queue if it matches. If topmost route does not match (or all routes were already matched and thus removed from a queue) - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).
-            </div>
-            <div class="mt-2">
+            </p>
+            <p class="mt-2">
                 - RING: same as QUEUE but restarts the queue when it depletes.
-            </div>
+            </p>
         </div>
 
         <Loading v-if="$fetchState.pending"></Loading>
@@ -226,4 +226,8 @@ export default {
     }
 </script>
 <style scoped>
+.text-indent > p {
+    margin-left: 1rem;
+    text-indent: -1.1rem;
+}
 </style>

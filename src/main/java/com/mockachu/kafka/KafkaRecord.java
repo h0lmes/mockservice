@@ -2,10 +2,10 @@ package com.mockachu.kafka;
 
 import java.util.Map;
 
-public record KafkaRecord(Long offset,
+public record KafkaRecord(long offset,
                           String topic,
-                          Integer partition,
-                          Long timestamp,
+                          int partition,
+                          long timestamp,
                           String key,
                           String value,
                           Map<String, String> headers) {

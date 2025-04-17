@@ -237,14 +237,46 @@ routes:
   triggerRequest: false
   triggerRequestIds: ""
   triggerRequestDelay: ""
+scenarios:
+- group: robot
+  alias: robot sequence
+  type: RING
+  data: |-
+    GET;/api/robot;R2D2
+    GET;/api/robot;
+    GET;/api/robot;terminator
 requests:
-- id: _kafka.GET.localhost.8081.__kafka__.test
-  group: _kafka
+- id: 3.consume
+  group: _kafka_test
   type: REST
-  method: GET
-  path: http://localhost:8081/__kafka__/test
-  headers: ""
-  body: ""
+  method: POST
+  path: http://localhost:8081/__kafka__/consumer
+  headers: "Content-Type: application/json"
+  body: "[{\"topic\": \"space\", \"partition\": 0}]"
+  responseToVars: false
+  disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
+  triggerRequestDelay: ""
+- id: 1.produce.min
+  group: _kafka_test
+  type: REST
+  method: POST
+  path: http://localhost:8081/__kafka__/producer
+  headers: "Content-Type: application/json"
+  body: "[{\"topic\": \"space\", \"key\": \"commsat\", \"value\": \"Iridium 66\"}]"
+  responseToVars: false
+  disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
+  triggerRequestDelay: ""
+- id: 2.produce
+  group: _kafka_test
+  type: REST
+  method: POST
+  path: http://localhost:8081/__kafka__/producer
+  headers: "Content-Type: application/json"
+  body: "[{\"topic\": \"space\", \"partition\": 0, \"timestamp\": 0, \"value\": \"Falcon 9\", \"headers\": {\"trace-id\": 42}}]"
   responseToVars: false
   disabled: false
   triggerRequest: false
@@ -304,11 +336,13 @@ tests:
     POST localhost:8081/v2/store/order {"x": 400} -> 400
 
     products.random -> 208
-scenarios:
-- group: robot
-  alias: robot sequence
-  type: RING
-  data: |-
-    GET;/api/robot;R2D2
-    GET;/api/robot;
-    GET;/api/robot;terminator
+kafkaTopics:
+- group: space
+  topic: space
+  partition: 0
+- group: test
+  topic: test
+  partition: 0
+- group: test
+  topic: test
+  partition: 1

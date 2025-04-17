@@ -39,4 +39,21 @@ public class TopicPartitionData {
         }
         return list;
     }
+
+    public Long getProducerOffset() {
+        return producerOffset.get();
+    }
+
+    public Long getConsumerOffset() {
+        return consumerOffset.get();
+    }
+
+    public List<KafkaRecord> getRecords(long offset, long limit) {
+        List<KafkaRecord> result = new ArrayList<>();
+        for (long i = 0; i < limit; i++) {
+            var rec = records.get(offset + i);
+            if (rec != null) result.add(rec);
+        }
+        return result;
+    }
 }

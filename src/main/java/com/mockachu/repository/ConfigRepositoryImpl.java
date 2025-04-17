@@ -3,6 +3,7 @@ package com.mockachu.repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockachu.domain.*;
+import com.mockachu.exception.KafkaTopicAlreadyExistsException;
 import com.mockachu.exception.RouteAlreadyExistsException;
 import com.mockachu.exception.ScenarioAlreadyExistsException;
 import com.mockachu.exception.TestAlreadyExistsException;
@@ -111,6 +112,10 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         config.getRoutes().sort(Route::compareTo);
     }
 
+    private void sortScenarios() {
+        config.getScenarios().sort(Scenario::compareTo);
+    }
+
     private void sortRequests() {
         config.getRequests().sort(OutboundRequest::compareTo);
     }
@@ -119,8 +124,8 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         config.getTests().sort(ApiTest::compareTo);
     }
 
-    private void sortScenarios() {
-        config.getScenarios().sort(Scenario::compareTo);
+    private void sortKafkaTopics() {
+        config.getKafkaTopics().sort(KafkaTopic::compareTo);
     }
 
     private void tryPersistConfig() throws IOException {
@@ -181,6 +186,14 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         tryPersistConfig();
     }
 
+    private void notifyBeforeConfigChanged() {
+        configObservers.forEach(ConfigObserver::onBeforeConfigChanged);
+    }
+
+    private void notifyAfterConfigChanged() {
+        configObservers.forEach(ConfigObserver::onAfterConfigChanged);
+    }
+
     //----------------------------------------------------------------------
     //
     //   Settings
@@ -197,6 +210,10 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         config.setSettings(settings);
         notifySettingsChanged();
         tryPersistConfig();
+    }
+
+    private void notifySettingsChanged() {
+        settingsObservers.forEach(SettingsObserver::onAfterSettingsChanged);
     }
 
     //----------------------------------------------------------------------
@@ -273,25 +290,18 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     private boolean putRouteInternal(@Nonnull Route route, boolean overwrite) {
         Objects.requireNonNull(route, "Route could not be null.");
         Route existing = findRoute(route).orElse(null);
+
         if (existing == null) {
-            putNewRoute(route);
+            config.getRoutes().add(route);
+            notifyRouteCreated(route);
             return true;
         } else if (overwrite) {
-            putExistingRoute(existing, route);
+            notifyRouteDeleted(existing);
+            existing.assignFrom(route);
+            notifyRouteCreated(existing);
             return true;
         }
         return false;
-    }
-
-    private void putNewRoute(Route route) {
-        config.getRoutes().add(route);
-        notifyRouteCreated(route);
-    }
-
-    private void putExistingRoute(Route existing, Route route) {
-        notifyRouteDeleted(existing);
-        existing.assignFrom(route);
-        notifyRouteCreated(existing);
     }
 
     @Override
@@ -306,6 +316,75 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
 
         if (modified) {
+            tryPersistConfig();
+        }
+    }
+
+    private void notifyRouteCreated(Route route) {
+        routeObservers.forEach(o -> o.onRouteCreated(route));
+    }
+
+    private void notifyRouteDeleted(Route route) {
+        routeObservers.forEach(o -> o.onRouteDeleted(route));
+    }
+
+    //----------------------------------------------------------------------
+    //
+    //   Scenarios
+    //
+    //----------------------------------------------------------------------
+
+    @Override
+    public List<Scenario> findAllScenarios() {
+        return config.getScenarios();
+    }
+
+    @Override
+    public Optional<Scenario> findScenario(@Nullable Scenario scenario) {
+        if (scenario == null) {
+            return Optional.empty();
+        }
+        return findAllScenarios().stream()
+                .filter(scenario::equals)
+                .findFirst();
+    }
+
+    @Override
+    public void putScenario(@Nullable Scenario originalScenario, @Nonnull Scenario scenario) throws IOException {
+        Objects.requireNonNull(scenario, "Scenario could not be null.");
+        putScenarioToConfig(originalScenario, scenario);
+        sortScenarios();
+        tryPersistConfig();
+    }
+
+    private void putScenarioToConfig(Scenario originalScenario, Scenario scenario) {
+        Scenario existingOriginal = findScenario(originalScenario).orElse(null);
+        if (existingOriginal == null) {
+            putScenarioNew(scenario);
+        } else {
+            putScenarioExisting(scenario, existingOriginal);
+        }
+    }
+
+    private void putScenarioNew(Scenario scenario) {
+        Scenario existing = findScenario(scenario).orElse(null);
+        if (existing != null) {
+            throw new ScenarioAlreadyExistsException(scenario);
+        }
+        config.getScenarios().add(scenario);
+    }
+
+    private void putScenarioExisting(Scenario scenario, Scenario existingOriginal) {
+        Scenario existingScenario = findScenario(scenario).orElse(null);
+        if (existingScenario != null && !existingOriginal.equals(existingScenario)) {
+            throw new ScenarioAlreadyExistsException(scenario);
+        }
+        existingOriginal.assignFrom(scenario);
+    }
+
+    @Override
+    public void deleteScenario(Scenario scenario) throws IOException {
+        if (config.getScenarios().remove(scenario)) {
             tryPersistConfig();
         }
     }
@@ -415,6 +494,14 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
     }
 
+    private void notifyRequestCreated(OutboundRequest request) {
+        requestObservers.forEach(o -> o.onRequestCreated(request));
+    }
+
+    private void notifyRequestDeleted(OutboundRequest request) {
+        requestObservers.forEach(o -> o.onRequestDeleted(request));
+    }
+
     //----------------------------------------------------------------------
     //
     //   Tests
@@ -482,6 +569,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     private boolean putTestInternal(@Nonnull ApiTest apiTest, boolean overwrite) {
         Objects.requireNonNull(apiTest, TEST_COULD_NOT_BE_NULL);
         ApiTest existing = findTest(apiTest.getAlias()).orElse(null);
+
         if (existing == null) {
             config.getTests().add(apiTest);
             //notifyTestCreated(test);
@@ -514,96 +602,104 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
     //----------------------------------------------------------------------
     //
-    //   Scenarios
+    //   Kafka
     //
     //----------------------------------------------------------------------
 
     @Override
-    public List<Scenario> findAllScenarios() {
-        return config.getScenarios();
+    public List<KafkaTopic> findAllKafkaTopics() {
+        return config.getKafkaTopics();
     }
 
     @Override
-    public Optional<Scenario> findScenario(@Nullable Scenario scenario) {
-        if (scenario == null) {
-            return Optional.empty();
-        }
-        return findAllScenarios().stream()
-                .filter(scenario::equals)
+    public Optional<KafkaTopic> findKafkaTopic(@Nonnull String topic, int partition) {
+        return findAllKafkaTopics().stream()
+                .filter(e -> e.getTopic().equals(topic) && e.getPartition() == partition)
                 .findFirst();
     }
 
     @Override
-    public void putScenario(@Nullable Scenario originalScenario, @Nonnull Scenario scenario) throws IOException {
-        Objects.requireNonNull(scenario, "Scenario could not be null.");
-        putScenarioToConfig(originalScenario, scenario);
-        sortScenarios();
+    public void putKafkaTopic(@Nullable KafkaTopic originalKafkaTopic, @Nonnull KafkaTopic kafkaTopic) throws IOException {
+        Objects.requireNonNull(kafkaTopic, "Kafka topic could not be null.");
+        putKafkaTopicToConfig(originalKafkaTopic, kafkaTopic);
+        sortKafkaTopics();
         tryPersistConfig();
     }
 
-    private void putScenarioToConfig(Scenario originalScenario, Scenario scenario) {
-        Scenario existingOriginal = findScenario(originalScenario).orElse(null);
-        if (existingOriginal == null) {
-            putScenarioNew(scenario);
+    private void putKafkaTopicToConfig(@Nullable KafkaTopic reference, KafkaTopic kafkaTopic) {
+        KafkaTopic existing = null;
+        if (reference != null) existing = findKafkaTopic(reference.getTopic(), reference.getPartition()).orElse(null);
+
+        if (existing == null) {
+            putKafkaTopicNew(kafkaTopic);
         } else {
-            putScenarioExisting(scenario, existingOriginal);
+            putKafkaTopicExisting(kafkaTopic, existing);
         }
     }
 
-    private void putScenarioNew(Scenario scenario) {
-        Scenario existing = findScenario(scenario).orElse(null);
+    private void putKafkaTopicNew(KafkaTopic kafkaTopic) {
+        KafkaTopic existing = findKafkaTopic(kafkaTopic.getTopic(), kafkaTopic.getPartition()).orElse(null);
         if (existing != null) {
-            throw new ScenarioAlreadyExistsException(scenario);
+            throw new KafkaTopicAlreadyExistsException(kafkaTopic);
         }
-        config.getScenarios().add(scenario);
+        config.getKafkaTopics().add(kafkaTopic);
+        //notifyKafkaTopicCreated(kafkaTopic);
     }
 
-    private void putScenarioExisting(Scenario scenario, Scenario existingOriginal) {
-        Scenario existingScenario = findScenario(scenario).orElse(null);
-        if (existingScenario != null && !existingOriginal.equals(existingScenario)) {
-            throw new ScenarioAlreadyExistsException(scenario);
+    private void putKafkaTopicExisting(KafkaTopic kafkaTopic, KafkaTopic existingOriginal) {
+        KafkaTopic existingKafkaTopic = findKafkaTopic(kafkaTopic.getTopic(), kafkaTopic.getPartition()).orElse(null);
+        if (existingKafkaTopic != null && !existingOriginal.equals(existingKafkaTopic)) {
+            throw new KafkaTopicAlreadyExistsException(kafkaTopic);
         }
-        existingOriginal.assignFrom(scenario);
+        //notifyKafkaTopicDeleted(existingOriginal);
+        existingOriginal.assignFrom(kafkaTopic);
+        //notifyKafkaTopicCreated(existingOriginal);
     }
 
     @Override
-    public void deleteScenario(Scenario scenario) throws IOException {
-        if (config.getScenarios().remove(scenario)) {
+    public void putKafkaTopics(List<KafkaTopic> kafkaTopics, boolean overwrite) throws IOException {
+        boolean modified = false;
+
+        for (KafkaTopic kafkaTopic : kafkaTopics) {
+            modified |= putKafkaTopicInternal(kafkaTopic, overwrite);
+        }
+
+        if (modified) {
+            sortKafkaTopics();
             tryPersistConfig();
         }
     }
 
-    //----------------------------------------------------------------------
-    //
-    //   Observers
-    //
-    //----------------------------------------------------------------------
+    private boolean putKafkaTopicInternal(@Nonnull KafkaTopic topic, boolean overwrite) {
+        Objects.requireNonNull(topic, "Kafka topic could not be null.");
+        KafkaTopic existing = findKafkaTopic(topic.getTopic(), topic.getPartition()).orElse(null);
 
-    private void notifyBeforeConfigChanged() {
-        configObservers.forEach(ConfigObserver::onBeforeConfigChanged);
+        if (existing == null) {
+            config.getKafkaTopics().add(topic);
+            //notifyKafkaTopicCreated(topic);
+            return true;
+        } else if (overwrite) {
+            //notifyKafkaTopicDeleted(existing);
+            existing.assignFrom(topic);
+            //notifyKafkaTopicCreated(existing);
+            return true;
+        }
+        return false;
     }
 
-    private void notifyAfterConfigChanged() {
-        configObservers.forEach(ConfigObserver::onAfterConfigChanged);
-    }
+    @Override
+    public void deleteKafkaTopics(List<KafkaTopic> topics) throws IOException {
+        boolean modified = false;
 
-    private void notifyRouteCreated(Route route) {
-        routeObservers.forEach(o -> o.onRouteCreated(route));
-    }
+        for (KafkaTopic kafkaTopic : topics) {
+            if (config.getKafkaTopics().remove(kafkaTopic)) {
+                //notifyKafkaTopicDeleted(kafkaTopic);
+                modified = true;
+            }
+        }
 
-    private void notifyRouteDeleted(Route route) {
-        routeObservers.forEach(o -> o.onRouteDeleted(route));
-    }
-
-    private void notifyRequestCreated(OutboundRequest request) {
-        requestObservers.forEach(o -> o.onRequestCreated(request));
-    }
-
-    private void notifyRequestDeleted(OutboundRequest request) {
-        requestObservers.forEach(o -> o.onRequestDeleted(request));
-    }
-
-    private void notifySettingsChanged() {
-        settingsObservers.forEach(SettingsObserver::onAfterSettingsChanged);
+        if (modified) {
+            tryPersistConfig();
+        }
     }
 }

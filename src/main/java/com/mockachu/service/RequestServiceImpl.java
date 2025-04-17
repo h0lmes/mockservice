@@ -159,21 +159,21 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public void putRequest(OutboundRequestDto existing, OutboundRequestDto request) throws IOException {
+    public synchronized void putRequest(OutboundRequestDto existing, OutboundRequestDto request) throws IOException {
         var ex = requestMapper.fromDto(existing);
         cacheRemove(ex);
         configRepository.putRequest(ex, requestMapper.fromDto(request));
     }
 
     @Override
-    public void putRequests(List<OutboundRequestDto> dto, boolean overwrite) throws IOException {
+    public synchronized void putRequests(List<OutboundRequestDto> dto, boolean overwrite) throws IOException {
         var requests = requestMapper.fromDto(dto);
         requests.forEach(this::cacheRemove);
         configRepository.putRequests(requests, overwrite);
     }
 
     @Override
-    public void deleteRequests(List<OutboundRequestDto> dto) throws IOException {
+    public synchronized void deleteRequests(List<OutboundRequestDto> dto) throws IOException {
         var requests = requestMapper.fromDto(dto);
         requests.forEach(this::cacheRemove);
         configRepository.deleteRequests(requests);

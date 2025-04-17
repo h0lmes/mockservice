@@ -1,11 +1,13 @@
 <template>
     <div class="config-page monospace">
-        <div class="component-toolbar mb-4">
-            <button type="button" class="btn btn-primary" @click="save">Save context</button>
-            <button type="button" class="btn btn-default" @click="download">Download as file</button>
-        </div>
+        <div class="mb-4">Variables on server</div>
         <AutoSizeTextArea class="main" v-model="context" :max-rows="maxRows"></AutoSizeTextArea>
         <AutoSizeTextArea class="helper invisible" v-model="context" :min-rows="1" :max-rows="1"></AutoSizeTextArea>
+        <div class="component-toolbar mt-4">
+            <button type="button" class="btn btn-primary" @click="save">Save variables to server</button>
+            <button type="button" class="btn btn-default" @click="download">Download variables as file</button>
+        </div>
+        <div class="component-row-group-boundary"></div>
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
 </template>

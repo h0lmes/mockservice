@@ -12,7 +12,7 @@
 
         <div class="mock-col w1" v-show="!editing">
             <div class="mock-col-header">TYPE</div>
-            <div v-show="!editing" class="mock-col-value">TEST</div>
+            <div v-show="!editing" class="mock-col-value">💡 TEST</div>
         </div>
 
         <div class="mock-col w3">

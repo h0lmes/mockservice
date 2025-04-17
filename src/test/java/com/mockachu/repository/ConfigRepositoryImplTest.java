@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.mockachu.domain.*;
+import com.mockachu.exception.KafkaTopicAlreadyExistsException;
 import com.mockachu.exception.RouteAlreadyExistsException;
 import com.mockachu.exception.ScenarioAlreadyExistsException;
 import com.mockachu.exception.TestAlreadyExistsException;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -190,46 +190,46 @@ class ConfigRepositoryImplTest {
 
     @Test
     void putRoute_NonExisting_RouteAdded() throws IOException {
-        ConfigRepository configRepository = repository();
-        Route route = new Route().setPath(PATH);
+        var configRepository = repository();
+        var route = new Route().setPath(PATH);
         configRepository.putRoute(null, route);
 
-        List<Route> allRoutes = configRepository.findAllRoutes();
+        var allRoutes = configRepository.findAllRoutes();
         assertEquals(1, allRoutes.size());
         assertEquals(route, allRoutes.get(0));
     }
 
     @Test
     void putRoute_NonExisting_ListenerCalled() throws IOException {
-        ConfigRepository configRepository = repository();
-        Route route = new Route().setPath(PATH);
+        var configRepository = repository();
+        var route = new Route().setPath(PATH);
         configRepository.putRoute(null, route);
 
         verify(routeObserver, times(1)).onRouteCreated(any());
     }
 
-    @DisplayName("Update existing route [1] with contents of [2], updates")
+    @DisplayName("Update existing [1] with contents of [2], update successful")
     @Test
     void putRoute_UpdateExisting_RouteUpdated() throws IOException {
-        ConfigRepository configRepository = repository();
-        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR1);
-        Route route2 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR2);
+        var configRepository = repository();
+        var route1 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR1);
+        var route2 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR2);
         configRepository.putRoute(null, route1);
         configRepository.putRoute(route1, route2);
 
-        Route routeSearch = new Route().setPath(PATH);
-        Optional<Route> routeOptional = configRepository.findRoute(routeSearch);
+        var routeSearch = new Route().setPath(PATH);
+        var routeOptional = configRepository.findRoute(routeSearch);
         assertTrue(routeOptional.isPresent());
         assertEquals(STR2, routeOptional.get().getResponse());
     }
 
-    @DisplayName("Update existing route [1] with contents of [2], calls listener")
+    @DisplayName("Update existing [1] with contents of [2], listener called")
     @Test
     void putRoute_UpdateExisting_ListenersCalled() throws IOException {
-        ConfigRepository configRepository = repository();
+        var configRepository = repository();
 
-        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR1);
-        Route route2 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR2);
+        var route1 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR1);
+        var route2 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR2);
 
         configRepository.putRoute(null, route1);
         verify(routeObserver, times(1)).onRouteCreated(any());
@@ -242,10 +242,10 @@ class ConfigRepositoryImplTest {
 
     @Test
     void putRoute_WithNoObservers_DoesNotThrow() {
-        ConfigRepository configRepository = repositoryWithNoObservers();
+        var configRepository = repositoryWithNoObservers();
 
-        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR1);
-        Route route2 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR2);
+        var route1 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR1);
+        var route2 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR2);
 
         assertDoesNotThrow(() -> configRepository.putRoute(null, route1));
         assertDoesNotThrow(() -> configRepository.putRoute(route1, route2));
@@ -254,9 +254,9 @@ class ConfigRepositoryImplTest {
     @DisplayName("Try to create new route [2] that equals already existing route [1] -> throws (do not allow duplicates)")
     @Test
     void putRoute_NewExistsByEquals_Throws() throws IOException {
-        ConfigRepository configRepository = repository();
-        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR1);
-        Route route2 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR2);
+        var configRepository = repository();
+        var route1 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR1);
+        var route2 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR2);
         configRepository.putRoute(null, route1);
         assertThrows(RouteAlreadyExistsException.class, () -> configRepository.putRoute(null, route2));
     }
@@ -264,10 +264,10 @@ class ConfigRepositoryImplTest {
     @DisplayName("Update existing route [1] with contents of [3] which equals other existing route [2] -> throws (do not allow duplicates)")
     @Test
     void putRoute_ReferenceExistsAndNewExistsAndReferenceNotEqualsNew_Throws() throws IOException {
-        ConfigRepository configRepository = repository();
-        Route route1 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR1);
-        Route route2 = new Route().setMethod(RequestMethod.POST).setPath(PATH).setResponse(STR1);
-        Route route3 = new Route().setMethod(RequestMethod.POST).setPath(PATH).setResponse(STR2);
+        var configRepository = repository();
+        var route1 = new Route().setMethod(RequestMethod.GET).setPath(PATH).setResponse(STR1);
+        var route2 = new Route().setMethod(RequestMethod.POST).setPath(PATH).setResponse(STR1);
+        var route3 = new Route().setMethod(RequestMethod.POST).setPath(PATH).setResponse(STR2);
         configRepository.putRoute(null, route1);
         configRepository.putRoute(null, route2);
         assertThrows(RouteAlreadyExistsException.class, () -> configRepository.putRoute(route1, route3));
@@ -275,22 +275,22 @@ class ConfigRepositoryImplTest {
 
     @Test
     void putRoutes_NonExisting_RoutesAdded() throws IOException {
-        ConfigRepository configRepository = repository();
+        var configRepository = repository();
 
-        Route route1 = new Route().setPath(PATH).setMethod(RequestMethod.GET);
-        Route route2 = new Route().setPath(PATH).setMethod(RequestMethod.POST);
+        var route1 = new Route().setPath(PATH).setMethod(RequestMethod.GET);
+        var route2 = new Route().setPath(PATH).setMethod(RequestMethod.POST);
         configRepository.putRoutes(List.of(route1, route2), true);
 
-        List<Route> allRoutes = configRepository.findAllRoutes();
+        var allRoutes = configRepository.findAllRoutes();
         assertEquals(2, allRoutes.size());
     }
 
     @Test
     void putRoutes_NonExisting_ListenerCalled() throws IOException {
-        ConfigRepository configRepository = repository();
+        var configRepository = repository();
 
-        Route route1 = new Route().setPath(PATH).setMethod(RequestMethod.GET);
-        Route route2 = new Route().setPath(PATH).setMethod(RequestMethod.POST);
+        var route1 = new Route().setPath(PATH).setMethod(RequestMethod.GET);
+        var route2 = new Route().setPath(PATH).setMethod(RequestMethod.POST);
         configRepository.putRoutes(List.of(route1, route2), true);
 
         verify(routeObserver, times(2)).onRouteCreated(any());
@@ -298,35 +298,35 @@ class ConfigRepositoryImplTest {
 
     @Test
     void putRoutes_OneOfTwoExists_OverwriteTrue_OneRouteAddedOtherRouteModified() throws IOException {
-        ConfigRepository configRepository = repository();
+        var configRepository = repository();
 
-        Route route1 = new Route().setPath(PATH).setMethod(RequestMethod.GET);
-        Route route2 = new Route().setPath(PATH).setMethod(RequestMethod.POST).setResponse(STR1);
+        var route1 = new Route().setPath(PATH).setMethod(RequestMethod.GET);
+        var route2 = new Route().setPath(PATH).setMethod(RequestMethod.POST).setResponse(STR1);
         configRepository.putRoutes(List.of(route1, route2), true);
 
-        Route routeFound = configRepository.findRoute(route2).orElse(null);
+        var routeFound = configRepository.findRoute(route2).orElse(null);
         assertNotNull(routeFound);
 
-        Route route3 = new Route().setPath(PATH).setMethod(RequestMethod.DELETE);
-        Route route4 = new Route().setPath(PATH).setMethod(RequestMethod.POST).setResponse(STR2);
+        var route3 = new Route().setPath(PATH).setMethod(RequestMethod.DELETE);
+        var route4 = new Route().setPath(PATH).setMethod(RequestMethod.POST).setResponse(STR2);
         configRepository.putRoutes(List.of(route3, route4), true);
 
         assertEquals(3, configRepository.findAllRoutes().size());
-        Route route4Found = configRepository.findRoute(route4).orElse(null);
+        var route4Found = configRepository.findRoute(route4).orElse(null);
         assertNotNull(route4Found);
         assertEquals(STR2, route4Found.getResponse());
     }
 
     @Test
     void putRoutes_RouteExists_OverwriteFalse_RouteNotModified_DoesNotThrow() throws IOException {
-        ConfigRepository configRepository = repository();
-        Route route2 = new Route().setPath(PATH).setMethod(RequestMethod.POST).setResponse(STR1);
+        var configRepository = repository();
+        var route2 = new Route().setPath(PATH).setMethod(RequestMethod.POST).setResponse(STR1);
         configRepository.putRoutes(List.of(route2), true);
-        Route route4 = new Route().setPath(PATH).setMethod(RequestMethod.POST).setResponse(STR2);
+        var route4 = new Route().setPath(PATH).setMethod(RequestMethod.POST).setResponse(STR2);
 
         assertDoesNotThrow(() -> configRepository.putRoutes(List.of(route4), false));
 
-        Route route4Found = configRepository.findRoute(route4).orElse(null);
+        var route4Found = configRepository.findRoute(route4).orElse(null);
 
         assertNotNull(route4Found);
         assertEquals(STR1, route4Found.getResponse());
@@ -334,14 +334,14 @@ class ConfigRepositoryImplTest {
 
     @Test
     void deleteRoutes_AddThenDeleteSameRoute_NoRoutesFound() throws IOException {
-        ConfigRepository configRepository = repository();
+        var configRepository = repository();
 
-        Route route1 = new Route().setPath(PATH);
+        var route1 = new Route().setPath(PATH);
         configRepository.putRoute(null, route1);
 
         assertEquals(1, configRepository.findAllRoutes().size());
 
-        Route route2 = new Route().setPath(PATH);
+        var route2 = new Route().setPath(PATH);
         configRepository.deleteRoutes(List.of(route2));
 
         assertEquals(0, configRepository.findAllRoutes().size());
@@ -349,14 +349,14 @@ class ConfigRepositoryImplTest {
 
     @Test
     void deleteRoutes_AddThenDeleteSameRoute_ListenerCalled() throws IOException {
-        ConfigRepository configRepository = repository();
+        var configRepository = repository();
 
-        Route route1 = new Route().setPath(PATH);
+        var route1 = new Route().setPath(PATH);
         configRepository.putRoute(null, route1);
 
         assertEquals(1, configRepository.findAllRoutes().size());
 
-        Route route2 = new Route(route1);
+        var route2 = new Route(route1);
         configRepository.deleteRoutes(List.of(route2));
 
         verify(routeObserver, times(1)).onRouteDeleted(any());
@@ -364,14 +364,14 @@ class ConfigRepositoryImplTest {
 
     @Test
     void deleteRoutes_AddThenDeleteDifferentRoute_OneRouteFound() throws IOException {
-        ConfigRepository configRepository = repository();
+        var configRepository = repository();
 
-        Route route1 = new Route().setPath(PATH).setMethod(RequestMethod.GET);
+        var route1 = new Route().setPath(PATH).setMethod(RequestMethod.GET);
         configRepository.putRoute(null, route1);
 
         assertEquals(1, configRepository.findAllRoutes().size());
 
-        Route route2 = new Route().setPath(PATH).setMethod(RequestMethod.DELETE);
+        var route2 = new Route().setPath(PATH).setMethod(RequestMethod.DELETE);
         configRepository.deleteRoutes(List.of(route2));
 
         assertEquals(1, configRepository.findAllRoutes().size());
@@ -647,5 +647,140 @@ class ConfigRepositoryImplTest {
         assertEquals(1, configRepository.findAllTests().size());
         configRepository.deleteTests(List.of(v2));
         assertEquals(1, configRepository.findAllTests().size());
+    }
+
+    //----------------------------------------------------------------------
+    //
+    //
+    //
+    //   Kafka Topics
+    //
+    //
+    //
+    //----------------------------------------------------------------------
+
+    @Test
+    void putKafkaTopic_NonExisting_Added() throws IOException {
+        ConfigRepository configRepository = repository();
+        var entity = new KafkaTopic().setTopic("AAA");
+        configRepository.putKafkaTopic(null, entity);
+
+        var list = configRepository.findAllKafkaTopics();
+        assertEquals(1, list.size());
+        assertEquals(entity, list.get(0));
+    }
+
+    @DisplayName("Update existing [1] with contents of [2], update successful")
+    @Test
+    void putKafkaTopic_UpdateExisting_Updated() throws IOException {
+        var configRepository = repository();
+        var entity1 = new KafkaTopic().setGroup("AAA").setTopic("AAA").setPartition(0);
+        var entity2 = new KafkaTopic().setGroup("AAA").setTopic("AAA").setPartition(1);
+        configRepository.putKafkaTopic(null, entity1);
+        configRepository.putKafkaTopic(entity1, entity2);
+
+        var optional = configRepository.findKafkaTopic("AAA", 1);
+        assertTrue(optional.isPresent());
+        assertEquals(1, optional.get().getPartition());
+    }
+
+    @DisplayName("Try to create new [2] that equals already existing [1] -> throws (do not allow duplicates)")
+    @Test
+    void putKafkaTopic_NewExistsByEquals_Throws() throws IOException {
+        var configRepository = repository();
+        var entity1 = new KafkaTopic().setGroup("AAA").setTopic("AAA").setPartition(0);
+        var entity2 = new KafkaTopic().setGroup("AAA").setTopic("AAA").setPartition(0);
+        configRepository.putKafkaTopic(null, entity1);
+        assertThrows(KafkaTopicAlreadyExistsException.class, () -> configRepository.putKafkaTopic(null, entity2));
+    }
+
+    @DisplayName("Update existing [1] with contents of [3] which equals other existing [2] -> throws (do not allow duplicates)")
+    @Test
+    void putKafkaTopic_ReferenceExistsAndNewExistsAndReferenceNotEqualsNew_Throws() throws IOException {
+        var configRepository = repository();
+        var entity1 = new KafkaTopic().setGroup("AAA").setTopic("AAA").setPartition(0);
+        var entity2 = new KafkaTopic().setGroup("AAA").setTopic("BBB").setPartition(1);
+        var entity3 = new KafkaTopic().setGroup("AAA").setTopic("BBB").setPartition(1);
+        configRepository.putKafkaTopic(null, entity1);
+        configRepository.putKafkaTopic(null, entity2);
+        assertThrows(KafkaTopicAlreadyExistsException.class, () -> configRepository.putKafkaTopic(entity1, entity3));
+    }
+
+    @Test
+    void putKafkaTopics_NonExisting_AllAdded() throws IOException {
+        var configRepository = repository();
+
+        var entity1 = new KafkaTopic().setGroup("AAA").setTopic("AAA").setPartition(0);
+        var entity2 = new KafkaTopic().setGroup("BBB").setTopic("BBB").setPartition(0);
+        configRepository.putKafkaTopics(List.of(entity1, entity2), true);
+
+        var all = configRepository.findAllKafkaTopics();
+        assertEquals(2, all.size());
+    }
+
+    @Test
+    void putKafkaTopics_OneOfTwoExists_OverwriteTrue_OneAddedOtherModified() throws IOException {
+        var configRepository = repository();
+
+        var entity1 = new KafkaTopic().setGroup("AAA").setTopic("AAA").setPartition(0);
+        var entity2 = new KafkaTopic().setGroup("BBB").setTopic("BBB").setPartition(0);
+        configRepository.putKafkaTopics(List.of(entity1, entity2), true);
+
+        var found = configRepository.findKafkaTopic("BBB", 0).orElse(null);
+        assertNotNull(found);
+
+        var entity3 = new KafkaTopic().setGroup("CCC").setTopic("CCC").setPartition(0);
+        var entity4 = new KafkaTopic().setGroup("BBB").setTopic("BBB").setPartition(0);
+        configRepository.putKafkaTopics(List.of(entity3, entity4), true);
+
+        assertEquals(3, configRepository.findAllKafkaTopics().size());
+        found = configRepository.findKafkaTopic("BBB", 0).orElse(null);
+        assertNotNull(found);
+        assertEquals("BBB", found.getTopic());
+    }
+
+    @Test
+    void putKafkaTopics_RouteExists_OverwriteFalse_RouteNotModified_DoesNotThrow() throws IOException {
+        var configRepository = repository();
+        var entity2 = new KafkaTopic().setGroup("BBB").setTopic("BBB").setPartition(0);
+        configRepository.putKafkaTopics(List.of(entity2), true);
+        var entity4 = new KafkaTopic().setGroup("BBB").setTopic("BBB").setPartition(0);
+
+        assertDoesNotThrow(() -> configRepository.putKafkaTopics(List.of(entity4), false));
+
+        var found = configRepository.findKafkaTopic("BBB", 0).orElse(null);
+
+        assertNotNull(found);
+        assertEquals("BBB", found.getTopic());
+    }
+
+    @Test
+    void deleteKafkaTopics_AddThenDeleteSameRoute_NoRoutesFound() throws IOException {
+        var configRepository = repository();
+
+        var entity1 = new KafkaTopic().setTopic("BBB");
+        configRepository.putKafkaTopic(null, entity1);
+
+        assertEquals(1, configRepository.findAllKafkaTopics().size());
+
+        var entity2 = new KafkaTopic().setTopic("BBB");
+        configRepository.deleteKafkaTopics(List.of(entity2));
+
+        assertEquals(0, configRepository.findAllKafkaTopics().size());
+    }
+
+    @Test
+    void deleteKafkaTopics_AddThenDeleteDifferentOne_OneFound() throws IOException {
+        var configRepository = repository();
+
+        var entity1 = new KafkaTopic().setTopic("AAA");
+        configRepository.putKafkaTopic(null, entity1);
+
+        assertEquals(1, configRepository.findAllKafkaTopics().size());
+
+        var entity2 = new KafkaTopic().setTopic("BBB");
+        configRepository.deleteKafkaTopics(List.of(entity2));
+
+        assertEquals(1, configRepository.findAllKafkaTopics().size());
     }
 }

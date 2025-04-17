@@ -334,17 +334,17 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public void putTest(ApiTestDto existing, ApiTestDto test) throws IOException {
+    public synchronized void putTest(ApiTestDto existing, ApiTestDto test) throws IOException {
         configRepository.putTest(apiTestMapper.fromDto(existing), apiTestMapper.fromDto(test));
     }
 
     @Override
-    public void putTests(List<ApiTestDto> dto, boolean overwrite) throws IOException {
+    public synchronized void putTests(List<ApiTestDto> dto, boolean overwrite) throws IOException {
         configRepository.putTests(apiTestMapper.fromDto(dto), overwrite);
     }
 
     @Override
-    public void deleteTests(List<ApiTestDto> dto) throws IOException {
+    public synchronized void deleteTests(List<ApiTestDto> dto) throws IOException {
         configRepository.deleteTests(apiTestMapper.fromDto(dto));
     }
 }

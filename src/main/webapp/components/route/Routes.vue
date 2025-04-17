@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="width: 100%">
         <p v-if="entities.length === 0">
             Nothing here yet ¯\_(ツ)_/¯
         </p>

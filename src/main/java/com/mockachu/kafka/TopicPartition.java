@@ -21,12 +21,12 @@ public class TopicPartition {
     }
 
     public int hashCode() {
-        if (this.hash != 0) {
-            return this.hash;
+        if (hash != 0) {
+            return hash;
         } else {
-            int result = 63 + this.partition;
-            result = 63 * result + Objects.hashCode(this.topic);
-            this.hash = result;
+            int result = 63 + partition;
+            result = 63 * result + Objects.hashCode(topic);
+            hash = result;
             return result;
         }
     }
@@ -40,11 +40,11 @@ public class TopicPartition {
             return false;
         } else {
             TopicPartition other = (TopicPartition)obj;
-            return this.partition == other.partition && Objects.equals(this.topic, other.topic);
+            return partition == other.partition && Objects.equals(topic, other.topic);
         }
     }
 
     public String toString() {
-        return this.topic + "-" + this.partition;
+        return topic + "-" + partition;
     }
 }

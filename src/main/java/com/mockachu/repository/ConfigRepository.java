@@ -29,6 +29,11 @@ public interface ConfigRepository {
     void putRoutes(List<Route> routes, boolean overwrite) throws IOException;
     void deleteRoutes(List<Route> routes) throws IOException;
 
+    List<Scenario> findAllScenarios();
+    Optional<Scenario> findScenario(Scenario scenario);
+    void putScenario(@Nullable Scenario reference, @Nonnull Scenario scenario) throws IOException;
+    void deleteScenario(Scenario scenario) throws IOException;
+
     List<OutboundRequest> findAllRequests();
     Optional<OutboundRequest> findRequest(String requestId);
     void putRequest(@Nullable OutboundRequest existing, @Nonnull OutboundRequest request) throws IOException;
@@ -41,8 +46,9 @@ public interface ConfigRepository {
     void putTests(List<ApiTest> apiTests, boolean overwrite) throws IOException;
     void deleteTests(List<ApiTest> apiTests) throws IOException;
 
-    List<Scenario> findAllScenarios();
-    Optional<Scenario> findScenario(Scenario scenario);
-    void putScenario(@Nullable Scenario reference, @Nonnull Scenario scenario) throws IOException;
-    void deleteScenario(Scenario scenario) throws IOException;
+    List<KafkaTopic> findAllKafkaTopics();
+    Optional<KafkaTopic> findKafkaTopic(@Nonnull String topic, int partition);
+    void putKafkaTopic(@Nullable KafkaTopic reference, @Nonnull KafkaTopic kafkaTopic) throws IOException;
+    void putKafkaTopics(List<KafkaTopic> kafkaTopics, boolean overwrite) throws IOException;
+    void deleteKafkaTopics(List<KafkaTopic> kafkaTopics) throws IOException;
 }

@@ -57,12 +57,13 @@
         </div>
 
         <div v-show="editing" class="mock-group w100">
-            <div v-show="editing" class="mock-col w1">
+            <div class="mock-col w1">
                 <div class="mb-2 color-secondary">ALT</div>
-                <input type="text" class="form-control form-control-sm" v-model="editingData.alt"
+                <input type="text" class="form-control form-control-sm"
+                       v-model="editingData.alt"
                        placeholder="can contain condition (e.g. variable=value)"/>
             </div>
-            <div v-show="editing" class="mock-col w1">
+            <div class="mock-col w1">
                 <div class="mb-2 color-secondary">RESPONSE CODE</div>
                 <input type="text" class="form-control form-control-sm" v-model="editingData.responseCode"/>
             </div>

@@ -4,18 +4,20 @@
     </div>
 </template>
 <script>
-    import ToggleSwitch from './ToggleSwitch';
+import ToggleSwitch from './ToggleSwitch';
 
-    export default {
+export default {
         name: "ViewSelector",
         components: {ToggleSwitch},
         data() {
             return {
                 label: 'Compact',
-                storageKey: 'CompactView',
                 cssClass: 'compact-view',
                 value: false,
             }
+        },
+        props: {
+            storageKey: {type: String, default: 'CompactView'},
         },
         watch: {
             value (newValue, oldValue) {

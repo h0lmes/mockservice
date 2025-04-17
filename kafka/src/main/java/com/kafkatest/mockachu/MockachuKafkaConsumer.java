@@ -144,7 +144,7 @@ public class MockachuKafkaConsumer<K, V> implements Consumer<K, V> {
         try {
             Map<TopicPartition, List<ConsumerRecord<K, V>>> map = new HashMap<>();
 
-            query().forEach(rec -> {
+            query(l).forEach(rec -> {
                 var tp = new TopicPartition(rec.topic(), rec.partition());
                 var consumerRecords = map.computeIfAbsent(tp, k -> new ArrayList<>());
 
@@ -175,9 +175,10 @@ public class MockachuKafkaConsumer<K, V> implements Consumer<K, V> {
         }
     }
 
-    private List<MockachuKafkaConsumerResponse> query() throws JsonProcessingException {
+    private List<MockachuKafkaConsumerResponse> query(long l) throws JsonProcessingException {
         List<MockachuKafkaConsumerRequest> requests = new ArrayList<>();
-        assignments.forEach(a -> requests.add(new MockachuKafkaConsumerRequest(a.topic(), a.partition(), -1L)));
+        assignments.forEach(a -> requests.add(
+                new MockachuKafkaConsumerRequest(l, a.topic(), a.partition(), -1L)));
 
         var strRequest = objectMapper.writeValueAsString(requests);
         var strResponse = sender.sendSync(strRequest);
