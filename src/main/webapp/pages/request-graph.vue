@@ -1,5 +1,5 @@
 <template>
-    <div class="config-page monospace">
+    <div class="monospace">
         <pre v-html="valueProcessed"></pre>
         <Loading v-if="$fetchState.pending"></Loading>
     </div>

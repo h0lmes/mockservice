@@ -62,19 +62,12 @@
 
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">REQUEST HEADERS</div>
-            <AutoSizeTextArea v-model="editingData.headers"
-                              :min-rows="1"
-                              :max-rows="22"
-            ></AutoSizeTextArea>
+            <AutoSizeTextArea v-model="editingData.headers"></AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">REQUEST BODY</div>
-            <AutoSizeTextArea v-model="editingData.body"
-                              :min-rows="1"
-                              :max-rows="22"
-                              ref="body"
-            ></AutoSizeTextArea>
+            <AutoSizeTextArea v-model="editingData.body" ref="body"></AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-col w100 mt-1">
@@ -119,81 +112,77 @@ import ToggleSwitch from "../other/ToggleSwitch";
 import AutoSizeTextArea from "../other/AutoSizeTextArea";
 
 export default {
-        name: "Request",
-        components: {AutoSizeTextArea, RequestTester, RouteMethod, ToggleSwitch},
-        data() {
-            return {
-                editing: false,
-                editingData: {},
-                testing: false,
-            }
-        },
-        props: {
-            request: {type: Object},
-        },
-        computed: {
-            open() {
-                return this.editing || this.testing;
-            },
-            hasVariables() {
-                return false;
-            },
-        },
-        mounted() {
-            if (this.request._new) {
-                this.edit();
-            }
-        },
-        methods: {
-            ...mapActions({
-                saveRequest: 'requests/save',
-                deleteRequests: 'requests/delete',
-            }),
-            filter(value) {
-                this.$emit('filter', value);
-            },
-            edit() {
-                this.testing = false;
-                this.editingData = {...this.request};
-                if (!this.editing) this.editing = true; else this.cancel();
-                if (this.editing) this.$nextTick(() => this.$refs.body.focus());
-            },
-            cancel() {
-                if (!!this.request._new) {
-                    this.deleteRequests([this.request]);
-                } else {
-                    this.editing = false;
-                    this.editingData = {};
-                }
-            },
-            test() {
-                this.cancel();
-                this.testing = !this.testing;
-            },
-            del() {
-                if (!!this.request._new) {
-                    this.deleteRequests([this.request]);
-                } else if (confirm('Sure you want to delete?')) {
-                    this.$nuxt.$loading.start();
-                    this.deleteRequests([this.request]).then(() => this.$nuxt.$loading.finish());
-                }
-            },
-            save() {
-                this.$nuxt.$loading.start();
-                this.saveRequest([this.request, this.editingData]).then(() => {
-                    this.$nuxt.$loading.finish();
-                    this.editing = false;
-                });
-            },
-            saveAsCopy() {
-                this.$nuxt.$loading.start();
-                this.saveRequest([{}, this.editingData]).then(() => {
-                    this.$nuxt.$loading.finish();
-                    this.editing = false;
-                });
-            },
+    name: "Request",
+    components: {AutoSizeTextArea, RequestTester, RouteMethod, ToggleSwitch},
+    data() {
+        return {
+            editing: false,
+            editingData: {},
+            testing: false,
         }
+    },
+    props: {
+        request: {type: Object, default: {}},
+    },
+    computed: {
+        open() {
+            return this.editing || this.testing;
+        },
+        hasVariables() {
+            return false;
+        },
+    },
+    mounted() {
+        if (this.request._new) this.edit();
+    },
+    methods: {
+        ...mapActions({
+            filter: 'setApiSearchExpression',
+            saveRequest: 'requests/save',
+            deleteRequests: 'requests/delete',
+        }),
+        edit() {
+            this.testing = false;
+            this.editingData = {...this.request};
+            if (!this.editing) this.editing = true; else this.cancel();
+            if (this.editing) this.$nextTick(() => this.$refs.body.focus());
+        },
+        cancel() {
+            if (!!this.request._new) {
+                this.deleteRequests([this.request]);
+            } else {
+                this.editing = false;
+                this.editingData = {};
+            }
+        },
+        test() {
+            this.cancel();
+            this.testing = !this.testing;
+        },
+        del() {
+            if (!!this.request._new) {
+                this.deleteRequests([this.request]);
+            } else if (confirm('Sure you want to delete?')) {
+                this.$nuxt.$loading.start();
+                this.deleteRequests([this.request]).then(() => this.$nuxt.$loading.finish());
+            }
+        },
+        save() {
+            this.$nuxt.$loading.start();
+            this.saveRequest([this.request, this.editingData]).then(() => {
+                this.$nuxt.$loading.finish();
+                this.editing = false;
+            });
+        },
+        saveAsCopy() {
+            this.$nuxt.$loading.start();
+            this.saveRequest([{}, this.editingData]).then(() => {
+                this.$nuxt.$loading.finish();
+                this.editing = false;
+            });
+        },
     }
+}
 </script>
 <style scoped>
 </style>

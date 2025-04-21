@@ -143,12 +143,12 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-    .tester-result {
-        padding: 0;
-        text-align: initial;
-    }
-    .tester-buttons {
-        padding: 0.3rem 0 0.7rem;
-        text-align: center;
-    }
+.tester-result {
+    padding: 0;
+    text-align: initial;
+}
+.tester-buttons {
+    padding: 0.3rem 0 0.7rem;
+    text-align: center;
+}
 </style>

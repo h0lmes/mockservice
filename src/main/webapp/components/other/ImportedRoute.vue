@@ -27,13 +27,13 @@
             RESPONSE (GENERATED)
         </div>
         <div class="mock-col w100" v-show="open" @click.stop>
-            <AutoSizeTextArea v-model="route.response" placeholder="NO RESPONSE" :min-rows="1"></AutoSizeTextArea>
+            <AutoSizeTextArea v-model="route.response" placeholder="NO RESPONSE"></AutoSizeTextArea>
         </div>
         <div class="mock-col w100" v-show="open">
             REQUEST BODY SCHEMA
         </div>
         <div class="mock-col w100" v-show="open" @click.stop>
-            <AutoSizeTextArea v-model="route.requestBodySchema" placeholder="NO REQUEST BODY SCHEMA" :min-rows="1"></AutoSizeTextArea>
+            <AutoSizeTextArea v-model="route.requestBodySchema" placeholder="NO REQUEST BODY SCHEMA"></AutoSizeTextArea>
         </div>
     </div>
 </template>

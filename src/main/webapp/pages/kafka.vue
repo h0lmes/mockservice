@@ -30,64 +30,64 @@ import ViewSelector from "../components/other/ViewSelector";
 import ToggleSwitch from "../components/other/ToggleSwitch";
 
 export default {
-        name: "kafka",
-        components: {Topics, Loading, ViewSelector, ToggleSwitch},
-        data() {
-            return {
-                query: '',
-                timeout: null,
-                jsSearch: false,
+    name: "kafka",
+    components: {Topics, Loading, ViewSelector, ToggleSwitch},
+    data() {
+        return {
+            query: '',
+            timeout: null,
+            jsSearch: false,
+        }
+    },
+    async fetch() {
+        return this.fetchTopics();
+    },
+    fetchDelay: 0,
+    computed: {
+        topics() {
+            return this.$store.state.kafka.topics;
+        },
+        entities() {
+            return [...this.topics];
+        },
+        filteredEntities() {
+            if (!this.query) return this.entities;
+
+            try {
+                return this.entities.filter(this.getSearchFn());
+            } catch (e) {
+                console.error(e);
+                return [];
             }
         },
-        async fetch() {
-            return this.fetchTopics();
+    },
+    methods: {
+        ...mapActions({
+            fetchTopics: 'kafka/fetch',
+            addTopicAction: 'kafka/add',
+        }),
+        addTopic() {
+            this.addTopicAction()
         },
-        fetchDelay: 0,
-        computed: {
-            topics() {
-                return this.$store.state.kafka.topics;
-            },
-            entities() {
-                return [...this.topics];
-            },
-            filteredEntities() {
-                if (!this.query) return this.entities;
-
-                try {
-                    return this.entities.filter(this.getSearchFn());
-                } catch (e) {
-                    console.error(e);
-                    return [];
-                }
-            },
+        setFilter(value) {
+            this.$refs.search.value = value.trim();
+            this.query = value.trim();
         },
-        methods: {
-            ...mapActions({
-                fetchTopics: 'kafka/fetch',
-                addTopicAction: 'kafka/add',
-            }),
-            addTopic() {
-                this.addTopicAction()
-            },
-            setFilter(value) {
-                this.$refs.search.value = value.trim();
-                this.query = value.trim();
-            },
-            getSearchFn() {
-                if (this.jsSearch) {
-                    return Function("e", "return " + this.query + ";");
-                } else if (!this.query) {
-                    return (e) => true;
-                } else {
-                    const query = this.query;
-                    return (e) => {
-                        return e.group.includes(query)
-                            || e.topic.includes(query);
-                    };
-                }
+        getSearchFn() {
+            if (this.jsSearch) {
+                return Function("e", "return " + this.query + ";");
+            } else if (!this.query) {
+                return (e) => true;
+            } else {
+                const query = this.query;
+                return (e) => {
+                    return e.group.includes(query)
+                        || e.topic.includes(query);
+                };
             }
         }
     }
+}
 </script>
 <style scoped>
 </style>

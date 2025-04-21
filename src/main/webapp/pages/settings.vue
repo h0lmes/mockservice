@@ -62,99 +62,99 @@ import Loading from "../components/other/Loading";
 import ToggleSwitch from "../components/other/ToggleSwitch";
 
 export default {
-        name: "settings",
-        components: {Loading, ToggleSwitch},
-        data() {
-            return {
-                randomAlt: false,
-                quantum: false,
-                alt400OnFailedRequestValidation: true,
-                certificate: null,
-                password: '',
-                passwordSet: false,
-            }
+    name: "settings",
+    components: {Loading, ToggleSwitch},
+    data() {
+        return {
+            randomAlt: false,
+            quantum: false,
+            alt400OnFailedRequestValidation: true,
+            certificate: null,
+            password: '',
+            passwordSet: false,
+        }
+    },
+    async fetch() {
+        return this.fetchSettings();
+    },
+    fetchDelay: 0,
+    computed: {
+        settings() {
+            return this.$store.state.settings.settings
         },
-        async fetch() {
-            return this.fetchSettings();
+        hasCertificateOnServer() {
+            return this.settings.certificate !== null && this.settings.certificate !== ''
         },
-        fetchDelay: 0,
-        computed: {
-            settings() {
-                return this.$store.state.settings.settings
-            },
-            hasCertificateOnServer() {
-                return this.settings.certificate !== null && this.settings.certificate !== ''
-            },
-            certificateHumanReadable() {
-                return this.certificate == null ? 'No certificate' : 'Certificate: ' + this.certificate
-            }
+        certificateHumanReadable() {
+            return this.certificate == null ? 'No certificate' : 'Certificate: ' + this.certificate
+        }
+    },
+    watch: {
+        settings() {
+            this.randomAlt = this.settings.randomAlt;
+            this.quantum = this.settings.quantum;
+            this.alt400OnFailedRequestValidation = this.settings.alt400OnFailedRequestValidation;
+            this.certificate = this.settings.certificate;
         },
-        watch: {
-            settings() {
-                this.randomAlt = this.settings.randomAlt;
-                this.quantum = this.settings.quantum;
-                this.alt400OnFailedRequestValidation = this.settings.alt400OnFailedRequestValidation;
-                this.certificate = this.settings.certificate;
-            },
+    },
+    methods: {
+        ...mapActions({
+            fetchSettings: 'settings/fetch',
+            saveSettings: 'settings/save',
+            setCertificatePassword: 'settings/certificatePassword',
+        }),
+        async save() {
+            this.$nuxt.$loading.start();
+            await this.saveSettings(
+                {
+                    randomAlt: this.randomAlt,
+                    quantum: this.quantum,
+                    failedInputValidationAlt400: this.failedInputValidationAlt400,
+                    certificate: this.certificate,
+                }
+            ).then(() => this.$nuxt.$loading.finish());
         },
-        methods: {
-            ...mapActions({
-                fetchSettings: 'settings/fetch',
-                saveSettings: 'settings/save',
-                setCertificatePassword: 'settings/certificatePassword',
-            }),
-            async save() {
-                this.$nuxt.$loading.start();
-                await this.saveSettings(
-                    {
-                        randomAlt: this.randomAlt,
-                        quantum: this.quantum,
-                        failedInputValidationAlt400: this.failedInputValidationAlt400,
-                        certificate: this.certificate,
-                    }
-                ).then(() => this.$nuxt.$loading.finish());
-            },
-            selectCertFile() {
-                const el = document.querySelector('input[type="file"]');
-                if (el === null) return;
+        selectCertFile() {
+            const el = document.querySelector('input[type="file"]');
+            if (el === null) return;
 
-                el.onchange = () => {
-                    this.$nuxt.$loading.finish();
-                    this.certificate = null;
-                    this.passwordSet = false;
-                    try {
-                        const file = el.files[0];
-                        const reader = new FileReader();
-                        reader.readAsDataURL(file);
-                        reader.onload = () => {
-                            this.certificate = reader.result
-                                .replace('data:', '')
-                                .replace(/^.+,/, '');
-                            console.log('Certificate: ', this.certificate);
-                        }
-                        reader.onerror = (error) => console.log('Error: ', error);
-                    } catch (e) {
-                        console.error(e);
-                    }
-                };
-                this.$nuxt.$loading.start();
-                el.click();
-            },
-            resetCertFile() {
+            el.onchange = () => {
+                this.$nuxt.$loading.finish();
                 this.certificate = null;
                 this.passwordSet = false;
-            },
-            async setPass() {
-                this.$nuxt.$loading.start();
-                await this.setCertificatePassword(this.password)
-                    .then((result, error) => {
-                        this.$nuxt.$loading.finish();
-                        this.password = '';
-                        this.passwordSet = result;
-                    });
-            },
-        }
+                try {
+                    const file = el.files[0];
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => {
+                        this.certificate = reader.result
+                            .replace('data:', '')
+                            .replace(/^.+,/, '');
+                        console.log('Certificate: ', this.certificate);
+                    }
+                    reader.onerror = (error) => console.log('Error: ', error);
+                } catch (e) {
+                    console.error(e);
+                }
+            };
+            this.$nuxt.$loading.start();
+            el.click();
+        },
+        resetCertFile() {
+            this.certificate = null;
+            this.passwordSet = false;
+        },
+        async setPass() {
+            this.$nuxt.$loading.start();
+            await this.setCertificatePassword(this.password)
+                .then((result, error) => {
+                    this.$nuxt.$loading.finish();
+                    this.password = '';
+                    this.passwordSet = result;
+                });
+        },
     }
+}
 </script>
 <style scoped>
 </style>

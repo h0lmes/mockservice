@@ -71,24 +71,23 @@
 
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">RESPONSE BODY</div>
-            <AutoSizeTextArea v-model="editingData.response"
-                              :min-rows="1"
-                              :max-rows="22"
-                              ref="response"
-            ></AutoSizeTextArea>
+            <AutoSizeTextArea v-model="editingData.response" ref="response"></AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-col w100 mt-1">
             <ToggleSwitch class="mock-col-value" v-model="showRequestBodySchema">SHOW REQUEST BODY SCHEMA</ToggleSwitch>
         </div>
         <div v-show="editing && showRequestBodySchema" class="mock-col w100">
-            <AutoSizeTextArea v-model="editingData.requestBodySchema" :min-rows="1" :max-rows="256" placeholder="REQUEST BODY SCHEMA (JSON)"
+            <AutoSizeTextArea v-model="editingData.requestBodySchema"
+                              :min-rows="1" :max-rows="40"
+                              placeholder="REQUEST BODY SCHEMA (JSON)"
             ></AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-group w100">
             <div v-show="editing" class="mock-col w100">
-                <ToggleSwitch class="mock-col-value" v-model="editingData.triggerRequest">TRIGGER REQUESTS</ToggleSwitch>
+                <ToggleSwitch class="mock-col-value" v-model="editingData.triggerRequest">TRIGGER REQUESTS
+                </ToggleSwitch>
             </div>
             <div v-show="editing && editingData.triggerRequest" class="mock-col w2">
                 <input type="text" class="form-control form-control-sm" v-model="editingData.triggerRequestIds"
@@ -124,83 +123,79 @@ import ToggleSwitch from "../other/ToggleSwitch";
 import AutoSizeTextArea from "../other/AutoSizeTextArea";
 
 export default {
-        name: "Route",
-        components: {AutoSizeTextArea, RouteTester, RouteMethod, ToggleSwitch},
-        data() {
-            return {
-                editing: false,
-                editingData: {},
-                testing: false,
-                showRequestBodySchema: false,
-            }
-        },
-        props: {
-            route: {type: Object},
-        },
-        computed: {
-            open() {
-                return this.editing || this.testing;
-            },
-            hasVariables() {
-                return this.route.variables && this.route.variables.length > 0;
-            },
-        },
-        mounted() {
-            if (this.route._new) {
-                this.edit();
-            }
-        },
-        methods: {
-            ...mapActions({
-                saveRoute: 'routes/save',
-                deleteRoutes: 'routes/delete',
-            }),
-            filter(value) {
-                this.$emit('filter', value);
-            },
-            edit() {
-                this.testing = false;
-                this.editingData = {...this.route};
-                this.showRequestBodySchema = !!this.editingData.requestBodySchema;
-                if (!this.editing) this.editing = true; else this.cancel();
-                if (this.editing) this.$nextTick(() => this.$refs.response.focus());
-            },
-            cancel() {
-                if (!!this.route._new) {
-                    this.deleteRoutes([this.route]);
-                } else {
-                    this.editing = false;
-                    this.editingData = {};
-                }
-            },
-            test() {
-                this.cancel();
-                this.testing = !this.testing;
-            },
-            del() {
-                if (!!this.route._new) {
-                    this.deleteRoutes([this.route]);
-                } else if (confirm('Sure you want to delete?')) {
-                    this.$nuxt.$loading.start();
-                    this.deleteRoutes([this.route]).then(() => this.$nuxt.$loading.finish());
-                }
-            },
-            save() {
-                this.$nuxt.$loading.start();
-                this.saveRoute([this.route, this.editingData]).then(() => {
-                    this.$nuxt.$loading.finish();
-                    this.editing = false;
-                });
-            },
-            saveAsCopy() {
-                this.$nuxt.$loading.start();
-                this.saveRoute([{}, this.editingData]).then(() => {
-                    this.$nuxt.$loading.finish();
-                    this.editing = false;
-                });
-            },
+    name: "Route",
+    components: {AutoSizeTextArea, RouteTester, RouteMethod, ToggleSwitch},
+    data() {
+        return {
+            editing: false,
+            editingData: {},
+            testing: false,
+            showRequestBodySchema: false,
         }
+    },
+    props: {
+        route: {type: Object, default: {}},
+    },
+    computed: {
+        open() {
+            return this.editing || this.testing;
+        },
+        hasVariables() {
+            return this.route.variables && this.route.variables.length > 0;
+        },
+    },
+    mounted() {
+        if (this.route._new) this.edit();
+    },
+    methods: {
+        ...mapActions({
+            filter: 'setApiSearchExpression',
+            saveRoute: 'routes/save',
+            deleteRoutes: 'routes/delete',
+        }),
+        edit() {
+            this.testing = false;
+            this.editingData = {...this.route};
+            this.showRequestBodySchema = !!this.editingData.requestBodySchema;
+            if (!this.editing) this.editing = true; else this.cancel();
+            if (this.editing) this.$nextTick(() => this.$refs.response.focus());
+        },
+        cancel() {
+            if (!!this.route._new) {
+                this.deleteRoutes([this.route]);
+            } else {
+                this.editing = false;
+                this.editingData = {};
+            }
+        },
+        test() {
+            this.cancel();
+            this.testing = !this.testing;
+        },
+        del() {
+            if (!!this.route._new) {
+                this.deleteRoutes([this.route]);
+            } else if (confirm('Sure you want to delete?')) {
+                this.$nuxt.$loading.start();
+                this.deleteRoutes([this.route]).then(() => this.$nuxt.$loading.finish());
+            }
+        },
+        save() {
+            this.$nuxt.$loading.start();
+            this.saveRoute([this.route, this.editingData]).then(() => {
+                this.$nuxt.$loading.finish();
+                this.editing = false;
+            });
+        },
+        saveAsCopy() {
+            this.$nuxt.$loading.start();
+            this.saveRoute([{}, this.editingData]).then(() => {
+                this.$nuxt.$loading.finish();
+                this.editing = false;
+            });
+        },
     }
+}
 </script>
 <style scoped>
 </style>

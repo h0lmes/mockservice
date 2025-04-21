@@ -1,5 +1,6 @@
 package com.mockachu.service;
 
+import com.mockachu.repository.ConfigRepository;
 import com.mockachu.template.MockVariables;
 import com.mockachu.util.IOUtils;
 import org.springframework.lang.Nullable;
@@ -15,6 +16,12 @@ public class ContextServiceImpl implements ContextService {
     private static final int VAR_DELIMITER_LEN = VAR_DELIMITER.length();
 
     private final MockVariables variables = new MockVariables();
+
+    public ContextServiceImpl(ConfigRepository configRepository) {
+        if (configRepository.getSettings() != null) {
+            setFromString(configRepository.getSettings().getInitialContext());
+        }
+    }
 
     @Override
     public void put(String k, String v) {

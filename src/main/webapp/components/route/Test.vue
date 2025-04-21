@@ -35,13 +35,13 @@
             </div>
         </div>
 
-        <div v-show="editing" class="mock-col w100">
-            <div class="mb-2 color-secondary">TEST PLAN</div>
-            <AutoSizeTextArea v-model="editingTest.plan"
+        <div v-show="editing" class="mock-col w100 mt-2">
+            <div class="mb-2 color-secondary">
+                TEST PLAN
+                <button type="button" class="btn btn-sm ml-2" @click="addPlanStep">add step</button>
+            </div>
+            <AutoSizeTextArea v-model="editingTest.plan" ref="data"
                               placeholder="See test plan syntax at the bottom of page"
-                              :min-rows="1"
-                              :max-rows="22"
-                              ref="data"
             ></AutoSizeTextArea>
         </div>
 
@@ -64,86 +64,82 @@ import AutoSizeTextArea from "../other/AutoSizeTextArea";
 import TestRun from "@/components/route/TestRun";
 
 export default {
-        name: "Test",
-        components: {TestRun, AutoSizeTextArea},
-        data() {
-            return {
-                editing: false,
-                editingTest: {},
-                testing: false,
-            }
-        },
-        props: {
-            test: {type: Object},
-        },
-        computed: {
-            open() {
-                return this.editing || this.testing;
-            },
-        },
-        created() {
-            //this.activeSwitch = this.active;
-        },
-        mounted() {
-            if (this.test._new) {
-                this.edit();
-            }
-        },
-        methods: {
-            ...mapActions({
-                saveTest: 'tests/save',
-                deleteTest: 'tests/delete',
-            }),
-            filter(value) {
-                this.$emit('filter', value);
-            },
-            edit() {
-                this.testing = false;
-                this.editingTest = {...this.test};
-                if (!this.editing) this.editing = true; else this.cancel();
-                if (this.editing) this.$nextTick(() => this.$refs.data.focus());
-            },
-            cancel() {
-                if (!!this.test._new) {
-                    this.deleteTest([this.test]);
-                } else {
-                    this.editing = false;
-                    this.editingTest = {};
-                }
-            },
-            del() {
-                if (!!this.test._new) {
-                    this.deleteTest([this.test]);
-                    return;
-                }
-                if (confirm('Sure you want to delete?')) {
-                    this.$nuxt.$loading.start();
-                    this.deleteTest([this.test])
-                        .then(() => this.$nuxt.$loading.finish());
-                }
-            },
-            save() {
-                this.$nuxt.$loading.start();
-                this.saveTest([this.test, this.editingTest])
-                    .then(() => {
-                        this.$nuxt.$loading.finish();
-                        this.editing = false;
-                    });
-            },
-            saveAsCopy() {
-                this.$nuxt.$loading.start();
-                this.saveTest([{}, this.editingTest])
-                    .then(() => {
-                        this.$nuxt.$loading.finish();
-                        this.editing = false;
-                    });
-            },
-            testRun() {
-                this.cancel();
-                this.testing = !this.testing;
-            },
+    name: "Test",
+    components: {TestRun, AutoSizeTextArea},
+    data() {
+        return {
+            editing: false,
+            editingTest: {},
+            testing: false,
         }
+    },
+    props: {
+        test: {type: Object},
+    },
+    computed: {
+        open() {
+            return this.editing || this.testing;
+        },
+    },
+    mounted() {
+        if (this.test._new) this.edit();
+    },
+    methods: {
+        ...mapActions({
+            filter: 'setApiSearchExpression',
+            saveTest: 'tests/save',
+            deleteTest: 'tests/delete',
+        }),
+        edit() {
+            this.testing = false;
+            this.editingTest = {...this.test};
+            if (!this.editing) this.editing = true; else this.cancel();
+            if (this.editing) this.$nextTick(() => this.$refs.data.focus());
+        },
+        cancel() {
+            if (!!this.test._new) {
+                this.deleteTest([this.test]);
+            } else {
+                this.editing = false;
+                this.editingTest = {};
+            }
+        },
+        del() {
+            if (!!this.test._new) {
+                this.deleteTest([this.test]);
+                return;
+            }
+            if (confirm('Sure you want to delete?')) {
+                this.$nuxt.$loading.start();
+                this.deleteTest([this.test])
+                    .then(() => this.$nuxt.$loading.finish());
+            }
+        },
+        save() {
+            this.$nuxt.$loading.start();
+            this.saveTest([this.test, this.editingTest])
+                .then(() => {
+                    this.$nuxt.$loading.finish();
+                    this.editing = false;
+                });
+        },
+        saveAsCopy() {
+            this.$nuxt.$loading.start();
+            this.saveTest([{}, this.editingTest])
+                .then(() => {
+                    this.$nuxt.$loading.finish();
+                    this.editing = false;
+                });
+        },
+        testRun() {
+            this.cancel();
+            this.testing = !this.testing;
+        },
+        addPlanStep() {
+            // TODO
+        },
     }
+}
 </script>
 <style scoped>
 </style>

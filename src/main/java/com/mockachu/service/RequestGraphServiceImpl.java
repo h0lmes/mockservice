@@ -30,7 +30,7 @@ public class RequestGraphServiceImpl implements RequestGraphService {
                     !route.isTriggerRequest() ||
                     route.getTriggerRequestIds().isBlank()) continue;
 
-            String base = route.toString();
+            String base = "Route requested: " + route;
             Set<String> seen = new HashSet<>();
             seen.add(base);
             dfs(builder, base, route.getTriggerRequestIds(), route.getTriggerRequestDelay(), seen);
@@ -69,7 +69,7 @@ public class RequestGraphServiceImpl implements RequestGraphService {
             String delay = "100";
             if (i < delayArray.length && !delayArray[i].isBlank()) delay = delayArray[i].trim();
             String newBase = i == 0 ? base : " ".repeat(base.length());
-            newBase += " -> " + delay + " ms -> " + requestId;
+            newBase += " ---> wait " + delay + " ms ---> Make request: " + requestId;
 
             if (seen.contains(requestId)) {
                 newBase += " CYCLE";

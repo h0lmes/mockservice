@@ -6,6 +6,7 @@ public class Settings {
     private boolean quantum = false;
     private boolean alt400OnFailedRequestValidation = true;
     private String certificate;
+    private String initialContext;
 
     public Settings() {
         /* default */
@@ -44,6 +45,15 @@ public class Settings {
 
     public Settings setCertificate(String certificate) {
         this.certificate = certificate;
+        return this;
+    }
+
+    public String getInitialContext() {
+        return initialContext;
+    }
+
+    public Settings setInitialContext(String initialContext) {
+        this.initialContext = initialContext;
         return this;
     }
 }

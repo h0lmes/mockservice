@@ -1,5 +1,5 @@
 <template>
-    <textarea class="form-control form-control-sm v-resize monospace"
+    <textarea class="form-control form-control-sm no-resize monospace"
               ref="textArea"
               :value="value"
               :placeholder="placeholder"
@@ -18,7 +18,7 @@
         props: {
             value: {type: String},
             placeholder: {type: String},
-            minRows: {type: Number, default: 2},
+            minRows: {type: Number, default: 1},
             maxRows: {type: Number, default: 20},
         },
         computed: {

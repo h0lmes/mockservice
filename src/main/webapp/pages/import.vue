@@ -23,90 +23,90 @@ import ToggleSwitch from "../components/other/ToggleSwitch";
 import ImportedRoutes from "../components/other/ImportedRoutes";
 
 export default {
-        name: "import",
-        components: {Loading, ToggleSwitch, ImportedRoutes},
-        data() {
-            return {
-                value: '',
-                overwrite: false,
-                no400500: false,
-                fileName: ''
-            }
+    name: "import",
+    components: {Loading, ToggleSwitch, ImportedRoutes},
+    data() {
+        return {
+            value: '',
+            overwrite: false,
+            no400500: false,
+            fileName: ''
+        }
+    },
+    computed: {
+        importedRoutes() {
+            if (this.no400500) return this.$store.state.import.routes.filter(r => !r.alt || +r.alt < 400);
+            return this.$store.state.import.routes;
         },
-        computed: {
-            importedRoutes() {
-                if (this.no400500) return this.$store.state.import.routes.filter(r => !r.alt || +r.alt < 400);
-                return this.$store.state.import.routes;
-            },
-            existingRoutes() {
-                return this.$store.state.routes.routes;
-            },
+        existingRoutes() {
+            return this.$store.state.routes.routes;
         },
-        async fetch() {
-            if (!this.value) {
-                return Promise.resolve();
-            }
-            return this.import(this.value);
+    },
+    async fetch() {
+        if (!this.value) {
+            return Promise.resolve();
+        }
+        return this.import(this.value);
+    },
+    fetchDelay: 0,
+    methods: {
+        ...mapActions({
+            import: 'import/import',
+            fetchRoutes: 'routes/fetch',
+            saveAllRoutes: 'routes/saveAll',
+        }),
+        add(route) {
+            this.$nuxt.$loading.start();
+            this.saveAllRoutes({
+                routes: [route],
+                overwrite: true
+            })
+                .then(() => this.$nuxt.$loading.finish());
         },
-        fetchDelay: 0,
-        methods: {
-            ...mapActions({
-                import: 'import/import',
-                fetchRoutes: 'routes/fetch',
-                saveAllRoutes: 'routes/saveAll',
-            }),
-            add(route) {
+        addAll() {
+            if (this.importedRoutes) {
                 this.$nuxt.$loading.start();
                 this.saveAllRoutes({
-                    routes: [route],
-                    overwrite: true
+                    routes: this.importedRoutes,
+                    overwrite: this.overwrite
                 })
                     .then(() => this.$nuxt.$loading.finish());
-            },
-            addAll() {
-                if (this.importedRoutes) {
-                    this.$nuxt.$loading.start();
-                    this.saveAllRoutes({
-                        routes: this.importedRoutes,
-                        overwrite: this.overwrite
-                    })
-                        .then(() => this.$nuxt.$loading.finish());
+            }
+        },
+        selectFile() {
+            this.fileName = 'Loading...';
+            this.$nuxt.$loading.start();
+            this.$nextTick();
+            this.$refs.file.value = null;
+            this.$refs.file.click()
+        },
+        openFile() {
+            const files = this.$refs.file.files;
+            if (files && files[0]) {
+                const reader = new FileReader();
+                reader.readAsText(files[0], "UTF-8");
+                reader.onload = (e) => {
+                    this.$nuxt.$loading.finish();
+                    this.value = e.target.result;
+                    this.$fetch();
+                    this.fileName = files[0].name;
+                };
+                reader.onerror = () => {
+                    this.$nuxt.$loading.finish();
+                    this.fileName = '[Error]';
                 }
-            },
-            selectFile() {
-                this.fileName = 'Loading...';
-                this.$nuxt.$loading.start();
-                this.$nextTick();
-                this.$refs.file.value = null;
-                this.$refs.file.click()
-            },
-            openFile() {
-                const files = this.$refs.file.files;
-                if (files && files[0]) {
-                    const reader = new FileReader();
-                    reader.readAsText(files[0], "UTF-8");
-                    reader.onload = (e) => {
-                        this.$nuxt.$loading.finish();
-                        this.value = e.target.result;
-                        this.$fetch();
-                        this.fileName = files[0].name;
-                    };
-                    reader.onerror = () => {
-                        this.$nuxt.$loading.finish();
-                        this.fileName = '[Error]';
-                    }
-                }
-            },
-        }
+            }
+        },
     }
+}
 </script>
 <style scoped>
-    input[type=file] {
-        width: 0.1px;
-        height: 0.1px;
-        opacity: 0;
-        overflow: hidden;
-        position: absolute;
-        z-index: -1;
-    }
+input[type=file] {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
 </style>

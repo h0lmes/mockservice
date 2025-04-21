@@ -98,7 +98,7 @@
         </div>
 
         <div class="page-wrapper">
-            <div class="page-contents" :class="{'page-narrow': narrow}">
+            <div class="page-contents">
                 <Nuxt/>
             </div>
         </div>

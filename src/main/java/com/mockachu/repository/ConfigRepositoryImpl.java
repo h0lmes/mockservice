@@ -88,9 +88,9 @@ public class ConfigRepositoryImpl implements ConfigRepository {
             throw new IOException("Mapper returned null Config.");
         }
         sortRoutes();
+        sortScenarios();
         sortRequests();
         sortTests();
-        sortScenarios();
     }
 
     private void configFromString(String yaml) throws IOException {
@@ -100,9 +100,9 @@ public class ConfigRepositoryImpl implements ConfigRepository {
                 throw new IOException("Mapper returned null Config.");
             }
             sortRoutes();
+            sortScenarios();
             sortRequests();
             sortTests();
-            sortScenarios();
         } catch (IOException e) {
             throw new IOException("Could not deserialize config. " + e.getMessage(), e);
         }

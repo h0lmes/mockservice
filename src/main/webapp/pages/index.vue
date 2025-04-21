@@ -6,10 +6,10 @@
                        type="text"
                        class="form-control monospace"
                        placeholder="type in or click on values (group, path, etc)"
-                       @keydown.enter.exact.stop="setFilter($event.target.value)"/>
+                       @keydown.enter.exact.stop="filter($event.target.value)"/>
             </div>
-            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="setFilter('')">Clear search</button>
-            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="jsSearch" @toggle="setFilter('')">JS</ToggleSwitch>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="filter('')">Clear search</button>
+            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="jsSearch">JS</ToggleSwitch>
         </div>
 
         <div class="component-toolbar mb-3">
@@ -28,7 +28,7 @@
             <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger mr-3" @click="deleteVisibleRoutes">Delete visible routes</button>
         </div>
 
-        <Routes :entities="filteredEntities" @filter="setFilter($event)"></Routes>
+        <Routes :entities="filteredEntities"></Routes>
 
         <div class="color-secondary mt-6 text-indent">
             <div class="mt-2 bold">Tips</div>
@@ -100,130 +100,141 @@ import ViewSelector from "../components/other/ViewSelector";
 import ToggleSwitch from "../components/other/ToggleSwitch";
 
 export default {
-        name: "index",
-        components: {Routes, Loading, ViewSelector, ToggleSwitch},
-        data() {
-            return {
-                query: '',
-                timeout: null,
-                showRoutes: true,
-                showRequests: true,
-                showScenarios: true,
-                showTests: true,
-                jsSearch: false,
+    name: "index",
+    components: {Routes, Loading, ViewSelector, ToggleSwitch},
+    data() {
+        return {
+            query: '',
+            timeout: null,
+            showRoutes: true,
+            showRequests: true,
+            showScenarios: true,
+            showTests: true,
+            jsSearch: false,
+        }
+    },
+    async fetch() {
+        return this.fetchRoutes()
+            .then(this.fetchRequests())
+            .then(this.fetchScenarios())
+            .then(this.fetchTests());
+    },
+    fetchDelay: 0,
+    computed: {
+        searchExpression() {
+            return (this.$store.state.apiSearchExpression || '').trim();
+        },
+        routes() {
+            return this.showRoutes ? this.$store.state.routes.routes : [];
+        },
+        requests() {
+            return this.showRequests ? this.$store.state.requests.requests : [];
+        },
+        scenarios() {
+            return this.showScenarios ? this.$store.state.scenarios.scenarios : [];
+        },
+        tests() {
+            return this.showTests ? this.$store.state.tests.tests : [];
+        },
+        entities() {
+            return [...this.routes, ...this.requests, ...this.scenarios, ...this.tests];
+        },
+        filteredEntities() {
+            if (!this.query) return this.entities;
+
+            try {
+                return this.entities.filter(this.getSearchFn());
+            } catch (e) {
+                console.error(e);
+                return [];
             }
         },
-        async fetch() {
-            return this.fetchRoutes()
-                .then(this.fetchRequests())
-                .then(this.fetchScenarios())
-                .then(this.fetchTests());
+    },
+    mounted() {
+        this.$refs.search.value = this.searchExpression;
+        this.query = this.searchExpression;
+    },
+    watch: {
+        searchExpression(newValue) {
+            this.$refs.search.value = newValue;
+            this.query = newValue;
         },
-        fetchDelay: 0,
-        computed: {
-            routes() {
-                return this.showRoutes ? this.$store.state.routes.routes : [];
-            },
-            requests() {
-                return this.showRequests ? this.$store.state.requests.requests : [];
-            },
-            scenarios() {
-                return this.showScenarios ? this.$store.state.scenarios.scenarios : [];
-            },
-            tests() {
-                return this.showTests ? this.$store.state.tests.tests : [];
-            },
-            entities() {
-                return [...this.routes, ...this.requests, ...this.scenarios, ...this.tests];
-            },
-            filteredEntities() {
-                if (!this.query) return this.entities;
+    },
+    methods: {
+        ...mapActions({
+            filter: 'setApiSearchExpression',
 
-                try {
-                    return this.entities.filter(this.getSearchFn());
-                } catch (e) {
-                    console.error(e);
-                    return [];
-                }
-            },
+            fetchRoutes: 'routes/fetch',
+            addRouteAction: 'routes/add',
+            deleteRoutes: 'routes/delete',
+
+            fetchRequests: 'requests/fetch',
+            addRequestAction: 'requests/add',
+
+            fetchScenarios: 'scenarios/fetch',
+            addScenarioAction: 'scenarios/add',
+
+            fetchTests: 'tests/fetch',
+            addTestAction: 'tests/add',
+        }),
+        addRoute() {
+            this.showRoutes = true
+            this.addRouteAction()
         },
-        methods: {
-            ...mapActions({
-                fetchRoutes: 'routes/fetch',
-                addRouteAction: 'routes/add',
-                deleteRoutes: 'routes/delete',
-
-                fetchRequests: 'requests/fetch',
-                addRequestAction: 'requests/add',
-
-                fetchScenarios: 'scenarios/fetch',
-                addScenarioAction: 'scenarios/add',
-
-                fetchTests: 'tests/fetch',
-                addTestAction: 'tests/add',
-            }),
-            addRoute() {
-                this.showRoutes = true
-                this.addRouteAction()
-            },
-            addRequest() {
-                this.showRequests = true
-                this.addRequestAction()
-            },
-            addScenario() {
-                this.showScenarios = true
-                this.addScenarioAction()
-            },
-            addTest() {
-                this.showTests = true
-                this.addTestAction()
-            },
-            async deleteVisibleRoutes() {
-                if (confirm('Are you sure you want to delete all visible routes?\n'
-                    + 'Note: if filter (search) is applied - you only delete those you see on the screen.')) {
-                    this.$nuxt.$loading.start();
-                    await this.deleteRoutes(
-                        this.filteredEntities.filter(e => e.hasOwnProperty('alt'))
-                    ).then(() => this.$nuxt.$loading.finish());
-                }
-            },
-            setFilter(value) {
-                this.$refs.search.value = value.trim();
-                this.query = value.trim();
-            },
-            getSearchFn() {
-                if (this.jsSearch) {
-                    return Function("e", "return " + this.query + ";");
-                } else if (!this.query) {
-                    return (e) => true;
-                } else {
-                    const query = this.query;
-                    return (e) => {
-                        if (e.method && e.path && e.id) {
-                            return e.group.includes(query)
-                                || e.type.includes(query)
-                                || e.method.includes(query)
-                                || e.path.includes(query)
-                                || e.id.includes(query);
-                        } else if (e.method && e.path) {
-                            return e.group.includes(query)
-                                || e.type.includes(query)
-                                || e.method.includes(query)
-                                || e.path.includes(query)
-                                || e.alt.includes(query);
-                        } else if (e.alias && e.plan) {
-                            return e.group.includes(query)
-                                || e.alias.includes(query);
-                        } else {
-                            return e.group.includes(query)
-                                || e.alias.includes(query)
-                                || e.type.includes(query);
-                        }
-                    };
-                }
+        addRequest() {
+            this.showRequests = true
+            this.addRequestAction()
+        },
+        addScenario() {
+            this.showScenarios = true
+            this.addScenarioAction()
+        },
+        addTest() {
+            this.showTests = true
+            this.addTestAction()
+        },
+        async deleteVisibleRoutes() {
+            if (confirm('Are you sure you want to delete all visible routes?\n'
+                + 'Note: if filter (search) is applied - you only delete those you see on the screen.')) {
+                this.$nuxt.$loading.start();
+                await this.deleteRoutes(
+                    this.filteredEntities.filter(e => e.hasOwnProperty('alt'))
+                ).then(() => this.$nuxt.$loading.finish());
+            }
+        },
+        getSearchFn() {
+            if (this.jsSearch) {
+                return Function("e", "return " + this.query + ";");
+            } else if (!this.query) {
+                return e => true;
+            } else {
+                const query = this.query;
+                return e => {
+                    if (e.method && e.path && e.id) {
+                        return e.group.includes(query)
+                            || e.type.includes(query)
+                            || e.method.includes(query)
+                            || e.path.includes(query)
+                            || e.id.includes(query);
+                    } else if (e.method && e.path) {
+                        return e.group.includes(query)
+                            || e.type.includes(query)
+                            || e.method.includes(query)
+                            || e.path.includes(query)
+                            || e.alt.includes(query);
+                    } else if (e.alias && e.plan) {
+                        return e.group.includes(query)
+                            || e.alias.includes(query);
+                    } else {
+                        return e.group.includes(query)
+                            || e.alias.includes(query)
+                            || e.type.includes(query);
+                    }
+                };
             }
         }
     }
+}
 </script>
 <style scoped>
 .text-indent > p {

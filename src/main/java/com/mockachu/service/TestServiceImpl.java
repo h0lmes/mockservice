@@ -168,7 +168,7 @@ public class TestServiceImpl implements TestService {
     private void executeLine(TestRun run) {
         try {
             String line = run.getLine();
-            if (line.trim().isEmpty()) return;
+            if (line.trim().isEmpty() || line.startsWith("//")) return;
 
             if (line.startsWith("GET ") ||
                     line.startsWith("POST ") ||

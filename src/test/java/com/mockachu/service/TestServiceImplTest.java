@@ -37,7 +37,7 @@ class TestServiceImplTest {
     private WebSocketHandler webSocketHandler;
 
     private ContextService getContextService() {
-        return new ContextServiceImpl();
+        return new ContextServiceImpl(configRepository);
     }
 
     private TestService getService(ContextService contextService) {

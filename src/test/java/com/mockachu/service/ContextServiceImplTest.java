@@ -1,8 +1,10 @@
 package com.mockachu.service;
 
+import com.mockachu.repository.ConfigRepository;
 import com.mockachu.template.MockVariables;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,8 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(MockitoExtension.class)
 class ContextServiceImplTest {
 
+    @Mock
+    private ConfigRepository configRepository;
+
     private ContextService getService() {
-        return new ContextServiceImpl();
+        return new ContextServiceImpl(configRepository);
     }
 
     @Test

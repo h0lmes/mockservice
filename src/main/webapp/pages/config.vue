@@ -17,79 +17,79 @@ import Loading from "../components/other/Loading";
 import AutoSizeTextArea from "../components/other/AutoSizeTextArea";
 
 export default {
-        name: "config",
-        components: {AutoSizeTextArea, Loading},
-        data() {
-            return {
-                config: '',
-                maxRows: 30,
+    name: "config",
+    components: {AutoSizeTextArea, Loading},
+    data() {
+        return {
+            config: '',
+            maxRows: 30,
+        }
+    },
+    async fetch() {
+        return this.fetchConfig()
+            .then(response => {
+                this.config = response;
+                this.$nextTick(() => this.calcMaxRows());
+            });
+    },
+    fetchDelay: 0,
+    methods: {
+        ...mapActions({
+            fetchConfig: 'config/fetch',
+            saveConfig: 'config/save',
+            backupConfig: 'config/backup',
+            restoreConfig: 'config/restore'
+        }),
+        calcMaxRows() {
+            const ma = document.querySelector('textarea.main').getBoundingClientRect();
+            const ha = document.querySelector('textarea.helper').getBoundingClientRect();
+            const lineHeight = (ma.height - ha.height) / (this.maxRows - 1);
+            this.maxRows += (window.innerHeight - ma.bottom) / lineHeight - 2;
+        },
+        async save() {
+            if (confirm('Ye be warned =)')) {
+                this.$nuxt.$loading.start();
+                this.saveConfig(this.config)
+                    .then(() => this.$nuxt.$loading.finish());
             }
         },
-        async fetch() {
-            return this.fetchConfig()
-                .then(response => {
-                    this.config = response;
-                    this.$nextTick(() => this.calcMaxRows());
-                });
+        async backup() {
+            this.$nuxt.$loading.start();
+            this.backupConfig()
+                .then(() => this.$nuxt.$loading.finish());
         },
-        fetchDelay: 0,
-        methods: {
-            ...mapActions({
-                fetchConfig: 'config/fetch',
-                saveConfig: 'config/save',
-                backupConfig: 'config/backup',
-                restoreConfig: 'config/restore'
-            }),
-            calcMaxRows() {
-                const ma = document.querySelector('textarea.main').getBoundingClientRect();
-                const ha = document.querySelector('textarea.helper').getBoundingClientRect();
-                const lineHeight = (ma.height - ha.height) / (this.maxRows - 1);
-                this.maxRows += (window.innerHeight - ma.bottom) / lineHeight - 2;
-            },
-            async save() {
-                if (confirm('Ye be warned =)')) {
-                    this.$nuxt.$loading.start();
-                    this.saveConfig(this.config)
-                        .then(() => this.$nuxt.$loading.finish());
-                }
-            },
-            async backup() {
+        async restore() {
+            if (confirm('Confirm restore ?')) {
                 this.$nuxt.$loading.start();
-                this.backupConfig()
-                    .then(() => this.$nuxt.$loading.finish());
-            },
-            async restore() {
-                if (confirm('Confirm restore ?')) {
-                    this.$nuxt.$loading.start();
-                    this.restoreConfig()
-                        .then(() => {
-                            this.$nuxt.$loading.finish();
-                            this.$fetch();
-                        });
-                }
-            },
-            download() {
-                this.saveTextAsFile(this.config, 'config.yml')
-            },
-            saveTextAsFile(text, fileName) {
-                let blob = new Blob([text], {type: 'text/plain'});
-                let link = document.createElement("a");
-                link.download = fileName;
-                link.innerHTML = "Download File";
-                link.href = URL.createObjectURL(blob);
-                link.style.display = "none";
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-            },
-        }
+                this.restoreConfig()
+                    .then(() => {
+                        this.$nuxt.$loading.finish();
+                        this.$fetch();
+                    });
+            }
+        },
+        download() {
+            this.saveTextAsFile(this.config, 'config.yml')
+        },
+        saveTextAsFile(text, fileName) {
+            let blob = new Blob([text], {type: 'text/plain'});
+            let link = document.createElement("a");
+            link.download = fileName;
+            link.innerHTML = "Download File";
+            link.href = URL.createObjectURL(blob);
+            link.style.display = "none";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        },
     }
+}
 </script>
 <style scoped>
-    .invisible {
-        position: absolute;
-        top: -20rem;
-        left: 0;
-        right: 0;
-    }
+.invisible {
+    position: absolute;
+    top: -20rem;
+    left: 0;
+    right: 0;
+}
 </style>

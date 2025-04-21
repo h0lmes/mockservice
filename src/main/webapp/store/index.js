@@ -1,7 +1,7 @@
 export const state = () => ({
     BASE_URL: location.protocol + '//' + location.hostname + ':8081',
     lastError: '',
-    search: ''
+    apiSearchExpression: '',
 });
 
 export const mutations = {
@@ -12,11 +12,11 @@ export const mutations = {
     resetLastError(state) {
         state.lastError = '';
     },
-    setSearch(state, payload) {
-        state.search = payload;
+    setApiSearchExpression(state, payload) {
+        state.apiSearchExpression = payload == null ? '' : ('' + payload).trim();
     },
-    resetSearch(state) {
-        state.search = '';
+    resetApiSearchExpression(state) {
+        state.apiSearchExpression = '';
     },
 };
 
@@ -27,10 +27,10 @@ export const actions = {
     resetLastError({commit}) {
         commit('resetLastError');
     },
-    setSearch({commit}, text) {
-        commit('setSearch', text);
+    setApiSearchExpression({commit}, text) {
+        commit('setApiSearchExpression', text);
     },
-    resetSearch({commit}) {
-        commit('resetSearch');
+    resetApiSearchExpression({commit}) {
+        commit('resetApiSearchExpression');
     },
 };

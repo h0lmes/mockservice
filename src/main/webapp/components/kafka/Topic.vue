@@ -4,13 +4,13 @@
          @click.middle.stop.prevent="edit"
          @keydown.esc.exact="cancel">
 
-        <div class="mock-col w2">
+        <div v-show="!viewing" class="mock-col w2">
             <div class="mock-col-header">GROUP</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(topic.group)">{{ topic.group }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingData.group"/>
         </div>
 
-        <div class="mock-col w3">
+        <div v-show="!viewing" class="mock-col w3">
             <div class="mock-col-header">TOPIC</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(topic.topic)">{{ topic.topic }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm"
@@ -19,18 +19,18 @@
             />
         </div>
 
-        <div class="mock-col w1">
+        <div v-show="!viewing" class="mock-col w1">
             <div class="mock-col-header">PARTITION</div>
             <div v-show="!editing" class="mock-col-value">{{ topic.partition }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingData.partition"/>
         </div>
 
-        <div v-show="!editing" class="mock-col w2">
+        <div v-show="!editing && !viewing" class="mock-col w2">
             <div class="mock-col-header">OFFSETS</div>
             <div class="mock-col-value">{{ topic.producerOffset }}/{{ topic.consumerOffset }}</div>
         </div>
 
-        <div class="mock-col w-fixed-auto">
+        <div v-show="!viewing" class="mock-col w-fixed-auto">
             <div v-show="editing" class="mock-col-header"></div>
             <div class="mock-col-value">
                 <button type="button" class="btn btn-sm btn-default" @click="view">view</button>
@@ -39,18 +39,15 @@
             </div>
         </div>
 
-        <div v-show="editing" class="mock-col w100 mb-2">
-            <div class="color-secondary">
+        <div v-show="editing" class="mock-col w100 mt-2 mb-2">
+            <div class="color-secondary mb-2">
                 INITIAL DATA
-                <div class="btn btn-link" @click="addRecordToInitialData">+add record</div>
+                <button type="button" class="btn btn-sm ml-2" @click="addRecordToInitialData">add record</button>
             </div>
-            <AutoSizeTextArea v-model="editingData.initialData"
-                              :min-rows="1"
-                              :max-rows="20"
-            ></AutoSizeTextArea>
+            <AutoSizeTextArea v-model="editingData.initialData"></AutoSizeTextArea>
         </div>
 
-        <div v-show="viewing" class="mock-col w100 mt-4">
+        <div v-show="viewing" class="mock-col w100">
             <TopicRecordProducer :topic="topic.topic" :partition="topic.partition" @added="recordAdded" />
         </div>
 
@@ -65,6 +62,11 @@
         </div>
         <div v-show="viewing"  class="mock-col w-fixed-auto">
             <Pagination :limit="limit" :offset="offset" :total="total" @page="page" />
+        </div>
+
+        <div v-show="viewing" class="mock-col w100 text-right">
+            <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
+            <button type="button" class="btn btn-sm btn-primary" @click="view">close</button>
         </div>
 
         <div v-show="editing" class="mock-col w-fixed-auto">

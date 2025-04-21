@@ -14,7 +14,14 @@
 }
 
 .modal-border {
-  background: linear-gradient(130deg, #cb7e3b, #342377 52%, #329696 87%);
+  --modal-border-color-1: #cb7e3b;
+  --modal-border-color-2: #4b3b91;
+  --modal-border-color-3: #329696;
+
+  background: linear-gradient(130deg,
+          var(--modal-border-color-1),
+          var(--modal-border-color-2) 52%,
+          var(--modal-border-color-3) 87%);
   position: absolute;
   top: 50%;
   left: 50%;

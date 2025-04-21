@@ -3,6 +3,11 @@ settings:
   quantum: false
   alt400OnFailedRequestValidation: true
   certificate: null
+  initialContext: |-
+    a = 1
+    b = 2
+    c = 3
+    d = 24
 routes:
 - group: entity
   type: REST

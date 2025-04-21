@@ -42,11 +42,8 @@
 
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">LIST OF ROUTES</div>
-            <AutoSizeTextArea v-model="editingScenario.data"
+            <AutoSizeTextArea v-model="editingScenario.data" ref="data"
                               placeholder="click SHOW ROUTES to add routes; or just type them in as METHOD;PATH;ALT"
-                              :min-rows="1"
-                              :max-rows="22"
-                              ref="data"
             ></AutoSizeTextArea>
         </div>
 
@@ -72,117 +69,115 @@ import ToggleSwitch from "../other/ToggleSwitch";
 import AutoSizeTextArea from "../other/AutoSizeTextArea";
 
 export default {
-        name: "Scenario",
-        components: {AutoSizeTextArea, RoutesToAdd, ToggleSwitch},
-        data() {
-            return {
-                editing: false,
-                editingScenario: {},
-                activeSwitch: false,
-                showRoutes: false,
-            }
-        },
-        props: {
-            scenario: {type: Object},
-        },
-        computed: {
-            routes() {
-                return this.$store.state.routes.routes;
-            },
-            open() {
-                return this.editing || this.testing;
-            },
-            active() {
-                return this.scenario.active;
-            }
-        },
-        created() {
-            this.activeSwitch = this.active;
-        },
-        mounted() {
-            if (this.scenario._new) {
-                this.edit();
-            }
-        },
-        methods: {
-            ...mapActions({
-                saveScenario: 'scenarios/save',
-                deleteScenario: 'scenarios/delete',
-                activateScenario: 'scenarios/activate',
-                deactivateScenario: 'scenarios/deactivate',
-                fetchRoutes: 'routes/fetch',
-            }),
-            filter(value) {
-                this.$emit('filter', value);
-            },
-            activeToggled() {
-                if (this.activeSwitch) this.activate(); else this.deactivate();
-            },
-            activate() {
-                this.$nuxt.$loading.start();
-                this.activateScenario(this.scenario.alias)
-                    .then(() => {
-                        this.$nuxt.$loading.finish();
-                        this.activeSwitch = this.active;
-                    });
-            },
-            deactivate() {
-                this.$nuxt.$loading.start();
-                this.deactivateScenario(this.scenario.alias)
-                    .then(() => {
-                        this.$nuxt.$loading.finish();
-                        this.activeSwitch = this.active;
-                    });
-            },
-            edit() {
-                this.editingScenario = {...this.scenario};
-                if (!this.editing) this.editing = true; else this.cancel();
-                if (this.editing) this.$nextTick(() => this.$refs.data.focus());
-            },
-            cancel() {
-                if (!!this.scenario._new) {
-                    this.deleteScenario(this.scenario);
-                } else {
-                    this.editing = false;
-                    this.editingScenario = {};
-                }
-            },
-            del() {
-                if (!!this.scenario._new) {
-                    this.deleteScenario(this.scenario);
-                    return;
-                }
-                if (confirm('Sure you want to delete?')) {
-                    this.$nuxt.$loading.start();
-                    this.deleteScenario(this.scenario)
-                        .then(() => this.$nuxt.$loading.finish());
-                }
-            },
-            save() {
-                this.$nuxt.$loading.start();
-                this.saveScenario([this.scenario, this.editingScenario])
-                    .then(() => {
-                        this.$nuxt.$loading.finish();
-                        this.editing = false;
-                    });
-            },
-            saveAsCopy() {
-                this.$nuxt.$loading.start();
-                this.editingScenario.id = '';
-                this.saveScenario([{}, this.editingScenario])
-                    .then(() => {
-                        this.$nuxt.$loading.finish();
-                        this.editing = false;
-                    });
-            },
-            add(route) {
-                this.editingScenario.data = this.editingScenario.data || '';
-                if (!!this.editingScenario.data) this.editingScenario.data += '\n';
-                this.editingScenario.data += route.method + ';' + route.path + ';' + route.alt;
-                this.$refs.data.focus();
-            },
+    name: "Scenario",
+    components: {AutoSizeTextArea, RoutesToAdd, ToggleSwitch},
+    data() {
+        return {
+            editing: false,
+            editingScenario: {},
+            activeSwitch: false,
+            showRoutes: false,
         }
+    },
+    props: {
+        scenario: {type: Object},
+    },
+    computed: {
+        routes() {
+            return this.$store.state.routes.routes;
+        },
+        open() {
+            return this.editing || this.testing;
+        },
+        active() {
+            return this.scenario.active;
+        }
+    },
+    created() {
+        this.activeSwitch = this.active;
+    },
+    mounted() {
+        if (this.scenario._new) {
+            this.edit();
+        }
+    },
+    methods: {
+        ...mapActions({
+            filter: 'setApiSearchExpression',
+            saveScenario: 'scenarios/save',
+            deleteScenario: 'scenarios/delete',
+            activateScenario: 'scenarios/activate',
+            deactivateScenario: 'scenarios/deactivate',
+            fetchRoutes: 'routes/fetch',
+        }),
+        activeToggled() {
+            if (this.activeSwitch) this.activate(); else this.deactivate();
+        },
+        activate() {
+            this.$nuxt.$loading.start();
+            this.activateScenario(this.scenario.alias)
+                .then(() => {
+                    this.$nuxt.$loading.finish();
+                    this.activeSwitch = this.active;
+                });
+        },
+        deactivate() {
+            this.$nuxt.$loading.start();
+            this.deactivateScenario(this.scenario.alias)
+                .then(() => {
+                    this.$nuxt.$loading.finish();
+                    this.activeSwitch = this.active;
+                });
+        },
+        edit() {
+            this.editingScenario = {...this.scenario};
+            if (!this.editing) this.editing = true; else this.cancel();
+            if (this.editing) this.$nextTick(() => this.$refs.data.focus());
+        },
+        cancel() {
+            if (!!this.scenario._new) {
+                this.deleteScenario(this.scenario);
+            } else {
+                this.editing = false;
+                this.editingScenario = {};
+            }
+        },
+        del() {
+            if (!!this.scenario._new) {
+                this.deleteScenario(this.scenario);
+                return;
+            }
+            if (confirm('Sure you want to delete?')) {
+                this.$nuxt.$loading.start();
+                this.deleteScenario(this.scenario)
+                    .then(() => this.$nuxt.$loading.finish());
+            }
+        },
+        save() {
+            this.$nuxt.$loading.start();
+            this.saveScenario([this.scenario, this.editingScenario])
+                .then(() => {
+                    this.$nuxt.$loading.finish();
+                    this.editing = false;
+                });
+        },
+        saveAsCopy() {
+            this.$nuxt.$loading.start();
+            this.editingScenario.id = '';
+            this.saveScenario([{}, this.editingScenario])
+                .then(() => {
+                    this.$nuxt.$loading.finish();
+                    this.editing = false;
+                });
+        },
+        add(route) {
+            this.editingScenario.data = this.editingScenario.data || '';
+            if (!!this.editingScenario.data) this.editingScenario.data += '\n';
+            this.editingScenario.data += route.method + ';' + route.path + ';' + route.alt;
+            this.$refs.data.focus();
+        },
     }
+}
 </script>
 <style scoped>
 </style>
