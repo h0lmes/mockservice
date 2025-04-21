@@ -2,10 +2,9 @@ package com.mockachu.template;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class StringTemplateTest {
+class StringTemplateTest {
 
     private static final String LINE_BREAK = System.lineSeparator();
     private static final String STR_1 = "one";
@@ -48,7 +47,17 @@ public class StringTemplateTest {
     }
 
     @Test
-    public void add_TwoLinesOfText_LinesSeparatedByALineBreak() {
+    void addTwoLinesOfText_toString_LinesSeparatedByALineBreak() {
+        StringTemplate template = new StringTemplate();
+        template.add(STR_1);
+        template.add(templateVariable("name"));
+        String result = template.toString();
+
+        assertTrue(result.contains(LINE_BREAK));
+    }
+
+    @Test
+    void addTwoLinesOfText_toStringWithVars_LinesSeparatedByALineBreak() {
         StringTemplate template = new StringTemplate();
         template.add(STR_1);
         template.add(STR_2);
@@ -58,7 +67,7 @@ public class StringTemplateTest {
     }
 
     @Test
-    public void toString_Variable_VariableReplacedWithValue() {
+    void toString_Variable_VariableReplacedWithValue() {
         StringTemplate template = new StringTemplate();
         template.add(templateVariable(STR_1));
         String result = template.toString(variablesOf(STR_1, STR_2), functionsEmpty());
@@ -67,7 +76,7 @@ public class StringTemplateTest {
     }
 
     @Test
-    public void toString_VariableWhichValueIsAnotherVariable_VariableReplacedWithValue() {
+    void toString_VariableWhichValueIsAnotherVariable_VariableReplacedWithValue() {
         StringTemplate template = new StringTemplate();
         template.add(templateVariable(STR_1));
         MockVariables variables = variablesWithInner(STR_1, STR_2, STR_3);
@@ -77,7 +86,7 @@ public class StringTemplateTest {
     }
 
     @Test
-    public void toString_VariableWhichDefaultValueIsAnotherVariable_VariableReplacedWithValue() {
+    void toString_VariableWhichDefaultValueIsAnotherVariable_VariableReplacedWithValue() {
         StringTemplate template = new StringTemplate();
         template.add(templateVariable(STR_1, templateVariable(STR_2)));
         MockVariables variables = variablesOf(STR_2, STR_3);
@@ -87,7 +96,7 @@ public class StringTemplateTest {
     }
 
     @Test
-    public void toString_VariableValueIsNull_VariableReplacedWithNullString() {
+    void toString_VariableValueIsNull_VariableReplacedWithNullString() {
         StringTemplate template = new StringTemplate();
         template.add(templateVariable(STR_1));
         String result = template.toString(variablesOf(STR_1, null), functionsEmpty());
@@ -96,7 +105,7 @@ public class StringTemplateTest {
     }
 
     @Test
-    public void toString_Function_FunctionReplacedWithValue() {
+    void toString_Function_FunctionReplacedWithValue() {
         StringTemplate template = new StringTemplate();
         template.add(templateVariable(STR_1));
         String result = template.toString(variablesEmpty(), function(STR_1, STR_2));
@@ -105,11 +114,27 @@ public class StringTemplateTest {
     }
 
     @Test
-    public void toString_NoVariablesOrFunctions_ReturnsVariableAsIs() {
+    void toString_NoVariablesOrFunctions_ReturnsVariableAsIs() {
         StringTemplate template = new StringTemplate();
         template.add(templateVariable(STR_1));
         String result = template.toString(variablesEmpty(), functionsEmpty());
 
         assertEquals(templateVariable(STR_1), result);
+    }
+
+    @Test
+    void toString_emptyTemplate_ReturnsEmptyString() {
+        StringTemplate template = new StringTemplate();
+        String result = template.toString();
+        assertNotNull(result);
+        assertTrue(result.isBlank());
+    }
+
+    @Test
+    void toStringWithVars_emptyTemplate_ReturnsEmptyString() {
+        StringTemplate template = new StringTemplate();
+        String result = template.toString(variablesEmpty(), functionsEmpty());
+        assertNotNull(result);
+        assertTrue(result.isBlank());
     }
 }

@@ -30,10 +30,6 @@ public class Route implements Comparable<Route> {
         setMethod(RequestMethod.valueOf(method)).setPath(path).setAlt(alt);
     }
 
-    public Route(RequestMethod method, String path, String alt) {
-        setMethod(method).setPath(path).setAlt(alt);
-    }
-
     public Route(Route route) {
         assignFrom(route);
     }

@@ -1,5 +1,5 @@
 export const state = () => ({
-    topics: []
+    topics: [],
 });
 
 export const mutations = {
@@ -62,6 +62,7 @@ export const actions = {
             group: '',
             topic: 'new topic',
             partition: 0,
+            initialData: '',
             _new: true,
         };
         commit('add', topic);
@@ -74,6 +75,39 @@ export const actions = {
             return await res.json();
         } catch (err) {
             commit('setLastError', err, {root: true});
+        }
+    },
+    async produce({commit, rootState}, data) {
+        try {
+            const url = rootState.BASE_URL + '/__kafka__/producer';
+            const params = {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            };
+            const res = await fetch(url, params);
+            await handleError(res);
+            await res.text();
+        } catch (err) {
+            commit('setLastError', err, {root: true});
+        }
+    },
+    async appendItem({commit, rootState}, {text, topic, partition}) {
+        try {
+            const queryParams = {topic: topic, partition: partition};
+            const url = rootState.BASE_URL + '/__kafka__/append-item?' + new URLSearchParams(queryParams).toString();
+            const params = {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: text
+            };
+            const res = await fetch(url, params);
+            await handleError(res);
+            const data = await res.json();
+            return JSON.stringify(data, null, 4);
+        } catch (err) {
+            commit('setLastError', err, {root: true});
+            return text;
         }
     },
 };

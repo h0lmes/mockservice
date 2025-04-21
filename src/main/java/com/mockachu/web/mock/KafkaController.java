@@ -1,5 +1,8 @@
 package com.mockachu.web.mock;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockachu.kafka.KafkaRecord;
 import com.mockachu.kafka.MockachuKafkaConsumerRequest;
 import com.mockachu.kafka.MockachuKafkaProducerRequest;
@@ -10,12 +13,15 @@ import com.mockachu.service.KafkaService;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -25,9 +31,12 @@ public class KafkaController {
     private static final Logger log = LoggerFactory.getLogger(KafkaController.class);
 
     private final KafkaService kafkaService;
+    private final ObjectMapper objectMapper;
 
-    public KafkaController(KafkaService kafkaService) {
+    public KafkaController(KafkaService kafkaService,
+                           @Qualifier("jsonMapper") ObjectMapper objectMapper) {
         this.kafkaService = kafkaService;
+        this.objectMapper = objectMapper;
     }
 
     @ApiOperation(value = "Get all", tags = "kafka")
@@ -88,6 +97,30 @@ public class KafkaController {
     @PostMapping(value = "/consumer", produces = MediaType.APPLICATION_JSON_VALUE)
     public CompletableFuture<List<KafkaRecord>> consumer(@RequestBody List<MockachuKafkaConsumerRequest> body) {
         return CompletableFuture.supplyAsync(() -> kafkaService.consume(body));
+    }
+
+    @ApiOperation(value = "Inbound message format example", tags = "kafka")
+    @PostMapping(value = "/append-item", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<MockachuKafkaProducerRequest> appendItem(
+            @RequestBody(required = false) String appendTo,
+            @RequestParam(required = false) String topic,
+            @RequestParam(required = false) String partition) throws JsonProcessingException {
+        List<MockachuKafkaProducerRequest> list = readList(appendTo);
+
+        if (topic == null || topic.isBlank()) topic = "topic";
+
+        if (partition == null || partition.isBlank()) partition = "0";
+        int partitionValue = Integer.parseInt(partition);
+
+        list.add(new MockachuKafkaProducerRequest(
+                topic, partitionValue, null, "key", "value", Map.of("key", "value")));
+
+        return list;
+    }
+
+    private List<MockachuKafkaProducerRequest> readList(String value) throws JsonProcessingException {
+        if (value == null || value.isBlank()) return new ArrayList<>();
+        return objectMapper.readValue(value, new TypeReference<>() {});
     }
 
     @ExceptionHandler(produces = MediaType.APPLICATION_JSON_VALUE)

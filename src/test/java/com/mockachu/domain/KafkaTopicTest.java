@@ -53,8 +53,8 @@ class KafkaTopicTest {
 
     @Test
     void hashCode_EqualsForEqualObjects() {
-        var entity1 = new KafkaTopic().setGroup("AAA").setTopic("AAA").setPartition(0);
-        var entity2 = new KafkaTopic().setGroup("AAA").setTopic("AAA").setPartition(0);
+        var entity1 = new KafkaTopic().setGroup("AAA").setTopic("AAA").setPartition(0).setInitialData("AAA");
+        var entity2 = new KafkaTopic().setGroup("AAA").setTopic("AAA").setPartition(0).setInitialData("BBB");
         assertEquals(entity1.hashCode(), entity2.hashCode());
     }
 

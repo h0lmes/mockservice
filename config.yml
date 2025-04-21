@@ -340,9 +340,39 @@ kafkaTopics:
 - group: space
   topic: space
   partition: 0
+  initialData: |-
+    [
+        {
+            "topic": "space",
+            "partition": 0,
+            "value": "Sputnik"
+        },
+        {
+            "topic": "space",
+            "partition": 0,
+            "value": "Iridium 66"
+        },
+        {
+            "topic": "space",
+            "partition": 0,
+            "value": "Juno"
+        },
+        {
+            "topic": "space",
+            "partition": 0,
+            "value": "Gaia"
+        },
+        {
+            "topic": "space",
+            "partition": 0,
+            "value": "JWST"
+        }
+    ]
 - group: test
   topic: test
   partition: 0
+  initialData: ""
 - group: test
   topic: test
   partition: 1
+  initialData: ""

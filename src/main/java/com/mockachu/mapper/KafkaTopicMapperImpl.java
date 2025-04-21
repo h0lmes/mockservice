@@ -10,11 +10,12 @@ import java.util.List;
 public class KafkaTopicMapperImpl implements KafkaTopicMapper {
 
     @Override
-    public KafkaTopicDto toDto(KafkaTopic route) {
+    public KafkaTopicDto toDto(KafkaTopic entity) {
         return new KafkaTopicDto()
-                .setGroup(route.getGroup())
-                .setTopic(route.getTopic())
-                .setPartition(route.getPartition())
+                .setGroup(entity.getGroup())
+                .setTopic(entity.getTopic())
+                .setPartition(entity.getPartition())
+                .setInitialData(entity.getInitialData())
                 .setPersistent(true);
     }
 
@@ -23,7 +24,8 @@ public class KafkaTopicMapperImpl implements KafkaTopicMapper {
         return new KafkaTopic()
                 .setGroup(dto.getGroup())
                 .setTopic(dto.getTopic())
-                .setPartition(dto.getPartition());
+                .setPartition(dto.getPartition())
+                .setInitialData(dto.getInitialData());
     }
 
     @Override

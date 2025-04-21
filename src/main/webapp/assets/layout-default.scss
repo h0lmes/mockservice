@@ -46,6 +46,11 @@
 
 .page-contents {
   padding: 1.8rem 3rem;
+
+  .page-narrow & {
+    max-width: 80rem;
+    margin: 0 auto;
+  }
 }
 
 @media screen and (max-width: 1079px) {

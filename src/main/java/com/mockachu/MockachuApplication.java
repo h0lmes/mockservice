@@ -40,7 +40,7 @@ public class MockachuApplication {
         String msg = String.format("%s is running at: http://localhost:%s%s and http://%s:%s%s (dev mode UI http://localhost:3000%s)",
                 appName, serverPort, contextPath, hostAddress, serverPort, contextPath, contextPath);
         String line = repeat('-', msg.length());
-        log.info("\n{}\n{}\n{}", line, msg, line);
+        log.info("-->\n{}\n{}\n{}", line, msg, line);
     }
 
     private static String repeat(char ch, int count) {

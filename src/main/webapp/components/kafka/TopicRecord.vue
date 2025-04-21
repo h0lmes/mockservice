@@ -1,33 +1,46 @@
 <template>
     <div class="topic-record-row">
-        <div class="topic-record-col">{{entity.offset}}</div>
-        <div class="topic-record-col">{{entity.timestamp}}</div>
-        <div class="topic-record-col w2">{{entity.key}}</div>
-        <div class="topic-record-col w5">{{entity.value}}</div>
+        <div class="topic-record-col">{{ entity.offset }}</div>
+        <div :class="{'topic-record-separator': true, 'show' : separators}" aria-hidden="true" role="presentation"></div>
+
+        <div v-show="showTimestamp" class="topic-record-col">{{ entity.timestamp }}</div>
+        <div v-show="showTimestamp" :class="{'topic-record-separator': true, 'show' : separators}" aria-hidden="true" role="presentation"></div>
+
+        <div class="topic-record-col w2">{{ prettyKey }}</div>
+        <div :class="{'topic-record-separator': true, 'show' : separators}" aria-hidden="true" role="presentation"></div>
+
+        <div class="topic-record-col w5">{{ prettyValue }}</div>
+        <div v-show="showHeaders" :class="{'topic-record-separator': true, 'show' : separators}" aria-hidden="true" role="presentation"></div>
+
+        <div v-show="showHeaders" class="topic-record-col w4">{{ entity.headers }}</div>
     </div>
 </template>
 <script>
 export default {
-        name: "TopicRecord",
-        data() {
-            return {}
+    name: "TopicRecord",
+    data() {
+        return {}
+    },
+    props: {
+        entity: {type: Object},
+        separators: {type: Boolean, default: false},
+        showTimestamp: {type: Boolean, default: false},
+        showHeaders: {type: Boolean, default: false},
+    },
+    computed: {
+        prettyKey() {
+            return this.entity.key == null ? 'null' : this.entity.key;
         },
-        props: {
-            entity: {type: Object},
+        prettyValue() {
+            return this.entity.value == null ? 'null' : this.entity.value;
         },
-        computed: {
-            open() {
-                return true;
-            },
-        },
-        methods: {
-        }
-    }
+    },
+}
 </script>
 <style scoped lang="scss">
 .topic-record-row {
     display: flex;
-    gap: 0.5rem 1rem;
+    gap: 0.5rem 0.5rem;
     flex-wrap: wrap;
     justify-content: center;
     align-content: center;
@@ -44,11 +57,26 @@ export default {
     text-align: center;
 
     &.w2 {
-        flex: 3 1 0;
+        flex: 2 1 0;
+    }
+
+    &.w4 {
+        flex: 4 1 0;
     }
 
     &.w5 {
         flex: 5 1 0;
+    }
+}
+.topic-record-separator {
+    flex: 0 0 auto;
+    border: none;
+    border-left: 1px solid transparent;
+    width: 1px;
+    height: 1rem;
+
+    &.show {
+        border-left-color: var(--form-control-border);
     }
 }
 </style>

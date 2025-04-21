@@ -1,5 +1,8 @@
 package com.mockachu.kafka;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record MockachuKafkaConsumerRequest(long duration,
                                            String topic,
                                            int partition,

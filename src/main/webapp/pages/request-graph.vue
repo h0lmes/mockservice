@@ -24,9 +24,11 @@ export default {
     },
     fetchDelay: 0,
     computed: {
+        valueRaw() {
+            return this.value || '';
+        },
         valueProcessed() {
-            return this.value
-                .replaceAll('CYCLE', '<span class="red">CYCLE</span>');
+            return this.valueRaw.replaceAll('CYCLE', '<span class="red">CYCLE</span>');
         },
     },
     methods: {

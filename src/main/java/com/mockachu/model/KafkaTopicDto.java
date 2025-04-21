@@ -5,6 +5,7 @@ public class KafkaTopicDto {
     private String group = "";
     private String topic = "";
     private int partition;
+    private String initialData = "";
     private boolean persistent = false;
 
     private long producerOffset;
@@ -38,6 +39,15 @@ public class KafkaTopicDto {
 
     public KafkaTopicDto setPartition(int partition) {
         this.partition = partition;
+        return this;
+    }
+
+    public String getInitialData() {
+        return initialData;
+    }
+
+    public KafkaTopicDto setInitialData(String initialData) {
+        this.initialData = initialData == null ? "" : initialData;
         return this;
     }
 

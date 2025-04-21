@@ -1,13 +1,19 @@
 <template>
     <div class="topic-records-holder">
-        <TopicRecord class="mb-3" :entity="header"></TopicRecord>
+        <TopicRecord class="mb-3" :entity="header"
+                     :separators="headerSeparators"
+                     :show-timestamp="showTimestamp"
+                     :show-headers="showHeaders"
+        ></TopicRecord>
         <div v-if="entities.length === 0" class="mt-2 text-center">
-            No records yet
+            ...
         </div>
         <TopicRecord class="mt-2"
                      :entity="entity"
                      v-for="(entity, index) in sortedEntities"
-                     :key="entity.offset"/>
+                     :key="entity.offset"
+                     :show-timestamp="showTimestamp"
+                     :show-headers="showHeaders"/>
     </div>
 </template>
 <script>
@@ -18,16 +24,20 @@ export default {
     components: {TopicRecord},
     data() {
         return {
+            headerSeparators: true,
             header: {
                 offset: "OFFSET",
                 timestamp: "TIMESTAMP",
                 key: "KEY",
                 value: "VALUE",
-            }
+                headers: "HEADERS",
+            },
         }
     },
     props: {
         entities: {type: Array},
+        showTimestamp: {type: Boolean, default: false},
+        showHeaders: {type: Boolean, default: false},
     },
     computed: {
         sortedEntities() {
@@ -47,8 +57,7 @@ export default {
 </script>
 <style scoped>
 .topic-records-holder {
-    width: 100%;
-    padding: 1rem;
+    padding: 1rem 1rem 0.75rem;
     border: 1px solid var(--form-control-border);
     border-radius: var(--form-control-border-radius);
 }

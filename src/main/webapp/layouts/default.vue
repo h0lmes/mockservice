@@ -80,6 +80,10 @@
                 <li class="nav-block">
                     <ColorAccentPicker></ColorAccentPicker>
                 </li>
+                <li class="nav-group">PAGE</li>
+                <li class="nav-block">
+                    <WidthSelector></WidthSelector>
+                </li>
                 <li class="nav-block nav-dummy"></li>
             </ul>
 
@@ -94,7 +98,7 @@
         </div>
 
         <div class="page-wrapper">
-            <div class="page-contents">
+            <div class="page-contents" :class="{'page-narrow': narrow}">
                 <Nuxt/>
             </div>
         </div>
@@ -109,9 +113,11 @@ import ColorAccentPicker from "../components/other/ColorAccentPicker";
 import ErrorPanel from "../components/other/ErrorPanel";
 import Loading from "../components/other/Loading";
 import IconKafka from '@/assets/icons/kafka.svg?inline';
+import ToggleSwitch from "@/components/other/ToggleSwitch";
+import WidthSelector from "@/components/other/WidthSelector";
 
 export default {
-        components: {ErrorPanel, Loading, ColorModePicker, ColorAccentPicker, IconKafka},
+        components: {WidthSelector, ToggleSwitch, ErrorPanel, Loading, ColorModePicker, ColorAccentPicker, IconKafka},
         data() {
             return {
                 isOpen: true,

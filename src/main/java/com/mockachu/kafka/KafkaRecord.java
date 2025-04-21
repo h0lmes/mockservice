@@ -1,11 +1,14 @@
 package com.mockachu.kafka;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.Map;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record KafkaRecord(long offset,
                           String topic,
                           int partition,
-                          long timestamp,
+                          Long timestamp,
                           String key,
                           String value,
                           Map<String, String> headers) {

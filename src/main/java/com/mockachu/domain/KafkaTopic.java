@@ -7,6 +7,7 @@ public class KafkaTopic implements Comparable<KafkaTopic> {
     private String group = "";
     private String topic = "";
     private int partition = 0;
+    private String initialData = "";
 
     public KafkaTopic() {
         // default
@@ -39,10 +40,20 @@ public class KafkaTopic implements Comparable<KafkaTopic> {
         return this;
     }
 
+    public String getInitialData() {
+        return initialData;
+    }
+
+    public KafkaTopic setInitialData(String initialData) {
+        this.initialData = initialData == null ? "" : initialData;
+        return this;
+    }
+
     public KafkaTopic assignFrom(KafkaTopic source) {
         setGroup(source.getGroup());
         setTopic(source.getTopic());
         setPartition(source.getPartition());
+        setInitialData(source.getInitialData());
         return this;
     }
 

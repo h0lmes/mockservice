@@ -1,5 +1,7 @@
 package com.mockachu.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mockachu.domain.KafkaTopic;
 import com.mockachu.kafka.*;
 import com.mockachu.mapper.KafkaTopicMapper;
@@ -23,10 +25,14 @@ public class KafkaServiceImpl implements KafkaService {
     private final Map<TopicPartition, TopicPartitionData> map = new ConcurrentHashMap<>();
     private final ConfigRepository repository;
     private final KafkaTopicMapper mapper;
+    private final ObjectMapper objectMapper;
 
-    public KafkaServiceImpl(ConfigRepository repository, KafkaTopicMapper mapper) {
+    public KafkaServiceImpl(ConfigRepository repository,
+                            KafkaTopicMapper mapper,
+                            ObjectMapper objectMapper) {
         this.repository = repository;
         this.mapper = mapper;
+        this.objectMapper = objectMapper;
         createAllTopicPartitionData();
     }
 
@@ -35,7 +41,18 @@ public class KafkaServiceImpl implements KafkaService {
     }
 
     private void createTopicPartitionDataIfNotExists(KafkaTopic topic) {
-        map.computeIfAbsent(new TopicPartition(topic.getTopic(), topic.getPartition()), e -> new TopicPartitionData());
+        var tp = new TopicPartition(topic.getTopic(), topic.getPartition());
+        map.computeIfAbsent(tp, e -> new TopicPartitionData());
+
+        if (topic.getInitialData() == null || topic.getInitialData().isBlank()) return;
+        try {
+            List<MockachuKafkaProducerRequest> initialData = objectMapper.readValue(
+                    topic.getInitialData(), new TypeReference<>() {});
+
+            produce(initialData);
+        } catch (Exception e) {
+            log.error("Malformed initial data for topic {}", topic);
+        }
     }
 
     private void deleteTopicPartitionData(KafkaTopic topic) {
@@ -44,12 +61,19 @@ public class KafkaServiceImpl implements KafkaService {
 
     @Override
     public void produce(List<MockachuKafkaProducerRequest> requests) {
-        requests.forEach(req -> {
+        requests.forEach(this::produce);
+    }
+
+    private void produce(MockachuKafkaProducerRequest req) {
+        try {
             var tp = new TopicPartition(req.topic(), req.partition());
             var data = map.computeIfAbsent(tp, e -> new TopicPartitionData());
-            var offset = data.put(req.topic(), req.partition(), req.timestamp(), req.key(), req.value(), req.headers());
-            log.info("produced in {} offset {}", tp, offset);
-        });
+            var offset = data.put(
+                    req.topic(), req.partition(), req.timestamp(), req.key(), req.value(), req.headers());
+            log.info("Produced to {} at offset {}", tp, offset);
+        } catch (Exception e) {
+            log.error("Producer error for {}", req);
+        }
     }
 
     @Override
@@ -71,7 +95,7 @@ public class KafkaServiceImpl implements KafkaService {
                 if (kafkaRecords != null && !kafkaRecords.isEmpty()) {
                     list.addAll(kafkaRecords);
 
-                    log.info("consumed from {} offsets from {} to {}",
+                    log.info("Consumed from {} offsets {} to {}",
                             tp,
                             kafkaRecords.get(0).offset(),
                             kafkaRecords.get(kafkaRecords.size() - 1).offset());

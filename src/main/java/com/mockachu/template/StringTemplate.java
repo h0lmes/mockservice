@@ -84,8 +84,8 @@ public class StringTemplate {
 
     public String toString(@Nullable MockVariables variables,
                            @Nullable MockFunctions functions) {
-        if (!containsTokens()) return this.toString();
         if (strings.isEmpty()) return "";
+        if (!containsTokens()) return this.toString();
 
         StringBuilder builder = new StringBuilder();
         for (String s : strings) {

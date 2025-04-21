@@ -55,7 +55,7 @@
                 - x = some string - set value of variable 'x' in global context (see Context page).
             </p>
             <p class="mt-2">
-                - x = ${item.capacity} - set value of variable 'x' in global context, value comes from variable 'item.capacity' from latest request response (assuming latest response was like <span>{"item": {"capacity": 100}}</span>>) or from global context.
+                - x = ${item.capacity} - set value of variable 'x' in global context, value comes from variable 'item.capacity' from latest request response (assuming latest response was like <span>{"item": {"capacity": 100}}</span>) or from global context.
             </p>
             <p class="mt-2">
                 - GET localhost:8081/products/${id} - execute inline request; variable comes from global context.
