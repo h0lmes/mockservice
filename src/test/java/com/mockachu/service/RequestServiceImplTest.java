@@ -116,4 +116,38 @@ class RequestServiceImplTest {
         assertTrue(result.isPresent());
         assertFalse(result.get().isFailed());
     }
+
+    @Test
+    void scheduleRequest() {
+        var res = Optional.of(new HttpRequestResult(
+                false, RequestMethod.GET, "uri", Map.of(),
+                "{\"test\": \"test\"}", "reqBody",
+                MockVariables.empty(), 200, Instant.now().toEpochMilli()));
+        doAnswer(ans -> res).when(httpService).request(any(), anyString(), anyString(), any());
+
+        var entity = new OutboundRequest()
+                .setId("id")
+                .setMethod(RequestMethod.GET)
+                .setPath("path")
+                .setBody("body")
+                .setHeaders("key: value");
+        when(configRepository.findRequest(anyString())).thenReturn(Optional.of(entity));
+        var service = getService();
+        service.schedule("id", "1000", null);
+
+        verify(httpService, timeout(2000).times(1)).request(any(), any(), any(), any());
+
+        ArgumentCaptor<RequestMethod> argMethod = ArgumentCaptor.forClass(RequestMethod.class);
+        ArgumentCaptor<String> argUri = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> argBody = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Map<String, List<String>>> argHeaders = ArgumentCaptor.forClass(Map.class);
+
+        verify(httpService).request(
+                argMethod.capture(), argUri.capture(), argBody.capture(), argHeaders.capture());
+
+        assertEquals(RequestMethod.GET, argMethod.getValue());
+        assertEquals("path", argUri.getValue());
+        assertEquals("body", argBody.getValue());
+        assertEquals("value", argHeaders.getValue().get("key").get(0));
+    }
 }

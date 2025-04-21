@@ -35,6 +35,8 @@ class TestServiceImplTest {
     private HttpService httpService;
     @Mock
     private WebSocketHandler webSocketHandler;
+    @Mock
+    private ContextService contextService;
 
     private ContextService getContextService() {
         return new ContextServiceImpl(configRepository);
@@ -337,5 +339,92 @@ class TestServiceImplTest {
         assertTrue(service.getTestLog("alias").contains(TestServiceImpl.SUCCESS));
         assertFalse(service.getTestLog("alias").contains(TestServiceImpl.FAILED));
         assertFalse(service.getTestLog("alias").contains(TestServiceImpl.WARNING));
+    }
+
+    //
+    //
+    //
+    // errors ------------------------------------
+    //
+    //
+    //
+
+    @Test
+    void WHEN_requestThrows_THEN_Failed() {
+        var entity = new ApiTest().setAlias("alias").setGroup("group")
+                .setPlan("request.id");
+        when(configRepository.findTest(anyString())).thenReturn(Optional.of(entity));
+        when(requestService.executeRequest(anyString(), any(), anyBoolean()))
+                .thenThrow(RuntimeException.class);
+
+        var contextService = getContextService();
+        var service = getService(contextService);
+        var result = service.execute("alias", false, false);
+
+        System.out.println(service.getTestLog("alias"));
+        assertEquals(TestRunStatus.OK, result);
+        assertTrue(service.getTestLog("alias").contains(TestServiceImpl.FAILED));
+    }
+
+    @Test
+    void WHEN_inlineRequestThrows_THEN_Failed() {
+        var entity = new ApiTest().setAlias("alias").setGroup("group")
+                .setPlan("GET localhost:8080");
+        when(configRepository.findTest(anyString())).thenReturn(Optional.of(entity));
+        when(httpService.request(any(), any(), any(), any()))
+                .thenThrow(RuntimeException.class);
+
+        var contextService = getContextService();
+        var service = getService(contextService);
+        var result = service.execute("alias", false, false);
+
+        System.out.println(service.getTestLog("alias"));
+        assertEquals(TestRunStatus.OK, result);
+        assertTrue(service.getTestLog("alias").contains(TestServiceImpl.FAILED));
+    }
+
+    @Test
+    void WHEN_evaluateVarThrows_THEN_Failed() {
+        var entity = new ApiTest().setAlias("alias").setGroup("group")
+                .setPlan("x = 2");
+        when(configRepository.findTest(anyString())).thenReturn(Optional.of(entity));
+        doThrow(RuntimeException.class).when(contextService).put(any(), any());
+
+        var service = getService(contextService);
+        var result = service.execute("alias", false, false);
+
+        System.out.println(service.getTestLog("alias"));
+        assertEquals(TestRunStatus.OK, result);
+        assertTrue(service.getTestLog("alias").contains(TestServiceImpl.FAILED));
+    }
+
+    @Test
+    void WHEN_executeVarEqualsStrictThrows_THEN_Failed() {
+        var entity = new ApiTest().setAlias("alias").setGroup("group")
+                .setPlan("x === 2");
+        when(configRepository.findTest(anyString())).thenReturn(Optional.of(entity));
+        doThrow(RuntimeException.class).when(contextService).get();
+
+        var service = getService(contextService);
+        var result = service.execute("alias", false, false);
+
+        System.out.println(service.getTestLog("alias"));
+        assertEquals(TestRunStatus.OK, result);
+        assertTrue(service.getTestLog("alias").contains(TestServiceImpl.FAILED));
+    }
+
+    @Test
+    void WHEN_executeVarEqualsThrows_THEN_Failed() {
+        var entity = new ApiTest().setAlias("alias").setGroup("group")
+                .setPlan("x == 2");
+        when(configRepository.findTest(anyString())).thenReturn(Optional.of(entity));
+        doThrow(RuntimeException.class).when(contextService).get();
+
+        var service = getService(contextService);
+        var result = service.execute("alias", false, false);
+
+        System.out.println(service.getTestLog("alias"));
+        assertEquals(TestRunStatus.OK, result);
+        assertTrue(service.getTestLog("alias").contains(TestServiceImpl.FAILED));
     }
 }

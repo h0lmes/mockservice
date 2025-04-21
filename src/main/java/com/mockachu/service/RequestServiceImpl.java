@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class RequestServiceImpl implements RequestService {
     private static final Logger log = LoggerFactory.getLogger(RequestServiceImpl.class);
-    private static final int MAX_LEVEL_FOR_TRIGGERED_REQUEST = 5;
+    public static final int MAX_LEVEL_FOR_TRIGGERED_REQUEST = 5;
 
     private final ConfigRepository configRepository;
     private final OutboundRequestMapper requestMapper;
