@@ -3,7 +3,7 @@
   --nav-color-active: white;
   --nav-color-group: #8e9599;
   --nav-bg: #3a3f45;
-  --nav-bg-active: #40454d;
+  --nav-bg-active: #454b52;
   --nav-bg-border: var(--nav-bg);
 }
 
@@ -11,24 +11,24 @@
   --nav-color: #8c7b6b;
   --nav-color-active: #594f46;
   --nav-color-group: #969188;
-  --nav-bg: var(--bg-component);
-  --nav-bg-active: var(--bg-component-active);
+  --nav-bg: #f5ebd3;
+  --nav-bg-active: #fff6e3;
 }
 
 .dark-mode {
   --nav-color: #6a6d76;
   --nav-color-active: #aeb3bf;
   --nav-color-group: #4c4e54;
-  --nav-bg: var(--bg-component);
-  --nav-bg-active: var(--bg-component-active);
+  --nav-bg: #191d20;
+  --nav-bg-active: #22272b;
 }
 
 .code-mode {
   --nav-color: #dae1ec;
   --nav-color-active: #fff;
   --nav-color-group: #5a7699;
-  --nav-bg: var(--bg-component);
-  --nav-bg-active: var(--bg-component-active);
+  --nav-bg: #2a313b;
+  --nav-bg-active: #343a45;
 }
 
 #page {

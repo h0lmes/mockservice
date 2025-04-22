@@ -2,6 +2,7 @@
     <div>
         <div class="route-tester-buttons">
             <button type="button" class="btn btn-sm btn-primary" @click="test">retry</button>
+            <ButtonEdit @click="$emit('edit')"></ButtonEdit>
             <button type="button" class="btn btn-sm btn-default" @click="$emit('close')">close</button>
         </div>
         <div class="route-tester-result">
@@ -10,8 +11,11 @@
     </div>
 </template>
 <script>
+import ButtonEdit from "@/components/other/ButtonEdit";
+
 export default {
     name: "RouteTester",
+    components: {ButtonEdit},
     data() {
         return {
             testResult: '',
@@ -90,6 +94,6 @@ export default {
 }
 .route-tester-buttons {
     padding: 0.3rem 0 0.7rem;
-    text-align: center;
+    text-align: end;
 }
 </style>

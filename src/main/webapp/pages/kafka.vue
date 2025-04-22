@@ -6,10 +6,10 @@
                        type="text"
                        class="form-control monospace"
                        placeholder="type in or click on values (group or topic)"
-                       @keydown.enter.exact.stop="setFilter($event.target.value)"/>
+                       @keydown.enter.exact.stop="filter($event.target.value)"/>
             </div>
-            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="setFilter('')">Clear search</button>
-            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="jsSearch" @toggle="setFilter('')">JS</ToggleSwitch>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="filter('')">Clear search</button>
+            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="jsSearch">JS</ToggleSwitch>
         </div>
 
         <div class="component-toolbar mb-3">
@@ -17,7 +17,7 @@
             <ViewSelector class="toolbar-item toolbar-item-w-fixed-auto" :storageKey="'CompactView-Kafka'"></ViewSelector>
         </div>
 
-        <Topics :entities="filteredEntities" @filter="setFilter($event)"></Topics>
+        <Topics :entities="filteredEntities"></Topics>
 
         <Loading v-if="$fetchState.pending"></Loading>
     </div>
@@ -44,6 +44,9 @@ export default {
     },
     fetchDelay: 0,
     computed: {
+        searchExpression() {
+            return (this.$store.state.kafkaSearchExpression || '').trim();
+        },
         topics() {
             return this.$store.state.kafka.topics;
         },
@@ -61,17 +64,25 @@ export default {
             }
         },
     },
+    mounted() {
+        this.$refs.search.value = this.searchExpression;
+        this.query = this.searchExpression;
+    },
+    watch: {
+        searchExpression(newValue) {
+            this.$refs.search.value = newValue;
+            this.query = newValue;
+        },
+    },
     methods: {
         ...mapActions({
+            filter: 'setKafkaSearchExpression',
+
             fetchTopics: 'kafka/fetch',
             addTopicAction: 'kafka/add',
         }),
         addTopic() {
             this.addTopicAction()
-        },
-        setFilter(value) {
-            this.$refs.search.value = value.trim();
-            this.query = value.trim();
         },
         getSearchFn() {
             if (this.jsSearch) {

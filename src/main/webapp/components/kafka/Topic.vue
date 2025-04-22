@@ -33,9 +33,9 @@
         <div v-show="!viewing" class="mock-col w-fixed-auto">
             <div v-show="editing" class="mock-col-header"></div>
             <div class="mock-col-value">
-                <button type="button" class="btn btn-sm btn-default" @click="view">view</button>
-                <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
-                <button type="button" class="btn btn-sm btn-danger ml-2" @click="del">delete</button>
+                <ButtonView @click="view"></ButtonView>
+                <ButtonEdit @click="edit"></ButtonEdit>
+                <ButtonDelete @click="del"></ButtonDelete>
             </div>
         </div>
 
@@ -51,7 +51,7 @@
             <TopicRecordProducer :topic="topic.topic" :partition="topic.partition" @added="recordAdded" />
         </div>
 
-        <div v-show="viewing" class="mock-col w100 mt-2">
+        <div v-show="viewing" class="mock-col w100 mt-3">
             <div class="mb-2 color-secondary">RECORDS IN TOPIC</div>
             <TopicRecords :entities="topicRecords"
                           :show-timestamp="showTimestamp"
@@ -64,8 +64,8 @@
             <Pagination :limit="limit" :offset="offset" :total="total" @page="page" />
         </div>
 
-        <div v-show="viewing" class="mock-col w100 text-right">
-            <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
+        <div v-show="viewing" class="mock-col w100 text-right mt-4">
+            <ButtonEdit @click="edit"></ButtonEdit>
             <button type="button" class="btn btn-sm btn-primary" @click="view">close</button>
         </div>
 
@@ -83,10 +83,15 @@ import ToggleSwitch from "../other/ToggleSwitch";
 import AutoSizeTextArea from "../other/AutoSizeTextArea";
 import TopicRecords from "@/components/kafka/TopicRecords";
 import Pagination from "@/components/other/Pagination";
+import ButtonDelete from "@/components/other/ButtonDelete";
+import ButtonEdit from "@/components/other/ButtonEdit";
+import ButtonView from "@/components/other/ButtonView";
 
 export default {
     name: "Topic",
-    components: {TopicRecordProducer, Pagination, TopicRecords, AutoSizeTextArea, ToggleSwitch},
+    components: {
+        ButtonView, ButtonEdit, ButtonDelete,
+        TopicRecordProducer, Pagination, TopicRecords, AutoSizeTextArea, ToggleSwitch},
     data() {
         return {
             editing: false,
@@ -115,6 +120,7 @@ export default {
     },
     methods: {
         ...mapActions({
+            filter: 'setKafkaSearchExpression',
             saveTopic: 'kafka/save',
             deleteTopics: 'kafka/delete',
             getRecords: 'kafka/records',
@@ -123,9 +129,6 @@ export default {
         async page(value) {
             this.offset = value * this.limit;
             if (this.viewing) await this.loadRecords();
-        },
-        filter(value) {
-            this.$emit('filter', value);
         },
         async view() {
             this.cancel();

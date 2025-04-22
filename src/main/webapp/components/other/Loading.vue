@@ -2,16 +2,21 @@
     <div class="modal-backdrop transparent">
         <div class="modal-border">
             <div class="modal-content monospace loading">
-                <div class="loader"></div>
-                <div class="mr-6">LOADING</div>
+                <div class="loader">
+                    <component :is="`icon`" class="orange-yellow"/>
+                </div>
+                <div class="mr-2">LOADING</div>
             </div>
         </div>
     </div>
 </template>
 <script>
-    export default {
-        name: "Loading"
-    }
+import Icon from '@/assets/icons/bolt.svg?inline';
+
+export default {
+    name: "Loading",
+    components: {Icon},
+}
 </script>
 <style lang="scss" scoped>
 .loading {
@@ -26,33 +31,11 @@
 }
 
 .loader {
-    width: 3rem;
+    width: 1rem;
     aspect-ratio: 1;
-    display: grid;
-    border: 4px solid #0000;
-    border-radius: 50%;
-    border-color: var(--modal-border-color-2) #0000;
-    animation: l16 1s infinite linear;
+    animation: anim-rotate 1s infinite linear;
 }
-.loader::before,
-.loader::after {
-    content: "";
-    grid-area: 1/1;
-    margin: 2px;
-    border: inherit;
-    border-radius: 50%;
-    border-color: var(--modal-border-color-3) #0000;
-}
-.loader::before {
-    border-color: var(--modal-border-color-1) #0000;
-    animation: inherit;
-    animation-duration: .5s;
-    animation-direction: reverse;
-}
-.loader::after {
-    margin: 8px;
-}
-@keyframes l16 {
+@keyframes anim-rotate {
     100% {transform: rotate(1turn)}
 }
 </style>

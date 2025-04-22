@@ -1,14 +1,11 @@
 <template>
     <div>
         <p v-if="entities.length === 0">
-            Nothing here yet ¯\_(ツ)_/¯
+            Nothing here ¯\_(ツ)_/¯
         </p>
         <div v-for="(entity, index) in sortedEntities" :key="entityKey(entity)">
             <div v-if="groupStart(sortedEntities, entity, index)" class="component-row-group-boundary"></div>
-            <Topic
-                :topic="entity"
-                @filter="$emit('filter', $event)"
-            ></Topic>
+            <Topic :topic="entity"></Topic>
         </div>
     </div>
 </template>

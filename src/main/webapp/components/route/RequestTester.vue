@@ -2,6 +2,7 @@
     <div>
         <div class="tester-buttons">
             <button type="button" class="btn btn-sm btn-primary" @click="test">retry</button>
+            <ButtonEdit @click="$emit('edit')"></ButtonEdit>
             <button type="button" class="btn btn-sm btn-default" @click="$emit('close')">close</button>
         </div>
         <div class="tester-result">
@@ -11,9 +12,11 @@
 </template>
 <script>
 import {mapActions} from "vuex";
+import ButtonEdit from "@/components/other/ButtonEdit";
 
 export default {
     name: "RequestTester",
+    components: {ButtonEdit},
     data() {
         return {
             testResult: '',
@@ -61,6 +64,6 @@ export default {
     }
     .tester-buttons {
         padding: 0.3rem 0 0.7rem;
-        text-align: center;
+        text-align: end;
     }
 </style>

@@ -117,66 +117,66 @@ import ToggleSwitch from "@/components/other/ToggleSwitch";
 import WidthSelector from "@/components/other/WidthSelector";
 
 export default {
-        components: {WidthSelector, ToggleSwitch, ErrorPanel, Loading, ColorModePicker, ColorAccentPicker, IconKafka},
-        data() {
-            return {
-                isOpen: true,
-                isSettings: false,
+    components: {WidthSelector, ToggleSwitch, ErrorPanel, Loading, ColorModePicker, ColorAccentPicker, IconKafka},
+    data() {
+        return {
+            isOpen: true,
+            isSettings: false,
+        }
+    },
+    computed: {
+        working() {
+            return this.$store.state.working
+        }
+    },
+    methods: {
+        toggleNavbar() {
+            if (this.isSettings) {
+                this.nav();
+            }
+
+            if (this.isOpen) {
+                this.close();
+            } else {
+                this.open();
             }
         },
-        computed: {
-            working() {
-                return this.$store.state.working
+        toggleSettings() {
+            if (!this.isOpen) {
+                this.open();
+            }
+
+            if (!this.isSettings) {
+                this.sets();
+            } else {
+                this.nav();
             }
         },
-        methods: {
-            toggleNavbar() {
-                if (this.isSettings) {
-                    this.nav();
-                }
-
-                if (this.isOpen) {
-                    this.close();
-                } else {
-                    this.open();
-                }
-            },
-            toggleSettings() {
-                if (!this.isOpen) {
-                    this.open();
-                }
-
-                if (!this.isSettings) {
-                    this.sets();
-                } else {
-                    this.nav();
-                }
-            },
-            open() {
-                this.isOpen = true;
-                this.$refs.page.classList.add('navbar-maximizing');
-                this.$refs.page.classList.remove('navbar-mini');
-                setTimeout(() => this.$refs.page.classList.remove('navbar-maximizing'), 200);
-            },
-            close() {
-                this.isOpen = false;
-                this.$refs.page.classList.add('navbar-mini');
-            },
-            nav() {
-                this.isSettings = false;
-                this.$refs.nav.classList.remove('nav-hidden');
-                this.$refs.settings.classList.add('nav-hidden');
-            },
-            sets() {
-                this.isSettings = true;
-                this.$refs.nav.classList.add('nav-hidden');
-                this.$refs.settings.classList.remove('nav-hidden');
-            },
-            accentChanged() {
-                this.close()
-            }
+        open() {
+            this.isOpen = true;
+            this.$refs.page.classList.add('navbar-maximizing');
+            this.$refs.page.classList.remove('navbar-mini');
+            setTimeout(() => this.$refs.page.classList.remove('navbar-maximizing'), 200);
+        },
+        close() {
+            this.isOpen = false;
+            this.$refs.page.classList.add('navbar-mini');
+        },
+        nav() {
+            this.isSettings = false;
+            this.$refs.nav.classList.remove('nav-hidden');
+            this.$refs.settings.classList.add('nav-hidden');
+        },
+        sets() {
+            this.isSettings = true;
+            this.$refs.nav.classList.add('nav-hidden');
+            this.$refs.settings.classList.remove('nav-hidden');
+        },
+        accentChanged() {
+            this.close()
         }
     }
+}
 </script>
 <style scoped>
     .icon-width-fix {

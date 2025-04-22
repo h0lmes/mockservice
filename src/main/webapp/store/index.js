@@ -2,6 +2,7 @@ export const state = () => ({
     BASE_URL: location.protocol + '//' + location.hostname + ':8081',
     lastError: '',
     apiSearchExpression: '',
+    kafkaSearchExpression: '',
 });
 
 export const mutations = {
@@ -15,8 +16,8 @@ export const mutations = {
     setApiSearchExpression(state, payload) {
         state.apiSearchExpression = payload == null ? '' : ('' + payload).trim();
     },
-    resetApiSearchExpression(state) {
-        state.apiSearchExpression = '';
+    setKafkaSearchExpression(state, payload) {
+        state.kafkaSearchExpression = payload == null ? '' : ('' + payload).trim();
     },
 };
 
@@ -30,7 +31,7 @@ export const actions = {
     setApiSearchExpression({commit}, text) {
         commit('setApiSearchExpression', text);
     },
-    resetApiSearchExpression({commit}) {
-        commit('resetApiSearchExpression');
+    setKafkaSearchExpression({commit}, text) {
+        commit('setKafkaSearchExpression', text);
     },
 };

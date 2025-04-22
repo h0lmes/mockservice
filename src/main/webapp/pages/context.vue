@@ -4,8 +4,8 @@
         <div class="mb-4">Variables on server now</div>
         <AutoSizeTextArea class="main" v-model="context"></AutoSizeTextArea>
         <div class="component-toolbar mt-4">
-            <button type="button" class="btn btn-primary" @click="saveGlobal">Save variables to server</button>
-            <button type="button" class="btn btn-default" @click="downloadGlobal">Download variables as file</button>
+            <button type="button" class="btn btn-primary" @click="saveGlobal">Save to server</button>
+            <button type="button" class="btn btn-default" @click="downloadGlobal">Download as file</button>
         </div>
 
         <div class="group-boundary"></div>

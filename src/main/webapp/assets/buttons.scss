@@ -37,8 +37,8 @@
   }
 
   & .btn-danger {
-    --btn-color: #b32453;
-    --btn-color-focus: #d62b64;
+    --btn-color: #b32b24;
+    --btn-color-focus: #d6332b;
     --btn-bg: #2e2e2e;
     --btn-bg-focus: #3b3b3b;
   }
@@ -109,6 +109,20 @@
   }
 }
 
+.btn-sm {
+  padding: .5rem .6rem;
+  font-size: smaller;
+  line-height: 1.2;
+}
+
+.btn > svg {
+  width: 16px;
+  height: 16px;
+  margin: -3px 0 -3px 0;
+  padding: 0;
+  vertical-align: middle;
+}
+
 .btn-link {
   font-weight: 400;
   color: var(--btn-color-link);
@@ -145,10 +159,4 @@
       text-decoration: none;
     }
   }
-}
-
-.btn-sm {
-  padding: .4rem .9rem;
-  font-size: smaller;
-  line-height: 1.2;
 }

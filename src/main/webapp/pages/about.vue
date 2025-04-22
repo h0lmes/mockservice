@@ -1,23 +1,23 @@
 <template>
     <div class="bg monospace">
         <div class="about">
-            <h1 class="mb-5">Mockachu</h1>
+            <h1 class="mb-6">Mockachu</h1>
             <p class="mb-2">Effortless API Mocking and Testing</p>
             <p class="mb-2">
                 <a target="_blank" href="https://github.com/h0lmes/mockservice" rel="noopener noreferrer">GitHub</a>
             </p>
-            <pre class="ascii">         --------                       </pre>
-            <pre class="ascii">    V   | Mock ? |   -------       V    </pre>
-            <pre class="ascii">  (o o) |/-------   | Mock ! \   (o o)  </pre>
-            <pre class="ascii"> (  V  )             ---------- (  V  ) </pre>
-            <pre class="ascii">...m.m............................m.m...</pre>
+            <pre class="ascii mt-4 orange-yellow">≽(◕ ᴗ ◕)≼</pre>
+            <component :is="`icon`" class="icon orange-yellow mt-2"/>
         </div>
     </div>
 </template>
 <script>
-    export default {
-        name: "about"
-    }
+import Icon from '@/assets/icons/bolt.svg?inline';
+
+export default {
+    name: "about",
+    components: {Icon},
+}
 </script>
 <style lang="scss" scoped>
     .bg {
@@ -39,9 +39,8 @@
         text-align: center;
     }
 
-    @media screen and (max-width: 599px) {
-        .ascii {
-            display: none;
-        }
+    .icon {
+        width: 1rem;
+        height: 1rem;
     }
 </style>

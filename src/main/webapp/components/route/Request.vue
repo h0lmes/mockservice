@@ -11,13 +11,13 @@
             </select>
         </div>
 
-        <div class="mock-col w2">
+        <div v-if="!testing" class="mock-col w2">
             <div class="mock-col-header">GROUP</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(request.group)">{{ request.group }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingData.group"/>
         </div>
 
-        <div class="mock-col w1">
+        <div v-if="!testing"  class="mock-col w1">
             <div class="mock-col-header">METHOD</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(request.method)">
                 <route-method :value="request.method" :disabled="request.disabled"></route-method>
@@ -31,7 +31,7 @@
             </select>
         </div>
 
-        <div v-show="!editing" class="mock-col w3">
+        <div v-show="!editing && !testing" class="mock-col w3">
             <div class="mock-col-header">URL</div>
             <div class="mock-col-value link" @click="filter(request.path)">{{ request.path }}</div>
         </div>
@@ -41,17 +41,17 @@
             <input type="text" class="form-control form-control-sm" v-model="editingData.id"
                    placeholder="(empty to generate)"/>
         </div>
-        <div v-show="!editing" class="mock-col w2">
+        <div v-show="!editing && !testing" class="mock-col w2">
             <div class="mock-col-header">ID</div>
             <div class="mock-col-value link" @click="filter(request.id)">{{ request.id }}</div>
         </div>
 
-        <div class="mock-col w-fixed-auto">
+        <div v-if="!testing" class="mock-col w-fixed-auto">
             <div v-show="editing" class="mock-col-header"></div>
             <div class="mock-col-value">
-                <button type="button" class="btn btn-sm btn-primary" @click="test">send</button>
-                <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
-                <button type="button" class="btn btn-sm btn-danger ml-2" @click="del">delete</button>
+                <ButtonExecute class="orange-yellow" @click="test"></ButtonExecute>
+                <ButtonEdit @click="edit"></ButtonEdit>
+                <ButtonDelete @click="del"></ButtonDelete>
             </div>
         </div>
 
@@ -100,7 +100,7 @@
         </div>
 
         <div v-if="testing" class="mock-col w100">
-            <RequestTester :request="request" @close="testing = false"></RequestTester>
+            <RequestTester :request="request" @close="testing = false" @edit="edit"></RequestTester>
         </div>
     </div>
 </template>
@@ -110,10 +110,13 @@ import RequestTester from "./RequestTester";
 import RouteMethod from "./RouteMethod";
 import ToggleSwitch from "../other/ToggleSwitch";
 import AutoSizeTextArea from "../other/AutoSizeTextArea";
+import ButtonDelete from "@/components/other/ButtonDelete";
+import ButtonEdit from "@/components/other/ButtonEdit";
+import ButtonExecute from "@/components/other/ButtonExecute";
 
 export default {
     name: "Request",
-    components: {AutoSizeTextArea, RequestTester, RouteMethod, ToggleSwitch},
+    components: {ButtonExecute, ButtonEdit, ButtonDelete, AutoSizeTextArea, RequestTester, RouteMethod, ToggleSwitch},
     data() {
         return {
             editing: false,

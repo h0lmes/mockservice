@@ -34,9 +34,9 @@
         <div class="mock-col w-fixed-auto">
             <div v-show="editing" class="mock-col-header"></div>
             <div class="mock-col-value">
-                <button type="button" class="btn btn-sm disabled">&#xA0;&#xA0;&#xA0;&#xA0;</button>
-                <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
-                <button type="button" class="btn btn-sm btn-danger ml-2" @click="del">delete</button>
+                <ButtonExecute class="disabled"></ButtonExecute>
+                <ButtonEdit @click="edit"></ButtonEdit>
+                <ButtonDelete @click="del"></ButtonDelete>
             </div>
         </div>
 
@@ -67,10 +67,13 @@ import {mapActions} from 'vuex';
 import RoutesToAdd from "./RoutesToAdd";
 import ToggleSwitch from "../other/ToggleSwitch";
 import AutoSizeTextArea from "../other/AutoSizeTextArea";
+import ButtonDelete from "@/components/other/ButtonDelete";
+import ButtonEdit from "@/components/other/ButtonEdit";
+import ButtonExecute from "@/components/other/ButtonExecute";
 
 export default {
     name: "Scenario",
-    components: {AutoSizeTextArea, RoutesToAdd, ToggleSwitch},
+    components: {ButtonExecute, ButtonEdit, ButtonDelete, AutoSizeTextArea, RoutesToAdd, ToggleSwitch},
     data() {
         return {
             editing: false,

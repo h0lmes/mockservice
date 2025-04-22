@@ -4,41 +4,41 @@
          @click.middle.stop.prevent="edit"
          @keydown.esc.exact="cancel">
 
-        <div class="mock-col w2">
+        <div v-if="!testing" class="mock-col w2">
             <div class="mock-col-header">GROUP</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(test.group)">{{ test.group }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingTest.group"/>
         </div>
 
-        <div class="mock-col w1" v-show="!editing">
+        <div v-show="!editing && ! testing" class="mock-col w1">
             <div class="mock-col-header">TYPE</div>
-            <div v-show="!editing" class="mock-col-value">💡 TEST</div>
+            <div v-show="!editing" class="mock-col-value">TEST</div>
         </div>
 
-        <div class="mock-col w3">
+        <div v-if="!testing" class="mock-col w3">
             <div class="mock-col-header">ALIAS</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(test.alias)">{{ test.alias }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingTest.alias"/>
         </div>
 
-        <div class="mock-col w2" v-show="!editing">
+        <div v-show="!editing && !testing" class="mock-col w2">
             <div class="mock-col-header"></div>
             <div class="mock-col-value"></div>
         </div>
 
-        <div class="mock-col w-fixed-auto">
+        <div v-if="!testing" class="mock-col w-fixed-auto">
             <div v-show="editing" class="mock-col-header"></div>
             <div class="mock-col-value">
-                <button type="button" class="btn btn-sm btn-primary" @click="testRun">test</button>
-                <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
-                <button type="button" class="btn btn-sm btn-danger ml-2" @click="del">delete</button>
+                <ButtonExecute class="orange-yellow" @click="testRun"></ButtonExecute>
+                <ButtonEdit @click="edit"></ButtonEdit>
+                <ButtonDelete @click="del"></ButtonDelete>
             </div>
         </div>
 
         <div v-show="editing" class="mock-col w100 mt-2">
             <div class="mb-2 color-secondary">
                 TEST PLAN
-                <button type="button" class="btn btn-sm ml-2" @click="addPlanStep">add step</button>
+                <!--button type="button" class="btn btn-sm ml-2" @click="addPlanStep">add step</button-->
             </div>
             <AutoSizeTextArea v-model="editingTest.plan" ref="data"
                               placeholder="See test plan syntax at the bottom of page"
@@ -54,7 +54,7 @@
         </div>
 
         <div v-if="testing" class="mock-col w100">
-            <TestRun :test="test" @close="testing = false"></TestRun>
+            <TestRun :test="test" @close="testing = false" @edit="edit"></TestRun>
         </div>
     </div>
 </template>
@@ -62,10 +62,13 @@
 import {mapActions} from 'vuex';
 import AutoSizeTextArea from "../other/AutoSizeTextArea";
 import TestRun from "@/components/route/TestRun";
+import ButtonDelete from "@/components/other/ButtonDelete";
+import ButtonEdit from "@/components/other/ButtonEdit";
+import ButtonExecute from "@/components/other/ButtonExecute";
 
 export default {
     name: "Test",
-    components: {TestRun, AutoSizeTextArea},
+    components: {ButtonExecute, ButtonEdit, ButtonDelete, TestRun, AutoSizeTextArea},
     data() {
         return {
             editing: false,

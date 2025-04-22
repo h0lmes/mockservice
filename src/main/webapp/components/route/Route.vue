@@ -12,13 +12,13 @@
             </select>
         </div>
 
-        <div class="mock-col w2">
+        <div v-show="!testing" class="mock-col w2">
             <div class="mock-col-header">GROUP</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(route.group)">{{ route.group }}</div>
             <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingData.group"/>
         </div>
 
-        <div class="mock-col w1">
+        <div v-show="!testing" class="mock-col w1">
             <div class="mock-col-header">METHOD</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(route.method)">
                 <route-method :value="route.method" :disabled="route.disabled"></route-method>
@@ -32,22 +32,22 @@
             </select>
         </div>
 
-        <div v-show="!editing" class="mock-col w3">
+        <div v-show="!editing && !testing" class="mock-col w3">
             <div class="mock-col-header">PATH</div>
             <div class="mock-col-value link" @click="filter(route.path)">{{ route.path }}</div>
         </div>
 
-        <div v-show="!editing" class="mock-col w2">
+        <div v-show="!editing && !testing" class="mock-col w2">
             <div class="mock-col-header">ALT</div>
             <div class="mock-col-value link" @click="filter(route.alt)">{{ route.alt }}</div>
         </div>
 
-        <div class="mock-col w-fixed-auto">
+        <div v-show="!testing" class="mock-col w-fixed-auto">
             <div v-show="editing" class="mock-col-header"></div>
             <div class="mock-col-value">
-                <button type="button" class="btn btn-sm btn-default" @click="test">test</button>
-                <button type="button" class="btn btn-sm btn-default" @click="edit">edit</button>
-                <button type="button" class="btn btn-sm btn-danger ml-2" @click="del">delete</button>
+                <ButtonExecute @click="test"></ButtonExecute>
+                <ButtonEdit @click="edit"></ButtonEdit>
+                <ButtonDelete @click="del"></ButtonDelete>
             </div>
         </div>
 
@@ -111,7 +111,7 @@
         </div>
 
         <div v-if="testing" class="mock-col w100">
-            <RouteTester :route="route" @close="testing = false"></RouteTester>
+            <RouteTester :route="route" @close="testing = false" @edit="edit"></RouteTester>
         </div>
     </div>
 </template>
@@ -121,10 +121,14 @@ import RouteTester from "./RouteTester";
 import RouteMethod from "./RouteMethod";
 import ToggleSwitch from "../other/ToggleSwitch";
 import AutoSizeTextArea from "../other/AutoSizeTextArea";
+import ButtonDelete from "@/components/other/ButtonDelete";
+import ButtonEdit from "@/components/other/ButtonEdit";
+import ButtonExecute from "@/components/other/ButtonExecute";
 
 export default {
     name: "Route",
-    components: {AutoSizeTextArea, RouteTester, RouteMethod, ToggleSwitch},
+    components: {ButtonExecute, ButtonEdit, ButtonDelete,
+        AutoSizeTextArea, RouteTester, RouteMethod, ToggleSwitch},
     data() {
         return {
             editing: false,

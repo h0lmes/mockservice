@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="tester-buttons">
-            <button type="button" class="btn btn-sm btn-primary" @click="testExecute">(re)run</button>
+            <button type="button" class="btn btn-sm btn-primary" @click="testExecute">run test</button>
             <button type="button" class="btn btn-sm btn-default" @click="testStop">stop</button>
             <button type="button" class="btn btn-sm btn-default" @click="testFetchResult">get log</button>
             <button type="button" class="btn btn-sm btn-danger" @click="testClear">clear log</button>
@@ -9,22 +9,30 @@
                 copy log
                 <span v-show="copied">&#9989;</span>
             </button>
+            <ButtonEdit @click="$emit('edit')"></ButtonEdit>
             <button type="button" class="btn btn-sm btn-default" @click="$emit('close')">close</button>
         </div>
         <div class="tester-result">
-            <pre class="form-control form-control-sm monospace" v-html="resultProcessed"></pre>
+            <pre class="form-control form-control-sm monospace"
+                 v-html="resultProcessed"></pre>
         </div>
+
+        <Loading v-if="loading"></Loading>
     </div>
 </template>
 <script>
 import {mapActions} from "vuex";
 import copy from "../../js/clipboard";
+import ButtonEdit from "@/components/other/ButtonEdit";
+import Loading from "@/components/other/Loading";
 
 export default {
     name: "TestRun",
+    components: {ButtonEdit, Loading},
     data() {
         return {
-            result: '',
+            loading: false,
+            result: '...',
             copied: false,
             ws: null,
         }
@@ -37,6 +45,7 @@ export default {
         this.startWebSocket();
     },
     beforeDestroy() {
+        if (this.ws == null) return;
         this.ws.close();
         this.ws = null;
     },
@@ -59,14 +68,18 @@ export default {
             clearTest: 'tests/clear',
         }),
         async testFetchResult() {
-            try {
-                const body = await this.fetchResult(this.test.alias);
-                this.clearOutput();
-                this.println(body);
-            } catch (err) {
-                this.println('----------');
-                this.println(err);
-            }
+            this.loading = true;
+            this.fetchResult(this.test.alias)
+                .then(result => {
+                    this.loading = false;
+                    this.clearOutput();
+                    this.println(result);
+                })
+                .catch(error => {
+                    this.loading = false;
+                    this.println('----------');
+                    this.println(error);
+                });
         },
         async testExecute() {
             if (this.ws == null) this.startWebSocket();
@@ -149,6 +162,6 @@ export default {
 }
 .tester-buttons {
     padding: 0.3rem 0 0.7rem;
-    text-align: center;
+    text-align: end;
 }
 </style>

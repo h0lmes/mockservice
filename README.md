@@ -2,7 +2,7 @@
 ![Branches](.github/badges/branches.svg)
 [![License](.github/badges/license.svg)](/LICENSE)
 
-# Mockachu
+# Mockachu ≽(◕ ᴗ ◕)≼
 
 **Effortless API Mocking and Testing**
 
