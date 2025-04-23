@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Example</title>
+
+    <style>
+        :root {
+            --grey: #909090;
+            --gray: #909090;
+            --gray-translucent: hsla(0, 0%, 55%, 0.2);
+            --cyan-blue: #179ae6;
+            --blue: #0077ff;
+            --violet: #4d4dff;
+            --indigo: #2d26ff;
+            --purple: #7141d9;
+            --pink: #d92e83;
+            --red: #dc3545;
+            --orange: #fc7c19;
+            --orange-yellow: #e6a117;
+            --yellow: #e6bf00;
+            --lime: #8ebd00;
+            --green: #29a649;
+            --teal: #1dc288;
+            --cyan: #1aaaba;
+
+            /* main components */
+
+            --color-primary: #c2b9b4;
+            --color-secondary: #6a6d76;
+            --color-disabled: #44464e;
+            --color-accent-one: hsla(230, 100%, 86%, 0.5);
+            --color-link: #0056b3;
+            --color-link-hover: #007bff;
+            --bg-page: #202426;
+            --bg-page-alt: #1b1e20;
+            --bg-component: rgba(64,64,64,0.3);
+            --bg-component-active: rgba(80,80,80,0.3);
+            --bg-border: var(--bg-component);
+            --bg-border-active: var(--color-accent-one);
+
+            /* buttons */
+
+            --btn-color: #999;
+            --btn-color-focus: #ddd;
+            --btn-bg: hsla(0, 0%, 50%, 0.2);
+            --btn-bg-focus: hsla(0, 0%, 50%, 0.3);
+            --btn-bg-primary: hsla(230, 100%, 86%, 0.2);
+            --btn-bg-primary-focus: hsla(230, 100%, 86%, 0.3);
+
+            /* form controls */
+
+            --form-control-color: var(--color-primary);
+            --form-control-color-disabled: var(--color-disabled);
+            --form-control-bg: var(--bg-component);
+            --form-control-border-radius: 0.25rem;
+            --form-control-bg-disabled: #787979;
+            --form-control-border: #323434;
+            --form-control-placeholder: #4a4f54;
+            --form-control-bg-hilight-shadow: var(--color-accent-one);
+        }
+
+        .red {color: var(--red) !important; text-decoration-color: var(--red) !important;}
+
+        * {
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            font-size: 16px;
+            background-color: var(--bg-page);
+            color: var(--color-primary);
+            width: 100%;
+            overflow: hidden auto;
+        }
+
+        .content {
+            display: flex;
+            column-gap: 3rem;
+            padding: 2rem 3rem;
+        }
+
+        .content:nth-child(2n) {
+            background-color: var(--bg-page-alt);
+        }
+
+        .section {
+            flex: 1 0 0;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-weight: 300;
+            margin: 0 0 2.5rem;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            line-height: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            line-height: 1.3rem;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            line-height: 1.2rem;
+        }
+
+        p {
+            padding: .25em;
+        }
+
+        a {
+            color: var(--color-link);
+            text-decoration: none;
+            background-color: transparent;
+        }
+        a:visited {
+            color: var(--color-link);
+        }
+        a:hover {
+            color: var(--color-link-hover);
+            text-decoration: underline;
+        }
+        a:focus {
+            outline: 0;
+        }
+
+        .mb {
+            margin-bottom: 1.0rem !important;
+        }
+
+        .mr {
+            margin-right: 1.0rem !important;
+        }
+
+        .monospace {
+            font-family: monospace, monospace;
+        }
+
+        .check::after {
+            content: ' ✅';
+        }
+
+        .question::after {
+            content: ' ❓';
+        }
+
+        .cross::after {
+            content: ' ❌';
+        }
+
+        .toolbar {
+            display: flex;
+            column-gap: 1rem;
+            margin-bottom: 1.5rem;
+            width: 100%;
+        }
+
+        /* button styles */
+
+        button {
+            font-family: monospace, monospace;
+            padding: 0.3rem 0.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            margin: 0;
+            font-weight: 300;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: middle;
+            touch-action: manipulation;
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            padding: .4rem .8rem;
+            line-height: 1.42857143;
+            user-select: none;
+            background-color: var(--btn-bg);
+            color: var(--btn-color);
+            outline: none;
+        }
+
+        .btn:hover,
+        .btn:focus {
+            color: var(--btn-color-focus);
+            text-decoration: none;
+        }
+
+        .btn:focus:not(.disabled) {
+            background-color: var(--btn-bg-focus);
+        }
+
+        .btn:active,
+        .btn.active {
+            background-image: none;
+            outline: 0;
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .18);
+        }
+
+        .btn.primary {
+            background-color: var(--btn-bg-primary);
+        }
+
+        .btn.primary:focus:not(.disabled) {
+            background-color: var(--btn-bg-primary-focus);
+        }
+
+        /* form controls */
+
+        .form-row {
+            display: flex;
+            column-gap: 3rem;
+            margin-bottom: 1.0rem;
+        }
+
+        .form-col {
+            flex: 1 0 0;
+            width: 100%;
+        }
+
+        .form-control {
+            display: block;
+            box-sizing: border-box;
+            width: 100%;
+            margin: 0;
+            padding: .375rem .75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--form-control-color);
+            background-color: var(--form-control-bg);
+            background-clip: padding-box;
+            border-radius: var(--form-control-border-radius);
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+            outline: none;
+            box-shadow: none;
+            border: 1px solid var(--form-control-bg);
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 5px var(--form-control-bg-hilight-shadow);
+        }
+
+        .form-control::placeholder {
+            color: var(--form-control-placeholder);
+            opacity: 1;
+        }
+
+        .form-control:disabled,
+        .form-control[readonly] {
+            background-color: var(--form-control-bg-disabled);
+            color: var(--form-control-color-disabled);
+            opacity: 1;
+        }
+
+        .form-control.no-border {
+            border: 1px solid var(--form-control-bg);
+        }
+
+        .form-control-label {
+            display: block;
+            margin-bottom: 0.75rem;
+        }
+
+        .form-control-label.empty::after {
+            content: '\00a0';
+        }
+
+        /* table styles */
+
+        table {
+            background-color: transparent;
+            position: relative;
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            vertical-align: middle;
+        }
+
+        th {
+            min-width: 5rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--gray-translucent);
+            text-align: center;
+        }
+
+        td {
+            min-width: 5rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--gray-translucent);
+            text-align: start;
+        }
+
+        td.center {
+            text-align: center;
+        }
+
+        tr.selected {
+            background-color: var(--bg-component-active);
+        }
+
+        /* modal styles */
+
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            overflow: hidden auto;
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-border {
+            background: linear-gradient(130deg, #cb7e3b, #ad003a 52%, #329696 87%);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 80%;
+            padding: 5px;
+            border-radius: 10px;
+            background-clip: padding-box;
+        }
+
+        .modal-content {
+            padding: 1em;
+            border-radius: 5px;
+            background: var(--bg-page);
+        }
+
+        .modal-content p {
+            flex: 0 0 100%;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- main page content -->
+
+    <div class="content">
+        <div class="section">
+            <h1>Store Items</h1>
+            <table id="table" class="mb"></table>
+        </div>
+    </div>
+
+    <!-- loader -->
+
+    <div class="loader modal-backdrop hidden">
+        <div class="modal-border">
+            <div class="modal-content monospace">
+                <p class="loader-message">Working ... Please wait</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- error dialog -->
+
+    <div class="error-dialog modal-backdrop hidden">
+        <div class="modal-border">
+            <div class="modal-content monospace red">
+                <p class="error-dialog-message">...</p>
+                <p>Click anywhere to dismiss</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS -->
+
+    <script>
+        const BASE_URL = 'http://localhost:8081';
+        let storeItems = [];
+
+        window.onload = function() {
+            initEvents();
+            updateStore();
+        }
+
+        function initEvents() {
+            document.querySelector('.error-dialog').addEventListener('click', hideErrorDialog);
+        }
+
+        //
+        //
+        // store items
+        //
+        //
+
+        async function updateStore() {
+            storeItems = await fetchStoreRequest();
+            if (storeItems) {
+                storeItems = storeItems.sort((a, b) => a.id - b.id);
+                populateStoreItems(storeItems);
+            }
+        }
+
+        function populateStoreItems(storeItems) {
+            const tbody = document.createElement('tbody');
+            setTBodyHeaders(tbody, ['ID', 'CATEGORY', 'TITLE', 'PRICE', 'DESCRIPTION']);
+            storeItems.forEach(item => addRowToTBody(tbody, item));
+            setNewTBody('#table', tbody);
+        }
+
+        function setTBodyHeaders(tbody, names) {
+            const header = tbody.insertRow();
+            names.forEach(name => {
+                const th = document.createElement('th');
+                th.appendChild(document.createTextNode(name));
+                header.appendChild(th);
+            });
+        }
+
+        function setNewTBody(tableSelector, newBody) {
+            const tbl = document.querySelector(tableSelector);
+            const oldBody = tbl.querySelector('tbody');
+            if (oldBody) {
+                tbl.replaceChild(newBody, oldBody);
+            } else {
+                tbl.appendChild(newBody);
+            }
+        }
+
+        function addRowToTBody(newBody, item) {
+            let row = createRow(newBody, item.id);
+            cell(row, document.createTextNode(item.id), 'center');
+            cell(row, document.createTextNode(item.category), 'center');
+            cell(row, document.createTextNode(item.title));
+            cell(row, document.createTextNode(item.price), 'center');
+            cell(row, document.createTextNode(item.description));
+        }
+
+        function createRow(tbody, id) {
+            let el = tbody.insertRow();
+            el.dataset.id = id;
+            return el;
+        }
+
+        function cell(row, content, classes) {
+            let cell = row.insertCell();
+            cell.appendChild(content);
+            if (classes) cell.classList.add(classes)
+        }
+
+        //
+        //
+        // network requests
+        //
+        //
+
+        async function fetchStoreRequest() {
+            showLoader();
+            try {
+                const url = BASE_URL + '/products';
+                const params = { method: 'GET' };
+                const res = await fetch(url, params);
+                handleError(res);
+                return await res.json();
+            } catch (err) {
+                showErrorDialog(err.message);
+            } finally {
+                hideLoader();
+            }
+        }
+
+        function handleError(response) {
+            if (!response.ok) {
+                const err = response.statusText || response.error || response.message || JSON.stringify(response);
+                throw new Error(err);
+            }
+        }
+
+        //
+        //
+        // error dialog
+        //
+        //
+
+        function showErrorDialog(err) {
+            document.querySelector('.error-dialog-message').textContent = err;
+            document.querySelector('.error-dialog').classList.remove('hidden');
+        }
+
+        function hideErrorDialog() {
+            document.querySelector('.error-dialog').classList.add('hidden');
+        }
+
+        //
+        //
+        // loader
+        //
+        //
+
+        function showLoader() {
+            document.querySelector('.loader').classList.remove('hidden');
+        }
+
+        function hideLoader() {
+            document.querySelector('.loader').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
