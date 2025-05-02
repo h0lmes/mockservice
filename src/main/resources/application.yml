@@ -23,7 +23,6 @@ spring:
 application:
   config-filename: ${CONFIG_FILENAME:.\config.yml}
   config-backup-filename: ${CONFIG_BACKUP_FILENAME:.\config-backup.yml}
-  soap-error-data-file: soapFault.xml
   client:
     max-connections: ${MAX_CONNECTIONS:2000}
     max-pending: ${MAX_PENDING:2000}

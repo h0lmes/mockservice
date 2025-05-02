@@ -46,84 +46,84 @@ class RouteServiceImplTest {
 
     @Test
     void getEnabledRoute_EnabledRouteExists_ReturnsRoute() {
-        Route route = new Route().setPath(PATH);
+        var route = new Route().setPath(PATH);
         when(configRepository.findRoute(any())).thenReturn(Optional.of(route));
 
-        RouteService service = service();
-        Route key = new Route().setPath(PATH);
+        var service = service();
+        var key = new Route().setPath(PATH);
 
         assertTrue(service.getEnabledRoute(key).isPresent());
     }
 
     @Test
     void getEnabledRoute_DisabledRouteExists_ReturnsEmpty() {
-        Route route = new Route().setPath(PATH).setDisabled(true);
+        var route = new Route().setPath(PATH).setDisabled(true);
         when(configRepository.findRoute(any())).thenReturn(Optional.of(route));
 
-        RouteService service = service();
-        Route key = new Route().setPath(PATH);
+        var service = service();
+        var key = new Route().setPath(PATH);
 
         assertTrue(service.getEnabledRoute(key).isEmpty());
     }
 
     @Test
     void getRouteForVariables_RoutesWithMatchingCondition_ReturnsCorrectRoute() {
-        Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt("1");
-        Route route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = tes value");
-        Route route3 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = test value");
+        var route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt("1");
+        var route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = tes value");
+        var route3 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = test value");
         when(configRepository.findAllRoutes()).thenReturn(List.of(route1, route2, route3));
 
-        RouteService service = service();
-        MockVariables variables = new MockVariables().put("var1", "test value");
-        Optional<Route> route = service.getRouteForVariables(METHOD, PATH, variables);
+        var service = service();
+        var variables = new MockVariables().put("var1", "test value");
+        var alt = service.getAltForVariables(METHOD, PATH, variables);
 
-        assertTrue(route.isPresent());
-        assertEquals(route3, route.get());
+        assertTrue(alt.isPresent());
+        assertEquals(route3.getAlt(), alt.get());
     }
 
     @Test
     void getRouteForVariables_RoutesWithNonMatchingCondition_ReturnsEmpty() {
-        Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt("1");
-        Route route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = \"tes value\"");
-        Route route3 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = \"test value\"");
+        var route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt("1");
+        var route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = \"tes value\"");
+        var route3 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = \"test value\"");
         when(configRepository.findAllRoutes()).thenReturn(List.of(route1, route2, route3));
 
-        RouteService service = service();
-        MockVariables variables = new MockVariables().put("var2", "test value");
-        Optional<Route> route = service.getRouteForVariables(METHOD, PATH, variables);
+        var service = service();
+        var variables = new MockVariables().put("var2", "test value");
+        var alt = service.getAltForVariables(METHOD, PATH, variables);
 
-        assertFalse(route.isPresent());
+        assertFalse(alt.isPresent());
     }
 
     @Test
     void getRouteForVariables_ConditionHasBeenReset_ReturnsEmpty() {
-        Route route3 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = \"test value\"");
+        var route3 = new Route().setMethod(METHOD).setPath(PATH).setAlt("var1 = \"test value\"");
         route3.setAlt("");
         when(configRepository.findAllRoutes()).thenReturn(List.of(route3));
 
-        RouteService service = service();
-        MockVariables variables = new MockVariables().put("var1", "test value");
-        Optional<Route> route = service.getRouteForVariables(METHOD, PATH, variables);
+        var service = service();
+        var variables = new MockVariables().put("var1", "test value");
+        var alt = service.getAltForVariables(METHOD, PATH, variables);
 
-        assertFalse(route.isPresent());
+        assertFalse(alt.isPresent());
     }
 
     @Test
     void getRoutes_RouteExists_ReturnsRouteDto() {
-        Route route = new Route().setPath(PATH);
+        var route = new Route().setPath(PATH);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route));
-        RouteDto routeDto = new RouteDto().setPath(PATH);
+        var routeDto = new RouteDto().setPath(PATH);
         when(routeMapper.toDto(anyList())).thenReturn(List.of(routeDto));
 
-        RouteService service = service();
+        var service = service();
 
-        List<RouteDto> routes = service.getRoutes();
+        var routes = service.getRoutes();
         assertTrue(routes.contains(routeDto));
     }
 
     @Test
     void putRoute_RouteDtoAsInput_CallsRepositoryMethod() throws IOException {
-        RouteService service = service();
+        var service = service();
         service.putRoute(new RouteDto(), new RouteDto());
 
         verify(configRepository, times(1)).putRoute(any(), any());
@@ -131,7 +131,7 @@ class RouteServiceImplTest {
 
     @Test
     void putRoutes_ListOfRouteDtoAsInput_CallsRepositoryMethod() throws IOException {
-        RouteService service = service();
+        var service = service();
         service.putRoutes(List.of(new RouteDto()), true);
 
         verify(configRepository, times(1)).putRoutes(anyList(), anyBoolean());
@@ -139,10 +139,10 @@ class RouteServiceImplTest {
 
     @Test
     void deleteRoutes_ListOfRouteDtoAsInput_CallsRepositoryMethod() throws IOException {
-        Route route = new Route().setPath(PATH);
+        var route = new Route().setPath(PATH);
         when(routeMapper.fromDto(anyList())).thenReturn(List.of(route));
 
-        RouteService service = service();
+        var service = service();
         service.deleteRoutes(List.of(new RouteDto().setPath(PATH)));
 
         ArgumentCaptor<List<Route>> routeListCaptor = ArgumentCaptor.forClass(List.class);
@@ -155,57 +155,57 @@ class RouteServiceImplTest {
 
     @Test
     void getRandomAltFor_MoreThanOneRouteSatisfiesSearchCondition_ReturnsAltOfEither() {
-        Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1);
-        Route route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT2);
+        var route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1);
+        var route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT2);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route1, route2));
 
-        RouteService service = service();
+        var service = service();
 
-        Optional<String> alt = service.getRandomAltFor(METHOD, PATH);
+        var alt = service.getRandomAltFor(METHOD, PATH);
         assertTrue(alt.isPresent());
         assertTrue(Set.of(ALT1, ALT2).contains(alt.get()));
     }
 
     @Test
     void getRandomAltFor_OneRouteSatisfiesSearchCondition_ReturnsAltOfTheRoute() {
-        Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1);
+        var route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route1));
 
-        RouteService service = service();
+        var service = service();
 
-        Optional<String> alt = service.getRandomAltFor(METHOD, PATH);
+        var alt = service.getRandomAltFor(METHOD, PATH);
         assertTrue(alt.isPresent());
         assertEquals(ALT1, alt.get());
     }
 
     @Test
     void getRandomAltFor_NoRoutesSatisfySearchConditionByMethod_ReturnsEmpty() {
-        Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1);
+        var route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route1));
 
-        RouteService service = service();
+        var service = service();
 
         assertTrue(service.getRandomAltFor(METHOD_OTHER, PATH).isEmpty());
     }
 
     @Test
     void getRandomAltFor_NoRoutesSatisfySearchConditionByPath_ReturnsEmpty() {
-        Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1);
-        Route route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT2);
+        var route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1);
+        var route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT2);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route1, route2));
 
-        RouteService service = service();
+        var service = service();
 
         assertTrue(service.getRandomAltFor(METHOD, PATH_OTHER).isEmpty());
     }
 
     @Test
     void getRandomAltFor_AnyNumberOfRoutesSatisfySearchConditionButAreDisabled_ReturnsEmpty() {
-        Route route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1).setDisabled(true);
-        Route route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT2).setDisabled(true);
+        var route1 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT1).setDisabled(true);
+        var route2 = new Route().setMethod(METHOD).setPath(PATH).setAlt(ALT2).setDisabled(true);
         when(configRepository.findAllRoutes()).thenReturn(List.of(route1, route2));
 
-        RouteService service = service();
+        var service = service();
 
         assertTrue(service.getRandomAltFor(METHOD, PATH).isEmpty());
     }

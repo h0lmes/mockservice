@@ -7,12 +7,14 @@ public class Settings {
     private boolean alt400OnFailedRequestValidation = true;
     private String certificate;
     private String initialContext;
+    private boolean proxyEnabled = false;
+    private String proxyLocation;
 
     public Settings() {
         /* default */
     }
 
-    public boolean getRandomAlt() {
+    public boolean isRandomAlt() {
         return randomAlt;
     }
 
@@ -21,7 +23,7 @@ public class Settings {
         return this;
     }
 
-    public boolean getQuantum() {
+    public boolean isQuantum() {
         return quantum;
     }
 
@@ -30,7 +32,7 @@ public class Settings {
         return this;
     }
 
-    public boolean getAlt400OnFailedRequestValidation() {
+    public boolean isAlt400OnFailedRequestValidation() {
         return alt400OnFailedRequestValidation;
     }
 
@@ -54,6 +56,24 @@ public class Settings {
 
     public Settings setInitialContext(String initialContext) {
         this.initialContext = initialContext;
+        return this;
+    }
+
+    public boolean isProxyEnabled() {
+        return proxyEnabled;
+    }
+
+    public Settings setProxyEnabled(boolean proxyEnabled) {
+        this.proxyEnabled = proxyEnabled;
+        return this;
+    }
+
+    public String getProxyLocation() {
+        return proxyLocation;
+    }
+
+    public Settings setProxyLocation(String proxyLocation) {
+        this.proxyLocation = proxyLocation;
         return this;
     }
 }

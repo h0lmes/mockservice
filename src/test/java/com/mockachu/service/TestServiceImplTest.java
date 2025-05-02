@@ -168,7 +168,7 @@ class TestServiceImplTest {
         when(configRepository.findTest(anyString())).thenReturn(Optional.of(entity));
 
         var requestResult = new HttpRequestResult(
-                false, RequestMethod.GET, "uri", Map.of(),
+                false, RequestMethod.GET, "uri", Map.of(), null,
                 "body", "response",
                 new MockVariables().put("x", "2"),
                 200, Instant.now().toEpochMilli());
@@ -196,7 +196,7 @@ class TestServiceImplTest {
         when(configRepository.findTest(anyString())).thenReturn(Optional.of(entity));
 
         var requestResult = new HttpRequestResult(
-                false, RequestMethod.GET, "uri", Map.of(),
+                false, RequestMethod.GET, "uri", Map.of(), null,
                 "body", "response",
                 new MockVariables().put("x", "2"),
                 200, Instant.now().toEpochMilli());
@@ -240,7 +240,7 @@ class TestServiceImplTest {
         when(configRepository.findTest(anyString())).thenReturn(Optional.of(entity));
 
         var requestResult = new HttpRequestResult(
-                false, RequestMethod.GET, "uri", Map.of(),
+                false, RequestMethod.GET, "uri", Map.of(), null,
                 "body", "response",
                 new MockVariables().put("x", "2"),
                 200, Instant.now().toEpochMilli());
@@ -265,7 +265,7 @@ class TestServiceImplTest {
         when(configRepository.findTest(anyString())).thenReturn(Optional.of(entity));
 
         var requestResult = new HttpRequestResult(
-                false, RequestMethod.GET, "uri", Map.of(),
+                false, RequestMethod.GET, "uri", Map.of(), null,
                 "", "", new MockVariables(),
                 200, Instant.now().toEpochMilli());
         when(requestService.executeRequest(anyString(), any(), anyBoolean()))
@@ -291,7 +291,7 @@ class TestServiceImplTest {
         when(configRepository.findTest(anyString())).thenReturn(Optional.of(entity));
 
         var requestResult = new HttpRequestResult(
-                false, RequestMethod.GET, "uri", Map.of(),
+                false, RequestMethod.GET, "uri", Map.of(), null,
                 "", "", new MockVariables(),
                 404, Instant.now().toEpochMilli());
         when(requestService.executeRequest(anyString(), any(), anyBoolean()))
@@ -323,12 +323,12 @@ class TestServiceImplTest {
         when(configRepository.findTest(anyString())).thenReturn(Optional.of(entity));
 
         var requestResult = new HttpRequestResult(
-                false, RequestMethod.GET, "localhost:8080", Map.of(),
+                false, RequestMethod.GET, "localhost:8080", Map.of(), null,
                 "", "",
                 new MockVariables(),
                 200, Instant.now().toEpochMilli());
         when(httpService.request(any(), anyString(), anyString(), any()))
-                .thenReturn(Optional.of(requestResult));
+                .thenReturn(requestResult);
 
         var varService = getContextService();
         var service = getService(varService);

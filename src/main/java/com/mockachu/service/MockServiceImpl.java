@@ -5,7 +5,6 @@ import com.mockachu.domain.Route;
 import com.mockachu.domain.RouteType;
 import com.mockachu.exception.RouteNotFoundException;
 import com.mockachu.repository.ConfigRepository;
-import com.mockachu.request.RequestFacade;
 import com.mockachu.response.MockResponse;
 import com.mockachu.response.RestMockResponse;
 import com.mockachu.response.SoapMockResponse;
@@ -14,6 +13,7 @@ import com.mockachu.template.MockVariables;
 import com.mockachu.validate.DataValidationException;
 import com.mockachu.validate.DataValidator;
 import com.mockachu.validate.RequestBodyValidationResult;
+import com.mockachu.web.mock.MockRequestFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -70,11 +70,17 @@ public class MockServiceImpl implements MockService {
     }
 
     @Override
-    public ResponseEntity<String> mock(RequestFacade request) {
-        var variables = request.getVariables(null);
+    public ResponseEntity<String> mock(MockRequestFacade request) {
+        var isXmlBody = routeService
+                .getEnabledRouteType(request.getMethod(), request.getEndpoint())
+                .orElse(RouteType.REST)
+                .equals(RouteType.SOAP);
+        var variables = request.getVariables(null, isXmlBody);
+
         var route = findRouteForRequest(request, variables);
         var validationResult = validateRequestBody(route, request.getBody());
         route = validationResult.getRoute();
+
         var response = responseCache.get(route);
 
         response.setVariables(variables, MockFunctions.create());
@@ -90,31 +96,29 @@ public class MockServiceImpl implements MockService {
         return responseEntity;
     }
 
-    private Route findRouteForRequest(RequestFacade request, MockVariables variables) {
-        var maybeRoute = routeService.getRouteForVariables(
-                request.getMethod(), request.getEndpoint(), variables);
-
-        if (maybeRoute.isPresent()) {
-            log.info("Route requested (defined by variables): {}", maybeRoute.get());
-            return maybeRoute.get();
-        }
-
-        String alt = request.getAlt()
+    private Route findRouteForRequest(MockRequestFacade request, MockVariables variables) {
+        var alt = request.getAlt()
+                .or(() -> getAltIfQuantum(request.getMethod(), request.getEndpoint()))
                 .or(() -> scenarioService.getAltFor(request.getMethod(), request.getEndpoint()))
-                .or(() -> maybeGetRandomAltFor(request.getMethod(), request.getEndpoint()))
+                .or(() -> routeService.getAltForVariables(request.getMethod(), request.getEndpoint(), variables))
+                .or(() -> getAltIfRandom(request.getMethod(), request.getEndpoint()))
                 .orElse("");
 
-        Route searchRoute = new Route()
-                .setMethod(request.getMethod()).setPath(request.getEndpoint()).setAlt(alt);
-
-        log.info("Route requested: {}", searchRoute);
-
-        return routeService.getEnabledRoute(searchRoute)
-                .orElseThrow(() -> new RouteNotFoundException(searchRoute));
+        var search = new Route().setMethod(request.getMethod()).setPath(request.getEndpoint()).setAlt(alt);
+        log.info("Route requested: {}", search);
+        return routeService.getEnabledRoute(search)
+                .orElseThrow(() -> new RouteNotFoundException(search));
     }
 
-    private Optional<String> maybeGetRandomAltFor(RequestMethod method, String path) {
-        if (configRepository.getSettings().getRandomAlt() || configRepository.getSettings().getQuantum()) {
+    private Optional<String> getAltIfQuantum(RequestMethod method, String path) {
+        if (configRepository.getSettings().isQuantum()) {
+            return routeService.getRandomAltFor(method, path);
+        }
+        return Optional.empty();
+    }
+
+    private Optional<String> getAltIfRandom(RequestMethod method, String path) {
+        if (configRepository.getSettings().isRandomAlt()) {
             return routeService.getRandomAltFor(method, path);
         }
         return Optional.empty();
@@ -137,7 +141,7 @@ public class MockServiceImpl implements MockService {
     }
 
     private RequestBodyValidationResult handleValidationException(DataValidationException e, Route route) {
-        if (configRepository.getSettings().getAlt400OnFailedRequestValidation()) {
+        if (configRepository.getSettings().isAlt400OnFailedRequestValidation()) {
             Route route400 = getRoute400For(route);
             if (route400 != null) {
                 log.info("Validation error. Route 400: {}", route400);
@@ -154,7 +158,7 @@ public class MockServiceImpl implements MockService {
     }
 
     private ResponseEntity<String> maybeApplyQuantumTheory(ResponseEntity<String> responseEntity) {
-        if (!configRepository.getSettings().getQuantum()) return responseEntity;
+        if (!configRepository.getSettings().isQuantum()) return responseEntity;
 
         for (QuantumTheory theory : quantumTheories) {
             if (theory.applicable(responseEntity.getBody())) {

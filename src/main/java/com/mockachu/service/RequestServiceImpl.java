@@ -132,20 +132,20 @@ public class RequestServiceImpl implements RequestService {
         var result = httpService.request(
                 request.getMethod(), uri, requestBody, headers);
 
-        result.ifPresent(res -> {
+        if (result != null) {
             if (request.isResponseToVars()) {
-                contextService.putAll(res.getResponseVariables());
-                contextService.putAll(request.getGroup(), res.getResponseVariables());
+                contextService.putAll(result.getResponseVariables());
+                contextService.putAll(request.getGroup(), result.getResponseVariables());
             }
             if (allowTrigger && request.isTriggerRequest()) {
                 scheduleRequests(request.getTriggerRequestIds(),
                         request.getTriggerRequestDelay(),
-                        res.getResponseVariables(),
+                        result.getResponseVariables(),
                         level + 1);
             }
-        });
+        }
 
-        return result;
+        return Optional.of(result);
     }
 
     @Override

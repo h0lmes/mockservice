@@ -6,10 +6,10 @@ import com.mockachu.domain.RouteType;
 import com.mockachu.domain.Settings;
 import com.mockachu.exception.RouteNotFoundException;
 import com.mockachu.repository.ConfigRepository;
-import com.mockachu.request.RequestFacade;
 import com.mockachu.template.MockVariables;
 import com.mockachu.validate.DataValidationException;
 import com.mockachu.validate.DataValidator;
+import com.mockachu.web.mock.MockRequestFacade;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,7 +57,7 @@ class MockServiceImplTest {
     @Mock
     private RequestService requestService;
     @Mock
-    private RequestFacade request;
+    private MockRequestFacade request;
     @Mock
     private QuantumTheory quantumTheory;
     @Mock
@@ -96,11 +96,12 @@ class MockServiceImplTest {
         String bodyWithVariables = "{\"test\": ${" + variableName + "}}";
         String bodyWithVariablesResult = "{\"test\": " + variableValue + "}";
         Route route = new Route().setMethod(GET_METHOD).setPath(PATH).setResponse(bodyWithVariables);
+        when(routeService.getEnabledRouteType(any(), any())).thenReturn(Optional.of(RouteType.REST));
         when(routeService.getEnabledRoute(any())).thenReturn(Optional.of(route));
 
         MockVariables variables = new MockVariables();
         variables.put(variableName, variableValue);
-        when(request.getVariables(any())).thenReturn(variables);
+        when(request.getVariables(any(), anyBoolean())).thenReturn(variables);
 
         MockService mockService = createMockService();
         ResponseEntity<String> responseEntity = mockService.mock(request);

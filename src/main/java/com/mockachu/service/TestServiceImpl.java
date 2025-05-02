@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,6 +31,8 @@ public class TestServiceImpl implements TestService {
     public static final String FAILED = "FAILED";
     public static final String ERROR = "ERROR (";
     private static final Logger log = LoggerFactory.getLogger(TestServiceImpl.class);
+    private static final String EXPECTED = "; expected: ";
+
     private final ConfigRepository configRepository;
     private final ApiTestMapper apiTestMapper;
     private final ContextService contextService;
@@ -213,7 +214,7 @@ public class TestServiceImpl implements TestService {
                 run.log(SUCCESS).log(" (").log(kv.key()).log(" == ").log(value).log(")\n");
             } else {
                 run.log(WARNING).log(" (").log(kv.key()).log(" == ").log(value)
-                        .log("; expected: ").log(expectedValue).log(")\n");
+                        .log(EXPECTED).log(expectedValue).log(")\n");
                 run.setErrorLevel(TestRunErrorLevel.WARNING);
             }
         } catch (Exception e) {
@@ -234,7 +235,7 @@ public class TestServiceImpl implements TestService {
                 run.log(SUCCESS).log(" (").log(kv.key()).log(" === ").log(value).log(")\n");
             } else {
                 run.log(FAILED).log(" (").log(kv.key()).log(" === ").log(value)
-                        .log("; expected: ").log(expectedValue).log(")\n");
+                        .log(EXPECTED).log(expectedValue).log(")\n");
                 run.setErrorLevel(TestRunErrorLevel.FAILED);
             }
         } catch (Exception e) {
@@ -267,10 +268,10 @@ public class TestServiceImpl implements TestService {
             String codes = kvStep.value();
             run.log("Request: ").log(request).log('\n');
 
-            Optional<HttpRequestResult> requestResult = requestService.executeRequest(
+            var result = requestService.executeRequest(
                     request, null, run.isAllowTrigger());
 
-            processRequestResult(run, requestResult, codes);
+            processRequestResult(run, result.orElse(null), codes);
         } catch (Exception e) {
             log.error("ERROR while executing request. ", e);
             run.log(ERROR).log("while executing request:\n").log(e.toString()).log(")\n");
@@ -294,10 +295,8 @@ public class TestServiceImpl implements TestService {
             String body = templateCache.get(kvUriBody.value())
                     .toString(contextService.get(), functions);
 
-            Optional<HttpRequestResult> requestResult = httpService.request(
-                    method, uri, body, null);
-
-            processRequestResult(run, requestResult, codes);
+            var result = httpService.request(method, uri, body, null);
+            processRequestResult(run, result, codes);
         } catch (Exception e) {
             log.error("ERROR while executing request. ", e);
             run.log(ERROR).log("while executing request:\n").log(e.toString()).log(")\n");
@@ -305,22 +304,20 @@ public class TestServiceImpl implements TestService {
         }
     }
 
-    private void processRequestResult(TestRun run,
-                                      Optional<HttpRequestResult> requestResult,
-                                      String codes) {
-        String result = requestResult.map(Objects::toString).orElse("...nothing...");
+    private void processRequestResult(TestRun run, HttpRequestResult requestResult, String codes) {
+        String result = requestResult == null ? "...nothing..." : requestResult.toString();
         run.log(result).log('\n');
 
-        requestResult.ifPresent(res -> {
-            run.setMockVariables(res.getResponseVariables());
-            if (codes == null || codes.isEmpty() || codes.contains("" + res.getStatusCode())) {
+        if (requestResult != null) {
+            run.setMockVariables(requestResult.getResponseVariables());
+            if (codes == null || codes.isEmpty() || codes.contains("" + requestResult.getStatusCode())) {
                 run.log("SUCCESS\n");
             } else {
-                run.log(FAILED).log(" (").log("status code = ").log(res.getStatusCode())
-                        .log("; expected: ").log(codes).log(")\n");
+                run.log(FAILED).log(" (").log("status code = ").log(requestResult.getStatusCode())
+                        .log(EXPECTED).log(codes).log(")\n");
                 run.setErrorLevel(TestRunErrorLevel.FAILED);
             }
-        });
+        }
     }
 
     @Override

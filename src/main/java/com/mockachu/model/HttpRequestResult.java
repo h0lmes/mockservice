@@ -1,6 +1,7 @@
 package com.mockachu.model;
 
 import com.mockachu.template.MockVariables;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -12,7 +13,8 @@ public class HttpRequestResult {
     private final boolean failed;
     private final RequestMethod method;
     private final String uri;
-    private final Map<String, List<String>> headers;
+    private final Map<String, List<String>> requestHeaders;
+    private final HttpHeaders responseHeaders;
     private final String requestBody;
     private final String responseBody;
     private final MockVariables responseVariables;
@@ -22,7 +24,8 @@ public class HttpRequestResult {
     public HttpRequestResult(boolean failed,
                              RequestMethod method,
                              String uri,
-                             Map<String, List<String>> headers,
+                             Map<String, List<String>> requestHeaders,
+                             HttpHeaders responseHeaders,
                              String requestBody,
                              String responseBody,
                              MockVariables responseVariables,
@@ -31,7 +34,8 @@ public class HttpRequestResult {
         this.failed = failed;
         this.method = method;
         this.uri = uri;
-        this.headers = headers;
+        this.requestHeaders = requestHeaders;
+        this.responseHeaders = responseHeaders;
         this.requestBody = requestBody;
         this.responseBody = responseBody;
         this.responseVariables = responseVariables;
@@ -55,11 +59,15 @@ public class HttpRequestResult {
         return statusCode;
     }
 
+    public HttpHeaders getResponseHeaders() {
+        return responseHeaders;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(method.toString()).append(" ").append(uri).append('\n');
-        if (headers != null && !headers.isEmpty()) {
+        if (requestHeaders != null && !requestHeaders.isEmpty()) {
             appendHeaders(builder);
         }
         if (!requestBody.isEmpty()) {
@@ -76,7 +84,7 @@ public class HttpRequestResult {
     }
 
     private void appendHeaders(StringBuilder builder) {
-        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : requestHeaders.entrySet()) {
             for (String value : entry.getValue()) {
                 builder.append(entry.getKey()).append(": ").append(value).append('\n');
             }

@@ -287,6 +287,18 @@ requests:
   triggerRequest: false
   triggerRequestIds: ""
   triggerRequestDelay: ""
+- id: _non_existent.GET..non-existent-route
+  group: _non_existent
+  type: REST
+  method: GET
+  path: localhost:8081/non-existent-route/234?q=1&a=test value
+  headers: ""
+  body: ""
+  responseToVars: false
+  disabled: false
+  triggerRequest: false
+  triggerRequestIds: ""
+  triggerRequestDelay: ""
 - id: api.robot
   group: robot
   type: REST

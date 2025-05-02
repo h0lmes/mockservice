@@ -171,11 +171,11 @@ class ConfigRepositoryImplTest {
         ConfigRepository configRepository = repository();
 
         Settings settings = new Settings();
-        boolean expected = !settings.getQuantum();
+        boolean expected = !settings.isQuantum();
         settings.setQuantum(expected);
         configRepository.setSettings(settings);
 
-        assertEquals(expected, configRepository.getSettings().getQuantum());
+        assertEquals(expected, configRepository.getSettings().isQuantum());
     }
 
     //----------------------------------------------------------------------

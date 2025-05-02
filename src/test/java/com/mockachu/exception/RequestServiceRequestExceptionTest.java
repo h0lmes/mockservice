@@ -8,7 +8,7 @@ class RequestServiceRequestExceptionTest {
 
     @Test
     void test() {
-        var e = new RequestServiceRequestException(200, "body");
+        var e = new RequestServiceRequestException(200, "body", null);
         assertEquals(200, e.getCode());
         assertEquals("body", e.getBody());
         assertEquals("body", e.toString());

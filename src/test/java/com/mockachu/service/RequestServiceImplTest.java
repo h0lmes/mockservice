@@ -102,10 +102,10 @@ class RequestServiceImplTest {
 
     @Test
     void executeRequest() {
-        var res = Optional.of(new HttpRequestResult(
-                false, RequestMethod.GET, "uri", Map.of(),
+        var res = new HttpRequestResult(
+                false, RequestMethod.GET, "uri", Map.of(), null,
                 "{\"test\": \"test\"}", "reqBody",
-                MockVariables.empty(), 200, Instant.now().toEpochMilli()));
+                MockVariables.empty(), 200, Instant.now().toEpochMilli());
         when(httpService.request(any(), anyString(), anyString(), any())).thenReturn(res);
 
         var entity = new OutboundRequest().setId("test_id");
@@ -120,7 +120,7 @@ class RequestServiceImplTest {
     @Test
     void scheduleRequest() {
         var res = Optional.of(new HttpRequestResult(
-                false, RequestMethod.GET, "uri", Map.of(),
+                false, RequestMethod.GET, "uri", Map.of(), null,
                 "{\"test\": \"test\"}", "reqBody",
                 MockVariables.empty(), 200, Instant.now().toEpochMilli()));
         doAnswer(ans -> res).when(httpService).request(any(), anyString(), anyString(), any());

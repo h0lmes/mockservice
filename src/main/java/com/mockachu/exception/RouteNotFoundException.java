@@ -11,6 +11,11 @@ public class RouteNotFoundException extends RuntimeException {
     }
 
     @Override
+    public String getMessage() {
+        return route != null ? route.toString() : "";
+    }
+
+    @Override
     public String toString() {
         return route != null ? route.toString() : "";
     }

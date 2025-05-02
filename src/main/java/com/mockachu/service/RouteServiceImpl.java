@@ -1,6 +1,7 @@
 package com.mockachu.service;
 
 import com.mockachu.domain.Route;
+import com.mockachu.domain.RouteType;
 import com.mockachu.mapper.RouteMapper;
 import com.mockachu.model.RouteDto;
 import com.mockachu.repository.ConfigRepository;
@@ -55,15 +56,24 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
-    public Optional<Route> getRouteForVariables(RequestMethod method, String path, MockVariables variables) {
-        return configRepository
-                .findAllRoutes()
-                .stream()
-                .filter(r -> Objects.equals(method, r.getMethod())
-                        && Objects.equals(path, r.getPath())
-                        && !r.getDisabled())
-                .filter(r -> r.getMatcher().match(variables))
-                .findFirst();
+    public Optional<String> getAltForVariables(RequestMethod method, String path, MockVariables variables) {
+        for (var route : configRepository.findAllRoutes()) {
+            if (Objects.equals(method, route.getMethod())
+                    && Objects.equals(path, route.getPath())
+                    && !route.getDisabled()
+                    && route.getMatcher().match(variables)) return Optional.of(route.getAlt());
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<RouteType> getEnabledRouteType(RequestMethod method, String path) {
+        for (var route : configRepository.findAllRoutes()) {
+            if (Objects.equals(method, route.getMethod())
+                    && Objects.equals(path, route.getPath())
+                    && !route.getDisabled()) return Optional.of(route.getType());
+        }
+        return Optional.empty();
     }
 
     //----------------------------------------------------------------------------------

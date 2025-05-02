@@ -32,7 +32,6 @@ import java.security.KeyStore;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Setting up SSL certificates
@@ -103,7 +102,7 @@ public class HttpServiceImpl implements HttpService, SettingsObserver {
     }
 
     @Override
-    public Optional<HttpRequestResult> request(RequestMethod method,
+    public HttpRequestResult request(RequestMethod method,
                         String uri,
                         String requestBody,
                         Map<String, List<String>> headers) {
@@ -122,28 +121,27 @@ public class HttpServiceImpl implements HttpService, SettingsObserver {
                     })
                     .retrieve()
                     // wrap any response into exception to extract both StatusCode and Body
-                    .onStatus(code -> true, res -> res.bodyToMono(String.class)
-                            .handle((error, sink) -> sink.error(
-                                            new RequestServiceRequestException(res.statusCode().value(), error)
-                                    )
-                            ))
+                    .onStatus(
+                            code -> true,
+                            res -> res.bodyToMono(String.class)
+                                    .handle((error, sink) -> sink.error(
+                                            new RequestServiceRequestException(
+                                                    res.statusCode().value(), error, res.headers().asHttpHeaders())
+                                    ))
+                    )
                     .bodyToMono(String.class)
                     .block(REQUEST_TIMEOUT);
 
-            throw new RequestServiceRequestException(200, body); // just in case
+            throw new RequestServiceRequestException(200, body, null); // just in case
         } catch (RequestServiceRequestException e) {
             log.info("Request ({} {}) response:\n{}", method, uri, e.toString());
             responseVars = jsonToMap(e.getBody());
-            return Optional.of(
-                    new HttpRequestResult(false, method, uri,
-                            headers, requestBody, e.getBody(),
-                            responseVars, e.getCode(), startMillis));
+            return new HttpRequestResult(false, method, uri, headers, e.getHeaders(),
+                    requestBody, e.getBody(), responseVars, e.getCode(), startMillis);
         } catch (Exception e) {
             log.error("Request (" + method + " " + uri + ") error.", e);
-            return Optional.of(
-                    new HttpRequestResult(true, method, uri,
-                            headers, requestBody, e.getMessage(),
-                            MockVariables.empty(), 0, startMillis));
+            return new HttpRequestResult(true, method, uri, headers, null,
+                    requestBody, e.getMessage(), MockVariables.empty(), 0, startMillis);
         }
     }
 

@@ -16,6 +16,19 @@
                           Variable ${requestBodyValidationErrorMessage} would be available to use in response body."
             >Alt '400' on failed request validation</ToggleSwitch>
         </p>
+        <div class="component px-4 py-3 mt-6">
+            <div>Proxying</div>
+
+            <p class="mb-3 mt-3">
+                <ToggleSwitch v-model="proxyEnabled"
+                              sub="When Route is not found for incoming request then proxy the request to the specified location"
+                >Proxy "Not Found"</ToggleSwitch>
+            </p>
+
+            <div>Proxy location</div>
+            <input type="text" class="form-control form-control-sm mt-3" v-model="proxyLocation"
+                placeholder="E.g. http://other.server:80"/>
+        </div>
 
         <div class="component px-4 py-3 mt-6">
             <div>SSL certificate</div>
@@ -35,7 +48,7 @@
 
             <div class="mt-4" v-show="hasCertificateOnServer">
                 <div>SSL certificate password</div>
-                <input type="password" class="form-control form-control-sm mt-3" v-model="password"/>
+                <input type="text" class="form-control form-control-sm mt-3" v-model="password"/>
                 <button type="button" class="btn btn-default mt-3" @click="setPass">
                     Set password
                     <span v-show="passwordSet">&#9989;</span>
@@ -69,6 +82,8 @@ export default {
             randomAlt: false,
             quantum: false,
             alt400OnFailedRequestValidation: true,
+            proxyEnabled: false,
+            proxyLocation: '',
             certificate: null,
             password: '',
             passwordSet: false,
@@ -94,6 +109,8 @@ export default {
             this.randomAlt = this.settings.randomAlt;
             this.quantum = this.settings.quantum;
             this.alt400OnFailedRequestValidation = this.settings.alt400OnFailedRequestValidation;
+            this.proxyEnabled = this.settings.proxyEnabled;
+            this.proxyLocation = this.settings.proxyLocation || '';
             this.certificate = this.settings.certificate;
         },
     },
@@ -110,6 +127,8 @@ export default {
                     randomAlt: this.randomAlt,
                     quantum: this.quantum,
                     failedInputValidationAlt400: this.failedInputValidationAlt400,
+                    proxyEnabled: this.proxyEnabled,
+                    proxyLocation: this.proxyLocation,
                     certificate: this.certificate,
                 }
             ).then(() => this.$nuxt.$loading.finish());
