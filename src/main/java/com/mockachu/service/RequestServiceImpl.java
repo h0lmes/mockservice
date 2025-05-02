@@ -145,7 +145,7 @@ public class RequestServiceImpl implements RequestService {
             }
         }
 
-        return Optional.of(result);
+        return Optional.ofNullable(result);
     }
 
     @Override

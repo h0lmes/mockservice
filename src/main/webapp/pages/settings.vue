@@ -21,11 +21,11 @@
 
             <p class="mb-3 mt-3">
                 <ToggleSwitch v-model="proxyEnabled"
-                              sub="When Route is not found for incoming request then proxy the request to the specified location"
-                >Proxy "Not Found"</ToggleSwitch>
+                              sub="When no Route is found for an incoming request then proxy request to the specified location"
+                >Proxy Not Found</ToggleSwitch>
             </p>
 
-            <div>Proxy location</div>
+            <div>Location</div>
             <input type="text" class="form-control form-control-sm mt-3" v-model="proxyLocation"
                 placeholder="E.g. http://other.server:80"/>
         </div>

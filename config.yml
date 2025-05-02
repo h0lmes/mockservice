@@ -8,6 +8,8 @@ settings:
     b = 2
     c = 3
     d = 24
+  proxyEnabled: false
+  proxyLocation: http://localhost:80
 routes:
 - group: entity
   type: REST
@@ -287,11 +289,11 @@ requests:
   triggerRequest: false
   triggerRequestIds: ""
   triggerRequestDelay: ""
-- id: _non_existent.GET..non-existent-route
-  group: _non_existent
+- id: _proxy.GET
+  group: _proxy
   type: REST
   method: GET
-  path: localhost:8081/non-existent-route/234?q=1&a=test value
+  path: localhost:8081/hello
   headers: ""
   body: ""
   responseToVars: false

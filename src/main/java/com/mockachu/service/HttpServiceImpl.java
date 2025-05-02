@@ -124,9 +124,9 @@ public class HttpServiceImpl implements HttpService, SettingsObserver {
                     .onStatus(
                             code -> true,
                             res -> res.bodyToMono(String.class)
-                                    .handle((error, sink) -> sink.error(
+                                    .handle((data, sink) -> sink.error(
                                             new RequestServiceRequestException(
-                                                    res.statusCode().value(), error, res.headers().asHttpHeaders())
+                                                    res.statusCode().value(), data, res.headers().asHttpHeaders())
                                     ))
                     )
                     .bodyToMono(String.class)
@@ -139,9 +139,9 @@ public class HttpServiceImpl implements HttpService, SettingsObserver {
             return new HttpRequestResult(false, method, uri, headers, e.getHeaders(),
                     requestBody, e.getBody(), responseVars, e.getCode(), startMillis);
         } catch (Exception e) {
-            log.error("Request (" + method + " " + uri + ") error.", e);
+            log.error("Request ({} {}) error. {}", method, uri, e.getMessage());
             return new HttpRequestResult(true, method, uri, headers, null,
-                    requestBody, e.getMessage(), MockVariables.empty(), 0, startMillis);
+                    requestBody, e.getMessage(), MockVariables.empty(), 400, startMillis);
         }
     }
 

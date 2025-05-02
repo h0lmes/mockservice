@@ -55,10 +55,11 @@ public class LoggingAspect {
                     e.getMessage(),
                     e);
         } else {
-            log.error("Exception in {}.{}() with cause:\n{}",
+            log.error("Exception in {}.{}() with cause:\n{}\nand exception:\n{}",
                     joinPoint.getSignature().getDeclaringTypeName(),
                     joinPoint.getSignature().getName(),
-                    e.getCause() != null ? e.getCause() : "NULL");
+                    e.getCause() != null ? e.getCause() : "NULL",
+                    e.getMessage());
         }
     }
 

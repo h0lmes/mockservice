@@ -71,7 +71,7 @@ public class HttpRequestResult {
             appendHeaders(builder);
         }
         if (!requestBody.isEmpty()) {
-            builder.append('\n').append(requestBody).append('\n');
+            builder.append(requestBody).append('\n');
         }
 
         if (failed) {
@@ -101,7 +101,9 @@ public class HttpRequestResult {
         builder.append("--- response in ").append(duration).append(" ms ---\n");
         var status = HttpStatus.resolve(statusCode);
         builder.append(statusCode).append(" ")
-                .append(status == null ? "Unknown" : status.getReasonPhrase()).append('\n');
-        builder.append(responseBody);
+                .append(status == null ? "Unknown" : status.getReasonPhrase());
+        if (responseBody != null && !responseBody.isBlank()) {
+            builder.append('\n').append(responseBody);
+        }
     }
 }

@@ -16,9 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class MockRequestFacade {
-
     private static final Logger log = LoggerFactory.getLogger(MockRequestFacade.class);
-
     private static final String REQUEST_MAPPING_DELIMITER = "/";
     private static final String NAME_DELIMITER = "-";
     private static final String ALT_HEADER = "Mock-Alt";
@@ -39,6 +37,11 @@ public class MockRequestFacade {
     private final List<String[]> mockAltHeaders;
     private final List<String[]> authHeaders;
     private String body = "";
+
+    @Override
+    public String toString() {
+        return requestMethod + " " + uri;
+    }
 
     @SuppressWarnings("unchecked")
     public MockRequestFacade(HttpServletRequest request, ObjectMapper jsonMapper) {

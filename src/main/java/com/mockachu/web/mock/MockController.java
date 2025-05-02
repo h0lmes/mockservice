@@ -27,9 +27,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
-public class ConfigBasedController implements ConfigObserver, RouteObserver {
+public class MockController implements ConfigObserver, RouteObserver {
 
-    private static final Logger log = LoggerFactory.getLogger(ConfigBasedController.class);
+    private static final Logger log = LoggerFactory.getLogger(MockController.class);
 
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
     private final HttpServletRequest request;
@@ -41,11 +41,11 @@ public class ConfigBasedController implements ConfigObserver, RouteObserver {
     private final Map<String, Integer> registeredRoutes = new ConcurrentHashMap<>();
     private final RequestMappingInfo.BuilderConfiguration options;
 
-    public ConfigBasedController(RequestMappingHandlerMapping requestMappingHandlerMapping,
-                                 HttpServletRequest request,
-                                 MockService mockService,
-                                 HttpService httpService, ConfigRepository configRepository,
-                                 @Qualifier("jsonMapper") ObjectMapper jsonMapper) throws NoSuchMethodException {
+    public MockController(RequestMappingHandlerMapping requestMappingHandlerMapping,
+                          HttpServletRequest request,
+                          MockService mockService,
+                          HttpService httpService, ConfigRepository configRepository,
+                          @Qualifier("jsonMapper") ObjectMapper jsonMapper) throws NoSuchMethodException {
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
         this.request = request;
         this.mockService = mockService;
@@ -78,6 +78,8 @@ public class ConfigBasedController implements ConfigObserver, RouteObserver {
     }
 
     private ResponseEntity<String> proxyRequest(MockRequestFacade facade) {
+        log.info("Proxying request: {}", facade);
+
         String proxyUri = configRepository.getSettings().getProxyLocation();
         if (proxyUri == null) proxyUri = "";
         if (!proxyUri.isBlank() && proxyUri.endsWith("/")) {
@@ -183,7 +185,7 @@ public class ConfigBasedController implements ConfigObserver, RouteObserver {
 
     @ExceptionHandler(RouteNotFoundException.class)
     protected ResponseEntity<String> handleRouteNotFoundException(RouteNotFoundException e) {
-        log.error("", e);
+        log.error("Route not found: {}", e.getMessage());
         return ResponseEntity.status(404).contentType(MediaType.TEXT_PLAIN).body(e.getMessage());
     }
 
