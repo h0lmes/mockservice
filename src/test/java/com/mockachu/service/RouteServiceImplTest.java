@@ -75,7 +75,7 @@ class RouteServiceImplTest {
 
         var service = service();
         var variables = new MockVariables().put("var1", "test value");
-        var alt = service.getAltForVariables(METHOD, PATH, variables);
+        var alt = service.getAltFor(METHOD, PATH, variables);
 
         assertTrue(alt.isPresent());
         assertEquals(route3.getAlt(), alt.get());
@@ -90,7 +90,7 @@ class RouteServiceImplTest {
 
         var service = service();
         var variables = new MockVariables().put("var2", "test value");
-        var alt = service.getAltForVariables(METHOD, PATH, variables);
+        var alt = service.getAltFor(METHOD, PATH, variables);
 
         assertFalse(alt.isPresent());
     }
@@ -103,7 +103,7 @@ class RouteServiceImplTest {
 
         var service = service();
         var variables = new MockVariables().put("var1", "test value");
-        var alt = service.getAltForVariables(METHOD, PATH, variables);
+        var alt = service.getAltFor(METHOD, PATH, variables);
 
         assertFalse(alt.isPresent());
     }

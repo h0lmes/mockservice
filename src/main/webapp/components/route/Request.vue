@@ -39,7 +39,7 @@
         <div v-show="editing" class="mock-col w1">
             <div class="mock-col-header">ID</div>
             <input type="text" class="form-control form-control-sm" v-model="editingData.id"
-                   placeholder="(empty to generate)"/>
+                   placeholder="empty to generate"/>
         </div>
         <div v-show="!editing && !testing" class="mock-col w2">
             <div class="mock-col-header">ID</div>
@@ -57,17 +57,21 @@
 
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">URL</div>
-            <input type="text" class="form-control form-control-sm" v-model="editingData.path"/>
+            <input type="text" class="form-control form-control-sm" v-model="editingData.path"
+                   placeholder="http://server:port/api/v1/path"/>
         </div>
 
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">REQUEST HEADERS</div>
-            <AutoSizeTextArea v-model="editingData.headers"></AutoSizeTextArea>
+            <AutoSizeTextArea v-model="editingData.headers"
+                              placeholder="Content-type: application/json"></AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">REQUEST BODY</div>
-            <AutoSizeTextArea v-model="editingData.body" ref="body"></AutoSizeTextArea>
+            <AutoSizeTextArea v-model="editingData.body" ref="body"
+                              placeholder='{"id": 1, "name": "admin"}'>
+            </AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-col w100 mt-1">

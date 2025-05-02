@@ -44,7 +44,7 @@ class ScenarioServiceImplTest {
 
         ScenarioService service = service();
 
-        assertTrue(service.getScenariosAsList().contains(scenario));
+        assertTrue(service.getScenarios().contains(scenario));
     }
 
     @Test

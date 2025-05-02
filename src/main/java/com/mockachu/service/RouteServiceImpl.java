@@ -24,8 +24,7 @@ public class RouteServiceImpl implements RouteService {
 
     public RouteServiceImpl(ConfigRepository configRepository,
                             RouteMapper routeMapper,
-                            RandomUtils randomUtils
-    ) {
+                            RandomUtils randomUtils) {
         this.configRepository = configRepository;
         this.routeMapper = routeMapper;
         this.randomUtils = randomUtils;
@@ -36,6 +35,16 @@ public class RouteServiceImpl implements RouteService {
         return configRepository
             .findRoute(route)
             .filter(r -> !r.getDisabled());
+    }
+
+    @Override
+    public Optional<RouteType> getEnabledRouteType(RequestMethod method, String path) {
+        for (var route : configRepository.findAllRoutes()) {
+            if (Objects.equals(method, route.getMethod())
+                    && Objects.equals(path, route.getPath())
+                    && !route.getDisabled()) return Optional.of(route.getType());
+        }
+        return Optional.empty();
     }
 
     @Override
@@ -56,7 +65,7 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
-    public Optional<String> getAltForVariables(RequestMethod method, String path, MockVariables variables) {
+    public Optional<String> getAltFor(RequestMethod method, String path, MockVariables variables) {
         for (var route : configRepository.findAllRoutes()) {
             if (Objects.equals(method, route.getMethod())
                     && Objects.equals(path, route.getPath())
@@ -65,18 +74,6 @@ public class RouteServiceImpl implements RouteService {
         }
         return Optional.empty();
     }
-
-    @Override
-    public Optional<RouteType> getEnabledRouteType(RequestMethod method, String path) {
-        for (var route : configRepository.findAllRoutes()) {
-            if (Objects.equals(method, route.getMethod())
-                    && Objects.equals(path, route.getPath())
-                    && !route.getDisabled()) return Optional.of(route.getType());
-        }
-        return Optional.empty();
-    }
-
-    //----------------------------------------------------------------------------------
 
     @Override
     public List<RouteDto> getRoutes() {

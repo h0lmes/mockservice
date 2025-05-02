@@ -32,20 +32,20 @@ public class ScenarioServiceImpl implements ScenarioService, ConfigObserver {
     }
 
     @Override
-    public List<Scenario> getScenariosAsList() {
+    public List<Scenario> getScenarios() {
         return new ArrayList<>(configRepository.findAllScenarios());
     }
 
     @Override
     public synchronized List<Scenario> putScenario(@Nullable Scenario originalScenario, @Nonnull Scenario scenario) throws IOException {
         configRepository.putScenario(originalScenario, scenario);
-        return getScenariosAsList();
+        return getScenarios();
     }
 
     @Override
     public synchronized List<Scenario> deleteScenario(Scenario scenario) throws IOException {
         configRepository.deleteScenario(scenario);
-        return getScenariosAsList();
+        return getScenarios();
     }
 
     // --- active scenarios ----------------------------------------------------------

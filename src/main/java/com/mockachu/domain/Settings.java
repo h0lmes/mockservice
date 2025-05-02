@@ -9,6 +9,7 @@ public class Settings {
     private String initialContext;
     private boolean proxyEnabled = false;
     private String proxyLocation;
+    private boolean useContextInRouteResponse = true;
 
     public Settings() {
         /* default */
@@ -74,6 +75,15 @@ public class Settings {
 
     public Settings setProxyLocation(String proxyLocation) {
         this.proxyLocation = proxyLocation;
+        return this;
+    }
+
+    public boolean isUseContextInRouteResponse() {
+        return useContextInRouteResponse;
+    }
+
+    public Settings setUseContextInRouteResponse(boolean useContextInRouteResponse) {
+        this.useContextInRouteResponse = useContextInRouteResponse;
         return this;
     }
 }

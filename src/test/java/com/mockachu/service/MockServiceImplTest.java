@@ -57,6 +57,8 @@ class MockServiceImplTest {
     @Mock
     private RequestService requestService;
     @Mock
+    private ContextService contextService;
+    @Mock
     private MockRequestFacade request;
     @Mock
     private QuantumTheory quantumTheory;
@@ -68,7 +70,7 @@ class MockServiceImplTest {
     private MockService createMockService() {
         return new MockServiceImpl(
                 2, routeService, scenarioService, configRepository, requestService,
-                List.of(quantumTheoryNonApplicable, quantumTheory), List.of(dataValidator));
+                contextService, List.of(quantumTheoryNonApplicable, quantumTheory), List.of(dataValidator));
     }
 
     @BeforeEach

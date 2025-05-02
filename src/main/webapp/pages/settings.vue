@@ -16,16 +16,22 @@
                           Variable ${requestBodyValidationErrorMessage} would be available to use in response body."
             >Alt '400' on failed request validation</ToggleSwitch>
         </p>
+        <p class="mb-2">
+            <ToggleSwitch v-model="useContextInRouteResponse"
+                          sub="When enabled variables from Context can be used in Route response body like ${var_name}"
+            >Use Context in Route response</ToggleSwitch>
+        </p>
         <div class="component px-4 py-3 mt-6">
             <div>Proxying</div>
 
             <p class="mb-3 mt-3">
                 <ToggleSwitch v-model="proxyEnabled"
-                              sub="When no Route is found for an incoming request then proxy request to the specified location"
-                >Proxy Not Found</ToggleSwitch>
+                              sub="When no Route is found for an incoming request then proxy request to the
+                              specified location. Useful when your application-in-development is partially done."
+                >Proxy not found Route</ToggleSwitch>
             </p>
 
-            <div>Location</div>
+            <div>Proxy location</div>
             <input type="text" class="form-control form-control-sm mt-3" v-model="proxyLocation"
                 placeholder="E.g. http://other.server:80"/>
         </div>
@@ -81,12 +87,13 @@ export default {
         return {
             randomAlt: false,
             quantum: false,
-            alt400OnFailedRequestValidation: true,
+            alt400OnFailedRequestValidation: false,
             proxyEnabled: false,
             proxyLocation: '',
             certificate: null,
             password: '',
             passwordSet: false,
+            useContextInRouteResponse: false,
         }
     },
     async fetch() {
@@ -112,6 +119,7 @@ export default {
             this.proxyEnabled = this.settings.proxyEnabled;
             this.proxyLocation = this.settings.proxyLocation || '';
             this.certificate = this.settings.certificate;
+            this.useContextInRouteResponse = this.settings.useContextInRouteResponse;
         },
     },
     methods: {
@@ -130,6 +138,7 @@ export default {
                     proxyEnabled: this.proxyEnabled,
                     proxyLocation: this.proxyLocation,
                     certificate: this.certificate,
+                    useContextInRouteResponse: this.useContextInRouteResponse,
                 }
             ).then(() => this.$nuxt.$loading.finish());
         },

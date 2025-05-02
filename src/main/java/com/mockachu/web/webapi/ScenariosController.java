@@ -29,7 +29,7 @@ public class ScenariosController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Scenario> scenarios() {
-        return scenarioService.getScenariosAsList();
+        return scenarioService.getScenarios();
     }
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)

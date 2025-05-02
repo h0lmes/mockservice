@@ -34,6 +34,7 @@ public class MockServiceImpl implements MockService {
     private final ScenarioService scenarioService;
     private final ConfigRepository configRepository;
     private final RequestService requestService;
+    private final ContextService contextService;
     private final List<QuantumTheory> quantumTheories;
     private final List<DataValidator> dataValidators;
     private final ConcurrentLruCache<Route, MockResponse> responseCache;
@@ -43,12 +44,13 @@ public class MockServiceImpl implements MockService {
                            ScenarioService scenarioService,
                            ConfigRepository configRepository,
                            RequestService requestService,
-                           List<QuantumTheory> quantumTheories,
+                           ContextService contextService, List<QuantumTheory> quantumTheories,
                            List<DataValidator> dataValidators) {
         this.routeService = routeService;
         this.scenarioService = scenarioService;
         this.configRepository = configRepository;
         this.requestService = requestService;
+        this.contextService = contextService;
         this.quantumTheories = quantumTheories;
         this.dataValidators = dataValidators;
         responseCache = new ConcurrentLruCache<>(cacheSize, this::mockResponseFromRoute);
@@ -71,11 +73,17 @@ public class MockServiceImpl implements MockService {
 
     @Override
     public ResponseEntity<String> mock(MockRequestFacade request) {
-        var isXmlBody = routeService
+        boolean isXmlBody = routeService
                 .getEnabledRouteType(request.getMethod(), request.getEndpoint())
                 .orElse(RouteType.REST)
                 .equals(RouteType.SOAP);
-        var variables = request.getVariables(null, isXmlBody);
+
+        MockVariables baseVariables = null;
+        if (configRepository.getSettings() != null
+                && configRepository.getSettings().isUseContextInRouteResponse()) {
+            baseVariables = contextService.get();
+        }
+        var variables = request.getVariables(baseVariables, isXmlBody);
 
         var route = findRouteForRequest(request, variables);
         var validationResult = validateRequestBody(route, request.getBody());
@@ -100,7 +108,7 @@ public class MockServiceImpl implements MockService {
         var alt = request.getAlt()
                 .or(() -> getAltIfQuantum(request.getMethod(), request.getEndpoint()))
                 .or(() -> scenarioService.getAltFor(request.getMethod(), request.getEndpoint()))
-                .or(() -> routeService.getAltForVariables(request.getMethod(), request.getEndpoint(), variables))
+                .or(() -> routeService.getAltFor(request.getMethod(), request.getEndpoint(), variables))
                 .or(() -> getAltIfRandom(request.getMethod(), request.getEndpoint()))
                 .orElse("");
 
@@ -111,17 +119,17 @@ public class MockServiceImpl implements MockService {
     }
 
     private Optional<String> getAltIfQuantum(RequestMethod method, String path) {
-        if (configRepository.getSettings().isQuantum()) {
-            return routeService.getRandomAltFor(method, path);
+        if (!configRepository.getSettings().isQuantum()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        return routeService.getRandomAltFor(method, path);
     }
 
     private Optional<String> getAltIfRandom(RequestMethod method, String path) {
-        if (configRepository.getSettings().isRandomAlt()) {
-            return routeService.getRandomAltFor(method, path);
+        if (!configRepository.getSettings().isRandomAlt()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        return routeService.getRandomAltFor(method, path);
     }
 
     private RequestBodyValidationResult validateRequestBody(Route route, String body) {
@@ -141,15 +149,13 @@ public class MockServiceImpl implements MockService {
     }
 
     private RequestBodyValidationResult handleValidationException(DataValidationException e, Route route) {
-        if (configRepository.getSettings().isAlt400OnFailedRequestValidation()) {
-            Route route400 = getRoute400For(route);
-            if (route400 != null) {
-                log.info("Validation error. Route 400: {}", route400);
-                return RequestBodyValidationResult.error(route400, e);
-            }
-        }
+        if (!configRepository.getSettings().isAlt400OnFailedRequestValidation()) throw e;
 
-        throw e;
+        var route400 = getRoute400For(route);
+        if (route400 == null) throw e;
+
+        log.info("Validation error. Route 400: {}", route400);
+        return RequestBodyValidationResult.error(route400, e);
     }
 
     private Route getRoute400For(Route route) {

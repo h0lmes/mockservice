@@ -54,7 +54,7 @@ class ScenariosControllerTest {
     @Test
     void getScenarios() throws Exception {
         Scenario scenario = new Scenario().setAlias(ALIAS);
-        when(scenarioService.getScenariosAsList()).thenReturn(List.of(scenario));
+        when(scenarioService.getScenarios()).thenReturn(List.of(scenario));
 
         mvc.perform(
                 get(WEB_API_SCENARIOS).contentType(MediaType.APPLICATION_JSON)
@@ -68,7 +68,7 @@ class ScenariosControllerTest {
 
     @Test
     void getScenarios_ExceptionThrown_ReturnsBadRequest() throws Exception {
-        when(scenarioService.getScenariosAsList()).thenThrow(RuntimeException.class);
+        when(scenarioService.getScenarios()).thenThrow(RuntimeException.class);
 
         mvc.perform(
                 get(WEB_API_SCENARIOS).contentType(MediaType.APPLICATION_JSON)

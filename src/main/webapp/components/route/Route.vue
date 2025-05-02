@@ -53,7 +53,8 @@
 
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">PATH</div>
-            <input type="text" class="form-control form-control-sm" v-model="editingData.path"/>
+            <input type="text" class="form-control form-control-sm" v-model="editingData.path"
+                   placeholder="/api/v1/etc"/>
         </div>
 
         <div v-show="editing" class="mock-group w100">
@@ -61,17 +62,20 @@
                 <div class="mb-2 color-secondary">ALT</div>
                 <input type="text" class="form-control form-control-sm"
                        v-model="editingData.alt"
-                       placeholder="can contain condition (e.g. variable=value)"/>
+                       placeholder="can contain condition like: id = 1"/>
             </div>
             <div class="mock-col w1">
                 <div class="mb-2 color-secondary">RESPONSE CODE</div>
-                <input type="text" class="form-control form-control-sm" v-model="editingData.responseCode"/>
+                <input type="text" class="form-control form-control-sm" v-model="editingData.responseCode"
+                       placeholder="200"/>
             </div>
         </div>
 
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">RESPONSE BODY</div>
-            <AutoSizeTextArea v-model="editingData.response" ref="response"></AutoSizeTextArea>
+            <AutoSizeTextArea v-model="editingData.response" ref="response"
+                              placeholder='{"id": 1, "name": "admin"}'>
+            </AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-col w100 mt-1">
@@ -80,7 +84,7 @@
         <div v-show="editing && showRequestBodySchema" class="mock-col w100">
             <AutoSizeTextArea v-model="editingData.requestBodySchema"
                               :min-rows="1" :max-rows="40"
-                              placeholder="REQUEST BODY SCHEMA (JSON)"
+                              placeholder="REQUEST BODY VALIDATION SCHEMA (JSON)"
             ></AutoSizeTextArea>
         </div>
 

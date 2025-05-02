@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface ScenarioService {
-    List<Scenario> getScenariosAsList();
+    List<Scenario> getScenarios();
     List<Scenario> putScenario(@Nullable Scenario originalScenario, @Nonnull Scenario scenario) throws IOException;
     List<Scenario> deleteScenario(Scenario scenario) throws IOException;
 

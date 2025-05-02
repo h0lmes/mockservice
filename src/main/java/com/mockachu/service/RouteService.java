@@ -12,9 +12,9 @@ import java.util.Optional;
 
 public interface RouteService {
     Optional<Route> getEnabledRoute(Route route);
-    Optional<String> getRandomAltFor(RequestMethod method, String path);
-    Optional<String> getAltForVariables(RequestMethod method, String path, MockVariables variables);
     Optional<RouteType> getEnabledRouteType(RequestMethod method, String path);
+    Optional<String> getRandomAltFor(RequestMethod method, String path);
+    Optional<String> getAltFor(RequestMethod method, String path, MockVariables variables);
     List<RouteDto> getRoutes();
     void putRoute(RouteDto reference, RouteDto route) throws IOException;
     void putRoutes(List<RouteDto> dto, boolean overwrite) throws IOException;
