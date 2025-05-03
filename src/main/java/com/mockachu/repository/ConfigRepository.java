@@ -32,7 +32,7 @@ public interface ConfigRepository {
     List<Scenario> findAllScenarios();
     Optional<Scenario> findScenario(Scenario scenario);
     void putScenario(@Nullable Scenario reference, @Nonnull Scenario scenario) throws IOException;
-    void deleteScenario(Scenario scenario) throws IOException;
+    void deleteScenarios(List<Scenario> scenarios) throws IOException;
 
     List<OutboundRequest> findAllRequests();
     Optional<OutboundRequest> findRequest(String requestId);

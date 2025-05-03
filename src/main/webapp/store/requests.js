@@ -1,17 +1,28 @@
+import {addSelectedProperty, handleError, selectAll} from "../js/common";
+
 export const state = () => ({
     requests: []
 });
 
 export const mutations = {
     store(state, payload) {
+        addSelectedProperty(payload);
         state.requests = payload;
     },
     add(state, payload) {
         state.requests.unshift(payload);
     },
+    select(state, payload) {
+        for (let i = 0; i < state.requests.length; i++) {
+            if (state.requests[i].id === payload.request.id) {
+                state.requests[i]._selected = payload.selected;
+            }
+        }
+    },
+    selectAll(state, payload) {
+        selectAll(state.requests, payload);
+    },
 };
-
-import {handleError} from "../js/common";
 
 export const actions = {
     async fetch({commit, rootState}) {
@@ -104,7 +115,14 @@ export const actions = {
             triggerRequestIds: '',
             triggerRequestDelay: '',
             _new: true,
+            _selected: null,
         };
         commit('add', request);
+    },
+    select({commit}, payload) {
+        commit('select', payload);
+    },
+    selectAll({commit}, payload) {
+        commit('selectAll', payload);
     },
 };

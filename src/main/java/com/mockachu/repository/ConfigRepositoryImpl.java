@@ -383,8 +383,17 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     }
 
     @Override
-    public void deleteScenario(Scenario scenario) throws IOException {
-        if (config.getScenarios().remove(scenario)) {
+    public void deleteScenarios(List<Scenario> scenarios) throws IOException {
+        boolean modified = false;
+
+        for (Scenario scenario : scenarios) {
+            if (config.getScenarios().remove(scenario)) {
+                //notifyScenarioDeleted(scenario);
+                modified = true;
+            }
+        }
+
+        if (modified) {
             tryPersistConfig();
         }
     }

@@ -24,6 +24,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -128,12 +129,12 @@ class ScenariosControllerTest {
     @Test
     void deleteScenario() throws Exception {
         Scenario scenario = new Scenario().setAlias(ALIAS);
-        when(scenarioService.deleteScenario(any())).thenReturn(List.of(scenario));
+        when(scenarioService.deleteScenarios(anyList())).thenReturn(List.of(scenario));
 
         mvc.perform(
                 delete(WEB_API_SCENARIOS)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.writeValueAsBytes(scenario))
+                        .content(jsonMapper.writeValueAsBytes(List.of(scenario)))
         )
                 .andDo(print())
                 .andExpect(status().isOk())

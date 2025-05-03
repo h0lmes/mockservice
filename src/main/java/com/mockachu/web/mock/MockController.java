@@ -61,6 +61,7 @@ public class MockController implements ConfigObserver, RouteObserver {
         options.setPatternParser(new PathPatternParser());
 
         register();
+        registerCaptureAll();
     }
 
     public CompletableFuture<ResponseEntity<String>> mock() {
@@ -72,7 +73,10 @@ public class MockController implements ConfigObserver, RouteObserver {
         try {
             return mockService.mock(facade);
         } catch (RouteNotFoundException e) {
-            if (!configRepository.getSettings().isProxyEnabled()) throw e;
+            if (!configRepository.getSettings().isProxyEnabled()) {
+                log.info("Not proxying");
+                throw e;
+            }
             return proxyRequest(facade);
         }
     }
@@ -97,13 +101,6 @@ public class MockController implements ConfigObserver, RouteObserver {
 
     private void register() {
         configRepository.findAllRoutes().forEach(this::registerRoute);
-
-        // capture all other requests
-        registerRoute(new Route().setMethod(RequestMethod.GET).setPath("/**"));
-        registerRoute(new Route().setMethod(RequestMethod.POST).setPath("/**"));
-        registerRoute(new Route().setMethod(RequestMethod.PUT).setPath("/**"));
-        registerRoute(new Route().setMethod(RequestMethod.PATCH).setPath("/**"));
-        registerRoute(new Route().setMethod(RequestMethod.DELETE).setPath("/**"));
     }
 
     @Override
@@ -147,6 +144,32 @@ public class MockController implements ConfigObserver, RouteObserver {
         requestMappingHandlerMapping.registerMapping(mappingInfo, this, mockMethod);
 
         log.info("Registering route, success: {}", route);
+    }
+
+    private void registerCaptureAll() {
+        log.info("Registering mappings for /**");
+
+        requestMappingHandlerMapping.registerMapping(
+                buildMapping(RequestMethod.GET, "/**"), this, mockMethod);
+        requestMappingHandlerMapping.registerMapping(
+                buildMapping(RequestMethod.POST, "/**"), this, mockMethod);
+        requestMappingHandlerMapping.registerMapping(
+                buildMapping(RequestMethod.PUT, "/**"), this, mockMethod);
+        requestMappingHandlerMapping.registerMapping(
+                buildMapping(RequestMethod.PATCH, "/**"), this, mockMethod);
+        requestMappingHandlerMapping.registerMapping(
+                buildMapping(RequestMethod.DELETE, "/**"), this, mockMethod);
+
+        log.info("Registered mappings for /**");
+    }
+
+    private RequestMappingInfo buildMapping(RequestMethod method, String path) {
+        return RequestMappingInfo
+                .paths(path)
+                .methods(method)
+                .headers("Connection!=upgrade", "Connection!=Upgrade")
+                .options(options)
+                .build();
     }
 
     private void unregisterRoute(Route route) {

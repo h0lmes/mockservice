@@ -4,6 +4,15 @@
          @click.middle.stop.prevent="edit"
          @keydown.esc.exact="cancel">
 
+        <div v-show="!open" class="mock-col w-fixed-auto">
+            <component :is="`icon`" class="component-row-icon color-accent-one"/>
+        </div>
+
+        <div v-show="selecting && !open" class="mock-col w-fixed-auto">
+            <ToggleSwitch class="mock-col-value"
+                          :value="selected" @toggle="select"></ToggleSwitch>
+        </div>
+
         <div v-if="!testing" class="mock-col w2">
             <div class="mock-col-header">GROUP</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(test.group)">{{ test.group }}</div>
@@ -29,7 +38,7 @@
         <div v-if="!testing" class="mock-col w-fixed-auto">
             <div v-show="editing" class="mock-col-header"></div>
             <div class="mock-col-value">
-                <ButtonExecute class="orange-yellow" @click="testRun"></ButtonExecute>
+                <ButtonExecute @click="testRun"></ButtonExecute>
                 <ButtonEdit @click="edit"></ButtonEdit>
                 <ButtonDelete @click="del"></ButtonDelete>
             </div>
@@ -61,14 +70,17 @@
 <script>
 import {mapActions} from 'vuex';
 import AutoSizeTextArea from "../other/AutoSizeTextArea";
+import ToggleSwitch from "../other/ToggleSwitch";
 import TestRun from "@/components/route/TestRun";
 import ButtonDelete from "@/components/other/ButtonDelete";
 import ButtonEdit from "@/components/other/ButtonEdit";
 import ButtonExecute from "@/components/other/ButtonExecute";
+import Icon from '@/assets/icons/question.svg?inline';
 
 export default {
     name: "Test",
-    components: {ButtonExecute, ButtonEdit, ButtonDelete, TestRun, AutoSizeTextArea},
+    components: {ButtonExecute, ButtonEdit, ButtonDelete, Icon,
+        TestRun, AutoSizeTextArea, ToggleSwitch},
     data() {
         return {
             editing: false,
@@ -83,6 +95,13 @@ export default {
         open() {
             return this.editing || this.testing;
         },
+        selected() {
+            if (!this.test) return null;
+            return this.test._selected;
+        },
+        selecting() {
+            return this.selected !== undefined && this.selected !== null;
+        },
     },
     mounted() {
         if (this.test._new) this.edit();
@@ -91,8 +110,12 @@ export default {
         ...mapActions({
             filter: 'setApiSearchExpression',
             saveTest: 'tests/save',
-            deleteTest: 'tests/delete',
+            deleteTests: 'tests/delete',
+            selectTest: 'tests/select',
         }),
+        select(value) {
+            this.selectTest({test: this.test, selected: value});
+        },
         edit() {
             this.testing = false;
             this.editingTest = {...this.test};
@@ -101,7 +124,7 @@ export default {
         },
         cancel() {
             if (!!this.test._new) {
-                this.deleteTest([this.test]);
+                this.deleteTests([this.test]);
             } else {
                 this.editing = false;
                 this.editingTest = {};
@@ -109,12 +132,12 @@ export default {
         },
         del() {
             if (!!this.test._new) {
-                this.deleteTest([this.test]);
+                this.deleteTests([this.test]);
                 return;
             }
             if (confirm('Sure you want to delete?')) {
                 this.$nuxt.$loading.start();
-                this.deleteTest([this.test])
+                this.deleteTests([this.test])
                     .then(() => this.$nuxt.$loading.finish());
             }
         },

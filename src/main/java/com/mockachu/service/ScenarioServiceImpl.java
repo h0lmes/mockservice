@@ -43,8 +43,8 @@ public class ScenarioServiceImpl implements ScenarioService, ConfigObserver {
     }
 
     @Override
-    public synchronized List<Scenario> deleteScenario(Scenario scenario) throws IOException {
-        configRepository.deleteScenario(scenario);
+    public synchronized List<Scenario> deleteScenarios(List<Scenario> scenarios) throws IOException {
+        configRepository.deleteScenarios(scenarios);
         return getScenarios();
     }
 

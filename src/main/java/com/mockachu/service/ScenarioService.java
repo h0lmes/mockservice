@@ -13,7 +13,7 @@ import java.util.Set;
 public interface ScenarioService {
     List<Scenario> getScenarios();
     List<Scenario> putScenario(@Nullable Scenario originalScenario, @Nonnull Scenario scenario) throws IOException;
-    List<Scenario> deleteScenario(Scenario scenario) throws IOException;
+    List<Scenario> deleteScenarios(List<Scenario> scenarios) throws IOException;
 
     Set<String> getActiveScenarios();
     Set<String> activateScenario(String alias);

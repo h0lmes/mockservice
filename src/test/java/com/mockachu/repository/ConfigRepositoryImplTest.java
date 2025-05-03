@@ -436,7 +436,7 @@ class ConfigRepositoryImplTest {
 
         Scenario scenario1 = new Scenario().setAlias(STR1);
         configRepository.putScenario(null, scenario1);
-        configRepository.deleteScenario(scenario1);
+        configRepository.deleteScenarios(List.of(scenario1));
 
         assertEquals(0, configRepository.findAllScenarios().size());
     }
@@ -447,7 +447,7 @@ class ConfigRepositoryImplTest {
 
         Scenario scenario1 = new Scenario().setAlias(STR1);
         assertDoesNotThrow(() -> configRepository.putScenario(null, scenario1));
-        assertDoesNotThrow(() -> configRepository.deleteScenario(scenario1));
+        assertDoesNotThrow(() -> configRepository.deleteScenarios(List.of(scenario1)));
     }
 
     @Test
@@ -458,7 +458,7 @@ class ConfigRepositoryImplTest {
         configRepository.putScenario(null, scenario1);
 
         Scenario scenario2 = new Scenario().setAlias(STR2);
-        configRepository.deleteScenario(scenario2);
+        configRepository.deleteScenarios(List.of(scenario2));
 
         assertEquals(1, configRepository.findAllScenarios().size());
     }

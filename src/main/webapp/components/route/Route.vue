@@ -4,6 +4,15 @@
          @click.middle.stop.prevent="edit"
          @keydown.esc.exact="cancel">
 
+        <div v-show="!open" class="mock-col w-fixed-auto">
+            <component :is="`icon`" class="component-row-icon grey"/>
+        </div>
+
+        <div v-show="selecting && !open" class="mock-col w-fixed-auto">
+            <ToggleSwitch class="mock-col-value"
+                          :value="selected" @toggle="select"></ToggleSwitch>
+        </div>
+
         <div v-show="editing" class="mock-col w1">
             <div class="mock-col-header">TYPE</div>
             <select class="form-control form-control-sm" v-model="editingData.type">
@@ -27,8 +36,8 @@
                 <option>GET</option>
                 <option>POST</option>
                 <option>PUT</option>
-                <option>DELETE</option>
                 <option>PATCH</option>
+                <option>DELETE</option>
             </select>
         </div>
 
@@ -128,10 +137,11 @@ import AutoSizeTextArea from "../other/AutoSizeTextArea";
 import ButtonDelete from "@/components/other/ButtonDelete";
 import ButtonEdit from "@/components/other/ButtonEdit";
 import ButtonExecute from "@/components/other/ButtonExecute";
+import Icon from '@/assets/icons/star.svg?inline';
 
 export default {
     name: "Route",
-    components: {ButtonExecute, ButtonEdit, ButtonDelete,
+    components: {ButtonExecute, ButtonEdit, ButtonDelete, Icon,
         AutoSizeTextArea, RouteTester, RouteMethod, ToggleSwitch},
     data() {
         return {
@@ -151,6 +161,13 @@ export default {
         hasVariables() {
             return this.route.variables && this.route.variables.length > 0;
         },
+        selected() {
+            if (!this.route) return null;
+            return this.route._selected;
+        },
+        selecting() {
+            return this.selected !== undefined && this.selected !== null;
+        },
     },
     mounted() {
         if (this.route._new) this.edit();
@@ -160,7 +177,11 @@ export default {
             filter: 'setApiSearchExpression',
             saveRoute: 'routes/save',
             deleteRoutes: 'routes/delete',
+            selectRoute: 'routes/select',
         }),
+        select(value) {
+            this.selectRoute({route: this.route, selected: value});
+        },
         edit() {
             this.testing = false;
             this.editingData = {...this.route};

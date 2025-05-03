@@ -18,6 +18,8 @@
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRequests">Requests</ToggleSwitch>
             <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showTests">Tests</ToggleSwitch>
             <ViewSelector class="toolbar-item toolbar-item-w-fixed-auto"></ViewSelector>
+            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto"
+                          :value="selecting" @toggle="setSelect">Select</ToggleSwitch>
         </div>
 
         <div class="component-toolbar mb-5">
@@ -25,7 +27,9 @@
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addScenario">Add scenario</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRequest">Add request</button>
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addTest">Add test</button>
-            <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger mr-3" @click="deleteVisibleRoutes">Delete visible routes</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger mr-3"
+                    v-show="selecting"
+                    @click="deleteSelected">Delete selected</button>
         </div>
 
         <Routes :entities="filteredEntities"></Routes>
@@ -98,6 +102,7 @@ import Routes from "../components/route/Routes";
 import Loading from "../components/other/Loading";
 import ViewSelector from "../components/other/ViewSelector";
 import ToggleSwitch from "../components/other/ToggleSwitch";
+import {_isRequest, _isRoute, _isScenario, _isTest} from "@/js/common";
 
 export default {
     name: "index",
@@ -149,6 +154,11 @@ export default {
                 return [];
             }
         },
+        selecting() {
+            if (!this.filteredEntities || this.filteredEntities.length === 0) return false;
+            return this.filteredEntities[0]._selected !== undefined
+                && this.filteredEntities[0]._selected !== null;
+        },
     },
     mounted() {
         this.$refs.search.value = this.searchExpression;
@@ -167,15 +177,22 @@ export default {
             fetchRoutes: 'routes/fetch',
             addRouteAction: 'routes/add',
             deleteRoutes: 'routes/delete',
+            selectRoutes: 'routes/selectAll',
 
             fetchRequests: 'requests/fetch',
             addRequestAction: 'requests/add',
+            deleteRequests: 'requests/delete',
+            selectRequests: 'requests/selectAll',
 
             fetchScenarios: 'scenarios/fetch',
             addScenarioAction: 'scenarios/add',
+            deleteScenarios: 'scenarios/delete',
+            selectScenarios: 'scenarios/selectAll',
 
             fetchTests: 'tests/fetch',
             addTestAction: 'tests/add',
+            deleteTests: 'tests/delete',
+            selectTests: 'tests/selectAll',
         }),
         addRoute() {
             this.showRoutes = true
@@ -193,13 +210,34 @@ export default {
             this.showTests = true
             this.addTestAction()
         },
-        async deleteVisibleRoutes() {
-            if (confirm('Are you sure you want to delete all visible routes?\n'
-                + 'Note: if filter (search) is applied - you only delete those you see on the screen.')) {
+        setSelect(value) {
+            if (value) {
+                this.selectRoutes(false);
+                this.selectRequests(false);
+                this.selectScenarios(false);
+                this.selectTests(false);
+            } else {
+                this.selectRoutes(null);
+                this.selectRequests(null);
+                this.selectScenarios(null);
+                this.selectTests(null);
+            }
+        },
+        async deleteSelected() {
+            if (confirm('Are you sure you want to delete all selected entities?')) {
                 this.$nuxt.$loading.start();
-                await this.deleteRoutes(
-                    this.filteredEntities.filter(e => e.hasOwnProperty('alt'))
-                ).then(() => this.$nuxt.$loading.finish());
+
+                const routes = this.filteredEntities.filter(e => _isRoute(e) && e._selected);
+                const requests = this.filteredEntities.filter(e => _isRequest(e) && e._selected);
+                const scenarios = this.filteredEntities.filter(e => _isScenario(e) && e._selected);
+                const tests = this.filteredEntities.filter(e => _isTest(e) && e._selected);
+
+                if (routes.length > 0) await this.deleteRoutes(routes);
+                if (requests.length > 0) await this.deleteRequests(requests);
+                if (scenarios.length > 0) await this.deleteScenarios(scenarios);
+                if (tests.length > 0) await this.deleteTests(tests);
+
+                this.$nuxt.$loading.finish();
             }
         },
         getSearchFn() {

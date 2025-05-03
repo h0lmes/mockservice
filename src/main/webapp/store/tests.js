@@ -1,17 +1,28 @@
+import {addSelectedProperty, handleError, selectAll} from "../js/common";
+
 export const state = () => ({
     tests: []
 });
 
 export const mutations = {
     store(state, payload) {
+        addSelectedProperty(payload);
         state.tests = payload;
     },
     add(state, payload) {
         state.tests.unshift(payload);
     },
+    select(state, payload) {
+        for (let i = 0; i < state.tests.length; i++) {
+            if (state.tests[i].alias === payload.test.alias) {
+                state.tests[i]._selected = payload.selected;
+            }
+        }
+    },
+    selectAll(state, payload) {
+        selectAll(state.tests, payload);
+    },
 };
-
-import {handleError} from "../js/common";
 
 export const actions = {
     async fetch({commit, rootState}) {
@@ -150,7 +161,14 @@ export const actions = {
             alias: 'New Test',
             plan: '',
             _new: true,
+            _selected: null,
         };
         commit('add', entity);
+    },
+    select({commit}, payload) {
+        commit('select', payload);
+    },
+    selectAll({commit}, payload) {
+        commit('selectAll', payload);
     },
 };

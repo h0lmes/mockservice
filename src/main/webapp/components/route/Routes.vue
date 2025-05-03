@@ -18,6 +18,7 @@ import Route from "./Route";
 import Request from "./Request";
 import Scenario from "./Scenario";
 import Test from "./Test";
+import {_isRequest, _isRoute, _isScenario, _isTest} from "@/js/common";
 
 export default {
     name: "Routes",
@@ -40,32 +41,32 @@ export default {
                 if (c !== 0) return c;
 
                 // within a group tests go first
-                if (this.isTest(a)) {
-                    if (!this.isTest(b)) return -1;
+                if (_isTest(a)) {
+                    if (!_isTest(b)) return -1;
                     // sorted by alias
                     return this.compare(a.alias, b.alias);
                 }
 
                 // requests
-                if (this.isRequest(a)) {
-                    if (this.isTest(b)) return 1;
-                    if (!this.isRequest(b)) return -1;
+                if (_isRequest(a)) {
+                    if (_isTest(b)) return 1;
+                    if (!_isRequest(b)) return -1;
                     // sorted by id
                     return this.compare(a.id, b.id);
                 }
 
                 // scenarios
-                if (this.isScenario(a)) {
-                    if (this.isTest(b)) return 1;
-                    if (this.isRequest(b)) return 1;
-                    if (this.isRoute(b)) return -1;
+                if (_isScenario(a)) {
+                    if (_isTest(b)) return 1;
+                    if (_isRequest(b)) return 1;
+                    if (_isRoute(b)) return -1;
                     // sorted by alias
                     return this.compare(a.alias, b.alias);
                 }
 
                 // routes go last
-                let isRouteA = this.isRoute(a);
-                let isRouteB = this.isRoute(b);
+                let isRouteA = _isRoute(a);
+                let isRouteB = _isRoute(b);
                 c = this.compare(isRouteA, isRouteB);
                 if (c !== 0) return c;
 
@@ -90,21 +91,21 @@ export default {
         groupStart(arr, entity, index) {
             return index > 0 && entity.group !== arr[index - 1].group;
         },
-        isRoute(entity) {
-            return entity.hasOwnProperty('alt');
+        isRoute(e) {
+            return _isRoute(e);
         },
-        isRequest(entity) {
-            return entity.hasOwnProperty('id') && !entity.hasOwnProperty('alt');
+        isRequest(e) {
+            return _isRequest(e);
         },
-        isScenario(entity) {
-            return entity.hasOwnProperty('alias') && entity.hasOwnProperty('data');
+        isScenario(e) {
+            return _isScenario(e);
         },
-        isTest(entity) {
-            return entity.hasOwnProperty('plan');
+        isTest(e) {
+            return _isTest(e);
         },
         entityKey(entity) {
-            if (this.isRoute(entity)) return entity.method + entity.path + entity.alt;
-            if (this.isRequest(entity)) return entity.id;
+            if (_isRoute(entity)) return entity.method + entity.path + entity.alt;
+            if (_isRequest(entity)) return entity.id;
             return entity.alias;
         },
     }

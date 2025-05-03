@@ -1,9 +1,12 @@
+import {addSelectedProperty, handleError, selectAll} from "../js/common";
+
 export const state = () => ({
     scenarios: [],
 });
 
 export const mutations = {
     store(state, payload) {
+        addSelectedProperty(payload);
         state.scenarios = payload;
     },
     add(state, payload) {
@@ -23,9 +26,17 @@ export const mutations = {
             }
         }
     },
+    select(state, payload) {
+        for (let i = 0; i < state.scenarios.length; i++) {
+            if (state.scenarios[i].alias === payload.scenario.alias) {
+                state.scenarios[i]._selected = payload.selected;
+            }
+        }
+    },
+    selectAll(state, payload) {
+        selectAll(state.scenarios, payload);
+    },
 };
-
-import {handleError} from "../js/common";
 
 export const actions = {
     async fetch({commit, rootState}) {
@@ -55,13 +66,13 @@ export const actions = {
             commit('setLastError', err, {root: true});
         }
     },
-    async delete({commit, rootState}, scenario) {
+    async delete({commit, rootState}, scenarios) {
         try {
             const url = rootState.BASE_URL + '/__webapi__/scenarios';
             const params = {
                 method: 'DELETE',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(scenario)
+                body: JSON.stringify(scenarios)
             };
             const res = await fetch(url, params);
             await handleError(res);
@@ -77,7 +88,8 @@ export const actions = {
             alias: 'New Scenario',
             type: 'MAP',
             data: '',
-            _new: true
+            _new: true,
+            _selected: null,
         };
         commit('add', scenario);
     },
@@ -108,5 +120,11 @@ export const actions = {
         } catch (err) {
             commit('setLastError', err, {root: true});
         }
+    },
+    select({commit}, payload) {
+        commit('select', payload);
+    },
+    selectAll({commit}, payload) {
+        commit('selectAll', payload);
     },
 };

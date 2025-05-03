@@ -1,17 +1,30 @@
+import {addSelectedProperty, handleError, selectAll} from "../js/common";
+
 export const state = () => ({
     routes: []
 });
 
 export const mutations = {
     store(state, payload) {
+        addSelectedProperty(payload);
         state.routes = payload;
     },
     add(state, payload) {
         state.routes.unshift(payload);
     },
+    select(state, payload) {
+        for (let i = 0; i < state.routes.length; i++) {
+            if (state.routes[i].method === payload.route.method
+                && state.routes[i].path === payload.route.path
+                && state.routes[i].alt === payload.route.alt) {
+                state.routes[i]._selected = payload.selected;
+            }
+        }
+    },
+    selectAll(state, payload) {
+        selectAll(state.routes, payload);
+    },
 };
-
-import {handleError} from "../js/common";
 
 export const actions = {
     async fetch({commit, rootState}) {
@@ -87,7 +100,14 @@ export const actions = {
             triggerRequestIds: '',
             triggerRequestDelay: '',
             _new: true,
+            _selected: null,
         };
         commit('add', route);
+    },
+    select({commit}, payload) {
+        commit('select', payload);
+    },
+    selectAll({commit}, payload) {
+        commit('selectAll', payload);
     },
 };

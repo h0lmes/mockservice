@@ -4,6 +4,15 @@
          @click.middle.stop.prevent="edit"
          @keydown.esc.exact="cancel">
 
+        <div v-show="!open" class="mock-col w-fixed-auto">
+            <component :is="`icon`" class="component-row-icon color-accent-one"/>
+        </div>
+
+        <div v-show="selecting && !open" class="mock-col w-fixed-auto">
+            <ToggleSwitch class="mock-col-value"
+                          :value="selected" @toggle="select"></ToggleSwitch>
+        </div>
+
         <div class="mock-col w2">
             <div class="mock-col-header">GROUP</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.group)">{{ scenario.group }}</div>
@@ -70,10 +79,12 @@ import AutoSizeTextArea from "../other/AutoSizeTextArea";
 import ButtonDelete from "@/components/other/ButtonDelete";
 import ButtonEdit from "@/components/other/ButtonEdit";
 import ButtonExecute from "@/components/other/ButtonExecute";
+import Icon from '@/assets/icons/scroll.svg?inline';
 
 export default {
     name: "Scenario",
-    components: {ButtonExecute, ButtonEdit, ButtonDelete, AutoSizeTextArea, RoutesToAdd, ToggleSwitch},
+    components: {ButtonExecute, ButtonEdit, ButtonDelete, Icon,
+        AutoSizeTextArea, RoutesToAdd, ToggleSwitch},
     data() {
         return {
             editing: false,
@@ -94,7 +105,14 @@ export default {
         },
         active() {
             return this.scenario.active;
-        }
+        },
+        selected() {
+            if (!this.scenario) return null;
+            return this.scenario._selected;
+        },
+        selecting() {
+            return this.selected !== undefined && this.selected !== null;
+        },
     },
     created() {
         this.activeSwitch = this.active;
@@ -108,11 +126,15 @@ export default {
         ...mapActions({
             filter: 'setApiSearchExpression',
             saveScenario: 'scenarios/save',
-            deleteScenario: 'scenarios/delete',
+            deleteScenarios: 'scenarios/delete',
             activateScenario: 'scenarios/activate',
             deactivateScenario: 'scenarios/deactivate',
             fetchRoutes: 'routes/fetch',
+            selectScenario: 'scenarios/select',
         }),
+        select(value) {
+            this.selectScenario({scenario: this.scenario, selected: value});
+        },
         activeToggled() {
             if (this.activeSwitch) this.activate(); else this.deactivate();
         },
@@ -139,7 +161,7 @@ export default {
         },
         cancel() {
             if (!!this.scenario._new) {
-                this.deleteScenario(this.scenario);
+                this.deleteScenarios([this.scenario]);
             } else {
                 this.editing = false;
                 this.editingScenario = {};
@@ -147,12 +169,12 @@ export default {
         },
         del() {
             if (!!this.scenario._new) {
-                this.deleteScenario(this.scenario);
+                this.deleteScenarios([this.scenario]);
                 return;
             }
             if (confirm('Sure you want to delete?')) {
                 this.$nuxt.$loading.start();
-                this.deleteScenario(this.scenario)
+                this.deleteScenarios([this.scenario])
                     .then(() => this.$nuxt.$loading.finish());
             }
         },

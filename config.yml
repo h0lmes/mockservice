@@ -10,6 +10,7 @@ settings:
     d = 24
   proxyEnabled: false
   proxyLocation: http://localhost:80
+  useContextInRouteResponse: true
 routes:
 - group: entity
   type: REST

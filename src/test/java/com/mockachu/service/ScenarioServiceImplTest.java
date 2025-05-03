@@ -65,9 +65,9 @@ class ScenarioServiceImplTest {
         when(configRepository.findAllScenarios()).thenReturn(List.of(scenario));
 
         ScenarioService service = service();
-        service.deleteScenario(scenario);
+        service.deleteScenarios(List.of(scenario));
 
-        verify(configRepository, times(1)).deleteScenario(scenario);
+        verify(configRepository, times(1)).deleteScenarios(List.of(scenario));
     }
 
     // --- active scenarios ----------------------------------------------------------------

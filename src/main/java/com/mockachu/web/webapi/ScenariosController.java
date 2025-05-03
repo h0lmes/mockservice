@@ -38,8 +38,8 @@ public class ScenariosController {
     }
 
     @DeleteMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Scenario> deleteScenario(@RequestBody Scenario scenario) throws IOException {
-        return scenarioService.deleteScenario(scenario);
+    public List<Scenario> deleteScenario(@RequestBody List<Scenario> scenarios) throws IOException {
+        return scenarioService.deleteScenarios(scenarios);
     }
 
     @PutMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)

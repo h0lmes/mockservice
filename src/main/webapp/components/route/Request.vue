@@ -4,6 +4,15 @@
          @click.middle.stop.prevent="edit"
          @keydown.esc.exact="cancel">
 
+        <div v-show="!open" class="mock-col w-fixed-auto">
+            <component :is="`icon`" class="component-row-icon color-accent-one"/>
+        </div>
+
+        <div v-show="selecting && !open" class="mock-col w-fixed-auto">
+            <ToggleSwitch class="mock-col-value"
+                          :value="selected" @toggle="select"></ToggleSwitch>
+        </div>
+
         <div v-show="editing" class="mock-col w1">
             <div class="mock-col-header">TYPE</div>
             <select class="form-control form-control-sm" v-model="editingData.type">
@@ -49,7 +58,7 @@
         <div v-if="!testing" class="mock-col w-fixed-auto">
             <div v-show="editing" class="mock-col-header"></div>
             <div class="mock-col-value">
-                <ButtonExecute class="orange-yellow" @click="test"></ButtonExecute>
+                <ButtonExecute @click="test"></ButtonExecute>
                 <ButtonEdit @click="edit"></ButtonEdit>
                 <ButtonDelete @click="del"></ButtonDelete>
             </div>
@@ -64,7 +73,7 @@
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">REQUEST HEADERS</div>
             <AutoSizeTextArea v-model="editingData.headers"
-                              placeholder="Content-type: application/json"></AutoSizeTextArea>
+                              placeholder="Content-Type: application/json"></AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-col w100">
@@ -117,10 +126,12 @@ import AutoSizeTextArea from "../other/AutoSizeTextArea";
 import ButtonDelete from "@/components/other/ButtonDelete";
 import ButtonEdit from "@/components/other/ButtonEdit";
 import ButtonExecute from "@/components/other/ButtonExecute";
+import Icon from '@/assets/icons/bolt.svg?inline';
 
 export default {
     name: "Request",
-    components: {ButtonExecute, ButtonEdit, ButtonDelete, AutoSizeTextArea, RequestTester, RouteMethod, ToggleSwitch},
+    components: {ButtonExecute, ButtonEdit, ButtonDelete, Icon,
+        AutoSizeTextArea, RequestTester, RouteMethod, ToggleSwitch},
     data() {
         return {
             editing: false,
@@ -138,6 +149,13 @@ export default {
         hasVariables() {
             return false;
         },
+        selected() {
+            if (!this.request) return null;
+            return this.request._selected;
+        },
+        selecting() {
+            return this.selected !== undefined && this.selected !== null;
+        },
     },
     mounted() {
         if (this.request._new) this.edit();
@@ -147,7 +165,11 @@ export default {
             filter: 'setApiSearchExpression',
             saveRequest: 'requests/save',
             deleteRequests: 'requests/delete',
+            selectRequest: 'requests/select',
         }),
+        select(value) {
+            this.selectRequest({request: this.request, selected: value});
+        },
         edit() {
             this.testing = false;
             this.editingData = {...this.request};
