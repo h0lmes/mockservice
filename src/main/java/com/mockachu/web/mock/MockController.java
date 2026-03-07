@@ -84,12 +84,8 @@ public class MockController implements ConfigObserver, RouteObserver {
     private ResponseEntity<String> proxyRequest(MockRequestFacade facade) {
         log.info("Proxying request: {}", facade);
 
-        String proxyUri = configRepository.getSettings().getProxyLocation();
-        if (proxyUri == null) proxyUri = "";
-        if (!proxyUri.isBlank() && proxyUri.endsWith("/")) {
-            proxyUri = proxyUri.substring(0, proxyUri.length() - 1);
-        }
-        proxyUri += facade.getUriAndQueryString();
+        String proxyUri = makeProxyUri(
+                configRepository.getSettings().getProxyLocation(), facade.getUriAndQueryString());
 
         var result = httpService.request(
                 facade.getMethod(), proxyUri, facade.getBody(), facade.getHeaders());
@@ -97,6 +93,16 @@ public class MockController implements ConfigObserver, RouteObserver {
         return ResponseEntity.status(result.getStatusCode())
                 .headers(result.getResponseHeaders())
                 .body(result.getResponseBody());
+    }
+
+    private String makeProxyUri(String location, String path) {
+        if (location == null) location = "";
+        if (location.isBlank()) return path;
+
+        if (location.endsWith("/")) {
+            location = location.substring(0, location.length() - 1);
+        }
+        return location + path;
     }
 
     private void register() {
@@ -110,7 +116,7 @@ public class MockController implements ConfigObserver, RouteObserver {
 
     @Override
     public void onAfterConfigChanged() {
-        configRepository.findAllRoutes().forEach(this::registerRoute);
+        register();
     }
 
     @Override

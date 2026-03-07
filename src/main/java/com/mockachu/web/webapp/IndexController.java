@@ -6,11 +6,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class IndexController {
 
-    /**
-     * Thymeleaf redirect
-     */
-    @GetMapping("/")
+    @GetMapping({
+            "/",
+            "/about",
+            "/config",
+            "/context",
+            "/generate",
+            "/import",
+            "/kafka",
+            "/log",
+            "/request-graph",
+            "/settings"
+    })
     public String index() {
-        return "index";
+        return "forward:/index.html";
     }
 }

@@ -13,13 +13,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry
-                .addResourceHandler("/resources/**")
-                .addResourceLocations("classpath:")
+                .addResourceHandler("/**")
+                .addResourceLocations("classpath:/webapp/")
                 .setCachePeriod(1);
-        registry
-                .addResourceHandler("/_nuxt/**")
-                .addResourceLocations("classpath:webapp/_nuxt/");
-
     }
 
     @Override
