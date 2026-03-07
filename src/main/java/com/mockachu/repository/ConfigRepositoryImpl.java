@@ -34,19 +34,19 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     private final List<OutboundRequestObserver> requestObservers = new ArrayList<>();
     private final List<SettingsObserver> settingsObservers = new ArrayList<>();
     private Config config;
+    private boolean autoSave = true;
 
     public ConfigRepositoryImpl(
             @Value("${application.config-filename}") String fileConfigPath,
             @Value("${application.config-backup-filename}") String fileConfigBackupPath,
-            @Qualifier("yamlMapper") ObjectMapper yamlMapper
-    ) {
+            @Qualifier("yamlMapper") ObjectMapper yamlMapper) {
         this.fileConfigPath = fileConfigPath;
         this.fileConfigBackupPath = fileConfigBackupPath;
         this.yamlMapper = yamlMapper.copy().setMixIns(getMixIns());
 
         try {
             readConfigFromFile();
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             log.warn("Could not read config file {}. Using empty config.", this.fileConfigPath);
             config = new Config();
         }
@@ -91,6 +91,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         sortScenarios();
         sortRequests();
         sortTests();
+        sortKafkaTopics();
     }
 
     private void configFromString(String yaml) throws IOException {
@@ -103,6 +104,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
             sortScenarios();
             sortRequests();
             sortTests();
+            sortKafkaTopics();
         } catch (IOException e) {
             throw new IOException("Could not deserialize config. " + e.getMessage(), e);
         }
@@ -128,6 +130,30 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         config.getKafkaTopics().sort(KafkaTopic::compareTo);
     }
 
+    @Override
+    public void save() throws IOException {
+        tryPersistConfig();
+    }
+
+    @Override
+    public boolean isAutoSave() {
+        return autoSave;
+    }
+
+    @Override
+    public ConfigRepository setAutoSave(boolean autoSave) {
+        this.autoSave = autoSave;
+        return this;
+    }
+
+    private void saveConfigInternal() throws IOException {
+        if (autoSave) tryPersistConfig();
+    }
+
+    private void backupConfigInternal() throws IOException {
+        if (autoSave) tryPersistConfig(getConfigBackupFile());
+    }
+
     private void tryPersistConfig() throws IOException {
         tryPersistConfig(getConfigFile());
     }
@@ -136,7 +162,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         try {
             yamlMapper.writeValue(file, config);
         } catch (IOException e) {
-            throw new IOException("Could not write config to file. " + e.getMessage(), e);
+            throw new IOException("Could not write config to file: " + e.getMessage(), e);
         }
     }
 
@@ -169,12 +195,12 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         configFromString(data);
         notifyAfterConfigChanged();
         notifySettingsChanged();
-        tryPersistConfig();
+        saveConfigInternal();
     }
 
     @Override
     public synchronized void backup() throws IOException {
-        tryPersistConfig(getConfigBackupFile());
+        backupConfigInternal();
     }
 
     @Override
@@ -183,7 +209,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         readConfigFromFile(getConfigBackupFile());
         notifyAfterConfigChanged();
         notifySettingsChanged();
-        tryPersistConfig();
+        saveConfigInternal();
     }
 
     private void notifyBeforeConfigChanged() {
@@ -209,7 +235,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
     public synchronized void setSettings(Settings settings) throws IOException {
         config.setSettings(settings);
         notifySettingsChanged();
-        tryPersistConfig();
+        saveConfigInternal();
     }
 
     private void notifySettingsChanged() {
@@ -242,7 +268,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         Objects.requireNonNull(route, "Route could not be null.");
         putRouteToConfig(originalRoute, route);
         sortRoutes();
-        tryPersistConfig();
+        saveConfigInternal();
     }
 
     private void putRouteToConfig(Route originalRoute, Route route) {
@@ -283,7 +309,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
         if (modified) {
             sortRoutes();
-            tryPersistConfig();
+            saveConfigInternal();
         }
     }
 
@@ -316,7 +342,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
 
         if (modified) {
-            tryPersistConfig();
+            saveConfigInternal();
         }
     }
 
@@ -354,7 +380,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         Objects.requireNonNull(scenario, "Scenario could not be null.");
         putScenarioToConfig(originalScenario, scenario);
         sortScenarios();
-        tryPersistConfig();
+        saveConfigInternal();
     }
 
     private void putScenarioToConfig(Scenario originalScenario, Scenario scenario) {
@@ -394,7 +420,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
 
         if (modified) {
-            tryPersistConfig();
+            saveConfigInternal();
         }
     }
 
@@ -436,7 +462,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
 
         sortRequests();
-        tryPersistConfig();
+        saveConfigInternal();
     }
 
     private void ensureUniqueRequestId(@Nullable String previousId, @Nonnull OutboundRequest request) {
@@ -467,7 +493,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
         if (modified) {
             sortRequests();
-            tryPersistConfig();
+            saveConfigInternal();
         }
     }
 
@@ -499,7 +525,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
 
         if (modified) {
-            tryPersistConfig();
+            saveConfigInternal();
         }
     }
 
@@ -548,7 +574,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
             //notifyTestCreated(existing);
         }
         sortTests();
-        tryPersistConfig();
+        saveConfigInternal();
     }
 
     private void ensureUniqueTestAlias(@Nullable String previousAlias, @Nonnull ApiTest apiTest) {
@@ -570,7 +596,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
         if (modified) {
             sortTests();
-            tryPersistConfig();
+            saveConfigInternal();
         }
     }
 
@@ -605,7 +631,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
 
         if (modified) {
-            tryPersistConfig();
+            saveConfigInternal();
         }
     }
 
@@ -632,7 +658,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         Objects.requireNonNull(kafkaTopic, "Kafka topic could not be null.");
         putKafkaTopicToConfig(originalKafkaTopic, kafkaTopic);
         sortKafkaTopics();
-        tryPersistConfig();
+        saveConfigInternal();
     }
 
     private void putKafkaTopicToConfig(@Nullable KafkaTopic reference, KafkaTopic kafkaTopic) {
@@ -675,7 +701,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
 
         if (modified) {
             sortKafkaTopics();
-            tryPersistConfig();
+            saveConfigInternal();
         }
     }
 
@@ -708,7 +734,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         }
 
         if (modified) {
-            tryPersistConfig();
+            saveConfigInternal();
         }
     }
 }

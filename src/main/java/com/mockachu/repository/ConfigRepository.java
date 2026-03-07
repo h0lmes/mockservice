@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ConfigRepository {
+    void save() throws IOException;
+    boolean isAutoSave();
+    ConfigRepository setAutoSave(boolean autoSave);
+
     void registerConfigObserver(ConfigObserver observer);
     void registerRouteObserver(RouteObserver observer);
     void registerRequestObserver(OutboundRequestObserver observer);

@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
 import java.net.InetAddress;
@@ -15,15 +14,14 @@ import java.util.concurrent.ForkJoinPool;
 
 @SpringBootApplication
 public class MockachuApplication {
-
     private static final Logger log = LoggerFactory.getLogger(MockachuApplication.class);
 
     public static void main(String[] args) {
-        ConfigurableEnvironment environment = SpringApplication.run(MockachuApplication.class, args).getEnvironment();
+        var ctx = SpringApplication.run(MockachuApplication.class, args);
         log.info("ForkJoinPool parallelism = {}, poolSize = {}",
             ForkJoinPool.commonPool().getParallelism(),
             ForkJoinPool.commonPool().getPoolSize());
-        logStartup(environment);
+        logStartup(ctx.getEnvironment());
     }
 
     private static void logStartup(Environment env) {
