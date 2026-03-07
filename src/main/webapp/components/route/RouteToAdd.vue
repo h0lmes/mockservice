@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div class="item w-fixed-auto">
-            <button type="button" class="btn btn-sm btn-default" @click="$emit('add', route)">ADD</button>
+            <button type="button" class="btn btn-sm btn-default" @click="emit('add', route)">ADD</button>
         </div>
         <div class="item w2">
             <div class="mock-col-value">{{ route.group }}</div>
@@ -17,18 +17,20 @@
         </div>
     </div>
 </template>
-<script>
-export default {
-    name: "RouteToAdd",
-    data() {
-        return {}
-    },
-    props: {
-        route: {type: Object},
-        groupStart: {type: Boolean}
-    },
-}
+
+<script setup lang="ts">
+import type {RouteEntity} from '@/types/models'
+
+defineProps<{
+  route: RouteEntity
+  groupStart?: boolean
+}>()
+
+const emit = defineEmits<{
+  add: [route: RouteEntity]
+}>()
 </script>
+
 <style lang="scss" scoped>
 .row {
     display: flex;

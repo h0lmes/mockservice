@@ -9,52 +9,47 @@
             ...
         </div>
         <TopicRecord class="mt-2"
-                     :entity="entity"
-                     v-for="(entity, index) in sortedEntities"
+                     v-for="entity in sortedEntities"
                      :key="entity.offset"
+                     :entity="entity"
                      :show-timestamp="showTimestamp"
                      :show-headers="showHeaders"/>
     </div>
 </template>
-<script>
-import TopicRecord from "./TopicRecord";
 
-export default {
-    name: "TopicRecords",
-    components: {TopicRecord},
-    data() {
-        return {
-            headerSeparators: true,
-            header: {
-                offset: "OFFSET",
-                timestamp: "TIMESTAMP",
-                key: "KEY",
-                value: "VALUE",
-                headers: "HEADERS",
-            },
-        }
-    },
-    props: {
-        entities: {type: Array},
-        showTimestamp: {type: Boolean, default: false},
-        showHeaders: {type: Boolean, default: false},
-    },
-    computed: {
-        sortedEntities() {
-            return this.entities.sort(
-                (a, b) => this.compare(a.offset, b.offset)
-            );
-        },
-    },
-    methods: {
-        compare(a, b) {
-            if (a < b) return -1;
-            else if (a > b) return 1;
-            return 0;
-        },
-    }
+<script setup lang="ts">
+import {computed} from 'vue'
+import type {KafkaRecordEntity} from '@/types/models'
+import TopicRecord from '@/components/kafka/TopicRecord.vue'
+
+const props = withDefaults(defineProps<{
+  entities?: KafkaRecordEntity[]
+  showTimestamp?: boolean
+  showHeaders?: boolean
+}>(), {
+  entities: () => [],
+  showTimestamp: false,
+  showHeaders: false,
+})
+
+const headerSeparators = true
+const header: KafkaRecordEntity = {
+  offset: 'OFFSET',
+  timestamp: 'TIMESTAMP',
+  key: 'KEY',
+  value: 'VALUE',
+  headers: 'HEADERS',
 }
+
+const compare = (a: string | number, b: string | number) => {
+  if (a < b) return -1
+  if (a > b) return 1
+  return 0
+}
+
+const sortedEntities = computed(() => [...props.entities].sort((a, b) => compare(a.offset, b.offset)))
 </script>
+
 <style scoped>
 .topic-records-holder {
     padding: 1rem 1rem 0.75rem;
@@ -62,3 +57,4 @@ export default {
     border-radius: var(--form-control-border-radius);
 }
 </style>
+

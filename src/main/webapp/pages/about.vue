@@ -7,18 +7,14 @@
                 <a target="_blank" href="https://github.com/h0lmes/mockservice" rel="noopener noreferrer">GitHub</a>
             </p>
             <pre class="ascii mt-4 orange-yellow">≽(◕ ᴗ ◕)≼</pre>
-            <component :is="`icon`" class="icon orange-yellow mt-2"/>
+            <Icon class="icon orange-yellow mt-2" />
         </div>
     </div>
 </template>
-<script>
-import Icon from '@/assets/icons/bolt.svg?inline';
 
-export default {
-    name: "about",
-    components: {Icon},
-}
-</script>
+<script setup lang="ts">
+import Icon from '@/assets/icons/bolt.svg?component'</script>
+
 <style lang="scss" scoped>
     .bg {
         position: absolute;

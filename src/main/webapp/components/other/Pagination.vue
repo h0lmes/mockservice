@@ -11,61 +11,66 @@
         <button type="button" class="btn btn-sm" @click="last">>></button>
     </div>
 </template>
-<script>
-export default {
-    name: "Pagination",
-    components: {},
-    data() {
-        return {}
-    },
-    props: {
-        offset: {type: Number, default: 0},
-        limit: {type: Number, default: 10},
-        total: {type: Number, default: 0},
-    },
-    computed: {
-        page() {
-            return this.offset / this.limit;
-        },
-        totalPages() {
-            return Math.ceil(this.total / this.limit);
-        },
-        pageLabel() {
-            if (this.totalPages === 0) return 'empty';
-            return `Page ${this.page + 1} of ${this.totalPages}`;
-        },
-    },
-    methods: {
-        plusOne() {
-            if (this.page >= this.totalPages - 1) return;
-            this.emitPage(this.page + 1);
-        },
-        plusTen() {
-            if (this.page >= this.totalPages - 1) return;
-            this.emitPage(this.page + Math.min(10, this.totalPages - this.page - 1));
-        },
-        last() {
-            if (this.page >= this.totalPages - 1) return;
-            this.emitPage(this.totalPages - 1);
-        },
-        minusOne() {
-            if (this.page <= 0) return;
-            this.emitPage(this.page - 1);
-        },
-        minusTen() {
-            if (this.page <= 0) return;
-            this.emitPage(this.page - Math.min(10, this.page));
-        },
-        first() {
-            if (this.page <= 0) return;
-            this.emitPage(0);
-        },
-        emitPage(value) {
-            this.$emit('page', value);
-        },
-    }
+
+<script setup lang="ts">
+import {computed} from 'vue'
+
+const props = withDefaults(defineProps<{
+  offset?: number
+  limit?: number
+  total?: number
+}>(), {
+  offset: 0,
+  limit: 10,
+  total: 0,
+})
+
+const emit = defineEmits<{
+  page: [value: number]
+}>()
+
+const page = computed(() => props.offset / props.limit)
+const totalPages = computed(() => Math.ceil(props.total / props.limit))
+const pageLabel = computed(() => {
+  if (totalPages.value === 0) return 'empty'
+  return `Page ${page.value + 1} of ${totalPages.value}`
+})
+
+const emitPage = (value: number) => {
+  emit('page', value)
+}
+
+const plusOne = () => {
+  if (page.value >= totalPages.value - 1) return
+  emitPage(page.value + 1)
+}
+
+const plusTen = () => {
+  if (page.value >= totalPages.value - 1) return
+  emitPage(page.value + Math.min(10, totalPages.value - page.value - 1))
+}
+
+const last = () => {
+  if (page.value >= totalPages.value - 1) return
+  emitPage(totalPages.value - 1)
+}
+
+const minusOne = () => {
+  if (page.value <= 0) return
+  emitPage(page.value - 1)
+}
+
+const minusTen = () => {
+  if (page.value <= 0) return
+  emitPage(page.value - Math.min(10, page.value))
+}
+
+const first = () => {
+  if (page.value <= 0) return
+  emitPage(0)
 }
 </script>
+
 <style lang="scss" scoped>
 .pagination-holder {
     display: flex;

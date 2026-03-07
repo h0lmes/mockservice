@@ -1,17 +1,17 @@
 <template>
-    <div class="component component-row" :class="{'open' : open}" @click="toggle">
+    <div class="component component-row" :class="{ open }" @click="toggle">
         <div class="mock-col w-fixed-auto">
-            <button type="button" class="btn btn-sm btn-default" @click.stop="$emit('add', route)">{{ addLabel }}</button>
+            <button type="button" class="btn btn-sm btn-default" @click.stop="emit('add', route)">{{ addLabel }}</button>
         </div>
         <div class="mock-col">
-            <div class="mock-col-value" :class="{'color-accent-one' : exists}">{{ existsLabel }}</div>
+            <div class="mock-col-value" :class="{ 'color-accent-one': exists }">{{ existsLabel }}</div>
         </div>
         <div class="mock-col">
             <div class="mock-col-value">{{ route.group }}</div>
         </div>
         <div class="mock-col">
             <div class="mock-col-value">
-                <route-method :value="route.method">{{ route.method }}</route-method>
+                <RouteMethod :value="route.method">{{ route.method }}</RouteMethod>
             </div>
         </div>
         <div class="mock-col w3">
@@ -21,64 +21,54 @@
             <div class="mock-col-value">{{ route.alt }}</div>
         </div>
         <div class="mock-col w2">
-            <div class="mock-col-value link" :class="{'color-accent-one' : more}">{{ moreLabel }}</div>
+            <div class="mock-col-value link" :class="{ 'color-accent-one': more }">{{ moreLabel }}</div>
         </div>
-        <div class="mock-col w100" v-show="open">
+        <div v-show="open" class="mock-col w100">
             RESPONSE (GENERATED)
         </div>
-        <div class="mock-col w100" v-show="open" @click.stop>
+        <div v-show="open" class="mock-col w100" @click.stop>
             <AutoSizeTextArea v-model="route.response" placeholder="NO RESPONSE"></AutoSizeTextArea>
         </div>
-        <div class="mock-col w100" v-show="open">
+        <div v-show="open" class="mock-col w100">
             REQUEST BODY SCHEMA
         </div>
-        <div class="mock-col w100" v-show="open" @click.stop>
+        <div v-show="open" class="mock-col w100" @click.stop>
             <AutoSizeTextArea v-model="route.requestBodySchema" placeholder="NO REQUEST BODY SCHEMA"></AutoSizeTextArea>
         </div>
     </div>
 </template>
-<script>
-import AutoSizeTextArea from "./AutoSizeTextArea";
-import RouteMethod from "../route/RouteMethod";
 
-export default {
-        name: "ImportedRoute",
-        components: {AutoSizeTextArea, RouteMethod},
-        data() {
-            return {
-                open: false,
-            }
-        },
-        props: {
-            route: {type: Object},
-            existingRoutes: {type: Array},
-        },
-        computed: {
-            more() {
-                return !!this.route.response || !!this.route.requestBodySchema;
-            },
-            moreLabel() {
-                let label = '';
-                if (!!this.route.response) label += 'has response';
-                if (!!this.route.requestBodySchema) label += (!!label ? ', ' : '') + 'has request body schema';
-                return !!label ? label : '-';
-            },
-            exists() {
-                return this.existingRoutes.some(e => e.method === this.route.method && e.path === this.route.path && e.alt === this.route.alt);
-            },
-            existsLabel() {
-                return this.exists ? 'exists' : '-';
-            },
-            addLabel() {
-                return this.exists ? 'overwrite route' : '\u00A0\u00A0 add route \u00A0\u00A0';
-            }
-        },
-        methods: {
-            toggle() {
-                this.open = !this.open;
-            },
-        },
-    }
+<script setup lang="ts">
+import {computed, ref} from 'vue'
+import type {RouteEntity} from '@/types/models'
+import AutoSizeTextArea from './AutoSizeTextArea'
+import RouteMethod from '../route/RouteMethod'
+
+const props = defineProps<{
+  route: RouteEntity
+  existingRoutes: RouteEntity[]
+}>()
+
+const emit = defineEmits<{
+  add: [route: RouteEntity]
+}>()
+
+const open = ref(false)
+const more = computed(() => !!props.route.response || !!props.route.requestBodySchema)
+const moreLabel = computed(() => {
+  let label = ''
+  if (props.route.response) label += 'has response'
+  if (props.route.requestBodySchema) label += (label ? ', ' : '') + 'has request body schema'
+  return label || '-'
+})
+const exists = computed(() => props.existingRoutes.some((entity) => entity.method === props.route.method && entity.path === props.route.path && entity.alt === props.route.alt))
+const existsLabel = computed(() => exists.value ? 'exists' : '-')
+const addLabel = computed(() => exists.value ? 'overwrite route' : '\u00A0\u00A0 add route \u00A0\u00A0')
+
+const toggle = () => {
+  open.value = !open.value
+}
 </script>
+
 <style lang="scss" scoped>
 </style>

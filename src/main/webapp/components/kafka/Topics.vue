@@ -9,50 +9,40 @@
         </div>
     </div>
 </template>
-<script>
-import Topic from "./Topic";
 
-export default {
-    name: "Topics",
-    components: {Topic},
-    data() {
-        return {}
-    },
-    props: {
-        entities: {type: Array},
-    },
-    computed: {
-        sortedEntities() {
-            return this.entities.sort((a, b) => {
-                // newly created entities at the very top
-                let c = this.compare(a._new, b._new);
-                if (c !== 0) return c;
+<script setup lang="ts">
+import {computed} from 'vue'
+import type {KafkaTopicEntity} from '@/types/models'
+import Topic from './Topic'
 
-                // keep same group entities together
-                c = this.compare(a.group, b.group);
-                if (c !== 0) return c;
+const props = withDefaults(defineProps<{
+  entities?: KafkaTopicEntity[]
+}>(), {
+  entities: () => [],
+})
 
-                c = this.compare(a.topic, b.topic);
-                if (c !== 0) return c;
-
-                return this.compare(a.partition, b.partition);
-            });
-        },
-    },
-    methods: {
-        compare(a, b) {
-            if (a < b) return -1;
-            else if (a > b) return 1;
-            return 0;
-        },
-        groupStart(arr, entity, index) {
-            return index > 0 && entity.group !== arr[index - 1].group;
-        },
-        entityKey(entity) {
-            return entity.topic + entity.partition;
-        },
-    }
+const compare = (a: unknown, b: unknown) => {
+  if (a == null && b == null) return 0
+  if (a == null) return 1
+  if (b == null) return -1
+  if (a < b) return -1
+  if (a > b) return 1
+  return 0
 }
+
+const sortedEntities = computed(() => [...props.entities].sort((a, b) => {
+  let c = compare(a._new, b._new)
+  if (c !== 0) return c
+  c = compare(a.group, b.group)
+  if (c !== 0) return c
+  c = compare(a.topic, b.topic)
+  if (c !== 0) return c
+  return compare(a.partition, b.partition)
+}))
+
+const groupStart = (entities: KafkaTopicEntity[], entity: KafkaTopicEntity, index: number) => index > 0 && entity.group !== entities[index - 1].group
+const entityKey = (entity: KafkaTopicEntity) => entity.topic + entity.partition
 </script>
+
 <style scoped>
 </style>

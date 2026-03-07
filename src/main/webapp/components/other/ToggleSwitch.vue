@@ -1,6 +1,6 @@
 <template>
-    <div class="toggle-switch" tabindex="0" :class="{small : !!small}" @keydown.space.exact="$refs.input.click()">
-        <input type="checkbox" tabindex="-1" ref="input" :id="id" :checked="value" @input="e => input(e)">
+    <div class="toggle-switch" tabindex="0" :class="{small : !!small}" @keydown.space.exact="inputRef?.click()">
+        <input type="checkbox" tabindex="-1" ref="inputRef" :id="id" :checked="checkedValue" @input="input">
         <label :for="id" :class="{gap : hasTitle}">
             <div class="area" aria-hidden="true">
                 <div class="background">
@@ -9,45 +9,56 @@
             </div>
             <slot></slot>
             <div v-if="sub"></div>
-            <div v-if="sub" class="toggle-switch__sub color-secondary">{{sub}}</div>
+            <div v-if="sub" class="toggle-switch__sub color-secondary">{{ sub }}</div>
         </label>
     </div>
 </template>
-<script>
-    export default {
-        name: "ToggleSwitch",
-        data() {
-            return {
-                id: null
-            }
-        },
-        props: {
-            value: {type: Boolean},
-            small: {type: Boolean},
-            sub: {type: String},
-        },
-        computed: {
-            hasTitle() {
-                return !!this.$slots.default;
-            }
-        },
-        created() {
-            this.id = this.uuid();
-        },
-        methods: {
-            input(e) {
-                this.$emit('input', e.target.checked);
-                this.$emit('toggle', e.target.checked);
-            },
-            uuid() {
-                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                    let r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-                    return v.toString(16);
-                });
-            }
-        },
-    }
+
+<script setup lang="ts">
+import {computed, ref, useSlots} from 'vue'
+
+const props = withDefaults(defineProps<{
+  modelValue?: boolean
+  value?: boolean
+  small?: boolean
+  sub?: string
+}>(), {
+  modelValue: undefined,
+  value: undefined,
+  small: false,
+  sub: undefined,
+})
+
+const emit = defineEmits<{
+  'update:modelValue': [value: boolean]
+  input: [value: boolean]
+  toggle: [value: boolean]
+}>()
+
+const slots = useSlots()
+const inputRef = ref<HTMLInputElement | null>(null)
+const id = `toggle-${Math.random().toString(36).slice(2)}-${Date.now().toString(36)}`
+const hasTitle = computed(() => !!slots.default)
+const checkedValue = computed(() => props.modelValue !== undefined ? props.modelValue : props.value)
+
+const input = (event: Event) => {
+  const checked = (event.target as HTMLInputElement).checked
+  emit('update:modelValue', checked)
+  emit('input', checked)
+  emit('toggle', checked)
+}
+
+const selectionStart = () => inputRef.value?.selectionStart
+const selectionEnd = () => inputRef.value?.selectionEnd
+const focus = () => inputRef.value?.focus()
+
+defineExpose({
+  selectionStart,
+  selectionEnd,
+  focus,
+})
 </script>
+
 <style lang="scss" scoped>
     .toggle-switch {
         --width: 2.5rem;

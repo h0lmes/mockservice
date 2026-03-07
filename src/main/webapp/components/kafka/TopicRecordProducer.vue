@@ -2,15 +2,15 @@
     <div class="holder">
         <div class="item">
             <div class="mb-2 color-secondary">KEY</div>
-            <input type="text" class="form-control form-control-sm" v-model="recordKey"/>
+            <input v-model="recordKey" type="text" class="form-control form-control-sm"/>
         </div>
         <div class="item">
             <div class="mb-2 color-secondary">VALUE</div>
-            <input type="text" class="form-control form-control-sm" v-model="recordValue"/>
+            <input v-model="recordValue" type="text" class="form-control form-control-sm"/>
         </div>
         <div class="item">
             <div class="mb-2 color-secondary">HEADERS</div>
-            <input type="text" class="form-control form-control-sm" v-model="recordHeaders"/>
+            <input v-model="recordHeaders" type="text" class="form-control form-control-sm"/>
         </div>
 
         <div class="item item-fixed">
@@ -19,58 +19,52 @@
         </div>
     </div>
 </template>
-<script>
-import {mapActions} from 'vuex';
 
-export default {
-    name: "TopicRecordProducer",
-    components: {},
-    data() {
-        return {
-            recordKey: '',
-            recordValue: '',
-            recordHeaders: '',
-        }
-    },
-    props: {
-        topic: {type: String},
-        partition: {type: Number},
-    },
-    computed: {
-    },
-    methods: {
-        ...mapActions({
-            produce: 'kafka/produce',
-            setLastError: 'setLastError',
-        }),
-        add() {
-            let rec = null;
-            try {
-                rec = {
-                    topic: this.topic,
-                    partition: this.partition,
-                    timestamp: 0,
-                    key: this.recordKey === '' ? null : this.recordKey,
-                    value: this.recordValue === '' ? null : this.recordValue,
-                    headers: this.recordHeaders === '' ? {} : JSON.parse(this.recordHeaders),
-                };
-            } catch (e) {
-                console.error('Error building record: ', e);
-                err('Error building record: ' + e.message);
-            }
-            this.$nuxt.$loading.start();
-            let that = this;
-            this.produce([rec]).then(() => {
-                that.$nuxt.$loading.finish();
-                that.$emit('added');
-            });
-        },
-        err(text) {
-            this.setLastError(text);
-        },
+<script setup lang="ts">
+import {ref} from 'vue'
+import {useWorkingAction} from '@/composables/useAsyncState'
+import {setLastError} from '@/state/app'
+import {produceKafkaRecords} from '@/state/kafka'
+
+const props = defineProps<{
+  topic: string
+  partition: number
+}>()
+
+const emit = defineEmits<{
+  added: []
+}>()
+
+const { runWhileWorking } = useWorkingAction()
+const recordKey = ref('')
+const recordValue = ref('')
+const recordHeaders = ref('')
+
+const add = async () => {
+  let record = null
+  try {
+    record = {
+      topic: props.topic,
+      partition: props.partition,
+      timestamp: 0,
+      key: recordKey.value === '' ? null : recordKey.value,
+      value: recordValue.value === '' ? null : recordValue.value,
+      headers: recordHeaders.value === '' ? {} : JSON.parse(recordHeaders.value),
     }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('Error building record: ', error)
+    setLastError('Error building record: ' + message)
+    return
+  }
+
+  await runWhileWorking(async () => {
+    await produceKafkaRecords([record])
+    emit('added')
+  })
 }
 </script>
+
 <style scoped>
 .holder {
     display: flex;

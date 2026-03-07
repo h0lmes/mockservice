@@ -18,7 +18,7 @@
                 </li>
                 <li class="nav-item">
                     <NuxtLink to="/kafka">
-                        <component :is="`icon-kafka`" class="nav-icon size-24"/>
+                        <IconKafka class="nav-icon size-24"/>
                         <span class="nav-label">Kafka</span>
                     </NuxtLink>
                 </li>
@@ -71,7 +71,7 @@
 
             <ul class="nav nav-hidden" ref="settings">
                 <li class="nav-group">COLOR THEME
-                    <button type="button" class="btn monospace nav-close-button" @click="nav">x</button>
+                    <button type="button" class="btn monospace nav-close-button" @click="navMode">x</button>
                 </li>
                 <li class="nav-block">
                     <ColorModePicker></ColorModePicker>
@@ -99,7 +99,7 @@
 
         <div class="page-wrapper">
             <div class="page-contents">
-                <Nuxt/>
+                <slot />
             </div>
         </div>
 
@@ -107,77 +107,73 @@
         <Loading v-if="working"></Loading>
     </div>
 </template>
-<script>
-import ColorModePicker from "../components/other/ColorModePicker";
-import ColorAccentPicker from "../components/other/ColorAccentPicker";
-import ErrorPanel from "../components/other/ErrorPanel";
-import Loading from "../components/other/Loading";
-import IconKafka from '@/assets/icons/kafka.svg?inline';
-import ToggleSwitch from "@/components/other/ToggleSwitch";
-import WidthSelector from "@/components/other/WidthSelector";
 
-export default {
-    components: {WidthSelector, ToggleSwitch, ErrorPanel, Loading, ColorModePicker, ColorAccentPicker, IconKafka},
-    data() {
-        return {
-            isOpen: true,
-            isSettings: false,
-        }
-    },
-    computed: {
-        working() {
-            return this.$store.state.working
-        }
-    },
-    methods: {
-        toggleNavbar() {
-            if (this.isSettings) {
-                this.nav();
-            }
+<script setup lang="ts">
+import {computed, ref} from 'vue'
+import IconKafka from '@/assets/icons/kafka.svg?component'
+import ColorAccentPicker from '../components/other/ColorAccentPicker'
+import ColorModePicker from '../components/other/ColorModePicker'
+import ErrorPanel from '../components/other/ErrorPanel'
+import Loading from '../components/other/Loading'
+import WidthSelector from '@/components/other/WidthSelector'
+import {frontendAppState} from '@/state/app'
 
-            if (this.isOpen) {
-                this.close();
-            } else {
-                this.open();
-            }
-        },
-        toggleSettings() {
-            if (!this.isOpen) {
-                this.open();
-            }
+const page = ref<HTMLElement | null>(null)
+const nav = ref<HTMLElement | null>(null)
+const settings = ref<HTMLElement | null>(null)
+const isOpen = ref(true)
+const isSettings = ref(false)
+const working = computed(() => frontendAppState.working)
 
-            if (!this.isSettings) {
-                this.sets();
-            } else {
-                this.nav();
-            }
-        },
-        open() {
-            this.isOpen = true;
-            this.$refs.page.classList.add('navbar-maximizing');
-            this.$refs.page.classList.remove('navbar-mini');
-            setTimeout(() => this.$refs.page.classList.remove('navbar-maximizing'), 200);
-        },
-        close() {
-            this.isOpen = false;
-            this.$refs.page.classList.add('navbar-mini');
-        },
-        nav() {
-            this.isSettings = false;
-            this.$refs.nav.classList.remove('nav-hidden');
-            this.$refs.settings.classList.add('nav-hidden');
-        },
-        sets() {
-            this.isSettings = true;
-            this.$refs.nav.classList.add('nav-hidden');
-            this.$refs.settings.classList.remove('nav-hidden');
-        },
-        accentChanged() {
-            this.close()
-        }
-    }
+const open = () => {
+  isOpen.value = true
+  page.value?.classList.add('navbar-maximizing')
+  page.value?.classList.remove('navbar-mini')
+  window.setTimeout(() => page.value?.classList.remove('navbar-maximizing'), 200)
+}
+
+const close = () => {
+  isOpen.value = false
+  page.value?.classList.add('navbar-mini')
+}
+
+const navMode = () => {
+  isSettings.value = false
+  nav.value?.classList.remove('nav-hidden')
+  settings.value?.classList.add('nav-hidden')
+}
+
+const settingsMode = () => {
+  isSettings.value = true
+  nav.value?.classList.add('nav-hidden')
+  settings.value?.classList.remove('nav-hidden')
+}
+
+const toggleNavbar = () => {
+  if (isSettings.value) {
+    navMode()
+  }
+
+  if (isOpen.value) {
+    close()
+  } else {
+    open()
+  }
+}
+
+const toggleSettings = () => {
+  if (!isOpen.value) {
+    open()
+  }
+
+  if (!isSettings.value) {
+    settingsMode()
+  } else {
+    navMode()
+  }
 }
 </script>
+
 <style scoped>
     .icon-width-fix {
         width: 1.2rem;

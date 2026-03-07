@@ -6,31 +6,30 @@
             <ImportedRoute
                     :route="route"
                     :existing-routes="existingRoutes"
-                    @add="$emit('add', $event)"
+                    @add="emit('add', $event)"
             ></ImportedRoute>
         </div>
     </div>
 </template>
-<script>
-    import ImportedRoute from "./ImportedRoute";
 
-    export default {
-        name: "ImportedRoutes",
-        components: {ImportedRoute},
-        data() {
-            return {}
-        },
-        props: {
-            importedRoutes: {type: Array},
-            existingRoutes: {type: Array},
-        },
-        methods: {
-            groupStart(route, index) {
-                return index > 0
-                    && route.group !== this.importedRoutes[index - 1].group;
-            },
-        }
-    }
+<script setup lang="ts">
+import type {RouteEntity} from '@/types/models'
+import ImportedRoute from './ImportedRoute'
+
+const props = withDefaults(defineProps<{
+  importedRoutes?: RouteEntity[]
+  existingRoutes?: RouteEntity[]
+}>(), {
+  importedRoutes: () => [],
+  existingRoutes: () => [],
+})
+
+const emit = defineEmits<{
+  add: [route: RouteEntity]
+}>()
+
+const groupStart = (route: RouteEntity, index: number) => index > 0 && route.group !== props.importedRoutes[index - 1].group
 </script>
+
 <style scoped>
 </style>

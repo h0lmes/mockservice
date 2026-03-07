@@ -1,33 +1,32 @@
 <template>
     <div class="table">
         <p v-if="routes.length === 0">No routes</p>
-        <div class="row" v-for="(route, index) in routes" :key="route.method + route.path + route.alt">
+        <div v-for="(route, index) in routes" :key="route.method + route.path + route.alt" class="row">
             <RouteToAdd :route="route"
-                        :groupStart="groupStart(route, index)"
-                        @add="$emit('add', $event)"
+                        :group-start="groupStart(route, index)"
+                        @add="emit('add', $event)"
             ></RouteToAdd>
         </div>
     </div>
 </template>
-<script>
-import RouteToAdd from "./RouteToAdd";
 
-export default {
-    name: "RoutesToAdd",
-    data() {
-        return {}
-    },
-    components: {RouteToAdd},
-    props: {
-        routes: {type: Array}
-    },
-    methods: {
-        groupStart(route, index) {
-            return index === 0 || route.group !== this.routes[index - 1].group;
-        }
-    }
-}
+<script setup lang="ts">
+import type {RouteEntity} from '@/types/models'
+import RouteToAdd from '@/components/route/RouteToAdd.vue'
+
+const props = withDefaults(defineProps<{
+  routes?: RouteEntity[]
+}>(), {
+  routes: () => [],
+})
+
+const emit = defineEmits<{
+  add: [route: RouteEntity]
+}>()
+
+const groupStart = (route: RouteEntity, index: number) => index === 0 || route.group !== props.routes[index - 1].group
 </script>
+
 <style lang="scss" scoped>
 .table {
     margin: 0;
@@ -48,3 +47,4 @@ export default {
     }
 }
 </style>
+

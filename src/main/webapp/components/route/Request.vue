@@ -1,21 +1,20 @@
 <template>
     <div class="component component-row monospace"
-         :class="{'open' : open, 'disabled' : request.disabled}"
+         :class="{ open, disabled: request.disabled }"
          @click.middle.stop.prevent="edit"
          @keydown.esc.exact="cancel">
 
         <div v-show="!open" class="mock-col w-fixed-auto">
-            <component :is="`icon`" class="component-row-icon color-accent-one"/>
+            <Icon class="component-row-icon color-accent-one"/>
         </div>
 
         <div v-show="selecting && !open" class="mock-col w-fixed-auto">
-            <ToggleSwitch class="mock-col-value"
-                          :value="selected" @toggle="select"></ToggleSwitch>
+            <ToggleSwitch class="mock-col-value" :value="selected" @toggle="select"></ToggleSwitch>
         </div>
 
         <div v-show="editing" class="mock-col w1">
             <div class="mock-col-header">TYPE</div>
-            <select class="form-control form-control-sm" v-model="editingData.type">
+            <select v-model="editingData.type" class="form-control form-control-sm">
                 <option>REST</option>
             </select>
         </div>
@@ -23,15 +22,15 @@
         <div v-if="!testing" class="mock-col w2">
             <div class="mock-col-header">GROUP</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(request.group)">{{ request.group }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingData.group"/>
+            <input v-show="editing" v-model="editingData.group" type="text" class="form-control form-control-sm"/>
         </div>
 
-        <div v-if="!testing"  class="mock-col w1">
+        <div v-if="!testing" class="mock-col w1">
             <div class="mock-col-header">METHOD</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(request.method)">
-                <route-method :value="request.method" :disabled="request.disabled"></route-method>
+                <RouteMethod :value="request.method" :disabled="request.disabled"></RouteMethod>
             </div>
-            <select v-show="editing" class="form-control form-control-sm" v-model="editingData.method">
+            <select v-show="editing" v-model="editingData.method" class="form-control form-control-sm">
                 <option>GET</option>
                 <option>POST</option>
                 <option>PUT</option>
@@ -47,8 +46,7 @@
 
         <div v-show="editing" class="mock-col w1">
             <div class="mock-col-header">ID</div>
-            <input type="text" class="form-control form-control-sm" v-model="editingData.id"
-                   placeholder="empty to generate"/>
+            <input v-model="editingData.id" type="text" class="form-control form-control-sm" placeholder="empty to generate"/>
         </div>
         <div v-show="!editing && !testing" class="mock-col w2">
             <div class="mock-col-header">ID</div>
@@ -66,44 +64,38 @@
 
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">URL</div>
-            <input type="text" class="form-control form-control-sm" v-model="editingData.path"
-                   placeholder="http://server:port/api/v1/path"/>
+            <input v-model="editingData.path" type="text" class="form-control form-control-sm" placeholder="http://server:port/api/v1/path"/>
         </div>
 
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">REQUEST HEADERS</div>
-            <AutoSizeTextArea v-model="editingData.headers"
-                              placeholder="Content-Type: application/json"></AutoSizeTextArea>
+            <AutoSizeTextArea v-model="editingData.headers" placeholder="Content-Type: application/json"></AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">REQUEST BODY</div>
-            <AutoSizeTextArea v-model="editingData.body" ref="body"
-                              placeholder='{"id": 1, "name": "admin"}'>
-            </AutoSizeTextArea>
+            <AutoSizeTextArea ref="body" v-model="editingData.body" placeholder='{"id": 1, "name": "admin"}'></AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-col w100 mt-1">
-            <ToggleSwitch class="mock-col-value" v-model="editingData.responseToVars">SAVE RESPONSE IN GLOBAL VARS</ToggleSwitch>
+            <ToggleSwitch v-model="editingData.responseToVars" class="mock-col-value">SAVE RESPONSE IN GLOBAL VARS</ToggleSwitch>
         </div>
 
         <div v-show="editing" class="mock-group w100">
             <div v-show="editing" class="mock-col w100">
-                <ToggleSwitch class="mock-col-value" v-model="editingData.triggerRequest">TRIGGER REQUESTS</ToggleSwitch>
+                <ToggleSwitch v-model="editingData.triggerRequest" class="mock-col-value">TRIGGER REQUESTS</ToggleSwitch>
             </div>
             <div v-show="editing && editingData.triggerRequest" class="mock-col w2">
-                <input type="text" class="form-control form-control-sm" v-model="editingData.triggerRequestIds"
-                       placeholder="Comma separated request IDs to trigger after this one"/>
+                <input v-model="editingData.triggerRequestIds" type="text" class="form-control form-control-sm" placeholder="Comma separated request IDs to trigger after this one"/>
             </div>
             <div v-show="editing && editingData.triggerRequest">after (millis)</div>
             <div v-show="editing && editingData.triggerRequest" class="mock-col w1">
-                <input type="text" class="form-control form-control-sm" v-model="editingData.triggerRequestDelay"
-                       placeholder="Comma separated delays (default is 100)"/>
+                <input v-model="editingData.triggerRequestDelay" type="text" class="form-control form-control-sm" placeholder="Comma separated delays (default is 100)"/>
             </div>
         </div>
 
         <div v-show="editing" class="mock-col w1">
-            <ToggleSwitch class="mock-col-value" v-model="editingData.disabled">DISABLED</ToggleSwitch>
+            <ToggleSwitch v-model="editingData.disabled" class="mock-col-value">DISABLED</ToggleSwitch>
         </div>
 
         <div v-show="editing" class="mock-col w-fixed-auto">
@@ -117,101 +109,108 @@
         </div>
     </div>
 </template>
-<script>
-import {mapActions} from 'vuex';
-import RequestTester from "./RequestTester";
-import RouteMethod from "./RouteMethod";
-import ToggleSwitch from "../other/ToggleSwitch";
-import AutoSizeTextArea from "../other/AutoSizeTextArea";
-import ButtonDelete from "@/components/other/ButtonDelete";
-import ButtonEdit from "@/components/other/ButtonEdit";
-import ButtonExecute from "@/components/other/ButtonExecute";
-import Icon from '@/assets/icons/bolt.svg?inline';
 
-export default {
-    name: "Request",
-    components: {ButtonExecute, ButtonEdit, ButtonDelete, Icon,
-        AutoSizeTextArea, RequestTester, RouteMethod, ToggleSwitch},
-    data() {
-        return {
-            editing: false,
-            editingData: {},
-            testing: false,
-        }
-    },
-    props: {
-        request: {type: Object, default: {}},
-    },
-    computed: {
-        open() {
-            return this.editing || this.testing;
-        },
-        hasVariables() {
-            return false;
-        },
-        selected() {
-            if (!this.request) return null;
-            return this.request._selected;
-        },
-        selecting() {
-            return this.selected !== undefined && this.selected !== null;
-        },
-    },
-    mounted() {
-        if (this.request._new) this.edit();
-    },
-    methods: {
-        ...mapActions({
-            filter: 'setApiSearchExpression',
-            saveRequest: 'requests/save',
-            deleteRequests: 'requests/delete',
-            selectRequest: 'requests/select',
-        }),
-        select(value) {
-            this.selectRequest({request: this.request, selected: value});
-        },
-        edit() {
-            this.testing = false;
-            this.editingData = {...this.request};
-            if (!this.editing) this.editing = true; else this.cancel();
-            if (this.editing) this.$nextTick(() => this.$refs.body.focus());
-        },
-        cancel() {
-            if (!!this.request._new) {
-                this.deleteRequests([this.request]);
-            } else {
-                this.editing = false;
-                this.editingData = {};
-            }
-        },
-        test() {
-            this.cancel();
-            this.testing = !this.testing;
-        },
-        del() {
-            if (!!this.request._new) {
-                this.deleteRequests([this.request]);
-            } else if (confirm('Sure you want to delete?')) {
-                this.$nuxt.$loading.start();
-                this.deleteRequests([this.request]).then(() => this.$nuxt.$loading.finish());
-            }
-        },
-        save() {
-            this.$nuxt.$loading.start();
-            this.saveRequest([this.request, this.editingData]).then(() => {
-                this.$nuxt.$loading.finish();
-                this.editing = false;
-            });
-        },
-        saveAsCopy() {
-            this.$nuxt.$loading.start();
-            this.saveRequest([{}, this.editingData]).then(() => {
-                this.$nuxt.$loading.finish();
-                this.editing = false;
-            });
-        },
-    }
+<script setup lang="ts">
+import {computed, nextTick, onMounted, ref} from 'vue'
+import Icon from '@/assets/icons/bolt.svg?component'
+import ButtonDelete from '@/components/other/ButtonDelete'
+import ButtonEdit from '@/components/other/ButtonEdit'
+import ButtonExecute from '@/components/other/ButtonExecute'
+import AutoSizeTextArea from '../other/AutoSizeTextArea'
+import ToggleSwitch from '../other/ToggleSwitch'
+import {useWorkingAction} from '@/composables/useAsyncState'
+import {setApiSearchExpression} from '@/state/app'
+import {deleteRequests, saveRequests, selectRequest} from '@/state/requests'
+import type {FocusableField, RequestDraft, RequestEntity} from '@/types/models'
+import RequestTester from './RequestTester'
+import RouteMethod from './RouteMethod'
+
+const createEmptyRequest = (): RequestDraft => ({
+  id: '',
+  group: '',
+  type: 'REST',
+  method: 'GET',
+  path: '/',
+  headers: '',
+  body: '',
+  responseToVars: false,
+  disabled: false,
+  triggerRequest: false,
+  triggerRequestIds: '',
+  triggerRequestDelay: '',
+})
+
+const props = defineProps<{
+  request: RequestEntity
+}>()
+
+const { runWhileWorking } = useWorkingAction()
+const body = ref<FocusableField | null>(null)
+const editing = ref(false)
+const editingData = ref<RequestDraft>(createEmptyRequest())
+const testing = ref(false)
+const open = computed(() => editing.value || testing.value)
+const selected = computed(() => props.request?._selected)
+const selecting = computed(() => selected.value !== undefined && selected.value !== null)
+
+const filter = (value: string) => setApiSearchExpression(value)
+const select = (value: boolean) => selectRequest({ request: props.request, selected: value })
+
+const edit = async () => {
+  testing.value = false
+  editingData.value = { ...createEmptyRequest(), ...props.request }
+  if (!editing.value) editing.value = true
+  else cancel()
+  if (editing.value) {
+    await nextTick()
+    body.value?.focus()
+  }
 }
+
+const cancel = () => {
+  if (props.request._new) {
+    deleteRequests([props.request])
+  } else {
+    editing.value = false
+    editingData.value = createEmptyRequest()
+  }
+}
+
+const test = () => {
+  cancel()
+  testing.value = !testing.value
+}
+
+const del = () => {
+  if (props.request._new) {
+    deleteRequests([props.request])
+  } else if (confirm('Sure you want to delete?')) {
+    void runWhileWorking(() => deleteRequests([props.request]))
+  }
+}
+
+const save = () => {
+  void runWhileWorking(async () => {
+    await saveRequests([props.request, editingData.value])
+    editing.value = false
+  })
+}
+
+const saveAsCopy = () => {
+  void runWhileWorking(async () => {
+    await saveRequests([{}, editingData.value])
+    editing.value = false
+  })
+}
+
+onMounted(() => {
+  if (props.request._new) {
+    edit()
+  }
+})
 </script>
+
 <style scoped>
 </style>
+
+

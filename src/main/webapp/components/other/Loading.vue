@@ -3,21 +3,17 @@
         <div class="modal-border">
             <div class="modal-content monospace loading">
                 <div class="loader">
-                    <component :is="`icon`" class="orange-yellow"/>
+                    <Icon class="orange-yellow" />
                 </div>
                 <div class="mr-2">LOADING</div>
             </div>
         </div>
     </div>
 </template>
-<script>
-import Icon from '@/assets/icons/bolt.svg?inline';
 
-export default {
-    name: "Loading",
-    components: {Icon},
-}
-</script>
+<script setup lang="ts">
+import Icon from '@/assets/icons/bolt.svg?component'</script>
+
 <style lang="scss" scoped>
 .loading {
     font-weight: 700;

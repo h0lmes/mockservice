@@ -1,26 +1,27 @@
 <template>
     <div :class="color">{{ value }}<span v-show="disabled"> (disabled)</span></div>
 </template>
-<script>
-export default {
-    name: "RouteMethod",
-    props: {
-        value: {type: String},
-        disabled: {type: Boolean, default: false},
-    },
-    computed: {
-        color() {
-            return {
-                'bold': !this.disabled,
-                'green': !this.disabled && this.value === 'GET',
-                'blue': !this.disabled && this.value === 'POST',
-                'orange-yellow': !this.disabled && this.value === 'PUT',
-                'orange': !this.disabled && this.value === 'PATCH',
-                'pink': !this.disabled && this.value === 'DELETE',
-            }
-        }
-    },
-}
+
+<script setup lang="ts">
+import {computed} from 'vue'
+
+const props = withDefaults(defineProps<{
+  value?: string
+  disabled?: boolean
+}>(), {
+  value: '',
+  disabled: false,
+})
+
+const color = computed(() => ({
+  bold: !props.disabled,
+  green: !props.disabled && props.value === 'GET',
+  blue: !props.disabled && props.value === 'POST',
+  'orange-yellow': !props.disabled && props.value === 'PUT',
+  orange: !props.disabled && props.value === 'PATCH',
+  pink: !props.disabled && props.value === 'DELETE',
+}))
 </script>
+
 <style scoped>
 </style>

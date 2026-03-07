@@ -11,65 +11,60 @@
         </ul>
     </div>
 </template>
-<script>
-    const storageKey = 'ColorAccent';
-    const HTML_CLASS_PREFIX = 'accent-';
 
-    export default {
-        name: "ColorAccentPicker",
-        components: {},
-        data() {
-            return {
-                colors: ['default', 'gray', 'purple', 'pink', 'red', 'orange', 'orange-yellow',
-                    'yellow', 'lime', 'green', 'teal', 'cyan', 'blue', 'violet'],
-                value: 'default',
-            }
-        },
-        watch: {
-            value(newValue, oldValue) {
-                if (oldValue !== newValue) {
-                    this.setValue(oldValue, newValue);
-                    this.storeValue(newValue);
-                    console.log(newValue)
-                }
-            }
-        },
-        mounted() {
-            if (window.localStorage) {
-                this.value = this.getValue();
-                this.setValue(null, this.value);
-                this.watchStorageChange();
-            }
-        },
-        methods: {
-            watchStorageChange() {
-                window.addEventListener('storage', e => {
-                    if (e.key === storageKey) {
-                        this.value = e.newValue
-                    }
-                });
-            },
-            storeValue(value) {
-                window.localStorage.setItem(storageKey, value);
-            },
-            getValue() {
-                return window.localStorage.getItem(storageKey) || this.value;
-            },
-            setValue(oldValue, newValue) {
-                if (oldValue) {
-                    document.documentElement.classList.remove(HTML_CLASS_PREFIX + oldValue);
-                }
-                document.documentElement.classList.add(HTML_CLASS_PREFIX + newValue);
-            },
-            getClasses(color) {
-                return color;
-            },
-            select(color) {
-                this.value = color;
-            },
-        }
-    }
+<script setup lang="ts">
+import {onBeforeUnmount, onMounted, ref, watch} from 'vue'
+
+const storageKey = 'ColorAccent'
+const htmlClassPrefix = 'accent-'
+const colors = ['default', 'gray', 'purple', 'pink', 'red', 'orange', 'orange-yellow', 'yellow', 'lime', 'green', 'teal', 'cyan', 'blue', 'violet']
+const value = ref('default')
+
+const setValue = (oldValue: string | null, newValue: string) => {
+  if (oldValue) {
+    document.documentElement.classList.remove(htmlClassPrefix + oldValue)
+  }
+  document.documentElement.classList.add(htmlClassPrefix + newValue)
+}
+
+const storeValue = (nextValue: string) => {
+  window.localStorage.setItem(storageKey, nextValue)
+}
+
+const getValue = () => window.localStorage.getItem(storageKey) || value.value
+const getClasses = (color: string) => color
+const select = (color: string) => {
+  value.value = color
+}
+
+const onStorage = (event: StorageEvent) => {
+  if (event.key === storageKey) {
+    value.value = event.newValue || 'default'
+  }
+}
+
+watch(value, (newValue, oldValue) => {
+  if (oldValue !== newValue) {
+    setValue(oldValue, newValue)
+    storeValue(newValue)
+    console.log(newValue)
+  }
+})
+
+onMounted(() => {
+  if (!window.localStorage) {
+    return
+  }
+  value.value = getValue()
+  setValue(null, value.value)
+  window.addEventListener('storage', onStorage)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('storage', onStorage)
+})
 </script>
+
 <style scoped>
     ul {
         list-style: none;

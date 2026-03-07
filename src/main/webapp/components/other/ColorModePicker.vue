@@ -2,50 +2,45 @@
     <div class="color-picker-base">
         <ul>
             <li v-for="color of colors" :key="color"
-                @keydown.enter.exact="$colorMode.preference = color"
-                @click="$colorMode.preference = color"
-                tabindex="0">
-                <component :is="`icon-${color}`" :class="getClasses(color)"/>
-                <span :class="getClasses(color)">{{color}}</span>
+                tabindex="0"
+                @keydown.enter.exact="colorMode.preference = color"
+                @click="colorMode.preference = color">
+                <component :is="getIconComponent(color)" :class="getClasses(color)"/>
+                <span :class="getClasses(color)">{{ color }}</span>
             </li>
         </ul>
     </div>
 </template>
-<script>
-import IconSystem from '@/assets/icons/system.svg?inline';
-import IconLight from '@/assets/icons/light.svg?inline';
-import IconSepia from '@/assets/icons/sepia.svg?inline';
-import IconDark from '@/assets/icons/dark.svg?inline';
-import IconCode from '@/assets/icons/cloud.svg?inline';
 
-export default {
-    name: "ColorModePicker",
-    components: {
-        IconSystem,
-        IconLight,
-        IconSepia,
-        IconDark,
-        IconCode
-    },
-    data() {
-        return {
-            colors: ['system', 'light', 'sepia', 'dark', 'code']
-        }
-    },
-    methods: {
-        getClasses (color) {
-            // Does not set classes on ssr when preference is system (because we don't know the preference until client-side)
-            if (this.$colorMode.unknown) {
-                return {}
-            }
-            return {
-                preferred: color === this.$colorMode.preference,
-                selected: color === this.$colorMode.value
-            }
-        }
-    }
+<script setup lang="ts">
+import IconCode from '@/assets/icons/cloud.svg?component'
+import IconDark from '@/assets/icons/dark.svg?component'
+import IconLight from '@/assets/icons/light.svg?component'
+import IconSepia from '@/assets/icons/sepia.svg?component'
+import IconSystem from '@/assets/icons/system.svg?component'
+
+const colorMode = useColorMode()
+const colors = ['system', 'light', 'sepia', 'dark', 'code']
+
+const getIconComponent = (color: string) => ({
+  system: IconSystem,
+  light: IconLight,
+  sepia: IconSepia,
+  dark: IconDark,
+  code: IconCode,
+}[color] || IconSystem)
+
+const getClasses = (color: string) => {
+  if (!colorMode || colorMode.unknown) {
+    return {}
+  }
+  return {
+    preferred: color === colorMode.preference,
+    selected: color === colorMode.value,
+  }
 }
 </script>
+
 <style scoped>
 .color-picker-base {
     width: 100%;

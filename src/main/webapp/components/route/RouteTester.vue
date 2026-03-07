@@ -2,91 +2,80 @@
     <div>
         <div class="route-tester-buttons">
             <button type="button" class="btn btn-sm btn-primary" @click="test">retry</button>
-            <ButtonEdit @click="$emit('edit')"></ButtonEdit>
-            <button type="button" class="btn btn-sm btn-default" @click="$emit('close')">close</button>
+            <ButtonEdit @click="emit('edit')"></ButtonEdit>
+            <button type="button" class="btn btn-sm btn-default" @click="emit('close')">close</button>
         </div>
         <div class="route-tester-result">
             <pre class="form-control form-control-sm monospace">{{ testResult }}</pre>
         </div>
     </div>
 </template>
-<script>
-import ButtonEdit from "@/components/other/ButtonEdit";
 
-export default {
-    name: "RouteTester",
-    components: {ButtonEdit},
-    data() {
-        return {
-            testResult: '',
-        }
-    },
-    props: {
-        route: {type: Object, default: {}}
-    },
-    mounted() {
-        this.test();
-    },
-    computed: {
-        host() {
-            return this.$store.state.BASE_URL;
-        },
-        encodedPath() {
-            let path = this.route.path;
-            if (path.startsWith('/')) path = path.substring(1);
-            return path.replaceAll('/', '-');
-        },
-        contentType() {
-            if (this.route.type === 'SOAP') return 'text/xml';
-            return 'application/json';
-        },
-        testHeaders() {
-            if (this.route.alt) {
-                return {
-                    'Content-Type': this.contentType,
-                    'Cache-Control': 'no-cache',
-                    'Mock-Alt': this.encodedPath + '/' + this.route.alt
-                }
-            } else {
-                return {
-                    'Content-Type': this.contentType,
-                    'Cache-Control': 'no-cache'
-                }
-            }
-        },
-    },
-    methods: {
-        async test() {
-            this.testResult = '';
-            this.println(this.route.method.toUpperCase() + ' ' + this.host + this.route.path);
-            this.println(JSON.stringify(this.testHeaders));
-            this.println('fetching ...');
-            this.$nextTick();
+<script setup lang="ts">
+import {computed, ref} from 'vue'
+import ButtonEdit from '@/components/other/ButtonEdit.vue'
+import {useFrontendApp} from '@/state/app'
+import type {RouteEntity} from '@/types/models'
 
-            try {
-                const startTime = new Date();
-                const response = await fetch(
-                    this.host + this.route.path,
-                    {
-                        method: this.route.method,
-                        headers: this.testHeaders
-                    }
-                );
-                const body = await response.text();
-                const elapsed = new Date() - startTime;
-                this.println('----- response in ' + elapsed + ' ms with status ' + response.status + ' -----');
-                this.println(body);
-            } catch (err) {
-                this.println('----------');
-                this.println(err);
-            }
-        },
-        println(text) {
-            this.testResult = this.testResult + text + '\n';
-        },
+const props = defineProps<{
+  route: RouteEntity
+}>()
+
+const emit = defineEmits<{
+  edit: []
+  close: []
+}>()
+
+const frontendApp = useFrontendApp()
+const testResult = ref('Press retry to execute this route sample.\n')
+const host = computed(() => frontendApp.state.baseUrl)
+const encodedPath = computed(() => {
+  let path = props.route.path
+  if (path.startsWith('/')) path = path.substring(1)
+  return path.replaceAll('/', '-')
+})
+const contentType = computed(() => props.route.type === 'SOAP' ? 'text/xml' : 'application/json')
+const testHeaders = computed<Record<string, string>>(() => {
+  if (props.route.alt) {
+    return {
+      'Content-Type': contentType.value,
+      'Cache-Control': 'no-cache',
+      'Mock-Alt': encodedPath.value + '/' + props.route.alt,
     }
+  }
+  return {
+    'Content-Type': contentType.value,
+    'Cache-Control': 'no-cache',
+  }
+})
+
+const println = (text: unknown) => {
+  testResult.value += String(text) + '\n'
+}
+
+const test = async () => {
+  testResult.value = ''
+  println(props.route.method.toUpperCase() + ' ' + host.value + props.route.path)
+  println(JSON.stringify(testHeaders.value))
+  println('fetching ...')
+
+  try {
+    const startTime = Date.now()
+    const response = await fetch(host.value + props.route.path, {
+      method: props.route.method,
+      headers: testHeaders.value,
+    })
+    const body = await response.text()
+    const elapsed = Date.now() - startTime
+    println('----- response in ' + elapsed + ' ms with status ' + response.status + ' -----')
+    println(body)
+  } catch (err) {
+    println('----------')
+    println(err)
+  }
 }
 </script>
+
 <style lang="scss" scoped>
 .route-tester-result {
     padding: 0;
@@ -97,3 +86,4 @@ export default {
     text-align: end;
 }
 </style>
+

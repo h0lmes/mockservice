@@ -1,53 +1,64 @@
 <template>
     <textarea class="form-control form-control-sm no-resize monospace"
               ref="textArea"
-              :value="value"
+              :value="modelValue"
               :placeholder="placeholder"
               :rows="rows"
               :spellcheck="false"
-              @input="e => input(e)"
-              @keydown="e => $emit('keydown', e)"
+              @input="input"
+              @keydown="event => emit('keydown', event)"
     ></textarea>
 </template>
-<script>
-    export default {
-        name: "AutoSizeTextArea",
-        data() {
-            return {}
-        },
-        props: {
-            value: {type: String},
-            placeholder: {type: String},
-            minRows: {type: Number, default: 1},
-            maxRows: {type: Number, default: 20},
-        },
-        computed: {
-            rows() {
-                let size = this.minRows;
-                if (!!this.value) {
-                    const lines = this.value.split('\n');
-                    if (lines.length > size) {
-                        size = Math.min(lines.length, this.maxRows);
-                    }
-                }
-                return size;
-            },
-        },
-        methods: {
-            input(e) {
-                this.$emit('input', e.target.value);
-            },
-            selectionStart() {
-                return this.$refs.textArea.selectionStart;
-            },
-            selectionEnd() {
-                return this.$refs.textArea.selectionEnd;
-            },
-            focus() {
-                this.$refs.textArea.focus();
-            },
-        },
+
+<script setup lang="ts">
+import {computed, ref} from 'vue'
+
+const props = withDefaults(defineProps<{
+  modelValue?: string
+  placeholder?: string
+  minRows?: number
+  maxRows?: number
+}>(), {
+  modelValue: '',
+  placeholder: undefined,
+  minRows: 1,
+  maxRows: 20,
+})
+
+const emit = defineEmits<{
+  'update:modelValue': [value: string]
+  input: [value: string]
+  keydown: [event: KeyboardEvent]
+}>()
+
+const textArea = ref<HTMLTextAreaElement | null>(null)
+const rows = computed(() => {
+  let size = props.minRows
+  if (props.modelValue) {
+    const lines = props.modelValue.split('\n')
+    if (lines.length > size) {
+      size = Math.min(lines.length, props.maxRows)
     }
+  }
+  return size
+})
+
+const input = (event: Event) => {
+  const value = (event.target as HTMLTextAreaElement).value
+  emit('update:modelValue', value)
+  emit('input', value)
+}
+
+const selectionStart = () => textArea.value?.selectionStart
+const selectionEnd = () => textArea.value?.selectionEnd
+const focus = () => textArea.value?.focus()
+
+defineExpose({
+  selectionStart,
+  selectionEnd,
+  focus,
+})
 </script>
+
 <style scoped>
 </style>

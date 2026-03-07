@@ -1,8 +1,7 @@
 <template>
     <div class="monospace">
-
         <div class="mb-4">Variables on server now</div>
-        <AutoSizeTextArea class="main" v-model="context"></AutoSizeTextArea>
+        <AutoSizeTextArea v-model="context" class="main"></AutoSizeTextArea>
         <div class="component-toolbar mt-4">
             <button type="button" class="btn btn-primary" @click="saveGlobal">Save to server</button>
             <button type="button" class="btn btn-default" @click="downloadGlobal">Download as file</button>
@@ -11,7 +10,7 @@
         <div class="group-boundary"></div>
 
         <div class="mb-4">Initialize these variables on server startup</div>
-        <AutoSizeTextArea class="main" v-model="initial"></AutoSizeTextArea>
+        <AutoSizeTextArea v-model="initial" class="main"></AutoSizeTextArea>
         <div class="component-toolbar mt-4">
             <button type="button" class="btn btn-primary" @click="saveInitial">Save to server</button>
             <button type="button" class="btn btn-default" @click="downloadInitial">Download as file</button>
@@ -19,68 +18,49 @@
 
         <div class="group-boundary"></div>
 
-        <Loading v-if="$fetchState.pending"></Loading>
+        <Loading v-if="pageLoading"></Loading>
     </div>
 </template>
-<script>
-import {mapActions} from 'vuex';
-import Loading from "../components/other/Loading";
-import AutoSizeTextArea from "../components/other/AutoSizeTextArea";
 
-export default {
-    name: "context",
-    components: {AutoSizeTextArea, Loading},
-    data() {
-        return {
-            context: '',
-            initial: '',
-        }
-    },
-    async fetch() {
-        return this.fetchGlobalContext().then(response => {
-            this.context = response;
-        }).then(await this.fetchInitialContext().then(response => {
-            this.initial = response;
-        }));
-    },
-    fetchDelay: 0,
-    methods: {
-        ...mapActions({
-            fetchGlobalContext: 'context/fetch',
-            saveGlobalContext: 'context/save',
-            fetchInitialContext: 'context/fetchInitial',
-            saveInitialContext: 'context/saveInitial',
-        }),
-        async saveGlobal() {
-            if (!confirm('Save global context?')) return;
-            this.$nuxt.$loading.start();
-            this.saveGlobalContext(this.context).then(() => this.$nuxt.$loading.finish());
-        },
-        async saveInitial() {
-            if (!confirm('Save initial context?')) return;
-            this.$nuxt.$loading.start();
-            this.saveInitialContext(this.initial).then(() => this.$nuxt.$loading.finish());
-        },
-        downloadGlobal() {
-            this.saveTextAsFile(this.context, 'context-global.txt')
-        },
-        downloadInitial() {
-            this.saveTextAsFile(this.initial, 'context-initial.txt')
-        },
-        saveTextAsFile(text, fileName) {
-            let blob = new Blob([text], {type: 'text/plain'});
-            let link = document.createElement("a");
-            link.download = fileName;
-            link.innerHTML = "Download File";
-            link.href = URL.createObjectURL(blob);
-            link.style.display = "none";
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-        },
-    }
+<script setup lang="ts">
+import {onMounted, ref} from 'vue'
+import {usePageLoader, useWorkingAction} from '@/composables/useAsyncState'
+import AutoSizeTextArea from '../components/other/AutoSizeTextArea'
+import Loading from '../components/other/Loading'
+import {fetchGlobalContext, fetchInitialContext, saveGlobalContext, saveInitialContext} from '@/state/context'
+import {saveTextAsFile} from '@/utils/download'
+
+const { pageLoading, runWhilePageLoading } = usePageLoader()
+const { runWhileWorking } = useWorkingAction()
+const context = ref('')
+const initial = ref('')
+
+const loadPage = async () => runWhilePageLoading(async () => {
+  context.value = (await fetchGlobalContext()) ?? ''
+  initial.value = (await fetchInitialContext()) ?? ''
+})
+
+const saveGlobal = async () => {
+  if (!confirm('Save global context?')) return
+  await runWhileWorking(() => saveGlobalContext(context.value))
 }
+
+const saveInitial = async () => {
+  if (!confirm('Save initial context?')) return
+  await runWhileWorking(() => saveInitialContext(initial.value))
+}
+
+const downloadGlobal = () => {
+  saveTextAsFile(context.value, 'context-global.txt')
+}
+
+const downloadInitial = () => {
+  saveTextAsFile(initial.value, 'context-initial.txt')
+}
+
+onMounted(loadPage)
 </script>
+
 <style scoped>
 .group-boundary {
     background: transparent;

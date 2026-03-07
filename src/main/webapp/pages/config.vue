@@ -6,85 +6,69 @@
             <button type="button" class="btn btn-default" @click="backup">Backup  config on server</button>
             <button type="button" class="btn btn-default" @click="restore">Restore from server backup</button>
         </div>
-        <AutoSizeTextArea class="main" v-model="config" :max-rows="maxRows"></AutoSizeTextArea>
-        <AutoSizeTextArea class="helper invisible" v-model="config" :min-rows="1" :max-rows="1"></AutoSizeTextArea>
-        <Loading v-if="$fetchState.pending"></Loading>
+        <AutoSizeTextArea v-model="config" class="main" :max-rows="maxRows"></AutoSizeTextArea>
+        <AutoSizeTextArea v-model="config" class="helper invisible" :min-rows="1" :max-rows="1"></AutoSizeTextArea>
+        <Loading v-if="pageLoading"></Loading>
     </div>
 </template>
-<script>
-import {mapActions} from 'vuex';
-import Loading from "../components/other/Loading";
-import AutoSizeTextArea from "../components/other/AutoSizeTextArea";
 
-export default {
-    name: "config",
-    components: {AutoSizeTextArea, Loading},
-    data() {
-        return {
-            config: '',
-            maxRows: 30,
-        }
-    },
-    async fetch() {
-        return this.fetchConfig()
-            .then(response => {
-                this.config = response;
-                this.$nextTick(() => this.calcMaxRows());
-            });
-    },
-    fetchDelay: 0,
-    methods: {
-        ...mapActions({
-            fetchConfig: 'config/fetch',
-            saveConfig: 'config/save',
-            backupConfig: 'config/backup',
-            restoreConfig: 'config/restore'
-        }),
-        calcMaxRows() {
-            const ma = document.querySelector('textarea.main').getBoundingClientRect();
-            const ha = document.querySelector('textarea.helper').getBoundingClientRect();
-            const lineHeight = (ma.height - ha.height) / (this.maxRows - 1);
-            this.maxRows += (window.innerHeight - ma.bottom) / lineHeight - 2;
-        },
-        async save() {
-            if (confirm('Ye be warned =)')) {
-                this.$nuxt.$loading.start();
-                this.saveConfig(this.config)
-                    .then(() => this.$nuxt.$loading.finish());
-            }
-        },
-        async backup() {
-            this.$nuxt.$loading.start();
-            this.backupConfig()
-                .then(() => this.$nuxt.$loading.finish());
-        },
-        async restore() {
-            if (confirm('Confirm restore ?')) {
-                this.$nuxt.$loading.start();
-                this.restoreConfig()
-                    .then(() => {
-                        this.$nuxt.$loading.finish();
-                        this.$fetch();
-                    });
-            }
-        },
-        download() {
-            this.saveTextAsFile(this.config, 'config.yml')
-        },
-        saveTextAsFile(text, fileName) {
-            let blob = new Blob([text], {type: 'text/plain'});
-            let link = document.createElement("a");
-            link.download = fileName;
-            link.innerHTML = "Download File";
-            link.href = URL.createObjectURL(blob);
-            link.style.display = "none";
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-        },
-    }
+<script setup lang="ts">
+import {nextTick, onMounted, ref} from 'vue'
+import {usePageLoader, useWorkingAction} from '@/composables/useAsyncState'
+import AutoSizeTextArea from '../components/other/AutoSizeTextArea'
+import Loading from '../components/other/Loading'
+import {backupConfig, fetchConfig, restoreConfig, saveConfig} from '@/state/config'
+import {saveTextAsFile} from '@/utils/download'
+
+const { pageLoading, runWhilePageLoading } = usePageLoader()
+const { runWhileWorking } = useWorkingAction()
+const config = ref('')
+const maxRows = ref(30)
+
+const calcMaxRows = () => {
+  const main = document.querySelector('textarea.main')?.getBoundingClientRect()
+  const helper = document.querySelector('textarea.helper')?.getBoundingClientRect()
+  if (!main || !helper) {
+    return
+  }
+  const lineHeight = (main.height - helper.height) / (maxRows.value - 1)
+  maxRows.value += (window.innerHeight - main.bottom) / lineHeight - 2
 }
+
+const loadPage = async () => runWhilePageLoading(async () => {
+  config.value = (await fetchConfig()) ?? ''
+  await nextTick()
+  calcMaxRows()
+})
+
+const save = async () => {
+  if (!confirm('Ye be warned =)')) {
+    return
+  }
+  await runWhileWorking(() => saveConfig(config.value))
+}
+
+const backup = async () => {
+  await runWhileWorking(() => backupConfig())
+}
+
+const restore = async () => {
+  if (!confirm('Confirm restore ?')) {
+    return
+  }
+  await runWhileWorking(async () => {
+    await restoreConfig()
+    await loadPage()
+  })
+}
+
+const download = () => {
+  saveTextAsFile(config.value, 'config.yml')
+}
+
+onMounted(loadPage)
 </script>
+
 <style scoped>
 .invisible {
     position: absolute;

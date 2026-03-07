@@ -1,28 +1,27 @@
 <template>
     <div class="component component-row monospace"
-         :class="{'open' : open}"
+         :class="{ open }"
          @click.middle.stop.prevent="edit"
          @keydown.esc.exact="cancel">
 
         <div v-show="!open" class="mock-col w-fixed-auto">
-            <component :is="`icon`" class="component-row-icon color-accent-one"/>
+            <Icon class="component-row-icon color-accent-one"/>
         </div>
 
         <div v-show="selecting && !open" class="mock-col w-fixed-auto">
-            <ToggleSwitch class="mock-col-value"
-                          :value="selected" @toggle="select"></ToggleSwitch>
+            <ToggleSwitch class="mock-col-value" :value="selected" @toggle="select"></ToggleSwitch>
         </div>
 
         <div class="mock-col w2">
             <div class="mock-col-header">GROUP</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.group)">{{ scenario.group }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingScenario.group"/>
+            <input v-show="editing" v-model="editingScenario.group" type="text" class="form-control form-control-sm"/>
         </div>
 
         <div class="mock-col w1">
             <div class="mock-col-header">SCENARIO TYPE</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.type)">{{ scenario.type }}</div>
-            <select v-show="editing" class="form-control form-control-sm" v-model="editingScenario.type">
+            <select v-show="editing" v-model="editingScenario.type" class="form-control form-control-sm">
                 <option>MAP</option>
                 <option>QUEUE</option>
                 <option>RING</option>
@@ -32,7 +31,7 @@
         <div class="mock-col w3">
             <div class="mock-col-header">SCENARIO ALIAS</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(scenario.alias)">{{ scenario.alias }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingScenario.alias"/>
+            <input v-show="editing" v-model="editingScenario.alias" type="text" class="form-control form-control-sm"/>
         </div>
 
         <div class="mock-col w2 text-center">
@@ -51,13 +50,11 @@
 
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">LIST OF ROUTES</div>
-            <AutoSizeTextArea v-model="editingScenario.data" ref="data"
-                              placeholder="click SHOW ROUTES to add routes; or just type them in as METHOD;PATH;ALT"
-            ></AutoSizeTextArea>
+            <AutoSizeTextArea ref="data" v-model="editingScenario.data" placeholder="click SHOW ROUTES to add routes; or just type them in as METHOD;PATH;ALT"></AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-col w1 mt-1">
-            <ToggleSwitch class="mock-col-value" v-model="showRoutes">SHOW ROUTES</ToggleSwitch>
+            <ToggleSwitch v-model="showRoutes" class="mock-col-value">SHOW ROUTES</ToggleSwitch>
         </div>
         <div v-show="editing" class="mock-col w-fixed-auto">
             <button type="button" class="btn btn-sm btn-primary" @click="save">SAVE</button>
@@ -71,138 +68,133 @@
 
     </div>
 </template>
-<script>
-import {mapActions} from 'vuex';
-import RoutesToAdd from "./RoutesToAdd";
-import ToggleSwitch from "../other/ToggleSwitch";
-import AutoSizeTextArea from "../other/AutoSizeTextArea";
-import ButtonDelete from "@/components/other/ButtonDelete";
-import ButtonEdit from "@/components/other/ButtonEdit";
-import ButtonExecute from "@/components/other/ButtonExecute";
-import Icon from '@/assets/icons/scroll.svg?inline';
 
-export default {
-    name: "Scenario",
-    components: {ButtonExecute, ButtonEdit, ButtonDelete, Icon,
-        AutoSizeTextArea, RoutesToAdd, ToggleSwitch},
-    data() {
-        return {
-            editing: false,
-            editingScenario: {},
-            activeSwitch: false,
-            showRoutes: false,
-        }
-    },
-    props: {
-        scenario: {type: Object},
-    },
-    computed: {
-        routes() {
-            return this.$store.state.routes.routes;
-        },
-        open() {
-            return this.editing || this.testing;
-        },
-        active() {
-            return this.scenario.active;
-        },
-        selected() {
-            if (!this.scenario) return null;
-            return this.scenario._selected;
-        },
-        selecting() {
-            return this.selected !== undefined && this.selected !== null;
-        },
-    },
-    created() {
-        this.activeSwitch = this.active;
-    },
-    mounted() {
-        if (this.scenario._new) {
-            this.edit();
-        }
-    },
-    methods: {
-        ...mapActions({
-            filter: 'setApiSearchExpression',
-            saveScenario: 'scenarios/save',
-            deleteScenarios: 'scenarios/delete',
-            activateScenario: 'scenarios/activate',
-            deactivateScenario: 'scenarios/deactivate',
-            fetchRoutes: 'routes/fetch',
-            selectScenario: 'scenarios/select',
-        }),
-        select(value) {
-            this.selectScenario({scenario: this.scenario, selected: value});
-        },
-        activeToggled() {
-            if (this.activeSwitch) this.activate(); else this.deactivate();
-        },
-        activate() {
-            this.$nuxt.$loading.start();
-            this.activateScenario(this.scenario.alias)
-                .then(() => {
-                    this.$nuxt.$loading.finish();
-                    this.activeSwitch = this.active;
-                });
-        },
-        deactivate() {
-            this.$nuxt.$loading.start();
-            this.deactivateScenario(this.scenario.alias)
-                .then(() => {
-                    this.$nuxt.$loading.finish();
-                    this.activeSwitch = this.active;
-                });
-        },
-        edit() {
-            this.editingScenario = {...this.scenario};
-            if (!this.editing) this.editing = true; else this.cancel();
-            if (this.editing) this.$nextTick(() => this.$refs.data.focus());
-        },
-        cancel() {
-            if (!!this.scenario._new) {
-                this.deleteScenarios([this.scenario]);
-            } else {
-                this.editing = false;
-                this.editingScenario = {};
-            }
-        },
-        del() {
-            if (!!this.scenario._new) {
-                this.deleteScenarios([this.scenario]);
-                return;
-            }
-            if (confirm('Sure you want to delete?')) {
-                this.$nuxt.$loading.start();
-                this.deleteScenarios([this.scenario])
-                    .then(() => this.$nuxt.$loading.finish());
-            }
-        },
-        save() {
-            this.$nuxt.$loading.start();
-            this.saveScenario([this.scenario, this.editingScenario])
-                .then(() => {
-                    this.$nuxt.$loading.finish();
-                    this.editing = false;
-                });
-        },
-        saveAsCopy() {
-            this.$nuxt.$loading.start();
-            this.editingScenario.id = '';
-            this.saveScenario([{}, this.editingScenario])
-                .then(() => {
-                    this.$nuxt.$loading.finish();
-                    this.editing = false;
-                });
-        },
-        add(route) {
-            this.editingScenario.data = this.editingScenario.data || '';
-            if (!!this.editingScenario.data) this.editingScenario.data += '\n';
-            this.editingScenario.data += route.method + ';' + route.path + ';' + route.alt;
-            this.$refs.data.focus();
-        },
-    }
+<script setup lang="ts">
+import {computed, nextTick, onMounted, ref} from 'vue'
+import Icon from '@/assets/icons/scroll.svg?component'
+import ButtonDelete from '@/components/other/ButtonDelete.vue'
+import ButtonEdit from '@/components/other/ButtonEdit.vue'
+import ButtonExecute from '@/components/other/ButtonExecute.vue'
+import AutoSizeTextArea from '@/components/other/AutoSizeTextArea.vue'
+import ToggleSwitch from '@/components/other/ToggleSwitch.vue'
+import {useWorkingAction} from '@/composables/useAsyncState'
+import {setApiSearchExpression} from '@/state/app'
+import {useRoutesState} from '@/state/routes'
+import {activateScenario, deactivateScenario, deleteScenarios, saveScenarios, selectScenario} from '@/state/scenarios'
+import type {FocusableField, RouteEntity, ScenarioDraft, ScenarioEntity} from '@/types/models'
+import RoutesToAdd from '@/components/route/RoutesToAdd.vue'
+
+const createEmptyScenario = (): ScenarioDraft => ({
+  id: '',
+  group: '',
+  alias: 'New Scenario',
+  type: 'MAP',
+  data: '',
+  active: false,
+})
+
+const props = defineProps<{
+  scenario: ScenarioEntity
+}>()
+
+const { runWhileWorking } = useWorkingAction()
+const routesState = useRoutesState()
+const data = ref<FocusableField | null>(null)
+const editing = ref(false)
+const editingScenario = ref<ScenarioDraft>(createEmptyScenario())
+const activeSwitch = ref(false)
+const showRoutes = ref(false)
+const testing = ref(false)
+const routes = computed(() => routesState.state.routes)
+const open = computed(() => editing.value || testing.value)
+const active = computed(() => !!props.scenario.active)
+const selected = computed(() => props.scenario?._selected)
+const selecting = computed(() => selected.value !== undefined && selected.value !== null)
+
+const filter = (value: string) => setApiSearchExpression(value)
+const select = (value: boolean) => selectScenario({ scenario: props.scenario, selected: value })
+
+const activate = () => {
+  void runWhileWorking(async () => {
+    await activateScenario(props.scenario.alias)
+    activeSwitch.value = active.value
+  })
 }
+
+const deactivate = () => {
+  void runWhileWorking(async () => {
+    await deactivateScenario(props.scenario.alias)
+    activeSwitch.value = active.value
+  })
+}
+
+const activeToggled = () => {
+  if (activeSwitch.value) activate()
+  else deactivate()
+}
+
+const edit = async () => {
+  editingScenario.value = { ...createEmptyScenario(), ...props.scenario }
+  if (!editing.value) editing.value = true
+  else cancel()
+  if (editing.value) {
+    await nextTick()
+    data.value?.focus()
+  }
+}
+
+const cancel = () => {
+  if (props.scenario._new) {
+    deleteScenarios([props.scenario])
+  } else {
+    editing.value = false
+    editingScenario.value = createEmptyScenario()
+  }
+}
+
+const del = () => {
+  if (props.scenario._new) {
+    deleteScenarios([props.scenario])
+    return
+  }
+  if (confirm('Sure you want to delete?')) {
+    void runWhileWorking(() => deleteScenarios([props.scenario]))
+  }
+}
+
+const save = () => {
+  void runWhileWorking(async () => {
+    await saveScenarios([props.scenario, editingScenario.value])
+    editing.value = false
+  })
+}
+
+const saveAsCopy = () => {
+  editingScenario.value.id = ''
+  void runWhileWorking(async () => {
+    await saveScenarios([{}, editingScenario.value])
+    editing.value = false
+  })
+}
+
+const add = (route: RouteEntity) => {
+  editingScenario.value.data = editingScenario.value.data || ''
+  if (editingScenario.value.data) editingScenario.value.data += '\n'
+  editingScenario.value.data += route.method + ';' + route.path + ';' + route.alt
+  data.value?.focus()
+}
+
+onMounted(() => {
+  activeSwitch.value = active.value
+  if (props.scenario._new) {
+    edit()
+  }
+})
 </script>
+
 <style scoped>
 </style>
+
+
+
+

@@ -1,15 +1,16 @@
 <template>
-    <button type="button" title="edit" class="btn btn-sm" @click="e => $emit('click', e)">
-        <component :is="`icon`"/>
+    <button type="button" title="edit" class="btn btn-sm" @click="emit('click', $event)">
+        <Icon />
     </button>
 </template>
-<script>
-import Icon from '@/assets/icons/pencil.svg?inline';
 
-export default {
-    name: "ButtonEdit",
-    components: {Icon},
-}
+<script setup lang="ts">
+import Icon from '@/assets/icons/pencil.svg?component'
+
+const emit = defineEmits<{
+  click: [event: MouseEvent]
+}>()
 </script>
+
 <style scoped>
 </style>

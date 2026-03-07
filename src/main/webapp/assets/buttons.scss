@@ -109,6 +109,10 @@
   }
 }
 
+.btn + .btn {
+  margin-left: .35rem;
+}
+
 .btn-sm {
   padding: .5rem .6rem;
   font-size: smaller;

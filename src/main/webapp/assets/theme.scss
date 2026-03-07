@@ -1,0 +1,134 @@
+:root {
+  --grey: #909090;
+  --gray: #909090;
+  --cyan-blue: #179ae6;
+  --blue: #257fff;
+  --violet: #4d4dff;
+  --purple: #7141d9;
+  --pink: #d92e94;
+  --red: #dc3545;
+  --orange: #fc7c19;
+  --orange-yellow: #e6a117;
+  --yellow: #e6bf00;
+  --lime: #8ebd00;
+  --green: #29a649;
+  --teal: #13c285;
+  --cyan: #1aaaba;
+  /**/
+  --color-primary: #243746;
+  --color-secondary: #999491;
+  --color-disabled: #bfbfbf;
+  --color-accent-one: var(--cyan);
+  --color-link: #0056b3;
+  --color-link-hover: #007bff;
+  --bg-page: #ededed;
+  --bg-component: #fff;
+  --bg-component-active: #ffbd8b;
+  --bg-border: #fff;
+  --bg-border-active: #dbe0e5;
+
+  --component-border-radius: 0.5rem;
+}
+
+.sepia-mode {
+  --teal: #44c296;
+  --cyan: #1a91a1;
+  /**/
+  --color-primary: #433422;
+  --color-secondary: #b3887d;
+  --color-disabled: #bfb8a6;
+  --color-accent-one: var(--orange-yellow);
+  --bg-page: #e3d9c5;
+  --bg-component: #f5ebd3;
+  --bg-component-active: #f5ebd3;
+  --bg-border: #f5ebd3;
+  --bg-border-active: #fff6e3;
+}
+
+.dark-mode {
+  --cyan-blue: #2e7599;
+  --blue: #3b7bd0;
+  --violet: #4d4dff;
+  --purple: #7141d9;
+  --pink: #a62e76;
+  --red: #992e3c;
+  --orange: #b3580e;
+  --orange-yellow: #b37c0e;
+  --yellow: #b39f47;
+  --lime: #80992e;
+  --green: #388c49;
+  --teal: #2d8064;
+  --cyan: #297e8a;
+  /**/
+  --color-primary: #c2b9b4;
+  --color-secondary: #6a6d76;
+  --color-disabled: #44464e;
+  --color-accent-one: var(--teal);
+  --bg-page: #0d1117;
+  --bg-component: #191d20;
+  --bg-component-active: #252729;
+  --bg-border: var(--bg-component);
+  --bg-border-active: var(--color-accent-one);
+}
+
+.code-mode {
+  --cyan-blue: #2e7599;
+  --blue: #3b7bd0;
+  --violet: #4d4dff;
+  --purple: #7141d9;
+  --pink: #a62e76;
+  --red: #ab3131;
+  --orange: #b3580e;
+  --orange-yellow: #d08f11;
+  --yellow: #c5af4b;
+  --lime: #80992e;
+  --green: #388c49;
+  --teal: #2d8064;
+  --cyan: #297e8a;
+  /**/
+  --color-primary: #dae2eb;
+  --color-secondary: #667c96;
+  --color-disabled: #455a73;
+  --color-accent-one: var(--cyan);
+  --bg-page: #20262e;
+  --bg-component: #2a313b;
+  --bg-component-active: #475566;
+  --bg-border: var(--bg-component);
+  --bg-border-active: var(--color-accent-one);
+}
+
+.accent-gray {--color-accent-one: var(--gray);}
+.accent-grey {--color-accent-one: var(--grey);}
+.accent-cyan-blue {--color-accent-one: var(--cyan-blue);}
+.accent-blue {--color-accent-one: var(--blue);}
+.accent-violet {--color-accent-one: var(--violet);}
+.accent-purple {--color-accent-one: var(--purple);}
+.accent-pink {--color-accent-one: var(--pink);}
+.accent-red {--color-accent-one: var(--red);}
+.accent-orange {--color-accent-one: var(--orange);}
+.accent-orange-yellow {--color-accent-one: var(--orange-yellow);}
+.accent-yellow {--color-accent-one: var(--yellow);}
+.accent-lime {--color-accent-one: var(--lime);}
+.accent-green {--color-accent-one: var(--green);}
+.accent-teal {--color-accent-one: var(--teal);}
+.accent-cyan {--color-accent-one: var(--cyan);}
+
+.color-primary {color: var(--color-primary) !important;}
+.color-secondary {color: var(--color-secondary) !important;}
+.color-accent-one {color: var(--color-accent-one) !important;}
+
+.gray {color: var(--gray) !important; text-decoration-color: var(--gray) !important;}
+.grey {color: var(--grey) !important; text-decoration-color: var(--grey) !important;}
+.cyan-blue {color: var(--cyan-blue) !important; text-decoration-color: var(--cyan-blue) !important;}
+.blue {color: var(--blue) !important; text-decoration-color: var(--blue) !important;}
+.violet {color: var(--violet) !important; text-decoration-color: var(--violet) !important;}
+.purple {color: var(--purple) !important; text-decoration-color: var(--purple) !important;}
+.pink {color: var(--pink) !important; text-decoration-color: var(--pink) !important;}
+.red {color: var(--red) !important; text-decoration-color: var(--red) !important;}
+.orange {color: var(--orange) !important; text-decoration-color: var(--orange) !important;}
+.orange-yellow {color: var(--orange-yellow) !important; text-decoration-color: var(--orange-yellow) !important;}
+.yellow {color: var(--yellow) !important; text-decoration-color: var(--yellow) !important;}
+.lime {color: var(--lime) !important; text-decoration-color: var(--lime) !important;}
+.green {color: var(--green) !important; text-decoration-color: var(--green) !important;}
+.teal {color: var(--teal) !important; text-decoration-color: var(--teal) !important;}
+.cyan {color: var(--cyan) !important; text-decoration-color: var(--cyan) !important;}

@@ -6,30 +6,27 @@
                        type="text"
                        class="form-control monospace"
                        placeholder="type in or click on values (group, path, etc)"
-                       @keydown.enter.exact.stop="filter($event.target.value)"/>
+                       @keydown.enter.exact.stop="filter(($event.target as HTMLInputElement).value)"/>
             </div>
             <button type="button" class="toolbar-item-w-fixed-auto btn" @click="filter('')">Clear search</button>
-            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="jsSearch">JS</ToggleSwitch>
+            <ToggleSwitch v-model="jsSearch" class="toolbar-item toolbar-item-w-fixed-auto">JS</ToggleSwitch>
         </div>
 
         <div class="component-toolbar mb-3">
-            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRoutes">Routes</ToggleSwitch>
-            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showScenarios">Scenarios</ToggleSwitch>
-            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showRequests">Requests</ToggleSwitch>
-            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto" v-model="showTests">Tests</ToggleSwitch>
+            <ToggleSwitch v-model="showRoutes" class="toolbar-item toolbar-item-w-fixed-auto">Routes</ToggleSwitch>
+            <ToggleSwitch v-model="showScenarios" class="toolbar-item toolbar-item-w-fixed-auto">Scenarios</ToggleSwitch>
+            <ToggleSwitch v-model="showRequests" class="toolbar-item toolbar-item-w-fixed-auto">Requests</ToggleSwitch>
+            <ToggleSwitch v-model="showTests" class="toolbar-item toolbar-item-w-fixed-auto">Tests</ToggleSwitch>
             <ViewSelector class="toolbar-item toolbar-item-w-fixed-auto"></ViewSelector>
-            <ToggleSwitch class="toolbar-item toolbar-item-w-fixed-auto"
-                          :value="selecting" @toggle="setSelect">Select</ToggleSwitch>
+            <ToggleSwitch :model-value="selecting" class="toolbar-item toolbar-item-w-fixed-auto" @toggle="setSelect">Select</ToggleSwitch>
         </div>
 
         <div class="component-toolbar mb-5">
-            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRoute">Add route</button>
-            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addScenario">Add scenario</button>
-            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRequest">Add request</button>
-            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addTest">Add test</button>
-            <button type="button" class="toolbar-item-w-fixed-auto btn btn-danger mr-3"
-                    v-show="selecting"
-                    @click="deleteSelected">Delete selected</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRouteEntity">Add route</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addScenarioEntity">Add scenario</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addRequestEntity">Add request</button>
+            <button type="button" class="toolbar-item-w-fixed-auto btn" @click="addTestEntity">Add test</button>
+            <button v-show="selecting" type="button" class="toolbar-item-w-fixed-auto btn btn-danger mr-3" @click="deleteSelected">Delete selected</button>
         </div>
 
         <Routes :entities="filteredEntities"></Routes>
@@ -52,231 +49,169 @@
         </div>
         <div class="color-secondary mt-6 text-indent">
             <div class="mt-2 bold">Test plan syntax</div>
-            <p class="mt-2">
-                - Each line is exactly one command.
-            </p>
-            <p class="mt-2">
-                - x = some string - set value of variable 'x' in global context (see Context page).
-            </p>
-            <p class="mt-2">
-                - x = ${item.capacity} - set value of variable 'x' in global context, value comes from variable 'item.capacity' from latest request response (assuming latest response was like <span>{"item": {"capacity": 100}}</span>) or from global context.
-            </p>
-            <p class="mt-2">
-                - GET localhost:8081/products/${id} - execute inline request; variable comes from global context.
-            </p>
-            <p class="mt-2">
-                - POST localhost:8081/v2/store/order {"x": 400} -> 400,404 - execute inline request and test status code is 400 or 404; if test fails - test run stops with FAILED.
-            </p>
-            <p class="mt-2">
-                - request_id - execute request with ID 'request_id'.
-            </p>
-            <p class="mt-2">
-                - request_id -> 200 - execute request with ID 'request_id' and test status code is 200; if test fails - test run stops with FAILED.
-            </p>
-            <p class="mt-2">
-                - x == 2 - non-strictly test variable 'x' from the latest request response; if test fails - test run proceeds with WARNING.
-            </p>
-            <p class="mt-2">
-                - x === some value - strictly test variable 'x' from the latest request response; if test fails - test run stops with FAILED.
-            </p>
+            <p class="mt-2">- Each line is exactly one command.</p>
+            <p class="mt-2">- x = some string - set value of variable 'x' in global context (see Context page).</p>
+            <p class="mt-2">- x = ${item.capacity} - set value of variable 'x' in global context, value comes from variable 'item.capacity' from latest request response (assuming latest response was like <span>{"item": {"capacity": 100}}</span>) or from global context.</p>
+            <p class="mt-2">- GET localhost:8081/products/${id} - execute inline request; variable comes from global context.</p>
+            <p class="mt-2">- POST localhost:8081/v2/store/order {"x": 400} -> 400,404 - execute inline request and test status code is 400 or 404; if test fails - test run stops with FAILED.</p>
+            <p class="mt-2">- request_id - execute request with ID 'request_id'.</p>
+            <p class="mt-2">- request_id -> 200 - execute request with ID 'request_id' and test status code is 200; if test fails - test run stops with FAILED.</p>
+            <p class="mt-2">- x == 2 - non-strictly test variable 'x' from the latest request response; if test fails - test run proceeds with WARNING.</p>
+            <p class="mt-2">- x === some value - strictly test variable 'x' from the latest request response; if test fails - test run stops with FAILED.</p>
         </div>
         <div class="color-secondary mt-6 text-indent">
             <div class="mt-2 bold">Scenario types</div>
-            <p class="mt-2">
-                - MAP: goes over the LIST OF ROUTES in a scenario top-to-bottom looking for the first match of requested METHOD + PATH pair, returns route with matching ALT. If no match found - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).
-            </p>
-            <p class="mt-2">
-                - QUEUE: same as MAP but looks only at the topmost route, removes route from a queue if it matches. If topmost route does not match (or all routes were already matched and thus removed from a queue) - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).
-            </p>
-            <p class="mt-2">
-                - RING: same as QUEUE but restarts the queue when it depletes.
-            </p>
+            <p class="mt-2">- MAP: goes over the LIST OF ROUTES in a scenario top-to-bottom looking for the first match of requested METHOD + PATH pair, returns route with matching ALT. If no match found - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).</p>
+            <p class="mt-2">- QUEUE: same as MAP but looks only at the topmost route, removes route from a queue if it matches. If topmost route does not match (or all routes were already matched and thus removed from a queue) - uses default behavior (returns route with matching METHOD + PATH and an empty ALT).</p>
+            <p class="mt-2">- RING: same as QUEUE but restarts the queue when it depletes.</p>
         </div>
 
-        <Loading v-if="$fetchState.pending"></Loading>
+        <Loading v-if="pageLoading"></Loading>
     </div>
 </template>
-<script>
-import {mapActions} from 'vuex';
-import Routes from "../components/route/Routes";
-import Loading from "../components/other/Loading";
-import ViewSelector from "../components/other/ViewSelector";
-import ToggleSwitch from "../components/other/ToggleSwitch";
-import {_isRequest, _isRoute, _isScenario, _isTest} from "@/js/common";
 
-export default {
-    name: "index",
-    components: {Routes, Loading, ViewSelector, ToggleSwitch},
-    data() {
-        return {
-            query: '',
-            timeout: null,
-            showRoutes: true,
-            showRequests: true,
-            showScenarios: true,
-            showTests: true,
-            jsSearch: false,
-        }
-    },
-    async fetch() {
-        return this.fetchRoutes()
-            .then(this.fetchRequests())
-            .then(this.fetchScenarios())
-            .then(this.fetchTests());
-    },
-    fetchDelay: 0,
-    computed: {
-        searchExpression() {
-            return (this.$store.state.apiSearchExpression || '').trim();
-        },
-        routes() {
-            return this.showRoutes ? this.$store.state.routes.routes : [];
-        },
-        requests() {
-            return this.showRequests ? this.$store.state.requests.requests : [];
-        },
-        scenarios() {
-            return this.showScenarios ? this.$store.state.scenarios.scenarios : [];
-        },
-        tests() {
-            return this.showTests ? this.$store.state.tests.tests : [];
-        },
-        entities() {
-            return [...this.routes, ...this.requests, ...this.scenarios, ...this.tests];
-        },
-        filteredEntities() {
-            if (!this.query) return this.entities;
+<script setup lang="ts">
+import {computed, ref} from 'vue'
+import type {RequestEntity, RouteEntity, ScenarioEntity, TestEntity} from '@/types/models'
+import {usePageLoader, useWorkingAction} from '@/composables/useAsyncState'
+import {useSyncedSearch} from '@/composables/useSyncedSearch'
+import Loading from '../components/other/Loading'
+import ToggleSwitch from '../components/other/ToggleSwitch'
+import ViewSelector from '../components/other/ViewSelector'
+import Routes from '../components/route/Routes'
+import {frontendAppState, setApiSearchExpression} from '@/state/app'
+import {addRequest, deleteRequests, fetchRequests, selectAllRequests, useRequestsState} from '@/state/requests'
+import {addRoute, deleteRoutes, fetchRoutes, selectAllRoutes, useRoutesState} from '@/state/routes'
+import {addScenario, deleteScenarios, fetchScenarios, selectAllScenarios, useScenariosState} from '@/state/scenarios'
+import {addTest, deleteTests, fetchTests, selectAllTests, useTestsState} from '@/state/tests'
+import {_isRequest, _isRoute, _isScenario, _isTest} from '@/js/common'
 
-            try {
-                return this.entities.filter(this.getSearchFn());
-            } catch (e) {
-                console.error(e);
-                return [];
-            }
-        },
-        selecting() {
-            if (!this.filteredEntities || this.filteredEntities.length === 0) return false;
-            return this.filteredEntities[0]._selected !== undefined
-                && this.filteredEntities[0]._selected !== null;
-        },
-    },
-    mounted() {
-        this.$refs.search.value = this.searchExpression;
-        this.query = this.searchExpression;
-    },
-    watch: {
-        searchExpression(newValue) {
-            this.$refs.search.value = newValue;
-            this.query = newValue;
-        },
-    },
-    methods: {
-        ...mapActions({
-            filter: 'setApiSearchExpression',
+type ApiEntity = RouteEntity | RequestEntity | ScenarioEntity | TestEntity
 
-            fetchRoutes: 'routes/fetch',
-            addRouteAction: 'routes/add',
-            deleteRoutes: 'routes/delete',
-            selectRoutes: 'routes/selectAll',
+const { pageLoading, runWhilePageLoading } = usePageLoader()
+const { runWhileWorking } = useWorkingAction()
+const showRoutes = ref(true)
+const showRequests = ref(true)
+const showScenarios = ref(true)
+const showTests = ref(true)
+const jsSearch = ref(false)
+const searchExpression = computed(() => (frontendAppState.apiSearchExpression || '').trim())
+const { search, query } = useSyncedSearch(searchExpression)
+const routes = computed(() => showRoutes.value ? useRoutesState().state.routes : [])
+const requests = computed(() => showRequests.value ? useRequestsState().state.requests : [])
+const scenarios = computed(() => showScenarios.value ? useScenariosState().state.scenarios : [])
+const tests = computed(() => showTests.value ? useTestsState().state.tests : [])
+const entities = computed<ApiEntity[]>(() => [...routes.value, ...requests.value, ...scenarios.value, ...tests.value])
 
-            fetchRequests: 'requests/fetch',
-            addRequestAction: 'requests/add',
-            deleteRequests: 'requests/delete',
-            selectRequests: 'requests/selectAll',
+const getSearchFn = () => {
+  if (jsSearch.value) {
+    return Function('e', 'return ' + query.value + ';') as (entity: ApiEntity) => boolean
+  }
+  if (!query.value) {
+    return () => true
+  }
 
-            fetchScenarios: 'scenarios/fetch',
-            addScenarioAction: 'scenarios/add',
-            deleteScenarios: 'scenarios/delete',
-            selectScenarios: 'scenarios/selectAll',
-
-            fetchTests: 'tests/fetch',
-            addTestAction: 'tests/add',
-            deleteTests: 'tests/delete',
-            selectTests: 'tests/selectAll',
-        }),
-        addRoute() {
-            this.showRoutes = true
-            this.addRouteAction()
-        },
-        addRequest() {
-            this.showRequests = true
-            this.addRequestAction()
-        },
-        addScenario() {
-            this.showScenarios = true
-            this.addScenarioAction()
-        },
-        addTest() {
-            this.showTests = true
-            this.addTestAction()
-        },
-        setSelect(value) {
-            if (value) {
-                this.selectRoutes(false);
-                this.selectRequests(false);
-                this.selectScenarios(false);
-                this.selectTests(false);
-            } else {
-                this.selectRoutes(null);
-                this.selectRequests(null);
-                this.selectScenarios(null);
-                this.selectTests(null);
-            }
-        },
-        async deleteSelected() {
-            if (confirm('Are you sure you want to delete all selected entities?')) {
-                this.$nuxt.$loading.start();
-
-                const routes = this.filteredEntities.filter(e => _isRoute(e) && e._selected);
-                const requests = this.filteredEntities.filter(e => _isRequest(e) && e._selected);
-                const scenarios = this.filteredEntities.filter(e => _isScenario(e) && e._selected);
-                const tests = this.filteredEntities.filter(e => _isTest(e) && e._selected);
-
-                if (routes.length > 0) await this.deleteRoutes(routes);
-                if (requests.length > 0) await this.deleteRequests(requests);
-                if (scenarios.length > 0) await this.deleteScenarios(scenarios);
-                if (tests.length > 0) await this.deleteTests(tests);
-
-                this.$nuxt.$loading.finish();
-            }
-        },
-        getSearchFn() {
-            if (this.jsSearch) {
-                return Function("e", "return " + this.query + ";");
-            } else if (!this.query) {
-                return e => true;
-            } else {
-                const query = this.query;
-                return e => {
-                    if (e.method && e.path && e.id) {
-                        return e.group.includes(query)
-                            || e.type.includes(query)
-                            || e.method.includes(query)
-                            || e.path.includes(query)
-                            || e.id.includes(query);
-                    } else if (e.method && e.path) {
-                        return e.group.includes(query)
-                            || e.type.includes(query)
-                            || e.method.includes(query)
-                            || e.path.includes(query)
-                            || e.alt.includes(query);
-                    } else if (e.alias && e.plan) {
-                        return e.group.includes(query)
-                            || e.alias.includes(query);
-                    } else {
-                        return e.group.includes(query)
-                            || e.alias.includes(query)
-                            || e.type.includes(query);
-                    }
-                };
-            }
-        }
+  const nextQuery = query.value
+  return (entity: ApiEntity) => {
+    if ('method' in entity && 'path' in entity && 'id' in entity) {
+      return entity.group.includes(nextQuery) || entity.type.includes(nextQuery) || entity.method.includes(nextQuery) || entity.path.includes(nextQuery) || entity.id.includes(nextQuery)
     }
+    if ('method' in entity && 'path' in entity) {
+      return entity.group.includes(nextQuery) || entity.type.includes(nextQuery) || entity.method.includes(nextQuery) || entity.path.includes(nextQuery) || entity.alt.includes(nextQuery)
+    }
+    if ('alias' in entity && 'plan' in entity) {
+      return entity.group.includes(nextQuery) || entity.alias.includes(nextQuery)
+    }
+    return entity.group.includes(nextQuery) || entity.alias.includes(nextQuery) || entity.type.includes(nextQuery)
+  }
 }
+
+const filteredEntities = computed<ApiEntity[]>(() => {
+  if (!query.value) return entities.value
+
+  try {
+    return entities.value.filter(getSearchFn())
+  } catch (error) {
+    console.error(error)
+    return []
+  }
+})
+
+const selecting = computed(() => {
+  if (!filteredEntities.value || filteredEntities.value.length === 0) return false
+  return filteredEntities.value[0]._selected !== undefined && filteredEntities.value[0]._selected !== null
+})
+
+const filter = (value: string) => {
+  setApiSearchExpression(value)
+}
+
+const loadPage = async () => runWhilePageLoading(async () => {
+  await fetchRoutes()
+  await fetchRequests()
+  await fetchScenarios()
+  await fetchTests()
+})
+
+const addRouteEntity = () => {
+  showRoutes.value = true
+  addRoute()
+}
+
+const addRequestEntity = () => {
+  showRequests.value = true
+  addRequest()
+}
+
+const addScenarioEntity = () => {
+  showScenarios.value = true
+  addScenario()
+}
+
+const addTestEntity = () => {
+  showTests.value = true
+  addTest()
+}
+
+const setSelect = (value: boolean | null) => {
+  if (value) {
+    selectAllRoutes(false)
+    selectAllRequests(false)
+    selectAllScenarios(false)
+    selectAllTests(false)
+  } else {
+    selectAllRoutes(null)
+    selectAllRequests(null)
+    selectAllScenarios(null)
+    selectAllTests(null)
+  }
+}
+
+const deleteSelected = async () => {
+  if (!confirm('Are you sure you want to delete all selected entities?')) {
+    return
+  }
+
+  await runWhileWorking(async () => {
+    const selectedRoutes = filteredEntities.value.filter((entity) => _isRoute(entity) && entity._selected) as RouteEntity[]
+    const selectedRequests = filteredEntities.value.filter((entity) => _isRequest(entity) && entity._selected) as RequestEntity[]
+    const selectedScenarios = filteredEntities.value.filter((entity) => _isScenario(entity) && entity._selected) as ScenarioEntity[]
+    const selectedTests = filteredEntities.value.filter((entity) => _isTest(entity) && entity._selected) as TestEntity[]
+
+    if (selectedRoutes.length > 0) await deleteRoutes(selectedRoutes)
+    if (selectedRequests.length > 0) await deleteRequests(selectedRequests)
+    if (selectedScenarios.length > 0) await deleteScenarios(selectedScenarios)
+    if (selectedTests.length > 0) await deleteTests(selectedTests)
+  })
+}
+
+await loadPage()
 </script>
+
 <style scoped>
 .text-indent > p {
     margin-left: 1rem;
     text-indent: -1.1rem;
 }
 </style>
+

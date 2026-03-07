@@ -2,61 +2,55 @@
     <div>
         <div class="tester-buttons">
             <button type="button" class="btn btn-sm btn-primary" @click="test">retry</button>
-            <ButtonEdit @click="$emit('edit')"></ButtonEdit>
-            <button type="button" class="btn btn-sm btn-default" @click="$emit('close')">close</button>
+            <ButtonEdit @click="emit('edit')"></ButtonEdit>
+            <button type="button" class="btn btn-sm btn-default" @click="emit('close')">close</button>
         </div>
         <div class="tester-result">
             <pre class="form-control form-control-sm monospace">{{ testResult }}</pre>
         </div>
     </div>
 </template>
-<script>
-import {mapActions} from "vuex";
-import ButtonEdit from "@/components/other/ButtonEdit";
 
-export default {
-    name: "RequestTester",
-    components: {ButtonEdit},
-    data() {
-        return {
-            testResult: '',
-        }
-    },
-    props: {
-        request: {type: Object, default: {}}
-    },
-    mounted() {
-        this.test();
-    },
-    computed: {
-    },
-    methods: {
-        ...mapActions({
-            executeRequest: 'requests/execute',
-        }),
-        async test() {
-            this.testResult = '';
-            this.println('working ...');
-            this.$nextTick();
+<script setup lang="ts">
+import {ref} from 'vue'
+import ButtonEdit from '@/components/other/ButtonEdit'
+import {executeRequest} from '@/state/requests'
+import type {RequestEntity} from '@/types/models'
 
-            try {
-                const body = await this.executeRequest(this.request.id);
-                this.clearOutput();
-                this.println(body);
-            } catch (err) {
-                this.println('----------');
-                this.println(err);
-            }
-        },
-        println(text) {
-            this.testResult = this.testResult + text + '\n';
-        },
-        clearOutput() {
-            this.testResult = '';
-        },
-    }
+const props = defineProps<{
+  request: RequestEntity
+}>()
+
+const emit = defineEmits<{
+  edit: []
+  close: []
+}>()
+
+const testResult = ref('Press retry to execute this saved request.\n')
+
+const println = (text: unknown) => {
+  testResult.value += String(text) + '\n'
+}
+
+const clearOutput = () => {
+  testResult.value = ''
+}
+
+const test = async () => {
+  testResult.value = ''
+  println('working ...')
+
+  try {
+    const body = await executeRequest(props.request.id)
+    clearOutput()
+    println(body)
+  } catch (err) {
+    println('----------')
+    println(err)
+  }
 }
 </script>
+
 <style lang="scss" scoped>
     .tester-result {
         padding: 0;

@@ -1,21 +1,20 @@
 <template>
     <div class="component component-row monospace"
-         :class="{'open' : open, 'disabled' : route.disabled}"
+         :class="{ open, disabled: route.disabled }"
          @click.middle.stop.prevent="edit"
          @keydown.esc.exact="cancel">
 
         <div v-show="!open" class="mock-col w-fixed-auto">
-            <component :is="`icon`" class="component-row-icon grey"/>
+            <Icon class="component-row-icon grey"/>
         </div>
 
         <div v-show="selecting && !open" class="mock-col w-fixed-auto">
-            <ToggleSwitch class="mock-col-value"
-                          :value="selected" @toggle="select"></ToggleSwitch>
+            <ToggleSwitch class="mock-col-value" :value="selected" @toggle="select"></ToggleSwitch>
         </div>
 
         <div v-show="editing" class="mock-col w1">
             <div class="mock-col-header">TYPE</div>
-            <select class="form-control form-control-sm" v-model="editingData.type">
+            <select v-model="editingData.type" class="form-control form-control-sm">
                 <option>REST</option>
                 <option>SOAP</option>
             </select>
@@ -24,15 +23,15 @@
         <div v-show="!testing" class="mock-col w2">
             <div class="mock-col-header">GROUP</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(route.group)">{{ route.group }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingData.group"/>
+            <input v-show="editing" v-model="editingData.group" type="text" class="form-control form-control-sm"/>
         </div>
 
         <div v-show="!testing" class="mock-col w1">
             <div class="mock-col-header">METHOD</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(route.method)">
-                <route-method :value="route.method" :disabled="route.disabled"></route-method>
+                <RouteMethod :value="route.method" :disabled="route.disabled"></RouteMethod>
             </div>
-            <select v-show="editing" class="form-control form-control-sm" v-model="editingData.method">
+            <select v-show="editing" v-model="editingData.method" class="form-control form-control-sm">
                 <option>GET</option>
                 <option>POST</option>
                 <option>PUT</option>
@@ -62,59 +61,47 @@
 
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">PATH</div>
-            <input type="text" class="form-control form-control-sm" v-model="editingData.path"
-                   placeholder="/api/v1/etc"/>
+            <input v-model="editingData.path" type="text" class="form-control form-control-sm" placeholder="/api/v1/etc"/>
         </div>
 
         <div v-show="editing" class="mock-group w100">
             <div class="mock-col w1">
                 <div class="mb-2 color-secondary">ALT</div>
-                <input type="text" class="form-control form-control-sm"
-                       v-model="editingData.alt"
-                       placeholder="can contain condition like: id = 1"/>
+                <input v-model="editingData.alt" type="text" class="form-control form-control-sm" placeholder="can contain condition like: id = 1"/>
             </div>
             <div class="mock-col w1">
                 <div class="mb-2 color-secondary">RESPONSE CODE</div>
-                <input type="text" class="form-control form-control-sm" v-model="editingData.responseCode"
-                       placeholder="200"/>
+                <input v-model="editingData.responseCode" type="text" class="form-control form-control-sm" placeholder="200"/>
             </div>
         </div>
 
         <div v-show="editing" class="mock-col w100">
             <div class="mb-2 color-secondary">RESPONSE BODY</div>
-            <AutoSizeTextArea v-model="editingData.response" ref="response"
-                              placeholder='{"id": 1, "name": "admin"}'>
-            </AutoSizeTextArea>
+            <AutoSizeTextArea ref="response" v-model="editingData.response" placeholder='{"id": 1, "name": "admin"}'></AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-col w100 mt-1">
-            <ToggleSwitch class="mock-col-value" v-model="showRequestBodySchema">SHOW REQUEST BODY SCHEMA</ToggleSwitch>
+            <ToggleSwitch v-model="showRequestBodySchema" class="mock-col-value">SHOW REQUEST BODY SCHEMA</ToggleSwitch>
         </div>
         <div v-show="editing && showRequestBodySchema" class="mock-col w100">
-            <AutoSizeTextArea v-model="editingData.requestBodySchema"
-                              :min-rows="1" :max-rows="40"
-                              placeholder="REQUEST BODY VALIDATION SCHEMA (JSON)"
-            ></AutoSizeTextArea>
+            <AutoSizeTextArea v-model="editingData.requestBodySchema" :min-rows="1" :max-rows="40" placeholder="REQUEST BODY VALIDATION SCHEMA (JSON)"></AutoSizeTextArea>
         </div>
 
         <div v-show="editing" class="mock-group w100">
             <div v-show="editing" class="mock-col w100">
-                <ToggleSwitch class="mock-col-value" v-model="editingData.triggerRequest">TRIGGER REQUESTS
-                </ToggleSwitch>
+                <ToggleSwitch v-model="editingData.triggerRequest" class="mock-col-value">TRIGGER REQUESTS</ToggleSwitch>
             </div>
             <div v-show="editing && editingData.triggerRequest" class="mock-col w2">
-                <input type="text" class="form-control form-control-sm" v-model="editingData.triggerRequestIds"
-                       placeholder="Comma separated request IDs to trigger after this one"/>
+                <input v-model="editingData.triggerRequestIds" type="text" class="form-control form-control-sm" placeholder="Comma separated request IDs to trigger after this one"/>
             </div>
             <div v-show="editing && editingData.triggerRequest">after (millis)</div>
             <div v-show="editing && editingData.triggerRequest" class="mock-col w1">
-                <input type="text" class="form-control form-control-sm" v-model="editingData.triggerRequestDelay"
-                       placeholder="Comma separated delays (default is 100)"/>
+                <input v-model="editingData.triggerRequestDelay" type="text" class="form-control form-control-sm" placeholder="Comma separated delays (default is 100)"/>
             </div>
         </div>
 
         <div v-show="editing" class="mock-col w1">
-            <ToggleSwitch class="mock-col-value" v-model="editingData.disabled">DISABLED</ToggleSwitch>
+            <ToggleSwitch v-model="editingData.disabled" class="mock-col-value">DISABLED</ToggleSwitch>
         </div>
 
         <div v-show="editing" class="mock-col w-fixed-auto">
@@ -128,103 +115,112 @@
         </div>
     </div>
 </template>
-<script>
-import {mapActions} from 'vuex';
-import RouteTester from "./RouteTester";
-import RouteMethod from "./RouteMethod";
-import ToggleSwitch from "../other/ToggleSwitch";
-import AutoSizeTextArea from "../other/AutoSizeTextArea";
-import ButtonDelete from "@/components/other/ButtonDelete";
-import ButtonEdit from "@/components/other/ButtonEdit";
-import ButtonExecute from "@/components/other/ButtonExecute";
-import Icon from '@/assets/icons/star.svg?inline';
 
-export default {
-    name: "Route",
-    components: {ButtonExecute, ButtonEdit, ButtonDelete, Icon,
-        AutoSizeTextArea, RouteTester, RouteMethod, ToggleSwitch},
-    data() {
-        return {
-            editing: false,
-            editingData: {},
-            testing: false,
-            showRequestBodySchema: false,
-        }
-    },
-    props: {
-        route: {type: Object, default: {}},
-    },
-    computed: {
-        open() {
-            return this.editing || this.testing;
-        },
-        hasVariables() {
-            return this.route.variables && this.route.variables.length > 0;
-        },
-        selected() {
-            if (!this.route) return null;
-            return this.route._selected;
-        },
-        selecting() {
-            return this.selected !== undefined && this.selected !== null;
-        },
-    },
-    mounted() {
-        if (this.route._new) this.edit();
-    },
-    methods: {
-        ...mapActions({
-            filter: 'setApiSearchExpression',
-            saveRoute: 'routes/save',
-            deleteRoutes: 'routes/delete',
-            selectRoute: 'routes/select',
-        }),
-        select(value) {
-            this.selectRoute({route: this.route, selected: value});
-        },
-        edit() {
-            this.testing = false;
-            this.editingData = {...this.route};
-            this.showRequestBodySchema = !!this.editingData.requestBodySchema;
-            if (!this.editing) this.editing = true; else this.cancel();
-            if (this.editing) this.$nextTick(() => this.$refs.response.focus());
-        },
-        cancel() {
-            if (!!this.route._new) {
-                this.deleteRoutes([this.route]);
-            } else {
-                this.editing = false;
-                this.editingData = {};
-            }
-        },
-        test() {
-            this.cancel();
-            this.testing = !this.testing;
-        },
-        del() {
-            if (!!this.route._new) {
-                this.deleteRoutes([this.route]);
-            } else if (confirm('Sure you want to delete?')) {
-                this.$nuxt.$loading.start();
-                this.deleteRoutes([this.route]).then(() => this.$nuxt.$loading.finish());
-            }
-        },
-        save() {
-            this.$nuxt.$loading.start();
-            this.saveRoute([this.route, this.editingData]).then(() => {
-                this.$nuxt.$loading.finish();
-                this.editing = false;
-            });
-        },
-        saveAsCopy() {
-            this.$nuxt.$loading.start();
-            this.saveRoute([{}, this.editingData]).then(() => {
-                this.$nuxt.$loading.finish();
-                this.editing = false;
-            });
-        },
-    }
+<script setup lang="ts">
+import {computed, nextTick, onMounted, ref} from 'vue'
+import Icon from '@/assets/icons/star.svg?component'
+import ButtonDelete from '@/components/other/ButtonDelete.vue'
+import ButtonEdit from '@/components/other/ButtonEdit.vue'
+import ButtonExecute from '@/components/other/ButtonExecute.vue'
+import AutoSizeTextArea from '@/components/other/AutoSizeTextArea.vue'
+import ToggleSwitch from '@/components/other/ToggleSwitch.vue'
+import {useWorkingAction} from '@/composables/useAsyncState'
+import {setApiSearchExpression} from '@/state/app'
+import {deleteRoutes, saveRoutes, selectRoute} from '@/state/routes'
+import type {FocusableField, RouteDraft, RouteEntity} from '@/types/models'
+import RouteMethod from '@/components/route/RouteMethod.vue'
+import RouteTester from '@/components/route/RouteTester.vue'
+
+const createEmptyRoute = (): RouteDraft => ({
+  group: '',
+  type: 'REST',
+  method: 'GET',
+  path: '/',
+  alt: '',
+  response: '',
+  responseCode: '200',
+  requestBodySchema: '',
+  disabled: false,
+  triggerRequest: false,
+  triggerRequestIds: '',
+  triggerRequestDelay: '',
+})
+
+const props = defineProps<{
+  route: RouteEntity
+}>()
+
+const { runWhileWorking } = useWorkingAction()
+const response = ref<FocusableField | null>(null)
+const editing = ref(false)
+const editingData = ref<RouteDraft>(createEmptyRoute())
+const testing = ref(false)
+const showRequestBodySchema = ref(false)
+const open = computed(() => editing.value || testing.value)
+const selected = computed(() => props.route?._selected)
+const selecting = computed(() => selected.value !== undefined && selected.value !== null)
+
+const filter = (value: string) => setApiSearchExpression(value)
+const select = (value: boolean) => selectRoute({ route: props.route, selected: value })
+
+const edit = async () => {
+  testing.value = false
+  editingData.value = { ...createEmptyRoute(), ...props.route }
+  showRequestBodySchema.value = !!editingData.value.requestBodySchema
+  if (!editing.value) editing.value = true
+  else cancel()
+  if (editing.value) {
+    await nextTick()
+    response.value?.focus()
+  }
 }
+
+const cancel = () => {
+  if (props.route._new) {
+    deleteRoutes([props.route])
+  } else {
+    editing.value = false
+    editingData.value = createEmptyRoute()
+  }
+}
+
+const test = () => {
+  cancel()
+  testing.value = !testing.value
+}
+
+const del = () => {
+  if (props.route._new) {
+    deleteRoutes([props.route])
+  } else if (confirm('Sure you want to delete?')) {
+    void runWhileWorking(() => deleteRoutes([props.route]))
+  }
+}
+
+const save = () => {
+  void runWhileWorking(async () => {
+    await saveRoutes([props.route, editingData.value])
+    editing.value = false
+  })
+}
+
+const saveAsCopy = () => {
+  void runWhileWorking(async () => {
+    await saveRoutes([{}, editingData.value])
+    editing.value = false
+  })
+}
+
+onMounted(() => {
+  if (props.route._new) {
+    edit()
+  }
+})
 </script>
+
 <style scoped>
 </style>
+
+
+
+

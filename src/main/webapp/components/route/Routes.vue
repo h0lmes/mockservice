@@ -13,103 +13,85 @@
         </div>
     </div>
 </template>
-<script>
-import Route from "./Route";
-import Request from "./Request";
-import Scenario from "./Scenario";
-import Test from "./Test";
-import {_isRequest, _isRoute, _isScenario, _isTest} from "@/js/common";
 
-export default {
-    name: "Routes",
-    components: {Route, Request, Scenario, Test},
-    data() {
-        return {}
-    },
-    props: {
-        entities: {type: Array},
-    },
-    computed: {
-        sortedEntities() {
-            return this.entities.sort((a, b) => {
-                // newly created entities at the very top
-                let c = this.compare(a._new, b._new);
-                if (c !== 0) return c;
+<script setup lang="ts">
+import {computed} from 'vue'
+import type {RequestEntity, RouteEntity, ScenarioEntity, TestEntity} from '@/types/models'
+import Request from './Request'
+import Route from './Route'
+import Scenario from './Scenario'
+import Test from './Test'
+import {_isRequest, _isRoute, _isScenario, _isTest} from '@/js/common'
 
-                // keep same group entities together
-                c = this.compare(a.group, b.group);
-                if (c !== 0) return c;
+type RouteListEntity = RouteEntity | RequestEntity | ScenarioEntity | TestEntity
 
-                // within a group tests go first
-                if (_isTest(a)) {
-                    if (!_isTest(b)) return -1;
-                    // sorted by alias
-                    return this.compare(a.alias, b.alias);
-                }
+const props = withDefaults(defineProps<{
+  entities?: RouteListEntity[]
+}>(), {
+  entities: () => [],
+})
 
-                // requests
-                if (_isRequest(a)) {
-                    if (_isTest(b)) return 1;
-                    if (!_isRequest(b)) return -1;
-                    // sorted by id
-                    return this.compare(a.id, b.id);
-                }
+const compare = (a: unknown, b: unknown) => {
+  if (a == null && b == null) return 0
+  if (a == null) return 1
+  if (b == null) return -1
+  if (a < b) return -1
+  if (a > b) return 1
+  return 0
+}
 
-                // scenarios
-                if (_isScenario(a)) {
-                    if (_isTest(b)) return 1;
-                    if (_isRequest(b)) return 1;
-                    if (_isRoute(b)) return -1;
-                    // sorted by alias
-                    return this.compare(a.alias, b.alias);
-                }
+const isRoute = (entity: RouteListEntity): entity is RouteEntity => _isRoute(entity)
+const isRequest = (entity: RouteListEntity): entity is RequestEntity => _isRequest(entity)
+const isScenario = (entity: RouteListEntity): entity is ScenarioEntity => _isScenario(entity)
+const isTest = (entity: RouteListEntity): entity is TestEntity => _isTest(entity)
 
-                // routes go last
-                let isRouteA = _isRoute(a);
-                let isRouteB = _isRoute(b);
-                c = this.compare(isRouteA, isRouteB);
-                if (c !== 0) return c;
+const sortedEntities = computed(() => [...props.entities].sort((a, b) => {
+  let c = compare(a._new, b._new)
+  if (c !== 0) return c
 
-                if (!isRouteA) return 0;
+  c = compare(a.group, b.group)
+  if (c !== 0) return c
 
-                c = this.compare(a.type, b.type);
-                if (c !== 0) return c;
-                c = this.compare(a.path, b.path);
-                if (c !== 0) return c;
-                c = this.compare(a.method, b.method);
-                if (c !== 0) return c;
-                return this.compare(a.alt, b.alt);
-            });
-        },
-    },
-    methods: {
-        compare(a, b) {
-            if (a < b) return -1;
-            else if (a > b) return 1;
-            return 0;
-        },
-        groupStart(arr, entity, index) {
-            return index > 0 && entity.group !== arr[index - 1].group;
-        },
-        isRoute(e) {
-            return _isRoute(e);
-        },
-        isRequest(e) {
-            return _isRequest(e);
-        },
-        isScenario(e) {
-            return _isScenario(e);
-        },
-        isTest(e) {
-            return _isTest(e);
-        },
-        entityKey(entity) {
-            if (_isRoute(entity)) return entity.method + entity.path + entity.alt;
-            if (_isRequest(entity)) return entity.id;
-            return entity.alias;
-        },
-    }
+  if (isTest(a)) {
+    if (!isTest(b)) return -1
+    return compare(a.alias, b.alias)
+  }
+
+  if (isRequest(a)) {
+    if (isTest(b)) return 1
+    if (!isRequest(b)) return -1
+    return compare(a.id, b.id)
+  }
+
+  if (isScenario(a)) {
+    if (isTest(b)) return 1
+    if (isRequest(b)) return 1
+    if (isRoute(b)) return -1
+    return compare(a.alias, b.alias)
+  }
+
+  const routeA = isRoute(a)
+  const routeB = isRoute(b)
+  c = compare(routeA, routeB)
+  if (c !== 0) return c
+  if (!routeA || !routeB) return 0
+
+  c = compare(a.type, b.type)
+  if (c !== 0) return c
+  c = compare(a.path, b.path)
+  if (c !== 0) return c
+  c = compare(a.method, b.method)
+  if (c !== 0) return c
+  return compare(a.alt, b.alt)
+}))
+
+const groupStart = (entities: RouteListEntity[], entity: RouteListEntity, index: number) => index > 0 && entity.group !== entities[index - 1].group
+const entityKey = (entity: RouteListEntity) => {
+  if (isRoute(entity)) return entity.method + entity.path + entity.alt
+  if (isRequest(entity)) return entity.id
+  return entity.alias
 }
 </script>
+
 <style scoped>
 </style>

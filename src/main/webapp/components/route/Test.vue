@@ -1,25 +1,24 @@
 <template>
     <div class="component component-row monospace"
-         :class="{'open' : open}"
+         :class="{ open }"
          @click.middle.stop.prevent="edit"
          @keydown.esc.exact="cancel">
 
         <div v-show="!open" class="mock-col w-fixed-auto">
-            <component :is="`icon`" class="component-row-icon color-accent-one"/>
+            <Icon class="component-row-icon color-accent-one"/>
         </div>
 
         <div v-show="selecting && !open" class="mock-col w-fixed-auto">
-            <ToggleSwitch class="mock-col-value"
-                          :value="selected" @toggle="select"></ToggleSwitch>
+            <ToggleSwitch class="mock-col-value" :value="selected" @toggle="select"></ToggleSwitch>
         </div>
 
         <div v-if="!testing" class="mock-col w2">
             <div class="mock-col-header">GROUP</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(test.group)">{{ test.group }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingTest.group"/>
+            <input v-show="editing" v-model="editingTest.group" type="text" class="form-control form-control-sm"/>
         </div>
 
-        <div v-show="!editing && ! testing" class="mock-col w1">
+        <div v-show="!editing && !testing" class="mock-col w1">
             <div class="mock-col-header">TYPE</div>
             <div v-show="!editing" class="mock-col-value">TEST</div>
         </div>
@@ -27,7 +26,7 @@
         <div v-if="!testing" class="mock-col w3">
             <div class="mock-col-header">ALIAS</div>
             <div v-show="!editing" class="mock-col-value link" @click="filter(test.alias)">{{ test.alias }}</div>
-            <input v-show="editing" type="text" class="form-control form-control-sm" v-model="editingTest.alias"/>
+            <input v-show="editing" v-model="editingTest.alias" type="text" class="form-control form-control-sm"/>
         </div>
 
         <div v-show="!editing && !testing" class="mock-col w2">
@@ -47,14 +46,11 @@
         <div v-show="editing" class="mock-col w100 mt-2">
             <div class="mb-2 color-secondary">
                 TEST PLAN
-                <!--button type="button" class="btn btn-sm ml-2" @click="addPlanStep">add step</button-->
             </div>
-            <AutoSizeTextArea v-model="editingTest.plan" ref="data"
-                              placeholder="See test plan syntax at the bottom of page"
-            ></AutoSizeTextArea>
+            <AutoSizeTextArea ref="data" v-model="editingTest.plan" placeholder="See test plan syntax at the bottom of page"></AutoSizeTextArea>
         </div>
 
-        <div v-show="editing" class="mock-col w1 mt-1"></div> <!-- no value here - just for alignment -->
+        <div v-show="editing" class="mock-col w1 mt-1"></div>
 
         <div v-show="editing" class="mock-col w-fixed-auto">
             <button type="button" class="btn btn-sm btn-primary" @click="save">SAVE</button>
@@ -67,105 +63,100 @@
         </div>
     </div>
 </template>
-<script>
-import {mapActions} from 'vuex';
-import AutoSizeTextArea from "../other/AutoSizeTextArea";
-import ToggleSwitch from "../other/ToggleSwitch";
-import TestRun from "@/components/route/TestRun";
-import ButtonDelete from "@/components/other/ButtonDelete";
-import ButtonEdit from "@/components/other/ButtonEdit";
-import ButtonExecute from "@/components/other/ButtonExecute";
-import Icon from '@/assets/icons/question.svg?inline';
 
-export default {
-    name: "Test",
-    components: {ButtonExecute, ButtonEdit, ButtonDelete, Icon,
-        TestRun, AutoSizeTextArea, ToggleSwitch},
-    data() {
-        return {
-            editing: false,
-            editingTest: {},
-            testing: false,
-        }
-    },
-    props: {
-        test: {type: Object},
-    },
-    computed: {
-        open() {
-            return this.editing || this.testing;
-        },
-        selected() {
-            if (!this.test) return null;
-            return this.test._selected;
-        },
-        selecting() {
-            return this.selected !== undefined && this.selected !== null;
-        },
-    },
-    mounted() {
-        if (this.test._new) this.edit();
-    },
-    methods: {
-        ...mapActions({
-            filter: 'setApiSearchExpression',
-            saveTest: 'tests/save',
-            deleteTests: 'tests/delete',
-            selectTest: 'tests/select',
-        }),
-        select(value) {
-            this.selectTest({test: this.test, selected: value});
-        },
-        edit() {
-            this.testing = false;
-            this.editingTest = {...this.test};
-            if (!this.editing) this.editing = true; else this.cancel();
-            if (this.editing) this.$nextTick(() => this.$refs.data.focus());
-        },
-        cancel() {
-            if (!!this.test._new) {
-                this.deleteTests([this.test]);
-            } else {
-                this.editing = false;
-                this.editingTest = {};
-            }
-        },
-        del() {
-            if (!!this.test._new) {
-                this.deleteTests([this.test]);
-                return;
-            }
-            if (confirm('Sure you want to delete?')) {
-                this.$nuxt.$loading.start();
-                this.deleteTests([this.test])
-                    .then(() => this.$nuxt.$loading.finish());
-            }
-        },
-        save() {
-            this.$nuxt.$loading.start();
-            this.saveTest([this.test, this.editingTest])
-                .then(() => {
-                    this.$nuxt.$loading.finish();
-                    this.editing = false;
-                });
-        },
-        saveAsCopy() {
-            this.$nuxt.$loading.start();
-            this.saveTest([{}, this.editingTest])
-                .then(() => {
-                    this.$nuxt.$loading.finish();
-                    this.editing = false;
-                });
-        },
-        testRun() {
-            this.cancel();
-            this.testing = !this.testing;
-        },
-        addPlanStep() {
-            // TODO
-        },
-    }
+<script setup lang="ts">
+import {computed, nextTick, onMounted, ref} from 'vue'
+import Icon from '@/assets/icons/question.svg?component'
+import ButtonDelete from '@/components/other/ButtonDelete'
+import ButtonEdit from '@/components/other/ButtonEdit'
+import ButtonExecute from '@/components/other/ButtonExecute'
+import AutoSizeTextArea from '../other/AutoSizeTextArea'
+import ToggleSwitch from '../other/ToggleSwitch'
+import {useWorkingAction} from '@/composables/useAsyncState'
+import {setApiSearchExpression} from '@/state/app'
+import {deleteTests, saveTests, selectTest} from '@/state/tests'
+import type {FocusableField, TestDraft, TestEntity} from '@/types/models'
+import TestRun from '@/components/route/TestRun'
+
+const createEmptyTest = (): TestDraft => ({
+  group: '',
+  alias: 'New Test',
+  plan: '',
+})
+
+const props = defineProps<{
+  test: TestEntity
+}>()
+
+const { runWhileWorking } = useWorkingAction()
+const data = ref<FocusableField | null>(null)
+const editing = ref(false)
+const editingTest = ref<TestDraft>(createEmptyTest())
+const testing = ref(false)
+const open = computed(() => editing.value || testing.value)
+const selected = computed(() => props.test?._selected)
+const selecting = computed(() => selected.value !== undefined && selected.value !== null)
+
+const filter = (value: string) => setApiSearchExpression(value)
+const select = (value: boolean) => selectTest({ test: props.test, selected: value })
+
+const edit = async () => {
+  testing.value = false
+  editingTest.value = { ...createEmptyTest(), ...props.test }
+  if (!editing.value) editing.value = true
+  else cancel()
+  if (editing.value) {
+    await nextTick()
+    data.value?.focus()
+  }
 }
+
+const cancel = () => {
+  if (props.test._new) {
+    deleteTests([props.test])
+  } else {
+    editing.value = false
+    editingTest.value = createEmptyTest()
+  }
+}
+
+const del = () => {
+  if (props.test._new) {
+    deleteTests([props.test])
+    return
+  }
+  if (confirm('Sure you want to delete?')) {
+    void runWhileWorking(() => deleteTests([props.test]))
+  }
+}
+
+const save = () => {
+  void runWhileWorking(async () => {
+    await saveTests([props.test, editingTest.value])
+    editing.value = false
+  })
+}
+
+const saveAsCopy = () => {
+  void runWhileWorking(async () => {
+    await saveTests([{}, editingTest.value])
+    editing.value = false
+  })
+}
+
+const testRun = () => {
+  cancel()
+  testing.value = !testing.value
+}
+
+onMounted(() => {
+  if (props.test._new) {
+    edit()
+  }
+})
 </script>
+
 <style scoped>
 </style>
+
+

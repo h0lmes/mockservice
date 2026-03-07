@@ -4,43 +4,30 @@
             <button type="button" class="btn btn-primary" @click="download">Download</button>
         </div>
         <pre class="smaller">{{ value }}</pre>
-        <Loading v-if="$fetchState.pending"></Loading>
+        <Loading v-if="pageLoading"></Loading>
     </div>
 </template>
-<script>
-import {mapActions} from 'vuex';
-import Loading from "../components/other/Loading";
 
-export default {
-    name: "log",
-    components: {Loading},
-    data() {
-        return {
-            value: '',
-        }
-    },
-    async fetch() {
-        return this.fetchLog().then(res => this.value = res);
-    },
-    fetchDelay: 0,
-    methods: {
-        ...mapActions({fetchLog: 'log/fetch'}),
-        download() {
-            this.saveTextAsFile(this.value, 'mockservice.log')
-        },
-        saveTextAsFile(text, fileName) {
-            let blob = new Blob([text], {type: 'text/plain'});
-            let link = document.createElement("a");
-            link.download = fileName;
-            link.innerHTML = "Download File";
-            link.href = URL.createObjectURL(blob);
-            link.style.display = "none";
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-        },
-    }
+<script setup lang="ts">
+import {onMounted, ref} from 'vue'
+import {usePageLoader} from '@/composables/useAsyncState'
+import Loading from '../components/other/Loading'
+import {fetchLog} from '@/state/log'
+import {saveTextAsFile} from '@/utils/download'
+
+const { pageLoading, runWhilePageLoading } = usePageLoader()
+const value = ref('')
+
+const loadPage = async () => runWhilePageLoading(async () => {
+  value.value = (await fetchLog()) ?? ''
+})
+
+const download = () => {
+  saveTextAsFile(value.value, 'mockservice.log')
 }
+
+onMounted(loadPage)
 </script>
+
 <style scoped>
 </style>

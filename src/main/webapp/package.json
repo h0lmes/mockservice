@@ -1,33 +1,34 @@
 {
-  "name": "mockachu",
-  "version": "1.0.0",
-  "scripts": {
-    "dev": "nuxt",
-    "build": "nuxt build",
-    "generate": "nuxt generate",
-    "start": "nuxt start",
-    "cleandist": "rimraf dist/*",
-    "clean": "rimraf ../resources/webapp/*",
-    "copy": "cpx dist/** ../resources/webapp/",
-    "all": "npm-run-all build clean copy"
-  },
-  "dependencies": {
-    "@fortawesome/free-solid-svg-icons": "^5.15.3",
-    "@nuxtjs/fontawesome": "^1.1.2",
-    "@nuxtjs/style-resources": "^1.0.0",
-    "nuxt": "^2.15.8",
-    "vue": "^2.6.14",
-    "vue-template-compiler": "^2.6.14"
-  },
-  "devDependencies": {
-    "@nuxt/types": "~2.15.0",
-    "@nuxtjs/color-mode": "^2.0.8",
-    "@nuxtjs/svg": "^0.1.12",
-    "cpx": "^1.5.0",
-    "css-loader": "^5.2.5",
-    "npm-run-all": "^4.1.5",
-    "rimraf": "^3.0.2",
-    "sass": "^1.32.6",
-    "sass-loader": "10.1.1"
-  }
+    "name": "mockachu",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "nuxt dev --host 127.0.0.1 --port 3000",
+        "build": "nuxt build",
+        "generate": "nuxt generate",
+        "start": "nuxt preview",
+        "cleandist": "rimraf .output",
+        "clean": "rimraf ../resources/webapp/*",
+        "copy": "cpx .output/public/** ../resources/webapp/",
+        "all": "npm-run-all clean generate copy",
+        "test": "vitest run"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-svg-core": "^6.7.2",
+        "@fortawesome/free-solid-svg-icons": "^5.15.3",
+        "@fortawesome/vue-fontawesome": "^3.0.8",
+        "@nuxtjs/color-mode": "^3.5.2",
+        "nuxt": "^3.16.2"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^6.0.4",
+        "@vue/test-utils": "^2.4.6",
+        "cpx": "^1.5.0",
+        "jsdom": "^28.1.0",
+        "npm-run-all": "^4.1.5",
+        "rimraf": "^3.0.2",
+        "sass": "^1.86.0",
+        "vite-svg-loader": "^5.1.0",
+        "vitest": "^4.0.18"
+    }
 }
