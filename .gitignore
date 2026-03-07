@@ -4,10 +4,12 @@ target/
 !**/src/test/**/target/
 
 /logs/
+*.log
 src/main/resources/webapp/*
 
 src/main/webapp/node_modules/
 src/main/webapp/.nuxt/
+src/main/webapp/.output/
 src/main/webapp/dist/
 
 ### STS ###
