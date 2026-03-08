@@ -25,8 +25,8 @@ see [LICENSE](/LICENSE) file for details
 # Where to start
 
 1. Grab latest release binary.
-2. Run it (Java 17+).
-3. Navigate to `http://your_ip:8081`.
+2. Run it (Java 17+): java -jar mockachu.jar.
+3. Navigate to `http://localhost:8081`.
 4. If you find UI unintuitive - contact me 🙃.
 
 For build instructions refer to [README](/src/main/webapp/README.md).
