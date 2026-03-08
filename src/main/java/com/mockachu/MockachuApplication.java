@@ -18,6 +18,9 @@ public class MockachuApplication {
 
     public static void main(String[] args) {
         var ctx = SpringApplication.run(MockachuApplication.class, args);
+//        ctx.getBeansOfType(Filter.class).forEach((name, filter) ->
+//                log.info("Filter: " + name + " -> " + filter.getClass().getSimpleName())
+//        );
         log.info("ForkJoinPool parallelism = {}, poolSize = {}",
             ForkJoinPool.commonPool().getParallelism(),
             ForkJoinPool.commonPool().getPoolSize());

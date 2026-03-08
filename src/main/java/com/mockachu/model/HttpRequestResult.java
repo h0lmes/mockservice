@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class HttpRequestResult {
 
-    private final boolean failed;
+    private final boolean error;
     private final RequestMethod method;
     private final String uri;
     private final Map<String, List<String>> requestHeaders;
@@ -21,7 +21,7 @@ public class HttpRequestResult {
     private final int statusCode;
     private final long duration;
 
-    public HttpRequestResult(boolean failed,
+    public HttpRequestResult(boolean error,
                              RequestMethod method,
                              String uri,
                              Map<String, List<String>> requestHeaders,
@@ -31,7 +31,7 @@ public class HttpRequestResult {
                              MockVariables responseVariables,
                              int statusCode,
                              long startMillis) {
-        this.failed = failed;
+        this.error = error;
         this.method = method;
         this.uri = uri;
         this.requestHeaders = requestHeaders;
@@ -43,8 +43,8 @@ public class HttpRequestResult {
         this.duration = System.currentTimeMillis() - startMillis;
     }
 
-    public boolean isFailed() {
-        return failed;
+    public boolean isError() {
+        return error;
     }
 
     public String getResponseBody() {
@@ -63,6 +63,18 @@ public class HttpRequestResult {
         return responseHeaders;
     }
 
+    public RequestMethod getMethod() {
+        return method;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public Map<String, List<String>> getRequestHeaders() {
+        return requestHeaders;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -74,7 +86,7 @@ public class HttpRequestResult {
             builder.append(requestBody).append('\n');
         }
 
-        if (failed) {
+        if (error) {
             appendError(builder);
         }
         else {

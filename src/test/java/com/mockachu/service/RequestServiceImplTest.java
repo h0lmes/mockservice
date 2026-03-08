@@ -114,7 +114,7 @@ class RequestServiceImplTest {
         var result = service.executeRequest("id", null, false);
 
         assertTrue(result.isPresent());
-        assertFalse(result.get().isFailed());
+        assertFalse(result.get().isError());
     }
 
     @Test
