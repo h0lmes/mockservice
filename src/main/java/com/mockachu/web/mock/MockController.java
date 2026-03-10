@@ -60,8 +60,31 @@ public class MockController implements ConfigObserver, RouteObserver {
         options = new RequestMappingInfo.BuilderConfiguration();
         options.setPatternParser(new PathPatternParser());
 
-        register();
         registerCaptureAll();
+
+        /**
+         * The following code is commented out because of new capture-all
+         * mappings were added.
+         * Uncomment this if capture-all removed.
+         */
+        //register();
+    }
+
+    private void registerCaptureAll() {
+        log.info("Register capture-all...");
+
+        requestMappingHandlerMapping.registerMapping(
+                buildMapping(RequestMethod.GET, "/**"), this, mockMethod);
+        requestMappingHandlerMapping.registerMapping(
+                buildMapping(RequestMethod.POST, "/**"), this, mockMethod);
+        requestMappingHandlerMapping.registerMapping(
+                buildMapping(RequestMethod.PUT, "/**"), this, mockMethod);
+        requestMappingHandlerMapping.registerMapping(
+                buildMapping(RequestMethod.PATCH, "/**"), this, mockMethod);
+        requestMappingHandlerMapping.registerMapping(
+                buildMapping(RequestMethod.DELETE, "/**"), this, mockMethod);
+
+        log.info("Registered capture-all.");
     }
 
     public CompletableFuture<ResponseEntity<String>> mock() {
@@ -74,7 +97,7 @@ public class MockController implements ConfigObserver, RouteObserver {
             return mockService.mock(facade);
         } catch (RouteNotFoundException e) {
             if (!configRepository.getSettings().isProxyEnabled()) {
-                log.info("Not proxying");
+                log.info("Proxy disabled.");
                 throw e;
             }
             return proxyRequest(facade);
@@ -105,10 +128,6 @@ public class MockController implements ConfigObserver, RouteObserver {
         return location + path;
     }
 
-    private void register() {
-        configRepository.findAllRoutes().forEach(this::registerRoute);
-    }
-
     @Override
     public void onBeforeConfigChanged() {
         configRepository.findAllRoutes().forEach(this::unregisterRoute);
@@ -129,6 +148,10 @@ public class MockController implements ConfigObserver, RouteObserver {
         unregisterRoute(route);
     }
 
+    private void register() {
+        configRepository.findAllRoutes().forEach(this::registerRoute);
+    }
+
     private void registerRoute(Route route) {
         if (route.getDisabled()) {
             return;
@@ -142,31 +165,19 @@ public class MockController implements ConfigObserver, RouteObserver {
             return;
         }
 
-        RequestMappingInfo mappingInfo = RequestMappingInfo
-                .paths(route.getPath())
-                .methods(route.getMethod())
-                .options(options)
-                .build();
-        requestMappingHandlerMapping.registerMapping(mappingInfo, this, mockMethod);
+        /**
+         * The following code is commented out because of new capture-all
+         * mappings were added.
+         * Uncomment this if capture-all removed.
+         */
+//        RequestMappingInfo mappingInfo = RequestMappingInfo
+//                .paths(route.getPath())
+//                .methods(route.getMethod())
+//                .options(options)
+//                .build();
+//        requestMappingHandlerMapping.registerMapping(mappingInfo, this, mockMethod);
 
         log.info("Registering route, success: {}", route);
-    }
-
-    private void registerCaptureAll() {
-        log.info("Registering mappings for /**");
-
-        requestMappingHandlerMapping.registerMapping(
-                buildMapping(RequestMethod.GET, "/**"), this, mockMethod);
-        requestMappingHandlerMapping.registerMapping(
-                buildMapping(RequestMethod.POST, "/**"), this, mockMethod);
-        requestMappingHandlerMapping.registerMapping(
-                buildMapping(RequestMethod.PUT, "/**"), this, mockMethod);
-        requestMappingHandlerMapping.registerMapping(
-                buildMapping(RequestMethod.PATCH, "/**"), this, mockMethod);
-        requestMappingHandlerMapping.registerMapping(
-                buildMapping(RequestMethod.DELETE, "/**"), this, mockMethod);
-
-        log.info("Registered mappings for /**");
     }
 
     private RequestMappingInfo buildMapping(RequestMethod method, String path) {
@@ -198,12 +209,17 @@ public class MockController implements ConfigObserver, RouteObserver {
             return;
         }
 
-        RequestMappingInfo mappingInfo = RequestMappingInfo
-                .paths(route.getPath())
-                .methods(route.getMethod())
-                .options(options)
-                .build();
-        requestMappingHandlerMapping.unregisterMapping(mappingInfo);
+        /**
+         * The following code is commented out because of new capture-all
+         * mappings were added.
+         * Uncomment this if capture-all removed.
+         */
+//        RequestMappingInfo mappingInfo = RequestMappingInfo
+//                .paths(route.getPath())
+//                .methods(route.getMethod())
+//                .options(options)
+//                .build();
+//        requestMappingHandlerMapping.unregisterMapping(mappingInfo);
 
         log.info("Unregistering route, success: {}", route);
     }
